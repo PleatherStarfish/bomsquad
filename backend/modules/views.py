@@ -1,0 +1,114 @@
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from .models import Module, Manufacturer
+from django.contrib import messages
+from .models import BuiltModules, WantToBuildModules
+from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+
+def module_list(request):
+    query = request.GET.get("search", "")
+    manufacturer = request.GET.get("manufacturer", None)  # Set default to None
+    module_list = Module.objects.order_by("name")  # Start with all modules
+
+    if manufacturer:
+        module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
+        print(module_list)
+
+    if query:
+        module_list = module_list.filter(
+            Q(name__icontains=query) | Q(manufacturer__name__icontains=query)
+        ).order_by("name")
+
+    paginator = Paginator(module_list, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    manufacturers = Manufacturer.objects.values("name").distinct()
+
+    # Add a boolean flag to indicate whether or not the module has been built by the user
+    user = request.user  # Replace with the appropriate user object
+    user = request.user if request.user.is_authenticated else None
+    if user:
+        for module in page_obj:
+            module.is_built = module.is_built_by_user(user)
+            module.is_wtb = module.is_wtb_by_user(user)
+
+    return render(
+        request,
+        "modules/index.html",
+        {
+            "page_obj": page_obj,
+            "manufacturers": manufacturers,
+            "search": query,
+            "manufacturer": manufacturer,
+        },
+    )
+
+
+@login_required
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_module_to_built(request, module_id):
+    if request.method == "POST":
+
+        # Get the user from the request
+        user = request.user
+
+        # Check if the module already exists in the BuiltModules table
+        built_module = BuiltModules.objects.filter(
+            user=user, module__id=module_id
+        ).first()
+        if built_module:
+            built_module.delete()
+            messages.success(request, "Module removed from want-to-build modules")
+        else:
+            # Create a new BuiltModules object and save it to the database
+            module = Module.objects.get(id=module_id)
+            built_module = BuiltModules(user=user, module=module)
+            built_module.save()
+            messages.success(request, "Module added to want-to-build modules")
+    else:
+        messages.error(request, "Please log in to add a module")
+
+    # Redirect back to the previous URL if available, otherwise redirect to "bomsquad:home"
+    redirect_url = request.META.get("HTTP_REFERER") or "bomsquad:home"
+    return redirect(redirect_url)
+
+
+@login_required
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_module_to_wtb(request, module_id):
+    if request.method == "POST":
+        user = request.user
+        # Check if the module already exists in the WantToBuildModules table
+        wtb_module = WantToBuildModules.objects.filter(
+            user=user, module__id=module_id
+        ).first()
+        if wtb_module:
+            wtb_module.delete()
+            message = "Module removed from want to build modules"
+        else:
+            module = Module.objects.get(id=module_id)
+            wtb_module = WantToBuildModules(user=user, module=module)
+            wtb_module.save()
+            message = "Module added to want to build modules"
+        response = {
+            "success": True,
+            "message": message,
+        }
+        return JsonResponse(response)
+    else:
+        response = {
+            "success": False,
+            "message": "Please log in to add a module",
+        }
+        return JsonResponse(response)

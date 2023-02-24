@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign up{% endblock title %}
+
+{% block content %}
+  <div class="flex justify-center">
+    <div class="w-full max-w-xs">
+      <h2 class="text-2xl font-bold mb-2">Sign up</h2>
+      <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 border border-gray-300">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mt-4 w-full" type="submit">Sign up</button>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

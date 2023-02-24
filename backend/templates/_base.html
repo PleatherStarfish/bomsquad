@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta
+      name="viewport"
+      content="width=device-width,minimum-scale=1,initial-scale=1"
+    />
+    <title>{% block title %}Bom Squad{% endblock title %}</title>
+    <meta
+      name="description"
+      content="An inventory and search tool for DIY Eurorack synthesizer modules and components"
+    />
+    <meta name="author" content="" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="{% static 'images/favicon.ico' %}"
+    />
+    <link rel="stylesheet" href="{% static "css/styles.css" %}"/>
+
+    {% block css %}{% endblock css %}
+  </head>
+
+  <body class="min-h-screen">
+      <header>{% include "nav.html" %}</header>
+
+      <div class="flex flex-col min-h-screen">
+        <div class="mt-16 py-8 px-2 md:px-24 lg:px-48 grow">
+          <div id="preact_root"></div>
+          {% block content %}{% endblock content %}
+        </div>
+        <footer>
+          {% include "footer.html" %}
+        </footer>
+      </div>
+
+    <!-- Project JS -->
+    <script src="{% static 'js/base.js' %}"></script>
+    
+    {% block javascript %}{% endblock javascript %}
+  </body>
+</html>

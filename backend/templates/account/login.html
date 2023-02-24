@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+<div class="flex justify-center mt-8">
+  <div class="w-full max-w-md">
+    <h2 class="text-center text-2xl font-bold mb-6">Log in</h2>
+    <form method="post" class="border border-gray-300 p-6 rounded-lg">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button class="bg-brandgreen-500 hover:bg-brandgreen-700 text-white font-bold py-2 px-4 rounded-full mt-4 w-full" type="submit">Log in</button>
+    </form>
+    <div class="text-center mt-4">
+      <a href="{% url 'account_reset_password' %}" class="text-gray-500 hover:text-gray-700">Forgot Password?</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}
