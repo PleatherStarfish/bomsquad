@@ -19,6 +19,7 @@ FARAD_UNITS = (
 
 
 class Types(models.Model):
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     order = models.PositiveSmallIntegerField(unique=False)
     notes = models.TextField(blank=True)
@@ -33,6 +34,7 @@ class Types(models.Model):
 
 
 class ComponentSupplier(models.Model):
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=30)
     url = models.URLField(max_length=255)
@@ -45,6 +47,7 @@ class ComponentSupplier(models.Model):
 
 
 class ComponentManufacturer(models.Model):
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
 
     class Meta:
@@ -55,6 +58,7 @@ class ComponentManufacturer(models.Model):
 
 
 class Component(models.Model):
+    id = models.BigAutoField(primary_key=True)
     description = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
