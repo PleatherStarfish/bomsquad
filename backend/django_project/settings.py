@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "modules",
     "components",
     "suppliers",
+    "inventory",
+    "shopping_list",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
