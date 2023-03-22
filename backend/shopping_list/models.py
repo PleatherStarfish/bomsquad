@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 
 
 class UserShoppingList(models.Model):
+    id = models.BigAutoField(primary_key=True)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
     bom_item = models.ForeignKey(ModuleBomListItem, on_delete=models.CASCADE)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
