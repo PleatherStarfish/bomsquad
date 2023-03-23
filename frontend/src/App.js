@@ -11,7 +11,7 @@ const App = () => {
     <div className="h-full">
       <Navbar />
       <div className="flex flex-col min-h-screen">
-        <div className="grow mt-16 py-8 px-48">
+        <div className="grow mt-16 py-8 px-2 md:px-24 lg:px-48">
           <Switch>
             <Route path="/module/:slug">
               {(params) => <ModuleDetail slug={params.slug} />}
