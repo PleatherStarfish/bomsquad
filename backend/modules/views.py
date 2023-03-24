@@ -88,27 +88,26 @@ def add_module_to_built(request, module_id):
 @permission_classes([IsAuthenticated])
 def add_module_to_wtb(request, module_id):
     if request.method == "POST":
+
+        # Get the user from the request
         user = request.user
-        # Check if the module already exists in the WantToBuildModules table
-        wtb_module = WantToBuildModules.objects.filter(
+
+        # Check if the module already exists in the BuiltModules table
+        built_module = WantToBuildModules.objects.filter(
             user=user, module__id=module_id
         ).first()
-        if wtb_module:
-            wtb_module.delete()
-            message = "Module removed from want to build modules"
+        if built_module:
+            built_module.delete()
+            messages.success(request, "Module removed from want-to-build modules")
         else:
+            # Create a new BuiltModules object and save it to the database
             module = Module.objects.get(id=module_id)
-            wtb_module = WantToBuildModules(user=user, module=module)
-            wtb_module.save()
-            message = "Module added to want to build modules"
-        response = {
-            "success": True,
-            "message": message,
-        }
-        return JsonResponse(response)
+            built_module = WantToBuildModules(user=user, module=module)
+            built_module.save()
+            messages.success(request, "Module added to want-to-build modules")
     else:
-        response = {
-            "success": False,
-            "message": "Please log in to add a module",
-        }
-        return JsonResponse(response)
+        messages.error(request, "Please log in to add a module")
+
+    # Redirect back to the previous URL if available, otherwise redirect to "bomsquad:home"
+    redirect_url = request.META.get("HTTP_REFERER") or "bomsquad:home"
+    return redirect(redirect_url)

@@ -12,6 +12,9 @@ from rest_framework.response import Response
 from django.core.paginator import Paginator
 from modules.serializers import BuiltModuleSerializer, WantTooBuildModuleSerializer
 from modules.models import BuiltModules, WantToBuildModules
+from rest_framework import status
+from inventory.models import UserInventory
+from .serializers import UserInventorySerializer
 
 
 @api_view(["GET"])
@@ -134,3 +137,15 @@ def get_wtb_modules(request):
     response["Access-Control-Allow-Credentials"] = "true"
     csrf.get_token(request)
     return response
+
+
+@login_required
+@api_view(["GET"])
+def get_user_inventory(request):
+    """
+    Retrieve the user's own inventory.
+    """
+    user = request.user
+    inventory = UserInventory.objects.filter(user=user)
+    serializer = UserInventorySerializer(inventory, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

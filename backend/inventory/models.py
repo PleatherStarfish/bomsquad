@@ -14,4 +14,4 @@ class UserInventory(models.Model):
         verbose_name_plural = "User Component Inventory"
 
     def __str__(self):
-        return f"[ {self.profile} ] - [ {self.location} ] - {self.component}"
+        return f"[ {self.user} ] - [ {self.location} ] - {self.component}"
