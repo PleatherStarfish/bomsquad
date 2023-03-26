@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npx tailwindcss build -i ../tailwind.css -o ../styles.css --minify",
-    "watch": "npx tailwindcss build -i ../tailwind.css -o ../styles.css --watch"
+    "build": "npx tailwindcss build -i ../tailwind.css -o ../styles.css --minify && cp ../styles.css ../../../../frontend/src/styles/",
+    "watch": "npx tailwindcss build -i ../tailwind.css -o ../styles.css --watch && cp ../styles.css ../../../../frontend/src/styles/"
   },
   "keywords": [],
   "author": "",

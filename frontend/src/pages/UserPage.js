@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Gravatar from 'react-gravatar'
-import ModuleButtons from "../components/AddModuleButtons";
-import DataTable from "react-data-table-component";
-
+import Inventory from "../components/Inventory"
+import ModulesList from "../components/ModulesLists"
+import cx from "classnames"
 
 const tabs = [
   { name: "Built", href: "#", current: true },
@@ -12,113 +12,6 @@ const tabs = [
   { name: "Inventory", href: "#", current: false },
   { name: "Shopping List", href: "#", current: false },
 ];
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const BuiltModules = () => {
-  const { data, isLoading, error } = useQuery(['builtModules'], async () => {
-    const response = await axios.get("http://127.0.0.1:8000/api/get-built-modules/", {
-      withCredentials: true,
-    });
-    return response.data;
-  });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  return (
-    <ul role="list" className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {data.results.map((built) => (
-        <li
-        key={built.module.id}
-        className="rounded-lg bg-white text-cente border max-w-[250px] lg:max-w-[300px]"
-      >
-        <div className="flex flex-1 flex-col p-8 justify-center items-center">
-          <img className="mx-auto h-32 flex-shrink-0" src={`http://127.0.0.1:8000/${built.module.image}`} alt="" />
-          <h3 className="mt-6 text-lg font-semibold text-gray-900">{built.module.name}</h3>
-          <p className="text-gray-400 text-base">{built.module.manufacturer}</p>
-          <ModuleButtons module={built} hideBuilt />
-        </div>
-      </li>
-      ))}
-    </ul>
-  )
-}
-
-const WtbModules = () => {
-  const { data, isLoading, error } = useQuery(['wtbModules'], async () => {
-    const response = await axios.get("http://127.0.0.1:8000/api/get-wtb-modules/", {
-      withCredentials: true,
-    });
-    return response.data;
-  });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  return (
-    <ul role="list" className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {data.results.map((wtb) => (
-        <li
-        key={wtb.module.id}
-        className="rounded-lg bg-white text-cente border w-[250px] lg:w-[300px]"
-      >
-        <div className="flex flex-1 flex-col p-8 justify-center items-center">
-          <img className="mx-auto h-32 flex-shrink-0" src={`http://127.0.0.1:8000/${wtb.module.image}`} alt="" />
-          <h3 className="mt-6 text-lg font-semibold text-gray-900">{wtb.module.name}</h3>
-          <p className="text-gray-400 text-base">{wtb.module.manufacturer}</p>
-          <ModuleButtons module={wtb} hideWtb />
-        </div>
-      </li>
-      ))}
-    </ul>
-  )
-}
-
-const Inventory = () => {
-  const columns = [
-    {
-        name: 'Title',
-        selector: row => row.title,
-    },
-    {
-        name: 'Year',
-        selector: row => row.year,
-    },
-];
-
-const data = [
-    {
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-    },
-]
-  return (
-          <DataTable
-              columns={columns}
-              data={data}
-          />
-      );
-  }
-
 
 const UserPage = () => {
   const [selectedTab, setSelectedTab] = useState(
@@ -177,7 +70,7 @@ const UserPage = () => {
                 <a
                   key={tab.name}
                   href={tab.href}
-                  className={classNames(
+                  className={cx(
                     tab.name === selectedTab
                       ? "pb-4 border-pink-500 text-pink-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
@@ -194,8 +87,8 @@ const UserPage = () => {
         </div>
       </div>
       <section className="my-12">
-        {selectedTab === "Built" &&  <BuiltModules />}
-        {selectedTab === "Want to Build" &&  <WtbModules />}
+        {selectedTab === "Built" &&  <ModulesList queryName="builtModules" url="http://127.0.0.1:8000/api/get-built-modules/" />}
+        {selectedTab === "Want to Build" &&  <ModulesList queryName="wtbModules" url="http://127.0.0.1:8000/api/get-wtb-modules/" />}
         {selectedTab === "Inventory" &&  <Inventory />}
       </section>
     </>
