@@ -6,8 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Create and set work directory called `app`
-RUN mkdir -p /code
-WORKDIR /code
+WORKDIR /code/
 
 # Install dependencies
 COPY requirements.txt /tmp/requirements.txt
@@ -22,11 +21,11 @@ RUN apt-get update && \
     npm install -g npm@latest && \
     npm install -g postcss-cli@latest
 
-# Copy local project
-COPY . /code/
+COPY . .
+COPY entrypoint.sh /entrypoint.sh
 
-# Expose port 8000
 EXPOSE 8000
 
-# Use gunicorn on port 8000
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "django_project.wsgi"]
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT /entrypoint.sh
