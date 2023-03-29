@@ -12,8 +12,14 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "https://134.209.65.8", "https://bom-squad.com"]
-
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "134.209.65.8", "bom-squad.com"]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://0.0.0.0',
+    'http://127.0.0.1',
+    'https://134.209.65.8',
+    'https://bom-squad.com',
+]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
