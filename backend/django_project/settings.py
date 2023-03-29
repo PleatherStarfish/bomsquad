@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('PRODUCTION') == 'False'
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "134.209.65.8", "bom-squad.com"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "https://134.209.65.8", "https://bom-squad.com"]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
@@ -57,7 +57,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "134.209.65.8", "bom-squad.com"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://134.209.65.8", "https://bom-squad.com"]
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
