@@ -35,7 +35,7 @@ const ModulesList = ({queryName, url}) => {
           <div className="flex flex-1 flex-col p-8 justify-center items-center">
             <img
               className="mx-auto h-32 flex-shrink-0"
-              src={`http://127.0.0.1:8000/${result.module.image}`}
+              src={`/${result.module.image}`}
               alt=""
             />
             <h3 className="mt-6 text-lg font-semibold text-gray-900">

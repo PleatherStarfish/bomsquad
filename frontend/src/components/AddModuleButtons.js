@@ -9,7 +9,7 @@ const ModuleButtons = ({ module, hideBuilt = false, hideWtb = false }) => {
 
   const addToBuilt = useMutation(
     async () => {
-      const response = await axios.post(`http://127.0.0.1:8000/add-to-built/${module.id}/`, {
+      const response = await axios.post(`/add-to-built/${module.id}/`, {
         headers: {
           "X-CSRFToken": csrftoken,
       },
@@ -21,7 +21,7 @@ const ModuleButtons = ({ module, hideBuilt = false, hideWtb = false }) => {
 
   const addToWtb = useMutation(
     async () => {
-      const response = await axios.post(`http://127.0.0.1:8000/add-to-wtb/${module.id}/`, {
+      const response = await axios.post(`/add-to-wtb/${module.id}/`, {
         headers: {
           "X-CSRFToken": csrftoken,
       },

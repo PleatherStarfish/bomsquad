@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "private": true,
+  "proxy": "http://0.0.0.0:8000/",
   "dependencies": {
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.16",
@@ -20,7 +21,7 @@
     "zustand": "^4.3.6"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HOST=0.0.0.0 PORT=3000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
