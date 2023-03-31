@@ -19,7 +19,7 @@ const UserPage = () => {
   );
 
   const { data: user, isLoading, isError } = useQuery(["authenticatedUser"], async () => {
-    const response = await axios.get("http://127.0.0.1:8000/api/get-user-me/", {
+    const response = await axios.get("/api/get-user-me/", {
       withCredentials: true,
     });
     return response.data;
@@ -87,8 +87,8 @@ const UserPage = () => {
         </div>
       </div>
       <section className="my-12">
-        {selectedTab === "Built" &&  <ModulesList queryName="builtModules" url="http://127.0.0.1:8000/api/get-built-modules/" />}
-        {selectedTab === "Want to Build" &&  <ModulesList queryName="wtbModules" url="http://127.0.0.1:8000/api/get-wtb-modules/" />}
+        {selectedTab === "Built" &&  <ModulesList queryName="builtModules" url="/api/get-built-modules/" />}
+        {selectedTab === "Want to Build" &&  <ModulesList queryName="wtbModules" url="/api/get-wtb-modules/" />}
         {selectedTab === "Inventory" &&  <Inventory />}
       </section>
     </>

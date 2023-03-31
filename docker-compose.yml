@@ -8,6 +8,11 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ./backend:/app/backend
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
 
   backend:
     build: ./backend
@@ -18,7 +23,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./backend/.env
+      - ./.env
 
   db:
     image: postgres:13

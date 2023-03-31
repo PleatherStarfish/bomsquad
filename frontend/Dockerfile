@@ -12,9 +12,10 @@ RUN npm install
 
 # Copy the rest of the app to the container
 COPY . .
+COPY entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 # Expose port 3000 for the React app
 EXPOSE 3000
 
-# Start the React app
-CMD ["npm", "start"]
+ENTRYPOINT ./entrypoint.sh

@@ -3,11 +3,11 @@ import MobileMenu from './MobileMenu';
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-const Navbar = () => {
+  const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
-
+  
   const { data: user, isLoading, isError } = useQuery(["authenticatedUser"], async () => {
-    const response = await axios.get("http://127.0.0.1:8000/api/get-user-me/", {
+    const response = await axios.get("/api/get-user-me/", {
       withCredentials: true,
     });
     return response.data;
@@ -25,10 +25,10 @@ const Navbar = () => {
             <div className="hidden sm:ml-6 sm:block">
               <ul className="flex space-x-4 text-white">
                 <li>
-                  <a href="http://localhost:8000/" className="nav-link px-2 text-secondary">Home</a>
+                  <a href="/" className="nav-link px-2 text-secondary">Home</a>
                 </li>
                 <li>
-                  <a href="http://localhost:8000/about/" className="nav-link px-2">About</a>
+                  <a href="/about/" className="nav-link px-2">About</a>
                 </li>
               </ul>
             </div>

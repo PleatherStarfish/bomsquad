@@ -13,7 +13,7 @@ const customStyles = {
 };
 
 const fetchData = async () => {
-  const { data } = await axios.get("http://127.0.0.1:8000/api/inventory/", {
+  const { data } = await axios.get("/api/inventory/", {
     withCredentials: true,
   });
   return data;
