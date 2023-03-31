@@ -36,3 +36,5 @@ yarn-error.log*
 
 staticfiles/
 .env
+build/
+backend/templates/frontend.html
