@@ -16,10 +16,9 @@ RUN set -ex && \
     pip install -r /tmp/requirements.txt && \
     rm -rf /root/.cache/
 
-RUN apt-get update && \
-    apt-get install -y nodejs npm && \
-    npm install -g npm@latest && \
-    npm install -g postcss-cli@latest
+RUN apt update && apt install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt -y install nodejs
 
 COPY . .
 COPY entrypoint.sh /entrypoint.sh
