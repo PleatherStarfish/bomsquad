@@ -8,7 +8,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - ./backend:/app/backend
     env_file:
       - ./.env
     depends_on:
@@ -18,6 +17,7 @@ services:
     build: ./backend
     volumes:
       - ./backend:/code
+      - ./frontend:/__frontend
     ports:
       - 8000:8000
     depends_on:

@@ -2,10 +2,7 @@
 
 if [ $PRODUCTION = True ]
 then
-    npm run build
-    mv /app/build/index.html /app/backend/templates/frontend.html
-    mv /app/build/static/css/* /app/backend/staticfiles/css/
-    mv /app/build/static/js/* /app/backend/staticfiles/js/
+    echo "No need to start frontend for production"
 else
     npm start
 fi
