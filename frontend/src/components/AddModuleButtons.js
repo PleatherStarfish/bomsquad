@@ -3,9 +3,12 @@ import { useMutation } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const ModuleButtons = ({ module, hideBuilt = false, hideWtb = false }) => {
+const ModuleButtons = ({ module, queryName }) => {
 
   const csrftoken = Cookies.get('csrftoken');
+
+  const hideBuilt = queryName === 'builtModules';
+  const hideWtb = queryName === 'wtbModules';
 
   const addToBuilt = useMutation(
     async () => {
