@@ -38,3 +38,10 @@ staticfiles/
 .env
 build/
 backend/templates/frontend.html
+
+**.chunk.css
+**.chunk.js
+**.chunk.css.map
+**.chunk.js.map
+runtime*.js
+runtime*.js.map
