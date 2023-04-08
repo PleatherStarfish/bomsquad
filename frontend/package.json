@@ -27,7 +27,7 @@
     "zustand": "^4.3.6"
   },
   "scripts": {
-    "start": "webpack serve --mode development",
+    "start": "webpack --mode development --watch",
     "build": "webpack --mode production",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
