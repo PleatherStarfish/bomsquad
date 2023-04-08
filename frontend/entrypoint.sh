@@ -2,7 +2,7 @@
 
 if [ $PRODUCTION = True ]
 then
-    echo "No need to start frontend for production"
+    npm run build
 else
-    npm start
+    npm run start
 fi
