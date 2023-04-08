@@ -7,9 +7,6 @@ WORKDIR /code/
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
 
-# Install the dependencies
-RUN npm install
-
 # Copy the rest of the app to the container
 COPY . .
 COPY entrypoint.sh entrypoint.sh
