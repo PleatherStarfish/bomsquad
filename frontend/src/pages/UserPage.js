@@ -19,7 +19,7 @@ const UserPage = () => {
   );
 
   const { data: user, isLoading, isError } = useQuery(["authenticatedUser"], async () => {
-    const response = await axios.get("http://localhost:8000/api/get-user-me/", {
+    const response = await axios.get("/api/get-user-me/", {
       withCredentials: true,
     });
     return response.data;

@@ -1,10 +1,5 @@
 from rest_framework import serializers
-from backend.modules.models import (
-    BuiltModules,
-    WantToBuildModules,
-    Module,
-    ModuleBomListItem,
-)
+from modules.models import BuiltModules, WantToBuildModules, Module, ModuleBomListItem
 
 
 class ModuleSerializer(serializers.ModelSerializer):

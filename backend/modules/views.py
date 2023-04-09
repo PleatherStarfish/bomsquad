@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
-from backend.modules.serializers import ModuleBomListItemSerializer
+from modules.serializers import ModuleBomListItemSerializer
 from .models import Module, Manufacturer, ModuleBomListItem
 from django.contrib import messages
 from .models import BuiltModules, WantToBuildModules
