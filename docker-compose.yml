@@ -9,7 +9,7 @@ services:
     volumes:
       - ./frontend:/code
     env_file:
-      - ./.env
+      - ./.env.dev
     depends_on:
       - backend
 
@@ -24,7 +24,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env
+      - ./.env.dev
 
   db:
     image: postgres:13

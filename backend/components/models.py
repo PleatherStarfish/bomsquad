@@ -1,6 +1,5 @@
 from djmoney.models.fields import MoneyField
 from django.db import models
-from suppliers.models import Supplier
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 

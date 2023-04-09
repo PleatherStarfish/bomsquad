@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import ModuleLinks from '../components/ModuleLinks'
 
 const ModuleDetail = ({ slug }) => {
   const { data, isLoading, isError } = useQuery(["module", slug], async () => {
@@ -18,6 +19,8 @@ const ModuleDetail = ({ slug }) => {
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error!</p>;
+
+  console.log(data)
 
   return (
     <>
@@ -41,16 +44,7 @@ const ModuleDetail = ({ slug }) => {
               </p>
             </div>
             <div className="mt-6">
-              {/* {built && built.includes(module) ? (
-              <BuiltSvgButton add={false} moduleId={module.id} requestPath={requestPath} />
-            ) : (
-              <BuiltSvgButton add moduleId={module.id} requestPath={requestPath} />
-            )}
-            {to_build && to_build.includes(module) ? (
-              <ToBuildSvgButton add={false} moduleId={module.id} requestPath={requestPath} />
-            ) : (
-              <ToBuildSvgButton add moduleId={module.id} requestPath={requestPath} />
-            )} */}
+              <ModuleLinks module={data} />
             </div>
           </div>
           <div>

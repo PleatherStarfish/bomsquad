@@ -6,19 +6,19 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = os.getenv("DEBUG") == "True"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "134.209.65.8", "bom-squad.com"]
+ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost',
-    'http://0.0.0.0',
-    'http://127.0.0.1',
-    'https://134.209.65.8',
-    'https://bom-squad.com',
+    "http://localhost",
+    "http://0.0.0.0",
+    "http://127.0.0.1",
+    "https://134.209.65.8",
+    "https://bom-squad.com",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
@@ -38,13 +38,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "djmoney",
-    # "debug_toolbar",
+    "import_export",
     # Local
     "accounts",
     "pages",
     "modules",
     "components",
-    "suppliers",
     "inventory",
     "shopping_list",
 ]
@@ -63,7 +62,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://134.209.65.8", "https://bom-squad.com"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://134.209.65.8",
+    "https://bom-squad.com",
+]
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -120,11 +124,11 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DB_NAME'),
-        "USER": os.getenv('DB_USER'),
-        "PASSWORD": os.getenv('DB_PASSWORD'),
-        "HOST": os.getenv('DB_HOST'),
-        "PORT": os.getenv('DB_PORT'),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 

@@ -1,0 +1,75 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}{{ block.super }}
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #79aec8;
+    --primary-fg: #fff;
+
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
+
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary);
+
+    --link-fg: #447e9b;
+    --link-hover-color: #036;
+    --link-selected-fg: #5b80b2;
+
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
+
+    --error-fg: #ba2121;      
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
+
+    --darkened-bg: #f8f8f8;
+    --selected-bg: #e4e4e4;
+    --selected-row: #ffc;
+
+    --close-button-bg: #888;
+    --close-button-hover-bg: #747474;
+  }
+}
+</style>
+{% endblock %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Bom Squad Admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Bom Squad Admin</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content %}
+{% if user.is_active and user.is_staff %}
+<div id="content-main">
+  {% block content_title %}{% endblock %}
+  {% block content_subtitle %}{% endblock %}
+  {% block content_area %}{% endblock %}
+  {% block sidebar %}{% endblock %}
+</div>
+{% else %}
+<div id="login-form">
+  <form method="post" action="{% url 'admin:login' %}">
+    {% csrf_token %}
+    <div class="fieldWrapper">
+      <label for="{{ form.username.id_for_label }}">Username:</label>
+      {{ form.username }}
+    </div>
+    <div class="fieldWrapper">
+      <label for="{{ form.password.id_for_label }}">Password:</label>
+      {{ form.password }}
+    </div>
+    <div class="submit-row">
+      <input type="submit" value="Log in">
+    </div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

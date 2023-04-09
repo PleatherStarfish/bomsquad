@@ -2,9 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from components.models import Component
-
-# from components.models import Component
-from django.core.files.storage import FileSystemStorage
+from accounts.models import CustomUser
 
 
 class Manufacturer(models.Model):
@@ -107,3 +105,20 @@ class BuiltModules(models.Model):
 
     class Meta:
         verbose_name_plural = "Built Modules"
+
+
+class ModuleBomListComponentForItemRating(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    module_bom_list_item = models.ForeignKey(
+        ModuleBomListItem, blank=False, null=False, on_delete=models.CASCADE
+    )
+    component = models.ForeignKey(
+        Component, blank=False, null=False, on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        CustomUser, blank=False, null=False, on_delete=models.CASCADE
+    )
+    rating = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ("module_bom_list_item", "component", "user")
