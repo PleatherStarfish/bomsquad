@@ -32,13 +32,13 @@ const ModulesList = ({ queryName, url }) => {
           <div className="flex flex-1 flex-col p-8 justify-center items-center">
             <img
               className="mx-auto h-32 flex-shrink-0"
-              src={`/${result.module.image}`}
+              src={`${result.module.image}`}
               alt=""
             />
-            <h3 className="mt-6 text-lg font-semibold text-gray-900">
+            <h3 className="mt-6 text-lg font-semibold text-gray-900 text-center">
               {result.module.name}
             </h3>
-            <p className="text-gray-400 text-base">
+            <p className="text-gray-400 text-base text-center">
               {result.module.manufacturer}
             </p>
             <ModuleButtons module={result} queryName={queryName} />

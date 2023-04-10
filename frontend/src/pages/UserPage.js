@@ -34,7 +34,7 @@ const UserPage = () => {
 
   return (
     <>
-      <div className="flex items-center py-6">
+      <div className="flex items-center py-6 mt-12">
         <div>
           <Gravatar className="rounded-full" email={user.email} rating="pg" size={100} />
         </div>

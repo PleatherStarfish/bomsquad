@@ -229,12 +229,12 @@ const Inventory = () => {
   return (
     <>
       <div className="w-full flex justify-end">
-        <button
+        {data && data.length > 0 && <button
           className="inline-flex items-center px-2 py-1 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
           onClick={handleDownloadCSV}
         >
           Download CSV
-        </button>
+        </button>}
       </div>
       <DataTable
         fixedHeader

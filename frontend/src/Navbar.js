@@ -13,6 +13,9 @@ import axios from "axios";
     return response.data;
   });
 
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error!</p>;
+
   const toggleMobileMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
