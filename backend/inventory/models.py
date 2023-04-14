@@ -12,6 +12,11 @@ class UserInventory(models.Model):
 
     class Meta:
         verbose_name_plural = "User Component Inventory"
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["user", "component"]),
+        ]
+        unique_together = ("user", "component")
 
     def __str__(self):
         return f"[ {self.user} ] - [ {self.location} ] - {self.component}"

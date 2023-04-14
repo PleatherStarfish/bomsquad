@@ -42,7 +42,9 @@ class ModuleBomListItem(models.Model):
 
     class Meta:
         verbose_name_plural = "Module BOM List Items"
-        unique_together = ("description", "module")
+        indexes = [
+            models.Index(fields=["module"]),
+        ]
 
     def __str__(self):
         return f"{self.module.name} ({self.description})"
@@ -96,6 +98,9 @@ class WantToBuildModules(models.Model):
 
     class Meta:
         verbose_name_plural = "Want-to-Build Modules"
+        indexes = [
+            models.Index(fields=["user"]),
+        ]
 
 
 class BuiltModules(models.Model):
@@ -105,6 +110,9 @@ class BuiltModules(models.Model):
 
     class Meta:
         verbose_name_plural = "Built Modules"
+        indexes = [
+            models.Index(fields=["user"]),
+        ]
 
 
 class ModuleBomListComponentForItemRating(models.Model):
@@ -121,4 +129,10 @@ class ModuleBomListComponentForItemRating(models.Model):
     rating = models.IntegerField(default=0)
 
     class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["component"]),
+            models.Index(fields=["module_bom_list_item"]),
+            models.Index(fields=["user", "component", "module_bom_list_item"]),
+        ]
         unique_together = ("module_bom_list_item", "component", "user")
