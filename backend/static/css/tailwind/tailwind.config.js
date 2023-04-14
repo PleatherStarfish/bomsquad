@@ -5,7 +5,17 @@ module.exports = {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
   },
-  content: ['/Users/danielmiller/dev/BomSquad/backend/*.{html,js}', '/Users/danielmiller/dev/BomSquad/frontend/*.{html,js}', '/Users/danielmiller/dev/BomSquad/backend/**/*.{html,js}', '/Users/danielmiller/dev/BomSquad/frontend/**/*.{html,js}', '/Users/danielmiller/dev/BomSquad/backend/**/**/*.{html,js}', '/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}', '/Users/danielmiller/dev/BomSquad/backend/**/**/**/*.{html,js}', '/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}'],
+  content: [
+    '/Users/danielmiller/dev/BomSquad/backend/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/frontend/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/backend/**/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/frontend/**/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/backend/**/**/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/backend/**/**/**/*.{html,js}', 
+    '/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}',
+    '/Users/danielmiller/dev/BomSquad/frontend/**/**/**/*.{html,js}'
+  ],
   theme: {
     screens: {
       'sm': '640px',

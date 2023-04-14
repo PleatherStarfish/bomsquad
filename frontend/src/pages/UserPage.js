@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import Gravatar from 'react-gravatar'
 import Inventory from "../components/Inventory"
 import ModulesList from "../components/ModulesLists"
@@ -18,15 +16,10 @@ const UserPage = () => {
     tabs.find((tab) => tab.current).name
   );
 
-  const { data: user, isLoading, isError } = useQuery(["authenticatedUser"], async () => {
-    const response = await axios.get("/api/get-user-me/", {
-      withCredentials: true,
-    });
-    return response.data;
-  });
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser()
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error!</p>;
+  if (userIsLoading) return <p>Loading...</p>;
+  if (userIsError) return <p>Error!</p>;
 
   function handleTabChange(e) {
     setSelectedTab(e.target.value);

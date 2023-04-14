@@ -2,8 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
-from modules.serializers import ModuleBomListItemSerializer
-from .models import Module, Manufacturer, ModuleBomListItem
+from .models import Module, Manufacturer
 from django.contrib import messages
 from .models import BuiltModules, WantToBuildModules
 from django.contrib.auth.decorators import login_required
@@ -60,7 +59,6 @@ def module_list(request):
 @permission_classes([IsAuthenticated])
 def add_module_to_built(request, module_id):
     if request.method == "POST":
-
         # Get the user from the request
         user = request.user
 
@@ -90,7 +88,6 @@ def add_module_to_built(request, module_id):
 @permission_classes([IsAuthenticated])
 def add_module_to_wtb(request, module_id):
     if request.method == "POST":
-
         # Get the user from the request
         user = request.user
 
@@ -113,11 +110,3 @@ def add_module_to_wtb(request, module_id):
     # Redirect back to the previous URL if available, otherwise redirect to "bomsquad:home"
     redirect_url = request.META.get("HTTP_REFERER") or "bomsquad:home"
     return redirect(redirect_url)
-
-
-@api_view(["GET"])
-def module_bom_list_items(request, module_pk):
-    # Retrieve ModuleBomListItems based on Module pk
-    module_bom_list_items = ModuleBomListItem.objects.filter(module__pk=module_pk)
-    serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
-    return Response(serializer.data)

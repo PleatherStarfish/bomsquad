@@ -245,7 +245,7 @@ const Inventory = () => {
         exportHeaders
         columns={columns}
         data={data}
-        disabled={isLoading}
+        progressPending={isLoading}
         customStyles={customStyles}
       />
     </>

@@ -1,34 +1,21 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import ModuleLinks from '../components/ModuleLinks'
+import useModule from '../services/useModule'
+import BomList from "../components/bom_list";
 
 const ModuleDetail = ({ slug }) => {
-  const { data, isLoading, isError } = useQuery(["module", slug], async () => {
-    try {
-      const response = await axios.get(
-        `/api/module/${slug}/`, {
-          withCredentials: true,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error("Network response was not ok");
-    }
-  });
+  const { module, moduleIsLoading, moduleIsError } = useModule(slug)
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error!</p>;
-
-  console.log(data)
+  if (moduleIsLoading) return <p>Loading...</p>;
+  if (moduleIsError) return <p>Error!</p>;
 
   return (
     <>
       <div className="flex justify-center">
-        {data.image && (
+        {module.image && (
           <img
           className="max-h-60"
-            src={`${data.image}`}
+            src={`${module.image}`}
           />
         )}
       </div>
@@ -36,24 +23,25 @@ const ModuleDetail = ({ slug }) => {
         <div>
           <div className="mt-12">
             <div>
-              <h1 className="text-3xl font-semibold py-4">{data.name}</h1>
+              <h1 className="text-3xl font-semibold py-4">{module.name}</h1>
               <p>
                 <a>
-                  {data.manufacturer_name}
+                  {module.manufacturer_name}
                 </a>
               </p>
             </div>
             <div className="mt-6">
-              <ModuleLinks module={data} />
+              <ModuleLinks module={module} />
             </div>
           </div>
           <div>
             <h2 className="text-xl py-4 font-semibold ">Description</h2>
-            <p className="card-text">{data.description}</p>
+            <p className="card-text">{module.description}</p>
           </div>
         </div>
       </div>
-      <h2 className="mb-4">Components</h2>
+      <h1  className="text-3xl font-semibold py-8">Components</h1>
+      <BomList module_id={module?.id} />
     </>
   );
 };

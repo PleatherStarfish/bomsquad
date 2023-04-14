@@ -1,5 +1,12 @@
+from components.models import ComponentManufacturer, ComponentSupplier, Types
+from components.models import Component
 from rest_framework import serializers
-from modules.models import BuiltModules, WantToBuildModules, Module, ModuleBomListItem
+from modules.models import (
+    BuiltModules,
+    WantToBuildModules,
+    Module,
+    ModuleBomListItem,
+)
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -41,6 +48,34 @@ class WantTooBuildModuleSerializer(serializers.ModelSerializer):
             "id",
             "module",
         )
+
+
+class TypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Types
+        fields = ["name"]
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComponentSupplier
+        fields = ["name", "short_name", "url"]
+
+
+class ManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComponentManufacturer
+        fields = ["name"]
+
+
+class ComponentSerializer(serializers.ModelSerializer):
+    manufacturer = ManufacturerSerializer()
+    supplier = SupplierSerializer()
+    type = TypeSerializer()
+
+    class Meta:
+        model = Component
+        fields = "__all__"
 
 
 class ModuleBomListItemSerializer(serializers.ModelSerializer):

@@ -1,6 +1,8 @@
+from modules.serializers import ComponentSerializer
+from components.models import Component
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
-from modules.models import Module
+from modules.models import Module, ModuleBomListItem
 from api.serializers import ModuleSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +17,7 @@ from modules.models import BuiltModules, WantToBuildModules
 from rest_framework import status
 from inventory.models import UserInventory
 from .serializers import UserInventorySerializer
+from modules.serializers import ModuleBomListItemSerializer
 
 
 @api_view(["GET"])
@@ -149,3 +152,66 @@ def get_user_inventory(request):
     inventory = UserInventory.objects.filter(user=user)
     serializer = UserInventorySerializer(inventory, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["GET"])
+def get_user_inventory_quantity(request, component_pk):
+    inventory = UserInventory.objects.filter(
+        component__id=component_pk, user=request.user
+    )
+
+    # Check if inventory exists
+    if inventory.exists():
+        # Access the first inventory object in the QuerySet
+        # and retrieve the 'quantity' attribute
+        quantity = inventory.first().quantity
+        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+    else:
+        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def get_module_bom_list_items(request, module_pk):
+    try:
+        # Retrieve the Module instance based on the provided module_pk
+        module = Module.objects.get(pk=module_pk)
+    except Module.DoesNotExist:
+        # Return a response indicating that the module does not exist
+        return Response(
+            {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Filter ModuleBomListItem instances based on the retrieved module
+    module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
+
+    # Serialize the retrieved ModuleBomListItem instances
+    serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
+
+    # Return the serialized data as a response
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def get_components(request, pks):
+    # Validate input
+    if not pks:
+        return Response(
+            {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Split the pks string into a list of integers
+    component_pks = list(map(int, pks.split(",")))
+
+    # Retrieve the Component instances based on the provided component_pks
+    components = Component.objects.filter(pk__in=component_pks)
+
+    # Check if components are found
+    if not components:
+        return Response(
+            {"error": "Components do not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Serialize and return the components
+    serializer = ComponentSerializer(components, many=True)
+    return Response(serializer.data)

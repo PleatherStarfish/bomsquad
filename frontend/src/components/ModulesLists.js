@@ -2,6 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import ModuleButtons from "../components/AddModuleButtons";
+import Alert from "../ui/Alert";
 
 const ModulesList = ({ queryName, url }) => {
   const { data, isLoading, error } = useQuery([queryName], async () => {
@@ -47,12 +48,12 @@ const ModulesList = ({ queryName, url }) => {
       ))}
     </ul>
   ) : (
-    <div className="bg-gray-100 p-6 text-gray-500 rounded" role="alert">
+    <Alert>
       There are no modules in your {queryName === "wtbModules" ? "want-to-build" : "modules"} list.{" "}
       <a className="text-blue-500" href="/">
         Add a module.
       </a>
-    </div>
+    </Alert>
   );
 };
 
