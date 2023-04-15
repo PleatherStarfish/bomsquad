@@ -11,7 +11,7 @@ const useGetUserInventoryQuantity = (componentPk) => {
     }
   };
 
-  return useQuery(['userInventoryQuantity'], fetchUserInventoryQuantity);
+  return useQuery(['userInventoryQuantity', componentPk], fetchUserInventoryQuantity);
 };
 
 export default useGetUserInventoryQuantity;

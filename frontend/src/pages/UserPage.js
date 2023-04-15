@@ -3,6 +3,7 @@ import Gravatar from 'react-gravatar'
 import Inventory from "../components/Inventory"
 import ModulesList from "../components/ModulesLists"
 import cx from "classnames"
+import useAuthenticatedUser from "../services/useAuthenticatedUser"
 
 const tabs = [
   { name: "Built", href: "#", current: true },
@@ -18,8 +19,8 @@ const UserPage = () => {
 
   const { user, userIsLoading, userIsError } = useAuthenticatedUser()
 
-  if (userIsLoading) return <p>Loading...</p>;
-  if (userIsError) return <p>Error!</p>;
+  if (userIsLoading) return <div className="text-gray-700 animate-pulse">Loading...</div>;
+  if (userIsError) return <div>Error!</div>;
 
   function handleTabChange(e) {
     setSelectedTab(e.target.value);

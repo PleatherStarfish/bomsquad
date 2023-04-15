@@ -223,6 +223,7 @@ const Inventory = () => {
         );
       },
       width: "5%",
+      minWidth: "50px"
     },
   ];
 

@@ -20,10 +20,10 @@ export const ButtonSizeIconOnly = {
 };
 
 export const ButtonVariant = {
-  primary: "bg-[#548a6a] text-white",
-  submit: "bg-blue-500 text-white",
-  muted: "bg-gray-400 text-white hover:bg-gray-300",
-  light: "bg-white border-2 border-gray-400 text-gray-500 hover:border-gray-300 hover:text-gray-400"
+  primary: "bg-[#548a6a] hover:bg-[#406a4c] text-white",
+  submit: "bg-blue-500 hover:bg-blue-700 text-white",
+  muted: "bg-gray-400 text-white hover:bg-gray-500",
+  light: "bg-white border-2 border-gray-400 text-gray-500 hover:border-gray-600 hover:text-gray-700"
 };
 
 const Button = ({

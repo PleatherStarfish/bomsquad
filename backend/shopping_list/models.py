@@ -26,4 +26,4 @@ class UserShoppingList(models.Model):
         unique_together = ("user", "component", "bom_item", "module")
 
     def __str__(self):
-        return f"[ {self.profile} ] - {self.component}"
+        return f"[ {self.user} ] - {self.component}"

@@ -6,8 +6,8 @@ import BomList from "../components/bom_list";
 const ModuleDetail = ({ slug }) => {
   const { module, moduleIsLoading, moduleIsError } = useModule(slug)
 
-  if (moduleIsLoading) return <p>Loading...</p>;
-  if (moduleIsError) return <p>Error!</p>;
+  if (moduleIsLoading) return <div className="text-gray-700 animate-pulse">Loading...</div>;
+  if (moduleIsError) return <div>Error!</div>;
 
   return (
     <>
@@ -41,7 +41,7 @@ const ModuleDetail = ({ slug }) => {
         </div>
       </div>
       <h1  className="text-3xl font-semibold py-8">Components</h1>
-      <BomList module_id={module?.id} />
+      <BomList moduleId={module?.id} moduleName={module?.name} />
     </>
   );
 };

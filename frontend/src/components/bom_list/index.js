@@ -18,45 +18,51 @@ export const customStyles = {
   },
 };
 
-const BomList = ({ module_id }) => {
+const BomList = ({ moduleId, moduleName }) => {
   const { user, userIsLoading } = useAuthenticatedUser();
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
-    useModuleBomListItems(module_id);
+    useModuleBomListItems(moduleId);
 
+  if (moduleBomIsLoading) return <div className="text-gray-700 animate-pulse">Loading...</div>;
   if (moduleBomIsError) {
     return <div>Error loading components: {moduleBomIsError.message}</div>;
   }
 
+  const moduleBomData = moduleBom.map(item => ({...item, moduleName, moduleId}));
+
   const columns = [
     {
-      name: "Name",
+      name: <div>Name</div>,
       selector: (row) => row.description,
       sortable: true,
       wrap: true,
+      grow: 1,
     },
     {
-      name: "Quantity Required",
+      name: <div>Qty</div>,
       selector: (row) => row.quantity,
       sortable: true,
       wrap: true,
+      maxWidth: "50px",
     },
     {
-      name: "Type",
+      name: <div>Type</div>,
       selector: (row) => row.type,
       sortable: true,
       wrap: true,
     },
     {
-      name: "Designators",
+      name: <div>Designators</div>,
       selector: (row) => row.designators,
       sortable: true,
       wrap: true,
     },
     {
-      name: "Notes",
+      name: <div>Notes</div>,
       selector: (row) => row.notes,
       sortable: true,
       wrap: true,
+      grow: 1,
     },
   ];
 
@@ -85,7 +91,7 @@ const BomList = ({ module_id }) => {
         expandOnRowClicked
         expandableRowsComponent={NestedTable}
         columns={columns}
-        data={moduleBom}
+        data={moduleBomData}
         progressPending={moduleBomIsLoading}
         customStyles={customStyles}
       />

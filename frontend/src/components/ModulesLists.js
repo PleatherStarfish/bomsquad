@@ -13,7 +13,7 @@ const ModulesList = ({ queryName, url }) => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="text-gray-700 animate-pulse">Loading...</div>;
   }
 
   if (error) {

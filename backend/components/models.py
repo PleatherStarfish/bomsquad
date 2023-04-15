@@ -113,13 +113,13 @@ class Component(models.Model):
 
     def __str__(self):
         if self.type.name == "Potentiometers":
-            return f"{self.description} {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
+            return f"{self.id} {self.description} {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
         elif self.type.name == "Resistors":
-            return f"{self.ohms} {self.ohms_unit} {self.type} ({self.supplier.name} {self.supplier_item_no})"
+            return f"{self.id} {self.ohms} {self.ohms_unit} {self.type} ({self.supplier.name} {self.supplier_item_no})"
         elif self.type.name == "Capacitors":
-            return f"{self.farads} {self.farads_unit} {self.type} ({self.supplier.name} {self.supplier_item_no})"
+            return f"{self.id} {self.farads} {self.farads_unit} {self.type} ({self.supplier.name} {self.supplier_item_no})"
         else:
-            return f"{self.description} {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
+            return f"{self.id} {self.description} {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
 
     def clean(self):
         if self.type.name == "Resistors":

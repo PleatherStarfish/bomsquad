@@ -1,3 +1,5 @@
+from shopping_list.serializers import UserShoppingListSerializer
+from shopping_list.models import UserShoppingList
 from modules.serializers import ComponentSerializer
 from components.models import Component
 from rest_framework import generics
@@ -156,6 +158,18 @@ def get_user_inventory(request):
 
 @login_required
 @api_view(["GET"])
+def get_user_shopping_list(request):
+    """
+    Retrieve the user's own inventory.
+    """
+    user = request.user
+    inventory = UserShoppingList.objects.filter(user=user).sort("module__name")
+    serializer = UserShoppingListSerializer(inventory, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["GET"])
 def get_user_inventory_quantity(request, component_pk):
     inventory = UserInventory.objects.filter(
         component__id=component_pk, user=request.user
@@ -166,6 +180,28 @@ def get_user_inventory_quantity(request, component_pk):
         # Access the first inventory object in the QuerySet
         # and retrieve the 'quantity' attribute
         quantity = inventory.first().quantity
+        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+    else:
+        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["GET"])
+def get_user_shopping_list_quantity(
+    request, component_pk, modulebomlistitem_pk, module_pk
+):
+    shopping_list_item = UserShoppingList.objects.filter(
+        component__id=component_pk,
+        module__id=module_pk,
+        bom_item__id=modulebomlistitem_pk,
+        user=request.user,
+    )
+
+    # Check if inventory exists
+    if shopping_list_item.exists():
+        # Access the first inventory object in the QuerySet
+        # and retrieve the 'quantity' attribute
+        quantity = shopping_list_item.first().quantity
         return Response({"quantity": quantity}, status=status.HTTP_200_OK)
     else:
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
