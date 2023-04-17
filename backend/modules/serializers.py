@@ -14,18 +14,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = (
-            "name",
-            "slug",
-            "manufacturer",
-            "version",
-            "description",
-            "image",
-            "manufacturer_page_link",
-            "bom_link",
-            "manual_link",
-            "modulargrid_link",
-        )
+        fields = "__all__"
 
 
 class BuiltModuleSerializer(serializers.ModelSerializer):

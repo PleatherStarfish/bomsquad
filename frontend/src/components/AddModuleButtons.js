@@ -3,7 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const ModuleButtons = ({ module, queryName }) => {
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+const AddModuleButtons = ({ module, queryName }) => {
 
   const csrftoken = Cookies.get('csrftoken');
 
@@ -12,7 +15,10 @@ const ModuleButtons = ({ module, queryName }) => {
 
   const addToBuilt = useMutation(
     async () => {
-      const response = await axios.post(`/add-to-built/${module.id}/`, {
+      const response = await axios.post(`/add-to-built/${module}/`, {}, {
+        headers: {
+          'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
+        },
         withCredentials: true, // enable sending cookies with CORS requests
       });
       return response.data;
@@ -21,7 +27,10 @@ const ModuleButtons = ({ module, queryName }) => {
 
   const addToWtb = useMutation(
     async () => {
-      const response = await axios.post(`/add-to-wtb/${module.id}/`, {
+      const response = await axios.post(`/add-to-wtb/${module}/`, {}, {
+        headers: {
+          'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
+        },
         withCredentials: true, // enable sending cookies with CORS requests
       });
       return response.data;
@@ -82,4 +91,4 @@ const ModuleButtons = ({ module, queryName }) => {
   );
 }
 
-export default ModuleButtons;
+export default AddModuleButtons;
