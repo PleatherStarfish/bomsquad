@@ -3,6 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import './styles/styles.css';
+import axios from 'axios';
+
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const queryClient = new QueryClient({
   defaultOptions: {

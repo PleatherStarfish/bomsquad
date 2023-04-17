@@ -1,41 +1,14 @@
 import React from 'react';
-import { useMutation } from '@tanstack/react-query';
-import Cookies from 'js-cookie';
-import axios from 'axios';
+import useAddToBuiltMutation from '../services/useAddToBuiltMutation';
+import useAddToWtbMutation from '../services/useAddToWtbMutation';
 
-axios.defaults.xsrfCookieName = 'csrftoken';
-axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-
-const AddModuleButtons = ({ module, queryName }) => {
-
-  const csrftoken = Cookies.get('csrftoken');
+const AddModuleButtons = ({ moduleId, queryName }) => {
 
   const hideBuilt = queryName === 'builtModules';
   const hideWtb = queryName === 'wtbModules';
 
-  const addToBuilt = useMutation(
-    async () => {
-      const response = await axios.post(`/add-to-built/${module}/`, {}, {
-        headers: {
-          'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
-        },
-        withCredentials: true, // enable sending cookies with CORS requests
-      });
-      return response.data;
-    }
-  );
-
-  const addToWtb = useMutation(
-    async () => {
-      const response = await axios.post(`/add-to-wtb/${module}/`, {}, {
-        headers: {
-          'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
-        },
-        withCredentials: true, // enable sending cookies with CORS requests
-      });
-      return response.data;
-    }
-  );
+  const addToBuilt = useAddToBuiltMutation(moduleId);
+  const addToWtb = useAddToWtbMutation(moduleId);
 
   return (
     <div className="flex flex-col gap-2 mt-4">

@@ -4,30 +4,36 @@ import axios from "axios";
 import AddModuleButtons from "../components/AddModuleButtons";
 import Alert from "../ui/Alert";
 
-const ModulesList = ({ queryName, url }) => {
-  const { data, isLoading, error } = useQuery([queryName], async () => {
+const useModulesList = (queryName, url) => {
+  const { data: listData, isLoading, isError, error } = useQuery([queryName], async () => {
     const response = await axios.get(url, {
       withCredentials: true,
     });
     return response.data;
   });
 
+  return {listData, isLoading, isError, error};
+};
+
+const ModulesList = ({ queryName, url }) => {
+  const {listData, isLoading, isError, error} = useModulesList(queryName, url);
+
   if (isLoading) {
     return <div className="text-gray-700 animate-pulse">Loading...</div>;
   }
 
-  if (error) {
+  if (isError) {
     return <div>Error: {error.message}</div>;
   }
 
-  return !!data.results.length ? (
+  return !!listData.results.length ? (
     <ul
       role="list"
       className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-col-5 gap-4"
     >
-      {data.results.map((result) => {
+      {listData.results.map((result) => {
         return (
-          <li key={result.id} className="rounded-lg bg-white text-cente border">
+          <li key={`${queryName}${result.module.id}`} className="rounded-lg bg-white text-cente border">
             <div className="flex flex-1 flex-col p-8 justify-center items-center">
               <img
                 className="mx-auto h-32 flex-shrink-0"
@@ -40,7 +46,7 @@ const ModulesList = ({ queryName, url }) => {
               <p className="text-gray-400 text-base text-center">
                 {result.module.manufacturer}
               </p>
-              <AddModuleButtons module={result.module.id} queryName={queryName} />
+              <AddModuleButtons moduleId={result.module.id} queryName={queryName} />
             </div>
           </li>
         );
