@@ -1,7 +1,7 @@
 import React from "react";
 import cx from "classnames";
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'; // optional
+import 'tippy.js/dist/tippy.css';
 
 export const ButtonSize = {
   xs: "rounded px-2 py-1 text-xs",

@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
 import DataTable from "react-data-table-component";
-import { useQuery } from "@tanstack/react-query";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import Button from "../ui/Button";
+import useGetUserInventory from "../services/useGetUserInventory";
 
 import Pill from "../ui/Pill";
 
@@ -13,29 +12,31 @@ const customStyles = {
       fontWeight: "bold",
     },
   },
-};
-
-const fetchData = async () => {
-  const { data } = await axios.get("/api/inventory/", {
-    withCredentials: true,
-  });
-  return data;
+  rows: {
+    style: {
+      padding: "0.2rem 0 0.2rem 0",
+    },
+  },
 };
 
 const Inventory = () => {
   const [editQuantity, setEditQuantity] = useState();
   const [editLocation, setEditLocation] = useState();
-  const { data, isLoading, isError } = useQuery(["inventory"], fetchData);
+  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } = useGetUserInventory();
 
-  if (isError) {
+  if (inventoryDataIsError) {
     return <div>Error fetching data</div>;
   }
+
+  useEffect(() => {
+    console.log(editQuantity)
+  }, [editQuantity]);
 
   const handleDownloadCSV = () => {
     const csvData =
       "data:text/csv;charset=utf-8," +
       encodeURIComponent(
-        data
+        inventoryData
           .map((row) =>
             [
               row.component.description,
@@ -84,23 +85,74 @@ const Inventory = () => {
       selector: (row) => row.component.description,
       sortable: true,
       wrap: true,
-      innerWidth: "200px",
+      grow: 1
     },
     {
-      name: "Supplier Item No",
-      selector: (row) => row.component.supplier_item_no,
+      name: <div>Type</div>,
+      selector: (row) => row.component.type?.name,
+      sortable: true,
+      wrap: true,
+      hide: 1700,
+    },
+    {
+      name: <div>Manufacturer</div>,
+      selector: (row) => row.component.manufacturer?.name,
+      sortable: true,
+      wrap: true,
+      hide: 1700,
+    },
+    {
+      name: <div>Supplier</div>,
+      selector: (row) => row.component.supplier?.name,
       sortable: true,
       wrap: true,
     },
     {
-      name: "Capacitance (μF)",
-      selector: (row) => row.component.farads,
+      name: <div>Supp. Item #</div>,
+      selector: (row) => {
+        return (
+          <a href={row.component.link} className="text-blue-500 hover:text-blue-700">
+            {row.component.supplier_item_no}
+          </a>
+        )},
       sortable: true,
+      wrap: true,
     },
     {
-      name: "Price (USD)",
-      selector: (row) => row.component.price,
+      name: <div>Farads</div>,
+      selector: (row) => row.farads,
       sortable: true,
+      wrap: true,
+      omit: (row) => row.component.type !== "Capacitor",
+    },
+    {
+      name: <div>Ohms</div>,
+      selector: (row) => row.ohms,
+      sortable: true,
+      wrap: true,
+      omit: (row) => row.component.type !== "Resistor",
+    },
+    {
+      name: <div>Price</div>,
+      selector: (row) =>
+      row.component.price && row.component.price_currency ? `${row.component.price} ${row.component.price_currency}` : row.component.price,
+      sortable: true,
+      wrap: true,
+      hide: 1700,
+    },
+    {
+      name: <div>Tolerance</div>,
+      selector: (row) => row.component.tolerance,
+      sortable: true,
+      wrap: true,
+      hide: 1700,
+    },
+    {
+      name: <div>V. Rating</div>,
+      selector: (row) => row.component.voltage_rating,
+      sortable: true,
+      wrap: true,
+      hide: 1700,
     },
     {
       name: "Quantity",
@@ -230,7 +282,7 @@ const Inventory = () => {
   return (
     <>
       <div className="w-full flex justify-end">
-        {data && data.length > 0 && <button
+        {inventoryData && inventoryData.length > 0 && <button
           className="inline-flex items-center px-2 py-1 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
           onClick={handleDownloadCSV}
         >
@@ -245,8 +297,8 @@ const Inventory = () => {
         subHeaderWrap
         exportHeaders
         columns={columns}
-        data={data}
-        progressPending={isLoading}
+        data={inventoryData}
+        progressPending={inventoryDataIsLoading}
         customStyles={customStyles}
       />
     </>

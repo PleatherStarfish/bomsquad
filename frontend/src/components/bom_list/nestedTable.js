@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import useGetComponents from "../../services/useGetComponents";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
@@ -236,10 +236,14 @@ const NestedTable = (props) => {
         responsive
         subHeaderAlign="right"
         subHeaderWrap
-        exportHeaders
         columns={columns}
         data={componentsData}
         progressPending={componentsAreLoading}
+        progressComponent={
+          <div className="flex justify-center w-full bg-sky-50 p-6">
+            <div className="text-gray-700 animate-pulse">Loading...</div>
+          </div>
+        }
         customStyles={customStyles}
       />
     </div>

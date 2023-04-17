@@ -20,6 +20,7 @@ from rest_framework import status
 from inventory.models import UserInventory
 from .serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
+from django.db.models import Sum, Q
 
 
 @api_view(["GET"])
@@ -207,6 +208,26 @@ def get_user_shopping_list_quantity(
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
+@login_required
+@api_view(["GET"])
+def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_pk):
+    """
+    Get sum of components in user inventory that fulfill a given bom list item
+    """
+    bom_list_item = ModuleBomListItem.objects.get(id=modulebomlistitem_pk)
+    inventory = UserInventory.objects.filter(
+        component__in=bom_list_item.components_options.all(), user=request.user
+    )
+
+    # Check if inventory exists
+    if inventory.exists():
+        # Use aggregate function to get the sum of 'quantity' attribute
+        quantity_sum = inventory.aggregate(Sum("quantity")).get("quantity__sum")
+        return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
+    else:
+        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 def get_module_bom_list_items(request, module_pk):
     try:
@@ -220,6 +241,16 @@ def get_module_bom_list_items(request, module_pk):
 
     # Filter ModuleBomListItem instances based on the retrieved module
     module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
+
+    if request.user.is_authenticated:
+        # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
+        module_bom_list_items = module_bom_list_items.annotate(
+            sum_of_user_options_from_inventory=Sum(
+                "components_options__userinventory__quantity",
+                filter=Q(components_options__userinventory__user=request.user),
+                distinct=True,
+            )
+        )
 
     # Serialize the retrieved ModuleBomListItem instances
     serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)

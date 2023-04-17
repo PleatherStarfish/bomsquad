@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 from components.models import Component
 from accounts.models import CustomUser
+from django.db.models import Sum, Q
+from accounts.models import CustomUser
 
 
 class Manufacturer(models.Model):

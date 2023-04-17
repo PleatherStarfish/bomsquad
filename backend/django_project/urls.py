@@ -10,7 +10,11 @@ from modules import views as ModuleView
 
 
 frontend_redirect_urls = [
-    re_path(r"^generic/.+$", TemplateView.as_view(template_name="frontend.html"), name='frontend'),
+    re_path(
+        r"^generic/.+$",
+        TemplateView.as_view(template_name="frontend.html"),
+        name="frontend",
+    ),
     path(
         "module/<slug:slug>/",
         TemplateView.as_view(template_name="frontend.html"),
@@ -31,10 +35,8 @@ frontend_redirect_urls = [
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
-    path("user/", RedirectView.as_view(pattern_name='frontend')),
-    
+    path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),
-
     path(
         "add-to-built/<int:module_id>/",
         login_required(ModuleView.add_module_to_built),

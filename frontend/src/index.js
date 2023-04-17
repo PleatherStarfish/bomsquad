@@ -4,7 +4,24 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import './styles/styles.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      staleTime: 1000 * 30, // 30seconds
+      cacheTime: 1000 * 30, //30 seconds
+      refetchOnMount: "always",
+      refetchOnWindowFocus: "always",
+      refetchOnReconnect: "always",
+      refetchInterval: 1000 * 30, //30 seconds
+      refetchIntervalInBackground: false,
+      suspense: false,
+
+    },
+    mutations: {
+      retry: 3,
+    },
+  }});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>

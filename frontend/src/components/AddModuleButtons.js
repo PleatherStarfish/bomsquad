@@ -13,9 +13,6 @@ const ModuleButtons = ({ module, queryName }) => {
   const addToBuilt = useMutation(
     async () => {
       const response = await axios.post(`/add-to-built/${module.id}/`, {
-        headers: {
-          "X-CSRFToken": csrftoken,
-      },
         withCredentials: true, // enable sending cookies with CORS requests
       });
       return response.data;
@@ -25,9 +22,6 @@ const ModuleButtons = ({ module, queryName }) => {
   const addToWtb = useMutation(
     async () => {
       const response = await axios.post(`/add-to-wtb/${module.id}/`, {
-        headers: {
-          "X-CSRFToken": csrftoken,
-      },
         withCredentials: true, // enable sending cookies with CORS requests
       });
       return response.data;

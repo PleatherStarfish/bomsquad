@@ -79,6 +79,8 @@ class ComponentSerializer(serializers.ModelSerializer):
 
 
 class ModuleBomListItemSerializer(serializers.ModelSerializer):
+    sum_of_user_options_from_inventory = serializers.IntegerField()
+
     class Meta:
         model = ModuleBomListItem
         fields = "__all__"
