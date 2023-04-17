@@ -3,8 +3,11 @@ import DataTable from "react-data-table-component";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import Button from "../ui/Button";
 import useGetUserInventory from "../services/useGetUserInventory";
-
+import useUpdateUserInventoryQuantity from "../services/useUpdateUserInventoryQuantity";
 import Pill from "../ui/Pill";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 const customStyles = {
   headCells: {
@@ -23,14 +26,40 @@ const Inventory = () => {
   const [editQuantity, setEditQuantity] = useState();
   const [editLocation, setEditLocation] = useState();
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } = useGetUserInventory();
+  const csrftoken = Cookies.get('csrftoken');
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: ({componentPk, quantity}) => {
+      console.log("asfdeWEQWEWE", componentPk, quantity)
+      return axios.patch(
+        `/api/inventory/${componentPk}/update-quantity/`,
+        {quantity},
+        {
+          headers: {
+            "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
+          },
+          withCredentials: true, // enable sending cookies with CORS requests
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("inventory");
+      queryClient.refetchQueries("inventory");
+    }
+  })
+
+  const handleQuantityChange = async (componentPk, quantity) => {
+    try {
+      await mutation.mutate({componentPk, quantity});
+      setEditQuantity(undefined);
+    } catch (error) {
+      console.error("Failed to update quantity", error);
+    }
+  };
 
   if (inventoryDataIsError) {
     return <div>Error fetching data</div>;
   }
-
-  useEffect(() => {
-    console.log(editQuantity)
-  }, [editQuantity]);
 
   const handleDownloadCSV = () => {
     const csvData =
@@ -167,7 +196,7 @@ const Inventory = () => {
                   id={`${row.id}_quantity`}
                   min={0}
                   value={parseInt(row.quantity)}
-                  onChange={(_name) => console.log(_name)}
+                  onChange={(event) => handleQuantityChange(row.component.id, event.target.value)}
                   onBlur={() => setEditQuantity(undefined)}
                 />
               </div>

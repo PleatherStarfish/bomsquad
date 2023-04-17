@@ -46,7 +46,7 @@ const ModulesList = ({ queryName, url }) => {
               <p className="text-gray-400 text-base text-center">
                 {result.module.manufacturer}
               </p>
-              <AddModuleButtons moduleId={result.module.id} queryName={queryName} />
+              <AddModuleButtons module={result} moduleId={result.module.id} queryName={queryName} />
             </div>
           </li>
         );

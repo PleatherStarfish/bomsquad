@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
 const useAddToBuiltMutation = (moduleId) => {
   const csrftoken = Cookies.get('csrftoken');
+  const queryClient = useQueryClient(); // Get queryClient instance
 
   return useMutation(
     async () => {
@@ -14,6 +15,13 @@ const useAddToBuiltMutation = (moduleId) => {
         withCredentials: true, // enable sending cookies with CORS requests
       });
       return response.data;
+    },
+    {
+      // Use onSuccess to invalidate and refetch the related query after mutation
+      onSuccess: () => {
+        queryClient.invalidateQueries('builtModules');
+        queryClient.refetchQueries('builtModules');
+      },
     }
   );
 };

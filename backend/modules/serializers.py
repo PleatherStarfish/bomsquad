@@ -22,10 +22,7 @@ class BuiltModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BuiltModules
-        fields = (
-            "id",
-            "module",
-        )
+        fields = "__all__"
 
 
 class WantTooBuildModuleSerializer(serializers.ModelSerializer):
@@ -33,10 +30,7 @@ class WantTooBuildModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WantToBuildModules
-        fields = (
-            "id",
-            "module",
-        )
+        fields = "__all__"
 
 
 class TypeSerializer(serializers.ModelSerializer):
@@ -55,16 +49,6 @@ class ManufacturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentManufacturer
         fields = ["name"]
-
-
-class ComponentSerializer(serializers.ModelSerializer):
-    manufacturer = ManufacturerSerializer()
-    supplier = SupplierSerializer()
-    type = TypeSerializer()
-
-    class Meta:
-        model = Component
-        fields = "__all__"
 
 
 class ModuleBomListItemSerializer(serializers.ModelSerializer):

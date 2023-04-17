@@ -8,6 +8,7 @@ from api.views import (
     get_module_bom_list_items,
     get_components,
     get_user_inventory_quantity,
+    user_inventory_update,
     get_user_shopping_list,
     get_user_shopping_list_quantity,
     get_user_inventory_quantities_for_bom_list_item,
@@ -27,6 +28,11 @@ urlpatterns = [
         "inventory/<int:component_pk>/component-quantity/",
         get_user_inventory_quantity,
         name="user-inventory-quantity",
+    ),
+    path(
+        "inventory/<int:component_pk>/update-quantity/",
+        user_inventory_update,
+        name="user_inventory_update",
     ),
     path("shopping_list/", get_user_shopping_list, name="user-shopping-list"),
     path(

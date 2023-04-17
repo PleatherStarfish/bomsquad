@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from modules.models import Module
-from inventory.models import UserInventory
-from modules.serializers import ComponentSerializer
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -24,11 +22,3 @@ class ModuleSerializer(serializers.ModelSerializer):
             "slug",
             "date_updated",
         ]
-
-
-class UserInventorySerializer(serializers.ModelSerializer):
-    component = ComponentSerializer()
-
-    class Meta:
-        model = UserInventory
-        fields = ("component", "quantity", "location")

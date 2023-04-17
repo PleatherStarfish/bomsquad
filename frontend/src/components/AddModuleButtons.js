@@ -2,7 +2,9 @@ import React from 'react';
 import useAddToBuiltMutation from '../services/useAddToBuiltMutation';
 import useAddToWtbMutation from '../services/useAddToWtbMutation';
 
-const AddModuleButtons = ({ moduleId, queryName }) => {
+const AddModuleButtons = ({ module, moduleId, queryName }) => {
+
+  console.log(module)
 
   const hideBuilt = queryName === 'builtModules';
   const hideWtb = queryName === 'wtbModules';

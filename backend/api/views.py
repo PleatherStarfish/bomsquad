@@ -1,6 +1,6 @@
 from shopping_list.serializers import UserShoppingListSerializer
 from shopping_list.models import UserShoppingList
-from modules.serializers import ComponentSerializer
+from components.serializers import ComponentSerializer
 from components.models import Component
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
@@ -18,7 +18,7 @@ from modules.serializers import BuiltModuleSerializer, WantTooBuildModuleSeriali
 from modules.models import BuiltModules, WantToBuildModules
 from rest_framework import status
 from inventory.models import UserInventory
-from .serializers import UserInventorySerializer
+from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q
 
@@ -95,13 +95,7 @@ def get_built_modules(request):
         module_data["is_built"] = is_built
         module_data["is_wtb"] = is_wtb
 
-    response = Response(data)
-    response["Access-Control-Allow-Origin"] = "http://localhost:3000"
-    response["Access-Control-Allow-Methods"] = "GET"
-    response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
-    response["Access-Control-Allow-Credentials"] = "true"
-    csrf.get_token(request)
-    return response
+    return Response(data)
 
 
 @api_view(["GET"])
@@ -136,13 +130,7 @@ def get_wtb_modules(request):
         module_data["is_built"] = is_built
         module_data["is_wtb"] = is_wtb
 
-    response = Response(data)
-    response["Access-Control-Allow-Origin"] = "http://localhost:3000"
-    response["Access-Control-Allow-Methods"] = "GET"
-    response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
-    response["Access-Control-Allow-Credentials"] = "true"
-    csrf.get_token(request)
-    return response
+    return Response(data)
 
 
 @login_required
@@ -155,6 +143,28 @@ def get_user_inventory(request):
     inventory = UserInventory.objects.filter(user=user)
     serializer = UserInventorySerializer(inventory, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["PATCH"])
+def user_inventory_update(request, component_pk):
+    user = request.user
+    user_inventor_item = UserInventory.objects.filter(
+        user=user, component__id=component_pk
+    ).first()
+
+    if not user_inventor_item:
+        return Response(
+            {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = UserInventorySerializer(
+        user_inventor_item, data=request.data, partial=True
+    )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @login_required
