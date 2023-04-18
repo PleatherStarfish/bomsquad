@@ -30,7 +30,7 @@ urlpatterns = [
         name="user-inventory-quantity",
     ),
     path(
-        "inventory/<int:component_pk>/update-quantity/",
+        "inventory/<int:component_pk>/update/",
         user_inventory_update,
         name="user_inventory_update",
     ),

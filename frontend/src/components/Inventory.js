@@ -3,11 +3,8 @@ import DataTable from "react-data-table-component";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import Button from "../ui/Button";
 import useGetUserInventory from "../services/useGetUserInventory";
-import useUpdateUserInventoryQuantity from "../services/useUpdateUserInventoryQuantity";
+import useUpdateUserInventory from "../services/useUpdateUserInventory";
 import Pill from "../ui/Pill";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Cookies from "js-cookie";
-import axios from "axios";
 
 const customStyles = {
   headCells: {
@@ -23,37 +20,49 @@ const customStyles = {
 };
 
 const Inventory = () => {
-  const [editQuantity, setEditQuantity] = useState();
-  const [editLocation, setEditLocation] = useState();
-  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } = useGetUserInventory();
-  const csrftoken = Cookies.get('csrftoken');
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: ({componentPk, quantity}) => {
-      console.log("asfdeWEQWEWE", componentPk, quantity)
-      return axios.patch(
-        `/api/inventory/${componentPk}/update-quantity/`,
-        {quantity},
-        {
-          headers: {
-            "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
-          },
-          withCredentials: true, // enable sending cookies with CORS requests
-        }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries("inventory");
-      queryClient.refetchQueries("inventory");
-    }
-  })
+  const [quantityIdToEdit, setQuantityIdToEdit] = useState();
+  const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
+  
+  const [locationIdToEdit, setLocationIdToEdit] = useState();
+  const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
+  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
+    useGetUserInventory();
+  const mutation = useUpdateUserInventory();
 
-  const handleQuantityChange = async (componentPk, quantity) => {
+  const handleKeyPress = (event) => {
+    if (event.key === " " && !updatedLocationToSubmit) {
+      // Prevent space key default behavior if input field is empty
+      event.preventDefault();
+    }
+  };
+
+  const handleQuantityChange = async (event) => {
+    event.preventDefault();
+    setUpdatedQuantityToSubmit(event.target.value);
+  };
+
+  const handleSubmitQuantity = async (componentPk) => {
     try {
-      await mutation.mutate({componentPk, quantity});
-      setEditQuantity(undefined);
+      await mutation.mutate({ componentPk, quantity: updatedQuantityToSubmit });
+      setQuantityIdToEdit(undefined);
+      setUpdatedQuantityToSubmit(undefined);
     } catch (error) {
       console.error("Failed to update quantity", error);
+    }
+  };
+
+  const handleLocationChange = async (event) => {
+    event.preventDefault();
+    setUpdatedLocationToSubmit(event.target.value);
+  };
+
+  const handleSubmitLocation = async (componentPk) => {
+    try {
+      await mutation.mutate({ componentPk, location: updatedLocationToSubmit });
+      setLocationIdToEdit(undefined);
+      setUpdatedLocationToSubmit(undefined);
+    } catch (error) {
+      console.error("Failed to update location", error);
     }
   };
 
@@ -90,12 +99,14 @@ const Inventory = () => {
   };
 
   const locationsSort = (locationA, locationB) => {
-    const a = locationA && Array.isArray(locationA.location)
-      ? locationA.location.join(",").toLowerCase()
-      : '';
-    const b = locationB && Array.isArray(locationB.location)
-      ? locationB.location.join(",").toLowerCase()
-      : '';
+    const a =
+      locationA && Array.isArray(locationA.location)
+        ? locationA.location.join(",").toLowerCase()
+        : "";
+    const b =
+      locationB && Array.isArray(locationB.location)
+        ? locationB.location.join(",").toLowerCase()
+        : "";
 
     if (a > b) {
       return 1;
@@ -114,7 +125,7 @@ const Inventory = () => {
       selector: (row) => row.component.description,
       sortable: true,
       wrap: true,
-      grow: 1
+      grow: 1,
     },
     {
       name: <div>Type</div>,
@@ -140,10 +151,14 @@ const Inventory = () => {
       name: <div>Supp. Item #</div>,
       selector: (row) => {
         return (
-          <a href={row.component.link} className="text-blue-500 hover:text-blue-700">
+          <a
+            href={row.component.link}
+            className="text-blue-500 hover:text-blue-700"
+          >
             {row.component.supplier_item_no}
           </a>
-        )},
+        );
+      },
       sortable: true,
       wrap: true,
     },
@@ -164,7 +179,9 @@ const Inventory = () => {
     {
       name: <div>Price</div>,
       selector: (row) =>
-      row.component.price && row.component.price_currency ? `${row.component.price} ${row.component.price_currency}` : row.component.price,
+        row.component.price && row.component.price_currency
+          ? `${row.component.price} ${row.component.price_currency}`
+          : row.component.price,
       sortable: true,
       wrap: true,
       hide: 1700,
@@ -184,30 +201,53 @@ const Inventory = () => {
       hide: 1700,
     },
     {
-      name: "Quantity",
+      name: <div>Qty.</div>,
       cell: (row) => {
         return (
-          <div className="flex justify-between w-full">
-            {row.component.id === editQuantity ? (
-              <div className="w-24">
-                <input
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                  type="number"
-                  id={`${row.id}_quantity`}
-                  min={0}
-                  value={parseInt(row.quantity)}
-                  onChange={(event) => handleQuantityChange(row.component.id, event.target.value)}
-                  onBlur={() => setEditQuantity(undefined)}
-                />
+          <div className="flex justify-between content-center w-full">
+            {row.component.id === quantityIdToEdit ? (
+              <div>
+                <form
+                  className="w-full flex content-center gap-1"
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <input
+                    className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+                    type="number"
+                    value={updatedQuantityToSubmit ?? row.quantity}
+                    onChange={(e) => handleQuantityChange(e)}
+                  />
+                  <div className="flex gap-1 justify-around">
+                    <Button
+                      className="h-full"
+                      variant="muted"
+                      size="sm"
+                      onClick={() => {
+                        setQuantityIdToEdit(undefined);
+                        setUpdatedQuantityToSubmit(undefined);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="h-full"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleSubmitQuantity(row.component.id)}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </form>
               </div>
             ) : (
-              <span>{row.quantity}</span>
+              <span className="font-bold">{row.quantity}</span>
             )}
-            {row.component.id !== editQuantity && (
+            {row.component.id !== quantityIdToEdit && (
               <div
                 onClick={() => {
-                  setEditQuantity(
-                    row.component.id !== editQuantity
+                  setQuantityIdToEdit(
+                    row.component.id !== quantityIdToEdit
                       ? row.component.id
                       : undefined
                   );
@@ -220,41 +260,45 @@ const Inventory = () => {
           </div>
         );
       },
-      maxWidth: "8%",
       sortable: true,
+      width: quantityIdToEdit ? "230px" : "80px",
     },
     {
-      name: "Location",
+      name: <div>Location</div>,
       cell: (row) => (
         <div className="flex justify-between w-full">
-          {row.component.id === editLocation ? (
-            <div className="flex gap-1.5 pb-1 pt-6">
-              <div className="flex flex-col justify-around">
-                <input
-                  className="block w-full h-8 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  type="text"
-                  id={`${row.id}_location`}
-                  min={0}
-                  value={row.location && row.location.join(", ")}
-                />
-                <p className="text-gray-500 text-xs">
-                  Separate locations with commas.
-                </p>
-              </div>
-              <div className="h-full flex flex-col">
-                <Button
-                  size="sm"
-                  variant="muted"
-                  onClick={() => setEditLocation(undefined)}
+          {row.component.id === locationIdToEdit ? (
+            <div className="flex flex-col">
+              <div className="flex gap-1.5 pb-1 pt-6">
+                <form
+                  className="w-full flex content-center gap-1"
+                  onSubmit={(e) => e.preventDefault()}
                 >
-                  Close
-                </Button>
+                  <input
+                    type="text"
+                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+                    value={updatedLocationToSubmit ?? row.location}
+                    onChange={(e) => handleLocationChange(e)}
+                    onKeyDown={handleKeyPress}
+                  />
+                  <Button
+                    variant="muted"
+                    onClick={() => setLocationIdToEdit(undefined)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    variant="primary" 
+                    onClick={() => handleSubmitLocation(row.component.id)}
+                  >
+                    Update
+                  </Button>
+                </form>
               </div>
-              <div className="h-full flex flex-col">
-                <Button size="sm" variant="primary">
-                  Submit
-                </Button>
-              </div>
+              <p className="text-gray-500 text-xs">
+                Separate locations with commas.
+              </p>
             </div>
           ) : (
             <ul className="flex flex-wrap w-full">
@@ -270,12 +314,12 @@ const Inventory = () => {
                 : "-"}
             </ul>
           )}
-          {row.component.id !== editLocation && (
+          {row.component.id !== locationIdToEdit && (
             <div
               className="flex flex-col justify-center"
               onClick={() => {
-                setEditLocation(
-                  row.component.id !== editLocation
+                setLocationIdToEdit(
+                  row.component.id !== locationIdToEdit
                     ? row.component.id
                     : undefined
                 );
@@ -289,7 +333,8 @@ const Inventory = () => {
       ),
       sortable: true,
       wrap: true,
-      minWidth: editLocation ? "30%" : "15%",
+      width: !!locationIdToEdit ? "350px" : undefined,
+      minWidth: "200px",
       sortFunction: locationsSort,
     },
     {
@@ -303,20 +348,21 @@ const Inventory = () => {
           />
         );
       },
-      width: "5%",
-      minWidth: "50px"
+      width: "50px",
     },
   ];
 
   return (
     <>
       <div className="w-full flex justify-end">
-        {inventoryData && inventoryData.length > 0 && <button
-          className="inline-flex items-center px-2 py-1 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
-          onClick={handleDownloadCSV}
-        >
-          Download CSV
-        </button>}
+        {inventoryData && inventoryData.length > 0 && (
+          <button
+            className="inline-flex items-center px-2 py-1 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
+            onClick={handleDownloadCSV}
+          >
+            Download CSV
+          </button>
+        )}
       </div>
       <DataTable
         fixedHeader
