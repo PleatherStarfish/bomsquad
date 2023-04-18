@@ -27,7 +27,7 @@ const handleClick = (
   field,
   fieldIdToEdit,
   setFieldIdToEdit,
-  setUpdatedFieldToSubmit,
+  setUpdatedFieldToSubmit
 ) => {
   const { component, [field]: fieldValue } = row;
   if (component.id !== fieldIdToEdit) {
@@ -39,12 +39,15 @@ const handleClick = (
 };
 
 const Inventory = () => {
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
 
   const [locationIdToEdit, setLocationIdToEdit] = useState();
   const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [dataToDelete, setDataToDelete] = useState();
 
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
@@ -374,6 +377,7 @@ const Inventory = () => {
             role="button"
             className="stroke-slate-500 w-5 h-5 hover:stroke-pink-500"
             onClick={() => {
+              setDataToDelete(row.component)
               setDeleteModalOpen(true)
             }}
           />
@@ -407,9 +411,16 @@ const Inventory = () => {
         progressPending={inventoryDataIsLoading}
         customStyles={customStyles}
       />
-      <Modal open={deleteModalOpen} setOpen={setDeleteModalOpen} title={"Delete row?"} submitButtonText={"Delete"} onSubmit={() => {
-              handleDelete(row.component.id)
-            }} >Are you sure you want to delete this component?</Modal>
+      <Modal
+        open={deleteModalOpen}
+        setOpen={setDeleteModalOpen}
+        title={"Delete component?"}
+        submitButtonText={"Delete"}
+        onSubmit={() => {
+          setDataToDelete(undefined);
+          handleDelete(row.component.id);
+        }}
+      >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
     </>
   );
 };
