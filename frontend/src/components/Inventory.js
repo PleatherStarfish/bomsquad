@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import DataTable from "react-data-table-component";
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import Button from "../ui/Button";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
 import Pill from "../ui/Pill";
+import ControlledInput from "./ControlledInput";
 
 const customStyles = {
   headCells: {
@@ -19,29 +20,38 @@ const customStyles = {
   },
 };
 
+const handleClick = (
+  row,
+  field,
+  fieldIdToEdit,
+  setFieldIdToEdit,
+  setUpdatedFieldToSubmit,
+) => {
+  const { component, [field]: fieldValue } = row;
+  if (component.id !== fieldIdToEdit) {
+    setFieldIdToEdit(component.id);
+    setUpdatedFieldToSubmit(fieldValue);
+  } else {
+    setFieldIdToEdit(undefined);
+  }
+};
+
 const Inventory = () => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
-  
+
   const [locationIdToEdit, setLocationIdToEdit] = useState();
   const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
   const mutation = useUpdateUserInventory();
 
-  const handleKeyPress = (event) => {
-    if (event.key === " " && !updatedLocationToSubmit) {
-      // Prevent space key default behavior if input field is empty
-      event.preventDefault();
-    }
-  };
-
-  const handleQuantityChange = async (event) => {
+  const handleQuantityChange = useCallback(async (event) => {
     event.preventDefault();
     setUpdatedQuantityToSubmit(event.target.value);
-  };
+  });
 
-  const handleSubmitQuantity = async (componentPk) => {
+  const handleSubmitQuantity = useCallback(async (componentPk) => {
     try {
       await mutation.mutate({ componentPk, quantity: updatedQuantityToSubmit });
       setQuantityIdToEdit(undefined);
@@ -49,14 +59,14 @@ const Inventory = () => {
     } catch (error) {
       console.error("Failed to update quantity", error);
     }
-  };
+  });
 
-  const handleLocationChange = async (event) => {
+  const handleLocationChange = useCallback(async (event) => {
     event.preventDefault();
     setUpdatedLocationToSubmit(event.target.value);
-  };
+  });
 
-  const handleSubmitLocation = async (componentPk) => {
+  const handleSubmitLocation = useCallback(async (componentPk) => {
     try {
       await mutation.mutate({ componentPk, location: updatedLocationToSubmit });
       setLocationIdToEdit(undefined);
@@ -64,7 +74,7 @@ const Inventory = () => {
     } catch (error) {
       console.error("Failed to update location", error);
     }
-  };
+  });
 
   if (inventoryDataIsError) {
     return <div>Error fetching data</div>;
@@ -245,13 +255,15 @@ const Inventory = () => {
             )}
             {row.component.id !== quantityIdToEdit && (
               <div
-                onClick={() => {
-                  setQuantityIdToEdit(
-                    row.component.id !== quantityIdToEdit
-                      ? row.component.id
-                      : undefined
-                  );
-                }}
+                onClick={() =>
+                  handleClick(
+                    row,
+                    "quantity",
+                    quantityIdToEdit,
+                    setQuantityIdToEdit,
+                    setUpdatedQuantityToSubmit
+                  )
+                }
                 role="button"
               >
                 <PencilSquareIcon className="stroke-slate-500 w-4 h-4 hover:stroke-pink-500" />
@@ -274,12 +286,11 @@ const Inventory = () => {
                   className="w-full flex content-center gap-1"
                   onSubmit={(e) => e.preventDefault()}
                 >
-                  <input
+                  <ControlledInput
                     type="text"
                     className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
                     value={updatedLocationToSubmit ?? row.location}
                     onChange={(e) => handleLocationChange(e)}
-                    onKeyDown={handleKeyPress}
                   />
                   <Button
                     variant="muted"
@@ -287,9 +298,9 @@ const Inventory = () => {
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    type="submit" 
-                    variant="primary" 
+                  <Button
+                    type="submit"
+                    variant="primary"
                     onClick={() => handleSubmitLocation(row.component.id)}
                   >
                     Update
@@ -317,13 +328,15 @@ const Inventory = () => {
           {row.component.id !== locationIdToEdit && (
             <div
               className="flex flex-col justify-center"
-              onClick={() => {
-                setLocationIdToEdit(
-                  row.component.id !== locationIdToEdit
-                    ? row.component.id
-                    : undefined
-                );
-              }}
+              onClick={() =>
+                handleClick(
+                  row,
+                  "location",
+                  locationIdToEdit,
+                  setLocationIdToEdit,
+                  setUpdatedLocationToSubmit
+                )
+              }
               role="button"
             >
               <PencilSquareIcon className="stroke-slate-500 w-4 h-4 hover:stroke-pink-500" />
