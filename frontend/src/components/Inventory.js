@@ -4,7 +4,9 @@ import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import Button from "../ui/Button";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
+import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import Pill from "../ui/Pill";
+import Modal from "../ui/Modal";
 import ControlledInput from "./ControlledInput";
 
 const customStyles = {
@@ -37,14 +39,19 @@ const handleClick = (
 };
 
 const Inventory = () => {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
 
   const [locationIdToEdit, setLocationIdToEdit] = useState();
   const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
+
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
+
   const mutation = useUpdateUserInventory();
+
+  const deleteMutation = useDeleteUserInventory();
 
   const handleQuantityChange = useCallback(async (event) => {
     event.preventDefault();
@@ -73,6 +80,14 @@ const Inventory = () => {
       setUpdatedLocationToSubmit(undefined);
     } catch (error) {
       console.error("Failed to update location", error);
+    }
+  });
+
+  const handleDelete = useCallback(async (componentPk) => {
+    try {
+      await deleteMutation.mutate({ componentPk });
+    } catch (error) {
+      console.error("Failed to delete item", error);
     }
   });
 
@@ -353,11 +368,14 @@ const Inventory = () => {
     {
       name: "",
       sortable: false,
-      cell: () => {
+      cell: (row) => {
         return (
           <TrashIcon
             role="button"
             className="stroke-slate-500 w-5 h-5 hover:stroke-pink-500"
+            onClick={() => {
+              setDeleteModalOpen(true)
+            }}
           />
         );
       },
@@ -389,6 +407,9 @@ const Inventory = () => {
         progressPending={inventoryDataIsLoading}
         customStyles={customStyles}
       />
+      <Modal open={deleteModalOpen} setOpen={setDeleteModalOpen} title={"Delete row?"} submitButtonText={"Delete"} onSubmit={() => {
+              handleDelete(row.component.id)
+            }} >Are you sure you want to delete this component?</Modal>
     </>
   );
 };

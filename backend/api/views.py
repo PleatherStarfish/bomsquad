@@ -168,6 +168,26 @@ def user_inventory_update(request, component_pk):
 
 
 @login_required
+@api_view(["DELETE"])
+def user_inventory_delete(request, component_pk):
+    user = request.user
+    user_inventory_item = UserInventory.objects.filter(
+        user=user, component__id=component_pk
+    ).first()
+
+    if not user_inventory_item:
+        return Response(
+            {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    user_inventory_item.delete()
+    return Response(
+        {"detail": "User inventory deleted successfully"},
+        status=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@login_required
 @api_view(["GET"])
 def get_user_shopping_list(request):
     """

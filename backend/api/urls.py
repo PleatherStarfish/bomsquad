@@ -12,6 +12,7 @@ from api.views import (
     get_user_shopping_list,
     get_user_shopping_list_quantity,
     get_user_inventory_quantities_for_bom_list_item,
+    user_inventory_delete,
 )
 
 urlpatterns = [
@@ -33,6 +34,11 @@ urlpatterns = [
         "inventory/<int:component_pk>/update/",
         user_inventory_update,
         name="user_inventory_update",
+    ),
+    path(
+        "inventory/<int:component_pk>/delete/",
+        user_inventory_delete,
+        name="user_inventory_delete",
     ),
     path("shopping_list/", get_user_shopping_list, name="user-shopping-list"),
     path(
