@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DataTable from "react-data-table-component";
-import useGetComponents from "../../services/useGetComponents";
+import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import Button from "../../ui/Button";
 import InventoryQuantity from "./userQty";
@@ -36,7 +36,7 @@ const NestedTable = (props) => {
 
   const { user } = useAuthenticatedUser();
   const { componentsData, componentsAreLoading, componentsAreError } =
-    useGetComponents(props.data.components_options);
+    useGetComponentsByIds(props.data.components_options);
 
   if (componentsAreError) {
     return (

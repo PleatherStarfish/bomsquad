@@ -419,6 +419,7 @@ const Inventory = () => {
         subHeaderAlign="right"
         subHeaderWrap
         exportHeaders
+        progressComponent={<div className="text-gray-700 animate-pulse">Loading...</div>}
         columns={columns}
         data={inventoryData}
         progressPending={inventoryDataIsLoading}

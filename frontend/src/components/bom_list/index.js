@@ -117,6 +117,7 @@ const BomList = ({ moduleId, moduleName }) => {
         exportHeaders
         expandableRows
         expandOnRowClicked
+        progressComponent={<div className="text-gray-700 animate-pulse">Loading...</div>}
         expandableRowsComponent={NestedTable}
         conditionalRowStyles={conditionalRowStyles}
         columns={columns}

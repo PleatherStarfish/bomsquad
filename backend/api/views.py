@@ -290,7 +290,28 @@ def get_module_bom_list_items(request, module_pk):
 
 
 @api_view(["GET"])
-def get_components(request, pks):
+def get_components(request):
+    # Get the page number from the request query parameters
+    page_number = request.query_params.get("page", 1)
+
+    # Retrieve only the id and name fields of the Component instances from the database
+    components = Component.objects.all()
+
+    # Create a paginator instance
+    paginator = Paginator(components, 10)
+
+    # Retrieve the page based on the page number
+    page = paginator.page(page_number)
+
+    # Serialize the retrieved Component instances
+    serializer = ComponentSerializer(page, many=True)
+
+    # Return the serialized data as a response
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def get_components_by_ids(request, pks):
     # Validate input
     if not pks:
         return Response(

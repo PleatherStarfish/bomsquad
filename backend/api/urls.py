@@ -7,6 +7,7 @@ from api.views import (
     get_wtb_modules,
     get_module_bom_list_items,
     get_components,
+    get_components_by_ids,
     get_user_inventory_quantity,
     user_inventory_update,
     get_user_shopping_list,
@@ -46,7 +47,8 @@ urlpatterns = [
         get_user_shopping_list_quantity,
         name="user-shopping-list",
     ),
-    path("components/<str:pks>/", get_components, name="component-list"),
+    path("components/", get_components, name="component-list"),
+    path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),
     path("module/<slug:slug>/", ModuleDetailView.as_view(), name="module-detail"),
     path(
         "module/<int:module_pk>/bom-list-items/",
