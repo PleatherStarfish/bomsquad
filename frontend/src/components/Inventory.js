@@ -8,6 +8,7 @@ import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import Pill from "../ui/Pill";
 import Modal from "../ui/Modal";
 import ControlledInput from "./ControlledInput";
+import { find } from 'lodash'
 
 const customStyles = {
   headCells: {
@@ -91,6 +92,17 @@ const Inventory = () => {
       await deleteMutation.mutate({ componentPk });
     } catch (error) {
       console.error("Failed to delete item", error);
+    }
+  });
+
+  const handlePillClick = useCallback(async (componentPk, index) => {
+    try {
+      const location = find(inventoryData, el => el?.component?.id === componentPk)?.location
+      location.splice(index, 1)
+      await mutation.mutate({ componentPk, location: location.join(", ") });
+
+    } catch (error) {
+      console.error("Failed to update location", error);
     }
   });
 
@@ -336,6 +348,7 @@ const Inventory = () => {
                     <Pill
                       key={index}
                       showArrow={index !== row.location.length - 1}
+                      onClick={() => handlePillClick(row.component.id, index)}
                     >
                       {item}
                     </Pill>
@@ -418,7 +431,7 @@ const Inventory = () => {
         submitButtonText={"Delete"}
         onSubmit={() => {
           setDataToDelete(undefined);
-          handleDelete(row.component.id);
+          handleDelete(dataToDelete.id);
         }}
       >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
     </>
