@@ -9,7 +9,6 @@ const useAddOrUpdateUserInventory = () => {
 
   const {mutate: addOrUpdateUserInventory} = useMutation({
     mutationFn: ({ componentId, ...data }) => {
-      console.log("useAddOrUpdateUserInventory", { componentId, ...data })
       return axios.post(
         `/api/inventory/${componentId}/add-or-update/`,
         data,

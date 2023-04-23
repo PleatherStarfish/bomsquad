@@ -6,7 +6,7 @@ import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
 import Modal from "../ui/Modal";
 import Pill from "../ui/Pill";
-import { find } from 'lodash'
+import { find } from 'lodash/find'
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";

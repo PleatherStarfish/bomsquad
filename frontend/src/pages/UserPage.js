@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Gravatar from 'react-gravatar'
 import Inventory from "../components/Inventory"
 import ModulesList from "../components/ModulesLists"
+import ShoppingList from "../components/ShoppingList"
 import cx from "classnames"
 import useAuthenticatedUser from "../services/useAuthenticatedUser"
 
@@ -85,6 +86,7 @@ const UserPage = () => {
         {selectedTab === "Built" &&  <ModulesList queryName="builtModules" url="/api/get-built-modules/" />}
         {selectedTab === "Want to Build" &&  <ModulesList queryName="wtbModules" url="/api/get-wtb-modules/" />}
         {selectedTab === "Inventory" &&  <Inventory />}
+        {selectedTab === "Shopping List" &&  <ShoppingList />}
       </section>
     </>
   );

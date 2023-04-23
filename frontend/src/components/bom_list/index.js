@@ -1,11 +1,11 @@
-import 'tippy.js/dist/tippy.css';
+import "tippy.js/dist/tippy.css";
 
 import Alert from "../../ui/Alert";
 import { Check2Circle } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
 import React from "react";
-import Tippy from '@tippyjs/react';
+import Tippy from "@tippyjs/react";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
 
@@ -18,7 +18,6 @@ export const customStyles = {
 };
 
 const BomList = ({ moduleId, moduleName }) => {
-
   const { user, userIsLoading } = useAuthenticatedUser();
 
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
@@ -31,8 +30,6 @@ const BomList = ({ moduleId, moduleName }) => {
     return <div>Error loading components: {moduleBomIsError.message}</div>;
   }
 
-  console.log(moduleBom)
-
   const moduleBomData = moduleBom.map((item) => ({
     ...item,
     moduleName,
@@ -43,14 +40,20 @@ const BomList = ({ moduleId, moduleName }) => {
     {
       name: <div className="sr-only">Alerts</div>,
       cell: (row) => {
-        return (row.quantity <= row.sum_of_user_options_from_inventory && 
-          <Tippy content={"Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."}>
-            <Check2Circle className="fill-[#548a6a] w-8 h-8" />
-          </Tippy>
-        )
+        return (
+          row.quantity <= row.sum_of_user_options_from_inventory && (
+            <Tippy
+              content={
+                "Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
+              }
+            >
+              <Check2Circle className="fill-[#548a6a] w-8 h-8" />
+            </Tippy>
+          )
+        );
       },
       sortable: false,
-      width: "60px"
+      width: "60px",
     },
     {
       name: <div>Name</div>,
@@ -99,11 +102,24 @@ const BomList = ({ moduleId, moduleName }) => {
 
   return (
     <div className="mb-8">
-      {!!user || (
+      {!!user ? (
+        <div className="mb-6 font-semibold">
+          Note: components are added to a shopping list for a particular module,
+          and quantities listed are for this module only. If you need to add
+          components to the shopping list that are not specific to any build, please visit the{" "}
+          <a href="/components/" className="text-blue-500 hover:text-blue-700">
+            Components
+          </a>{" "}
+          page.
+        </div>
+      ) : (
         <div className="mb-8">
           <Alert variant="warning">
             <div className="alert alert-warning" role="alert">
-              <a href="/accounts/login/" className="text-blue-500 hover:text-blue-700">
+              <a
+                href="/accounts/login/"
+                className="text-blue-500 hover:text-blue-700"
+              >
                 <b>Login</b>
               </a>{" "}
               to compare the bill of materials (BOM) against your personal user
@@ -118,7 +134,9 @@ const BomList = ({ moduleId, moduleName }) => {
         exportHeaders
         expandableRows
         expandOnRowClicked
-        progressComponent={<div className="text-gray-500 animate-pulse">Loading...</div>}
+        progressComponent={
+          <div className="text-gray-500 animate-pulse">Loading...</div>
+        }
         expandableRowsComponent={NestedTable}
         conditionalRowStyles={conditionalRowStyles}
         columns={columns}

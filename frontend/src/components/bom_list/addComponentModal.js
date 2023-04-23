@@ -1,10 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
 import { Fragment } from "react";
+import NumericInput from 'react-numeric-input';
 import useAddOrUpdateUserAnonymousShoppingList from "../../services/useAddOrUpdateUserAnonymousShoppingList";
 import useAddOrUpdateUserInventory from "../../services/useAddOrUpdateUserInventory";
 import useAddOrUpdateUserShoppingList from "../../services/useAddOrUpdateUserShoppingList";
@@ -62,7 +63,7 @@ const AddComponentModal = ({
   };
 
   useEffect(() => {
-    setQuantity(quantityRequired);
+    setQuantity(parseInt(quantityRequired));
   }, [quantityRequired]);
 
   const displayInventoryAlert =
@@ -139,10 +140,10 @@ const AddComponentModal = ({
                         >
                           Quantity to add:
                         </label>
-                        <input
+                        <NumericInput
                           id="quantityInput"
                           type="number"
-                          valueAsNumber={quantity}
+                          value={quantity}
                           onChange={(e) => setQuantity(e.target.value)}
                           className="w-full pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
                         />

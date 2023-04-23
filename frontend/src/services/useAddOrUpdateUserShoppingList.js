@@ -9,7 +9,6 @@ const useAddOrUpdateUserShoppingList = () => {
 
   const { mutate: addOrUpdateUserShoppingList } = useMutation({
     mutationFn: ({ componentId, ...data }) => {
-      console.log("useAddOrUpdateUserShoppingList", { componentId, ...data })
       return axios.post(
         `/api/shopping_list/${componentId}/add-or-update/`,
         data,

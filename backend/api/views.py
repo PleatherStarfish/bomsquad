@@ -225,10 +225,10 @@ def user_inventory_delete(request, component_pk):
 @api_view(["GET"])
 def get_user_shopping_list(request):
     """
-    Retrieve the user's own inventory.
+    Retrieve the user's own shooping list grouped by module.
     """
     user = request.user
-    inventory = UserShoppingList.objects.filter(user=user).sort("module__name")
+    inventory = UserShoppingList.objects.filter(user=user).order_by("module__name")
     serializer = UserShoppingListSerializer(inventory, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -275,19 +275,37 @@ def get_user_shopping_list_quantity(
 @login_required
 @api_view(["GET"])
 def get_user_anonymous_shopping_list_quantity(request, component_pk):
-    shopping_list_item = UserShoppingList.objects.filter(
-        component__id=component_pk,
-        user=request.user,
-    )
+    aggregate = request.query_params.get("aggregate", True)
 
-    # Check if inventory exists
-    if shopping_list_item.exists():
-        # Access the first inventory object in the QuerySet
-        # and retrieve the 'quantity' attribute
-        quantity = shopping_list_item.first().quantity
-        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+    if aggregate:
+        shopping_list_items = UserShoppingList.objects.filter(
+            component__id=component_pk,
+            user=request.user,
+        )
+
+        if shopping_list_items.exists():
+            quantity = shopping_list_items.aggregate(Sum("quantity"))["quantity__sum"]
+            return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+        else:
+            return Response({"quantity": 0}, status=status.HTTP_200_OK)
     else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+        shopping_list_item = (
+            UserShoppingList.objects.filter(
+                component__id=component_pk,
+                user=request.user,
+            )
+            .exclude(module__isnull=False)
+            .exclude(bom_item__isnull=False)
+        )
+
+        # Check if inventory exists
+        if shopping_list_item.exists():
+            # Access the first inventory object in the QuerySet
+            # and retrieve the 'quantity' attribute
+            quantity = shopping_list_item.first().quantity
+            return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+        else:
+            return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
 @login_required
@@ -326,8 +344,9 @@ def user_anonymous_shopping_list_add_or_update(request, component_pk):
 def user_shopping_list_add_or_update(request, component_pk):
     user = request.user
     quantity = int(request.data.get("quantity", 0))
-    module_bom_list_item = int(request.data.get("modulebomlistitem_pk", None))
-    module = int(request.data.get("module_pk", None))
+    module_bom_list_item_pk = int(request.data.get("modulebomlistitem_pk", None))
+    module_pk = int(request.data.get("module_pk", None))
+
     try:
         component = Component.objects.get(pk=component_pk)
     except Component.DoesNotExist:
@@ -336,47 +355,35 @@ def user_shopping_list_add_or_update(request, component_pk):
         )
 
     try:
-        module = Module.objects.get(pk=module)
-    except Component.DoesNotExist:
+        module_obj = Module.objects.get(pk=module_pk)
+    except Module.DoesNotExist:
         return Response(
             {"detail": "Module not found."}, status=status.HTTP_404_NOT_FOUND
         )
 
     try:
-        module_bom_list_item = ModuleBomListItem.objects.get(pk=module_bom_list_item)
-    except Component.DoesNotExist:
+        module_bom_list_item = ModuleBomListItem.objects.get(pk=module_bom_list_item_pk)
+    except ModuleBomListItem.DoesNotExist:
         return Response(
             {"detail": "Module BOM list item not found."},
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    print("==================", module_bom_list_item, "==================")
-
-    shopping_list_item = (
-        UserShoppingList.objects.filter(
-            user=user,
-            component=component,
-            bom_item=module_bom_list_item,
-            module=module,
-        )
-        .exclude(module__isnull=True)
-        .exclude(bom_item__isnull=True)
-        .first()
+    shopping_list_item, created = UserShoppingList.objects.get_or_create(
+        user=user,
+        component=component,
+        bom_item=module_bom_list_item,
+        module=module_obj,
+        defaults={"quantity": quantity},
     )
-    if shopping_list_item is not None:
+
+    if not created:
         shopping_list_item.quantity += quantity
         shopping_list_item.save()
-    else:
-        shopping_list_item = UserShoppingList.objects.create(
-            user=user,
-            component=component,
-            quantity=quantity,
-            bom_item=module_bom_list_item,
-            module=module,
-        )
 
     serializer = UserShoppingListSerializer(shopping_list_item)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+    return Response(serializer.data, status=status_code)
 
 
 @login_required

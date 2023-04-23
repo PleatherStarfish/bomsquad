@@ -4,8 +4,6 @@ import useAddToWtbMutation from '../services/useAddToWtbMutation';
 
 const AddModuleButtons = ({ module, moduleId, queryName }) => {
 
-  console.log(module)
-
   const hideBuilt = queryName === 'builtModules';
   const hideWtb = queryName === 'wtbModules';
 
