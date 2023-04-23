@@ -6,8 +6,10 @@ from accounts.models import CustomUser
 
 class UserShoppingList(models.Model):
     id = models.BigAutoField(primary_key=True)
-    module = models.ForeignKey(Module, null=True, on_delete=models.CASCADE)
-    bom_item = models.ForeignKey(ModuleBomListItem, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE)
+    bom_item = models.ForeignKey(
+        ModuleBomListItem, null=True, blank=True, on_delete=models.CASCADE
+    )
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0, blank=False)

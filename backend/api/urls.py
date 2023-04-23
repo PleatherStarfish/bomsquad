@@ -9,9 +9,13 @@ from api.views import (
     get_components,
     get_components_by_ids,
     get_user_inventory_quantity,
+    user_inventory_quantity_add_or_create,
     user_inventory_update,
     get_user_shopping_list,
+    user_anonymous_shopping_list_add_or_update,
+    user_shopping_list_add_or_update,
     get_user_shopping_list_quantity,
+    get_user_anonymous_shopping_list_quantity,
     get_user_inventory_quantities_for_bom_list_item,
     user_inventory_delete,
 )
@@ -32,6 +36,11 @@ urlpatterns = [
         name="user-inventory-quantity",
     ),
     path(
+        "inventory/<int:component_pk>/add-or-update/",
+        user_inventory_quantity_add_or_create,
+        name="user_inventory_add_or_update",
+    ),
+    path(
         "inventory/<int:component_pk>/update/",
         user_inventory_update,
         name="user_inventory_update",
@@ -42,6 +51,21 @@ urlpatterns = [
         name="user_inventory_delete",
     ),
     path("shopping_list/", get_user_shopping_list, name="user-shopping-list"),
+    path(
+        "shopping_list/<int:component_pk>/add-or-update/",
+        user_shopping_list_add_or_update,
+        name="user-shopping-list-add-or-update",
+    ),
+    path(
+        "shopping_list/<int:component_pk>/anonymous-add-or-update/",
+        user_anonymous_shopping_list_add_or_update,
+        name="user-anonymous-shopping-list-add-or-update",
+    ),
+    path(
+        "shopping_list/<int:component_pk>/component-quantity/",
+        get_user_anonymous_shopping_list_quantity,
+        name="user-shopping-list-anonymous",
+    ),
     path(
         "shopping_list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
         get_user_shopping_list_quantity,

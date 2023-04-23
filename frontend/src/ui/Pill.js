@@ -1,5 +1,6 @@
+import { ArrowLongRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
+
 import React from "react";
-import { XMarkIcon, ArrowLongRightIcon } from "@heroicons/react/24/solid";
 import cx from "classnames";
 
 const Pill = ({ color = "bg-slate-500", showArrow = true, onClick, children }) => {

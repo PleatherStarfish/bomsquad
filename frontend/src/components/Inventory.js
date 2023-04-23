@@ -1,14 +1,15 @@
-import React, { useState, useCallback } from "react";
-import DataTable from "react-data-table-component";
-import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import React, { useCallback, useState } from "react";
+
 import Button from "../ui/Button";
+import ControlledInput from "./ControlledInput";
+import DataTable from "react-data-table-component";
+import Modal from "../ui/Modal";
+import Pill from "../ui/Pill";
+import { find } from 'lodash'
+import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
-import useDeleteUserInventory from "../services/useDeleteUserInventory";
-import Pill from "../ui/Pill";
-import Modal from "../ui/Modal";
-import ControlledInput from "./ControlledInput";
-import { find } from 'lodash'
 
 const customStyles = {
   headCells: {
@@ -419,7 +420,7 @@ const Inventory = () => {
         subHeaderAlign="right"
         subHeaderWrap
         exportHeaders
-        progressComponent={<div className="text-gray-700 animate-pulse">Loading...</div>}
+        progressComponent={<div className="text-gray-500 animate-pulse">Loading...</div>}
         columns={columns}
         data={inventoryData}
         progressPending={inventoryDataIsLoading}

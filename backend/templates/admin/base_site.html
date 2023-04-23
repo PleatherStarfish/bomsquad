@@ -59,11 +59,11 @@
   <form method="post" action="{% url 'admin:login' %}">
     {% csrf_token %}
     <div class="fieldWrapper">
-      <label for="{{ form.username.id_for_label }}">Username:</label>
+      <label htmlFor="{{ form.username.id_for_label }}">Username:</label>
       {{ form.username }}
     </div>
     <div class="fieldWrapper">
-      <label for="{{ form.password.id_for_label }}">Password:</label>
+      <label htmlFor="{{ form.password.id_for_label }}">Password:</label>
       {{ form.password }}
     </div>
     <div class="submit-row">

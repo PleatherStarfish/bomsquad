@@ -1,11 +1,11 @@
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-const useGetUserShoppingListQuantity = (componentPk, moduleBomListItemPk, modulePk) => {
+const useGetUserAnonymousShoppingListQuantity = (componentPk) => {
   const fetchUserInventoryQuantity = async () => {
     try {
       const response = await axios.get(
-        `/api/shopping_list/${componentPk}/${moduleBomListItemPk}/${modulePk}/component-quantity/`
+        `/api/shopping_list/${componentPk}/component-quantity/`
       );
       return response.data.quantity;
     } catch (error) {
@@ -14,9 +14,9 @@ const useGetUserShoppingListQuantity = (componentPk, moduleBomListItemPk, module
   };
 
   return useQuery(
-    ["userInventoryQuantity", componentPk, moduleBomListItemPk, modulePk],
+    ["userAnonymousInventoryQuantity", componentPk],
     fetchUserInventoryQuantity
   );
 };
 
-export default useGetUserShoppingListQuantity;
+export default useGetUserAnonymousShoppingListQuantity;

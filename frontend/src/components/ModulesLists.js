@@ -1,8 +1,8 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import AddModuleButtons from "../components/AddModuleButtons";
 import Alert from "../ui/Alert";
+import React from "react";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 const useModulesList = (queryName, url) => {
   const { data: listData, isLoading, isError, error } = useQuery([queryName], async () => {
@@ -19,7 +19,7 @@ const ModulesList = ({ queryName, url }) => {
   const {listData, isLoading, isError, error} = useModulesList(queryName, url);
 
   if (isLoading) {
-    return <div className="text-gray-700 animate-pulse">Loading...</div>;
+    return <div className="text-gray-500 animate-pulse">Loading...</div>;
   }
 
   if (isError) {

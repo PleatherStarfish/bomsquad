@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import Gravatar from 'react-gravatar'
 import Inventory from "../components/Inventory"
 import ModulesList from "../components/ModulesLists"
@@ -19,7 +20,7 @@ const UserPage = () => {
 
   const { user, userIsLoading, userIsError } = useAuthenticatedUser()
 
-  if (userIsLoading) return <div className="text-gray-700 animate-pulse">Loading...</div>;
+  if (userIsLoading) return <div className="text-gray-500 animate-pulse">Loading...</div>;
   if (userIsError) return <div>Error!</div>;
 
   function handleTabChange(e) {

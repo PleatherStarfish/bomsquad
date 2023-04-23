@@ -1,12 +1,12 @@
-import React from "react";
-import ModuleLinks from '../components/ModuleLinks'
-import useModule from '../services/useModule'
 import BomList from "../components/bom_list";
+import ModuleLinks from '../components/ModuleLinks'
+import React from "react";
+import useModule from '../services/useModule'
 
 const ModuleDetail = ({ slug }) => {
   const { module, moduleIsLoading, moduleIsError } = useModule(slug)
 
-  if (moduleIsLoading) return <div className="text-gray-700 animate-pulse">Loading...</div>;
+  if (moduleIsLoading) return <div className="text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
 
   return (

@@ -1,16 +1,43 @@
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import React from "react";
 import cx from "classnames";
 
-export const ButtonVariant = {
-  warning: "bg-yellow-100 text-yellow-800", 
+export const AlertVariant = {
+  warning: "bg-yellow-100 text-yellow-800",
+  info: "bg-blue-50 text-blue-700",
   muted: "bg-gray-100 text-gray-500",
-  
 };
 
-const Alert = ({ variant = "muted", children }) => {
+export const AlertVariantPadding = {
+  normal: "p-6",
+  compact: "p-3",
+};
+
+export const AlertVariantIcon = {
+  info: (
+    <div className="flex-shrink-0">
+      <InformationCircleIcon
+        className="h-5 w-5 text-blue-400"
+        aria-hidden="true"
+      />
+    </div>
+  ),
+};
+
+const Alert = ({
+  variant = "muted",
+  icon = false,
+  padding = "normal",
+  children,
+}) => {
   return (
-    <div className={cx("p-6 rounded", ButtonVariant[variant])} role="alert">
-      {children}
+    <div className={cx("p-6 rounded w-full", AlertVariant[variant], AlertVariantPadding[padding])} role="alert">
+      <div className="flex w-full">
+        {icon && AlertVariantIcon[variant]}
+        <div className="ml-3 flex-1 md:flex md:justify-between">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };

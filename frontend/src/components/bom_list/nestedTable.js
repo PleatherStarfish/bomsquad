@@ -1,12 +1,13 @@
+import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
-import DataTable from "react-data-table-component";
-import useGetComponentsByIds from "../../services/useGetComponentsByIds";
-import useAuthenticatedUser from "../../services/useAuthenticatedUser";
-import Button from "../../ui/Button";
-import InventoryQuantity from "./userQty";
+
 import AddComponentModal from "./addComponentModal";
-import useUserInventoryQuantity from '../../services/useGetUserInventoryQuantity';
+import Button from "../../ui/Button";
+import DataTable from "react-data-table-component";
+import useAuthenticatedUser from "../../services/useAuthenticatedUser";
+import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserShoppingListQuantity from '../../services/useGetUserShoppingListQuantity';
+import useUserInventoryQuantity from '../../services/useGetUserInventoryQuantity';
 
 export const customStyles = {
   headCells: {
@@ -53,6 +54,7 @@ const NestedTable = (props) => {
       sortable: true,
       grow: 1,
       wrap: true,
+      minWidth: "200px"
     },
     {
       name: <div>Type</div>,
@@ -122,14 +124,14 @@ const NestedTable = (props) => {
     },
     {
       name: <div>Qty in User Inv.</div>,
-      cell: (row) => <InventoryQuantity useHook={useUserInventoryQuantity} hookArgs={[row.id]} />,
+      cell: (row) => <Quantity useHook={useUserInventoryQuantity} hookArgs={{component_pk: row.id}} />,
       sortable: false,
       omit: !user,
       width: "80px",
     },
     {
       name: <div>Qty in Shopping List</div>,
-      selector: (row) => <InventoryQuantity useHook={useGetUserShoppingListQuantity} hookArgs={[row.id, props.data.id, props.data.moduleId]} />,
+      selector: (row) => <Quantity useHook={useGetUserShoppingListQuantity} hookArgs={{component_pk: row.id, modulebomlistitem_pk: props.data.id, module_pk: props.data.moduleId}} />,
       sortable: false,
       omit: !user,
       width: "80px",
@@ -141,17 +143,64 @@ const NestedTable = (props) => {
           <>
             <Button
               variant="primary"
-              size="sm"
+              size="xs"
+              onClick={() => setInventoryModalOpen(row.id)}
+            >
+              + Inventory
+            </Button>
+            <AddComponentModal
+              open={inventoryModalOpen === row.id}
+              setOpen={setInventoryModalOpen}
+              title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
+              type={Types.INVENTORY}
+              text={<>
+                <span>
+                  {`${props.data.moduleName} requires ${props.data.quantity} x
+                  ${props.data.description}. How many `}
+                </span>
+                <span>
+                  <a
+                    href={row.link}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    {`${row.description} ${props.data.type.toLowerCase()}s by ${row.supplier?.name} `}
+                  </a>
+                </span>
+                <span>would you like to add to your inventory to fulfill this BOM item?
+                </span>
+              </>}
+              quantityRequired={props.data.quantity}
+              componentId={row.id}
+            />
+          </>
+        );
+      },
+      button: true,
+      sortable: false,
+      omit: !user,
+      ignoreRowClick: true,
+      width: "95px",
+    },
+    {
+      name: "",
+      cell: (row) => {
+        return (
+          <>
+            <Button
+              variant="primary"
+              size="xs"
               onClick={() => {
                 setShoppingModalOpen(row.id);
               }}
             >
-              Add to Shopping List
+              + Shopping List
             </Button>
             <AddComponentModal
               open={shoppingModalOpen === row.id}
               setOpen={setShoppingModalOpen}
               title={`Add ${row.description} to Shopping List?`}
+              type={Types.SHOPPING}
+              hookArgs={{component_pk: row.id, modulebomlistitem_pk: props.data.id, module_pk: props.data.moduleId}}
               text={
                 <>
                   <span>
@@ -180,51 +229,7 @@ const NestedTable = (props) => {
       sortable: false,
       omit: !user,
       ignoreRowClick: true,
-      width: "160px",
-    },
-    {
-      name: "",
-      cell: (row) => {
-        return (
-          <>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setInventoryModalOpen(row.id)}
-            >
-              Add to Inventory
-            </Button>
-            <AddComponentModal
-              open={inventoryModalOpen === row.id}
-              setOpen={setInventoryModalOpen}
-              title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
-              text={<>
-                <span>
-                  {`${props.data.moduleName} requires ${props.data.quantity} x
-                  ${props.data.description}. How many `}
-                </span>
-                <span>
-                  <a
-                    href={row.link}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    {`${row.description} ${props.data.type.toLowerCase()}s by ${row.supplier?.name} `}
-                  </a>
-                </span>
-                <span>would you like to add to your inventory to fulfill this BOM item?
-                </span>
-              </>}
-              quantityRequired={props.data.quantity}
-              componentId={row.id}
-            />
-          </>
-        );
-      },
-      button: true,
-      sortable: false,
-      omit: !user,
-      ignoreRowClick: true,
-      width: "140px",
+      width: "115px",
     },
   ];
 
@@ -241,7 +246,7 @@ const NestedTable = (props) => {
         progressPending={componentsAreLoading}
         progressComponent={
           <div className="flex justify-center w-full bg-sky-50 p-6">
-            <div className="text-gray-700 animate-pulse">Loading...</div>
+            <div className="text-gray-500 animate-pulse">Loading...</div>
           </div>
         }
         customStyles={customStyles}

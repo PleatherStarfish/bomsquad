@@ -1,0 +1,33 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import Cookies from "js-cookie";
+import axios from "axios";
+
+const useAddOrUpdateUserShoppingList = () => {
+  const csrftoken = Cookies.get("csrftoken");
+  const queryClient = useQueryClient();
+
+  const { mutate: addOrUpdateUserShoppingList } = useMutation({
+    mutationFn: ({ componentId, ...data }) => {
+      console.log("useAddOrUpdateUserShoppingList", { componentId, ...data })
+      return axios.post(
+        `/api/shopping_list/${componentId}/add-or-update/`,
+        data,
+        {
+          headers: {
+            "X-CSRFToken": csrftoken,
+          },
+          withCredentials: true,
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("shoppingList");
+      queryClient.refetchQueries("shoppingList");
+    },
+  });
+
+  return addOrUpdateUserShoppingList;
+};
+
+export default useAddOrUpdateUserShoppingList;

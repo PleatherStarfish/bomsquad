@@ -145,6 +145,40 @@ def get_user_inventory(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(["POST"])
+def user_inventory_quantity_add_or_create(request, component_pk):
+    user = request.user
+
+    # Check if the user inventory item exists
+    try:
+        user_inventory_item = UserInventory.objects.get(
+            user=user, component_id=component_pk
+        )
+    except UserInventory.DoesNotExist:
+        user_inventory_item = None
+
+    # If the user inventory item exists, update the quantity
+    if user_inventory_item is not None:
+        user_inventory_item.quantity += int(request.data.get("quantity", 0))
+        user_inventory_item.save()
+        serializer = UserInventorySerializer(user_inventory_item)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # If the user inventory item does not exist, create a new one
+    try:
+        quantity = int(request.data.get("quantity", 0))
+        component = Component.objects.get(id=component_pk)
+        user_inventory = UserInventory.objects.create(
+            user=user, component=component, quantity=quantity
+        )
+        serializer = UserInventorySerializer(user_inventory)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Component not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+
 @login_required
 @api_view(["PATCH"])
 def user_inventory_update(request, component_pk):
@@ -236,6 +270,113 @@ def get_user_shopping_list_quantity(
         return Response({"quantity": quantity}, status=status.HTTP_200_OK)
     else:
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["GET"])
+def get_user_anonymous_shopping_list_quantity(request, component_pk):
+    shopping_list_item = UserShoppingList.objects.filter(
+        component__id=component_pk,
+        user=request.user,
+    )
+
+    # Check if inventory exists
+    if shopping_list_item.exists():
+        # Access the first inventory object in the QuerySet
+        # and retrieve the 'quantity' attribute
+        quantity = shopping_list_item.first().quantity
+        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+    else:
+        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["POST"])
+def user_anonymous_shopping_list_add_or_update(request, component_pk):
+    user = request.user
+    quantity = int(request.data.get("quantity", 0))
+    try:
+        component = Component.objects.get(pk=component_pk)
+        print(component)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    shopping_list_item = (
+        UserShoppingList.objects.filter(user=user, component=component)
+        .exclude(module__isnull=False)
+        .exclude(bom_item__isnull=False)
+        .first()
+    )
+    if shopping_list_item is not None:
+        shopping_list_item.quantity += quantity
+        shopping_list_item.save()
+    else:
+        shopping_list_item = UserShoppingList.objects.create(
+            user=user, component=component, quantity=quantity
+        )
+
+    serializer = UserShoppingListSerializer(shopping_list_item)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["POST"])
+def user_shopping_list_add_or_update(request, component_pk):
+    user = request.user
+    quantity = int(request.data.get("quantity", 0))
+    module_bom_list_item = int(request.data.get("modulebomlistitem_pk", None))
+    module = int(request.data.get("module_pk", None))
+    try:
+        component = Component.objects.get(pk=component_pk)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        module = Module.objects.get(pk=module)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Module not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        module_bom_list_item = ModuleBomListItem.objects.get(pk=module_bom_list_item)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Module BOM list item not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    print("==================", module_bom_list_item, "==================")
+
+    shopping_list_item = (
+        UserShoppingList.objects.filter(
+            user=user,
+            component=component,
+            bom_item=module_bom_list_item,
+            module=module,
+        )
+        .exclude(module__isnull=True)
+        .exclude(bom_item__isnull=True)
+        .first()
+    )
+    if shopping_list_item is not None:
+        shopping_list_item.quantity += quantity
+        shopping_list_item.save()
+    else:
+        shopping_list_item = UserShoppingList.objects.create(
+            user=user,
+            component=component,
+            quantity=quantity,
+            bom_item=module_bom_list_item,
+            module=module,
+        )
+
+    serializer = UserShoppingListSerializer(shopping_list_item)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @login_required

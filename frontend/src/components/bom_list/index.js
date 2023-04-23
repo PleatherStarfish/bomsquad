@@ -1,12 +1,13 @@
-import React from "react";
-import DataTable from "react-data-table-component";
-import useModuleBomListItems from "../../services/useModuleBomListItems";
-import NestedTable from "./nestedTable";
-import Alert from "../../ui/Alert";
-import useAuthenticatedUser from "../../services/useAuthenticatedUser";
-import { Check2Circle } from "react-bootstrap-icons";
-import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+
+import Alert from "../../ui/Alert";
+import { Check2Circle } from "react-bootstrap-icons";
+import DataTable from "react-data-table-component";
+import NestedTable from "./nestedTable";
+import React from "react";
+import Tippy from '@tippyjs/react';
+import useAuthenticatedUser from "../../services/useAuthenticatedUser";
+import useModuleBomListItems from "../../services/useModuleBomListItems";
 
 export const customStyles = {
   headCells: {
@@ -24,7 +25,7 @@ const BomList = ({ moduleId, moduleName }) => {
     useModuleBomListItems(moduleId);
 
   if (moduleBomIsLoading)
-    return <div className="text-gray-700 animate-pulse">Loading...</div>;
+    return <div className="text-gray-500 animate-pulse">Loading...</div>;
 
   if (moduleBomIsError) {
     return <div>Error loading components: {moduleBomIsError.message}</div>;
@@ -117,7 +118,7 @@ const BomList = ({ moduleId, moduleName }) => {
         exportHeaders
         expandableRows
         expandOnRowClicked
-        progressComponent={<div className="text-gray-700 animate-pulse">Loading...</div>}
+        progressComponent={<div className="text-gray-500 animate-pulse">Loading...</div>}
         expandableRowsComponent={NestedTable}
         conditionalRowStyles={conditionalRowStyles}
         columns={columns}

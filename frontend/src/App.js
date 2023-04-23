@@ -1,8 +1,9 @@
-import React from "react";
 import { Route, Switch } from "wouter";
-import ModuleDetail from "./pages/ModuleDetail";
-import UserPage from "./pages/UserPage";
+
 import Components from "./pages/Components";
+import ModuleDetail from "./pages/ModuleDetail";
+import React from "react";
+import UserPage from "./pages/UserPage";
 
 const App = () => {
   return (
