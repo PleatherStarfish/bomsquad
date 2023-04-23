@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
+from django.db.models import Q
+
 from modules.models import Module, ModuleBomListItem
 from components.models import Component
 from accounts.models import CustomUser
@@ -25,7 +28,17 @@ class UserShoppingList(models.Model):
             models.Index(fields=["user", "component", "bom_item"]),
             models.Index(fields=["user", "component", "bom_item", "module"]),
         ]
-        unique_together = ("user", "component", "bom_item", "module")
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "component", "bom_item", "module"],
+                name="unique_with_optional",
+            ),
+            UniqueConstraint(
+                fields=["user", "component"],
+                condition=Q(bom_item=None, module=None),
+                name="unique_without_optional",
+            ),
+        ]
 
     def __str__(self):
         return f"[ {self.user} ] - {self.component}"
