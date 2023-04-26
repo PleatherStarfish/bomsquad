@@ -124,8 +124,8 @@ const Inventory = () => {
               row.component.price,
               row.quantity,
               row.location
-                ? row.location.join(", ").replace(", ", " -> ")
-                : "-",
+                ? row.location.join(", ")
+                : "",
             ].join(",")
           )
           .join("\n")

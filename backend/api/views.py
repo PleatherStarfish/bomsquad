@@ -252,6 +252,25 @@ def get_user_inventory_quantity(request, component_pk):
 
 @login_required
 @api_view(["GET"])
+def get_user_shopping_list_quantity_bom_item_agnostic(request, component_pk, module_pk):
+    shopping_list_item = UserShoppingList.objects.filter(
+        component__id=component_pk,
+        module__id=module_pk,
+        user=request.user,
+    )
+
+    # Check if inventory exists
+    if shopping_list_item.exists():
+        # Access the first inventory object in the QuerySet
+        # and retrieve the 'quantity' attribute
+        quantity = shopping_list_item.first().quantity
+        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+    else:
+        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+
+
+@login_required
+@api_view(["GET"])
 def get_user_shopping_list_quantity(
     request, component_pk, modulebomlistitem_pk, module_pk
 ):

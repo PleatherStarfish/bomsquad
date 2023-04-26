@@ -1,5 +1,5 @@
+import _ from "lodash";
 import axios from "axios";
-import { groupBy } from "lodash";
 import { useQuery } from "@tanstack/react-query";
 
 const useUserShoppingList = () => {
@@ -8,15 +8,23 @@ const useUserShoppingList = () => {
     isLoading: userShoppingListIsLoading,
     isError: userShoppingListIsError,
   } = useQuery(["userShoppingList"], async () => {
-        const response = await axios.get("/api/shopping_list/");
-        const grouped = groupBy(response.data, "module_name");
-        return grouped;
-      });
+    const response = await axios.get("/api/shopping_list/");
+    const groupedByModule = _(response.data)
+      .groupBy("module_name")
+      .toPairs()
+      .sortBy(([key]) => (key === "null" ? "" : key)) // key by component id
+      .map(([key, value]) => ({ name: key, data: _.groupBy(value, "component.id") }))
+      .value();
+
+    const aggregatedComponents = _(response.data).uniqBy("component.id").sortBy("component.supplier.name").value();
+
+    return { groupedByModule, aggregatedComponents };
+  });
   return {
     userShoppingListData,
     userShoppingListIsLoading,
     userShoppingListIsError,
   };
-}
+};
 
 export default useUserShoppingList;

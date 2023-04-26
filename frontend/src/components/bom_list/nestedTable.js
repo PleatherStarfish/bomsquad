@@ -237,10 +237,6 @@ const NestedTable = (props) => {
     <div className="py-1 px-3 ml-[47px] bg-sky-50">
       <DataTable
         compact
-        fixedHeader
-        responsive
-        subHeaderAlign="right"
-        subHeaderWrap
         columns={columns}
         data={componentsData}
         progressPending={componentsAreLoading}

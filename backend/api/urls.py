@@ -14,6 +14,7 @@ from api.views import (
     get_user_shopping_list,
     user_anonymous_shopping_list_add_or_update,
     user_shopping_list_add_or_update,
+    get_user_shopping_list_quantity_bom_item_agnostic,
     get_user_shopping_list_quantity,
     get_user_anonymous_shopping_list_quantity,
     get_user_inventory_quantities_for_bom_list_item,
@@ -65,6 +66,11 @@ urlpatterns = [
         "shopping_list/<int:component_pk>/component-quantity/",
         get_user_anonymous_shopping_list_quantity,
         name="user-shopping-list-anonymous",
+    ),
+    path(
+        "shopping_list/<int:component_pk>/<int:module_pk>/component-quantity/",
+        get_user_shopping_list_quantity_bom_item_agnostic,
+        name="user-shopping-list-bom-item-agnostic",
     ),
     path(
         "shopping_list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
