@@ -27,6 +27,7 @@ const TotalQuantity = ({ componentId }) => {
 const ListSlice = ({
   name,
   index,
+  slug,
   allModulesData,
   componentsInModule,
   aggregatedComponents,
@@ -86,9 +87,24 @@ const ListSlice = ({
 
   const qtyColumns = [
     {
-      name: (
+      name: slug ? (
         <div className="text-bold">
-          {name === "null" ? "Module not specif." : `${name} qty.`}
+          {name === "null" ? (
+            "Other"
+          ) : (
+            <span>
+              <a
+                href={`/module/${slug}`}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                {name}
+              </a>
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="text-bold">
+          {name === "null" ? "Other" : name}
         </div>
       ),
       selector: (row) => (
@@ -114,7 +130,7 @@ const ListSlice = ({
       ),
       sortable: false,
       width: "100px",
-	  style: { backgroundColor: "#f0f9ff" },
+      style: { backgroundColor: "#f0f9ff" },
     },
   ];
 

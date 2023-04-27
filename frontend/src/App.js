@@ -1,24 +1,39 @@
-import { Route, Switch } from "wouter";
+import { Route, Routes } from "react-router-dom";
 
 import Components from "./pages/Components";
+import Inventory from "./components/Inventory";
 import ModuleDetail from "./pages/ModuleDetail";
+import ModulesList from "./components/ModulesLists";
 import React from "react";
+import ShoppingList from "./components/ShoppingList";
 import UserPage from "./pages/UserPage";
 
 const App = () => {
   return (
     <div className="h-full">
-      <Switch>
-        <Route path="/components/">
-          {() => <Components />}
-        </Route>
-        <Route path="/module/:slug">
-          {(params) => <ModuleDetail slug={params.slug} />}
-        </Route>
-        <Route path="/user/:username">
-          {(params) => <UserPage username={params.username} />}
-        </Route>
-      </Switch>
+        <Routes>
+          <Route path="/components/" element={<Components />} />
+          <Route path="/module/:slug" element={<ModuleDetail />} />
+          <Route path="/user/:username" element={<UserPage />} >
+            <Route
+              index
+              element={
+                <ModulesList
+                  queryName="builtModules"
+                  url="/api/get-built-modules/"
+                />
+              }
+            />
+            <Route
+              path={`want-to-build`}
+              element={
+                <ModulesList queryName="wtbModules" url="/api/get-wtb-modules/" />
+              }
+            />
+            <Route path={`inventory`} element={<Inventory />} />
+            <Route path={`shopping-list`} element={<ShoppingList />} />
+          </Route>
+        </Routes>
     </div>
   );
 };
