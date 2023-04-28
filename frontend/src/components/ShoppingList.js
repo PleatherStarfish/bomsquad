@@ -1,5 +1,6 @@
 import ListSlice from "./shopping_list/listSlice";
 import React from "react";
+import Toggle from "../ui/Toggle"
 import _ from "lodash";
 import useGetUserShoppingList from "../services/useGetUserShoppingList";
 
@@ -21,6 +22,7 @@ const ShoppingList = () => {
 
   return (
     <div>
+      <Toggle />
       <div className="flex">
         {[{name: "", data: []}, ...userShoppingListData.groupedByModule, {name: "TOTAL", data: []}].map((value, index) => {
           const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module?.slug

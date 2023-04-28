@@ -6,7 +6,7 @@ import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
 import Modal from "../ui/Modal";
 import Pill from "../ui/Pill";
-import { find } from 'lodash/find'
+import { find } from "lodash/find";
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
@@ -41,7 +41,6 @@ const handleClick = (
 };
 
 const Inventory = () => {
-
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
 
@@ -98,10 +97,12 @@ const Inventory = () => {
 
   const handlePillClick = useCallback(async (componentPk, index) => {
     try {
-      const location = find(inventoryData, el => el?.component?.id === componentPk)?.location
-      location.splice(index, 1)
+      const location = find(
+        inventoryData,
+        (el) => el?.component?.id === componentPk
+      )?.location;
+      location.splice(index, 1);
       await mutation.mutate({ componentPk, location: location.join(", ") });
-
     } catch (error) {
       console.error("Failed to update location", error);
     }
@@ -123,9 +124,7 @@ const Inventory = () => {
               row.component.farads,
               row.component.price,
               row.quantity,
-              row.location
-                ? row.location.join(", ")
-                : "",
+              row.location ? row.location.join(", ") : "",
             ].join(",")
           )
           .join("\n")
@@ -297,7 +296,7 @@ const Inventory = () => {
                 }
                 role="button"
               >
-                <PencilSquareIcon className="stroke-slate-500 w-4 h-4 hover:stroke-pink-500" />
+                <PencilSquareIcon className="stroke-slate-400 w-4 h-4 hover:stroke-pink-500" />
               </div>
             )}
           </div>
@@ -391,8 +390,8 @@ const Inventory = () => {
             role="button"
             className="stroke-slate-500 w-5 h-5 hover:stroke-pink-500"
             onClick={() => {
-              setDataToDelete(row.component)
-              setDeleteModalOpen(true)
+              setDataToDelete(row.component);
+              setDeleteModalOpen(true);
             }}
           />
         );
@@ -420,7 +419,9 @@ const Inventory = () => {
         subHeaderAlign="right"
         subHeaderWrap
         exportHeaders
-        progressComponent={<div className="text-gray-500 animate-pulse">Loading...</div>}
+        progressComponent={
+          <div className="text-gray-500 animate-pulse">Loading...</div>
+        }
         columns={columns}
         data={inventoryData}
         progressPending={inventoryDataIsLoading}

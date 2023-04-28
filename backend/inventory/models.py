@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
 from components.models import Component
+from model_utils import FieldTracker
 
 
 class UserInventory(models.Model):
@@ -9,6 +10,7 @@ class UserInventory(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0, blank=False)
     location = models.JSONField(null=True, blank=True)
+    tracker = FieldTracker()
 
     class Meta:
         verbose_name_plural = "User Component Inventory"

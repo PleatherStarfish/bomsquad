@@ -5,6 +5,7 @@ import Inventory from "./components/Inventory";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
 import React from "react";
+import Settings from "./components/settings";
 import ShoppingList from "./components/ShoppingList";
 import UserPage from "./pages/UserPage";
 
@@ -14,6 +15,7 @@ const App = () => {
         <Routes>
           <Route path="/components/" element={<Components />} />
           <Route path="/module/:slug" element={<ModuleDetail />} />
+          <Route path={`/user/:username/settings/`} element={<Settings />} />
           <Route path="/user/:username" element={<UserPage />} >
             <Route
               index
@@ -25,13 +27,22 @@ const App = () => {
               }
             />
             <Route
-              path={`want-to-build`}
+              path={`built/`}
+              element={
+                <ModulesList
+                  queryName="builtModules"
+                  url="/api/get-built-modules/"
+                />
+              }
+            />
+            <Route
+              path={`want-to-build/`}
               element={
                 <ModulesList queryName="wtbModules" url="/api/get-wtb-modules/" />
               }
             />
-            <Route path={`inventory`} element={<Inventory />} />
-            <Route path={`shopping-list`} element={<ShoppingList />} />
+            <Route path={`inventory/`} element={<Inventory />} />
+            <Route path={`shopping-list/`} element={<ShoppingList />} />
           </Route>
         </Routes>
     </div>

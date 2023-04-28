@@ -1,6 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
 import React, { useState } from "react";
 
+import Button from "../ui/Button";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Gravatar from "react-gravatar";
 import cx from "classnames";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
@@ -29,7 +31,7 @@ const UserPage = () => {
 
   return (
     <>
-      <div className="flex items-center py-6 mt-12">
+      <div className="w-full flex items-center py-6 mt-12">
         <div>
           <Gravatar
             className="rounded-full"
@@ -38,11 +40,21 @@ const UserPage = () => {
             size={100}
           />
         </div>
-        <div className="ml-4">
+        <div className="grow ml-6">
           <h1 className="text-2xl font-medium text-gray-700 group-hover:text-gray-900">
             {user.username}
           </h1>
         </div>
+        <Link to="settings">
+          <Button
+            variant="muted"
+            size="md"
+            Icon={Cog6ToothIcon}
+            iconLocation="left"
+          >
+            Account settings
+          </Button>
+        </Link>
       </div>
       <div className="relative border-b border-gray-200">
         <div className="mt-4">
@@ -69,7 +81,7 @@ const UserPage = () => {
               {tabs.map((tab) => (
                 <Link
                   key={tab.name}
-                  to={`${tab.to}`}
+                  to={tab.to}
                   className={cx(
                     tab.name === selectedTab
                       ? "pb-4 border-pink-500 text-pink-600"

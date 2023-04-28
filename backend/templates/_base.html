@@ -19,27 +19,24 @@
       type="image/x-icon"
       href="{% static 'images/logo.png' %}"
     />
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 
     {% block css %}{% endblock css %}
   </head>
 
   <body class="min-h-screen">
-      <header>{% include "nav.html" %}</header>
+    <header>{% include "nav.html" %}</header>
 
-      <div class="flex flex-col min-h-screen">
-        <div class="mb-12 mt-32 py-8 px-4 md:px-24 lg:px-48 grow">
-          <div id="preact_root"></div>
-          {% block content %}{% endblock content %}
-        </div>
-        <footer>
-          {% include "footer.html" %}
-        </footer>
+    <div class="flex flex-col min-h-screen">
+      <div class="mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow">
+        {% block content %}{% endblock content %}
       </div>
+      <footer>{% include "footer.html" %}</footer>
+    </div>
 
     <!-- Project JS -->
     <script src="{% static 'js/base.js' %}"></script>
-    
+
     {% block javascript %}{% endblock javascript %}
   </body>
 </html>
