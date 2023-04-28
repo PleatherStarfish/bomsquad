@@ -1,10 +1,16 @@
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  LightBulbIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import React, { useCallback, useState } from "react";
 
 import Button from "../ui/Button";
 import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
+import { Link } from "react-router-dom";
 import Modal from "../ui/Modal";
+import NumericInput from "react-numeric-input";
 import Pill from "../ui/Pill";
 import { find } from "lodash/find";
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
@@ -116,18 +122,32 @@ const Inventory = () => {
     const csvData =
       "data:text/csv;charset=utf-8," +
       encodeURIComponent(
-        inventoryData
-          .map((row) =>
-            [
-              row.component.description,
-              row.component.supplier_item_no,
-              row.component.farads,
-              row.component.price,
-              row.quantity,
-              row.location ? row.location.join(", ") : "",
-            ].join(",")
-          )
-          .join("\n")
+        [
+          "Name",
+          "Supplier Item No",
+          "Farads",
+          "Price",
+          "Quantity",
+          "Location",
+        ].join(",") +
+          "\n" +
+          inventoryData
+            .map((row) =>
+              [
+                row.component.description.replace(/,/g, ""),
+                row.component.supplier_item_no.replace(/,/g, ""),
+                row.component.farads,
+                row.component.price,
+                row.quantity,
+                row.location
+                  ? row.location
+                      .map((item) => item.trim())
+                      .join()
+                      .replace(/,/g, " -> ")
+                  : "",
+              ].join(",")
+            )
+            .join("\n")
       );
 
     const downloadLink = document.createElement("a");
@@ -251,7 +271,7 @@ const Inventory = () => {
                   className="w-full flex content-center gap-1"
                   onSubmit={(e) => e.preventDefault()}
                 >
-                  <input
+                  <NumericInput
                     className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
                     type="number"
                     value={updatedQuantityToSubmit ?? row.quantity}
@@ -296,7 +316,7 @@ const Inventory = () => {
                 }
                 role="button"
               >
-                <PencilSquareIcon className="stroke-slate-400 w-4 h-4 hover:stroke-pink-500" />
+                <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
               </div>
             )}
           </div>
@@ -370,7 +390,7 @@ const Inventory = () => {
               }
               role="button"
             >
-              <PencilSquareIcon className="stroke-slate-500 w-4 h-4 hover:stroke-pink-500" />
+              <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
             </div>
           )}
         </div>
@@ -402,14 +422,19 @@ const Inventory = () => {
 
   return (
     <>
-      <div className="w-full flex justify-end">
+      <div className="w-full flex justify-end gap-2 mb-8">
         {inventoryData && inventoryData.length > 0 && (
-          <button
-            className="inline-flex items-center px-2 py-1 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
-            onClick={handleDownloadCSV}
-          >
-            Download CSV
-          </button>
+          <>
+            <Button version="primary" Icon={LightBulbIcon} iconLocation="left">
+              Soldering Mode
+            </Button>
+            <Link to="version-history/">
+              <Button version="primary">Version History</Button>
+            </Link>
+            <Button version="primary" onClick={handleDownloadCSV}>
+              Download CSV
+            </Button>
+          </>
         )}
       </div>
       <DataTable

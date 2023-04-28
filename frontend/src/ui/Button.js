@@ -31,7 +31,7 @@ export const ButtonVariant = {
 const Button = ({
   size = "md",
   variant = "primary",
-  onClick = () => {},
+  onClick,
   classNames = "",
   Icon = undefined,
   iconLocation = "left",

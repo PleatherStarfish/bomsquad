@@ -1,5 +1,5 @@
-import { Link, Outlet } from "react-router-dom";
-import React, { useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
 import Button from "../ui/Button";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
@@ -19,7 +19,16 @@ const UserPage = () => {
     tabs.find((tab) => tab.current).name
   );
 
+  const location = useLocation();
+
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
+
+  useEffect(() => {
+    const matchingTab = tabs.find((tab) => location.pathname.includes(tab.to));
+    if (matchingTab) {
+      setSelectedTab(matchingTab.name);
+    }
+  }, [location]);
 
   if (userIsLoading)
     return <div className="text-gray-500 animate-pulse">Loading...</div>;

@@ -41,6 +41,11 @@ frontend_redirect_urls = [
         name="user-inventory",
     ),
     path(
+        "user/<str:username>/inventory/version-history/",
+        TemplateView.as_view(template_name="frontend.html"),
+        name="user-inventory-version-history",
+    ),
+    path(
         "user/<str:username>/shopping-list/",
         TemplateView.as_view(template_name="frontend.html"),
         name="user-shopping-list",
