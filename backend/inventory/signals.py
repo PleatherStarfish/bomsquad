@@ -2,6 +2,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from inventory.models import UserInventory
 from django.utils.timezone import now
+from django.db.models.signals import pre_save
+import bleach
+
+
+@receiver(pre_save, sender=UserInventory)
+def save_old_fields(sender, instance, **kwargs):
+    if instance.pk:
+        old_instance = UserInventory.objects.get(pk=instance.pk)
+        instance.old_quantity = old_instance.quantity
+        instance.old_location = old_instance.location
 
 
 @receiver(post_save, sender=UserInventory)
@@ -12,9 +22,9 @@ def update_user_inventory_history(sender, instance, created, **kwargs):
     # Create a new entry for the change history
     history_entry = {
         "component_id": instance.component_id,
-        "quantity_before": instance.tracker.previous('quantity'),
+        "quantity_before": instance.old_quantity,
         "quantity_after": instance.quantity,
-        "location_before": instance.tracker.previous('location'),
+        "location_before": instance.old_location,
         "location_after": instance.location,
         "timestamp": str(now()),
     }

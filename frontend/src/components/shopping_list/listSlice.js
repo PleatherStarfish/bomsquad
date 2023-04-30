@@ -1,17 +1,28 @@
+import {
+  ArrowPathIcon,
+  PencilSquareIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import React, { useState } from "react";
+
+import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
-import React from "react";
+import NumericInput from "react-numeric-input";
 import cx from "classnames";
 import { get } from "lodash";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 
-const Quantity = ({ componentId, componentsInModule }) => {
+const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
   const compsForModuleThatMatchRow = get(componentsInModule, componentId, []);
   const totalQuantity = compsForModuleThatMatchRow.reduce(
     (acc, obj) => acc + obj.quantity,
     0
   );
   return totalQuantity ? (
-    <span className="font-bold">{totalQuantity}</span>
+    <>
+      <span className="font-bold">{totalQuantity}</span>
+      {pencilComponent}
+    </>
   ) : undefined;
 };
 
@@ -33,6 +44,9 @@ const ListSlice = ({
   aggregatedComponents,
   componentsAreLoading,
 }) => {
+  const [quantityIdToEdit, setQuantityIdToEdit] = useState();
+  const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
+
   const labelColumns = [
     {
       name: <div className="text-gray-400 font-bold">Description</div>,
@@ -103,18 +117,79 @@ const ListSlice = ({
           )}
         </div>
       ) : (
-        <div className="text-bold">
-          {name === "null" ? "Other" : name}
-        </div>
+        <div className="text-bold">{name === "null" ? "Other" : name}</div>
       ),
-      selector: (row) => (
-        <Quantity
-          componentId={row.component.id}
-          componentsInModule={componentsInModule}
-        />
-      ),
+      cell: (row) => {
+        return (
+          <div className="flex justify-between content-center w-full">
+            {row.component.id === quantityIdToEdit ? (
+              <div>
+                <form
+                  className="w-full flex content-center gap-1"
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <NumericInput
+                    className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+                    type="number"
+                    value={updatedQuantityToSubmit ?? row.quantity}
+                    onChange={(e) => handleQuantityChange(e)}
+                  />
+                  <div className="flex gap-1 justify-around">
+                    <Button
+                      className="h-full"
+                      variant="muted"
+                      size="xs"
+                      iconOnly
+                      Icon={XMarkIcon}
+                      onClick={() => {
+                        setQuantityIdToEdit(undefined);
+                        setUpdatedQuantityToSubmit(undefined);
+                      }}
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      className="h-full"
+                      variant="primary"
+                      size="xs"
+                      iconOnly
+                      Icon={ArrowPathIcon}
+                      onClick={() => handleSubmitQuantity(row.component.id)}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <Quantity
+                componentId={row.component.id}
+                componentsInModule={componentsInModule}
+                pencilComponent={
+                  row.component.id !== quantityIdToEdit && (
+                    <div
+                      onClick={() =>
+                        handleClick(
+                          row,
+                          "quantity",
+                          quantityIdToEdit,
+                          setQuantityIdToEdit,
+                          setUpdatedQuantityToSubmit
+                        )
+                      }
+                      role="button"
+                    >
+                      <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
+                    </div>
+                  )
+                }
+              />
+            )}
+          </div>
+        );
+      },
       sortable: false,
-      width: "100px",
+      width: quantityIdToEdit ? "165px" : "100px",
     },
   ];
 
@@ -134,8 +209,30 @@ const ListSlice = ({
     },
   ];
 
+  const handleClick = (
+    row,
+    field,
+    fieldIdToEdit,
+    setFieldIdToEdit,
+    setUpdatedFieldToSubmit
+  ) => {
+    const { component, [field]: fieldValue } = row;
+    if (component.id !== fieldIdToEdit) {
+      setFieldIdToEdit(component.id);
+      setUpdatedFieldToSubmit(fieldValue);
+    } else {
+      setFieldIdToEdit(undefined);
+    }
+  };
+
   return (
-    <div className={cx({ "w-[450px]": index === 0, "w-[100px]": index !== 0 })}>
+    <div
+      className={cx({
+        "w-[450px]": index === 0,
+        "w-[100px]": index !== 0 && !quantityIdToEdit,
+        "w-[165px]": index !== 0 && quantityIdToEdit,
+      })}
+    >
       <div className={cx({ "border-r border-gray-300": index === 0 })}>
         <DataTable
           compact

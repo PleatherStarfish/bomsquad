@@ -21,27 +21,23 @@ from inventory.models import UserInventory
 from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q
+from accounts.serializers import UserSerializer, UserHistorySerializer
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
 @login_required
 def get_user_me(request):
     user = request.user
-    data = {
-        "id": user.id,
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-    }
-    response = Response(data)
-    response["Access-Control-Allow-Origin"] = "http://localhost:3000"
-    response["Access-Control-Allow-Methods"] = "GET"
-    response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
-    response["Access-Control-Allow-Credentials"] = "true"
-    csrf.get_token(request)
-    return response
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@login_required
+def get_user_history(request):
+    user = request.user
+    serializer = UserHistorySerializer(user)
+    return Response(serializer.data)
 
 
 class ModuleDetailView(generics.RetrieveAPIView):
@@ -64,10 +60,11 @@ class ModuleDetailView(generics.RetrieveAPIView):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@login_required
 def get_built_modules(request):
     # Get all built modules for the current user
-    built_modules = BuiltModules.objects.filter(user=request.user).order_by("-id")
+    built_modules = BuiltModules.objects.filter(
+        user=request.user).order_by("-id")
 
     # Paginate the results
     paginator = Paginator(built_modules, 10)  # Show 10 built modules per page
@@ -99,10 +96,11 @@ def get_built_modules(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@login_required
 def get_wtb_modules(request):
     # Get all built modules for the current user
-    built_modules = WantToBuildModules.objects.filter(user=request.user).order_by("-id")
+    built_modules = WantToBuildModules.objects.filter(
+        user=request.user).order_by("-id")
 
     # Paginate the results
     paginator = Paginator(built_modules, 10)  # Show 10 built modules per page
@@ -228,7 +226,8 @@ def get_user_shopping_list(request):
     Retrieve the user's own shooping list grouped by module.
     """
     user = request.user
-    inventory = UserShoppingList.objects.filter(user=user).order_by("module__name")
+    inventory = UserShoppingList.objects.filter(
+        user=user).order_by("module__name")
     serializer = UserShoppingListSerializer(inventory, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -303,7 +302,8 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
         )
 
         if shopping_list_items.exists():
-            quantity = shopping_list_items.aggregate(Sum("quantity"))["quantity__sum"]
+            quantity = shopping_list_items.aggregate(Sum("quantity"))[
+                "quantity__sum"]
             return Response({"quantity": quantity}, status=status.HTTP_200_OK)
         else:
             return Response({"quantity": 0}, status=status.HTTP_200_OK)
@@ -363,7 +363,8 @@ def user_anonymous_shopping_list_add_or_update(request, component_pk):
 def user_shopping_list_add_or_update(request, component_pk):
     user = request.user
     quantity = int(request.data.get("quantity", 0))
-    module_bom_list_item_pk = int(request.data.get("modulebomlistitem_pk", None))
+    module_bom_list_item_pk = int(
+        request.data.get("modulebomlistitem_pk", None))
     module_pk = int(request.data.get("module_pk", None))
 
     try:
@@ -381,7 +382,8 @@ def user_shopping_list_add_or_update(request, component_pk):
         )
 
     try:
-        module_bom_list_item = ModuleBomListItem.objects.get(pk=module_bom_list_item_pk)
+        module_bom_list_item = ModuleBomListItem.objects.get(
+            pk=module_bom_list_item_pk)
     except ModuleBomListItem.DoesNotExist:
         return Response(
             {"detail": "Module BOM list item not found."},
@@ -419,7 +421,8 @@ def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_p
     # Check if inventory exists
     if inventory.exists():
         # Use aggregate function to get the sum of 'quantity' attribute
-        quantity_sum = inventory.aggregate(Sum("quantity")).get("quantity__sum")
+        quantity_sum = inventory.aggregate(
+            Sum("quantity")).get("quantity__sum")
         return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
     else:
         return Response({"quantity": 0}, status=status.HTTP_200_OK)

@@ -18,9 +18,7 @@ const UserPage = () => {
   const [selectedTab, setSelectedTab] = useState(
     tabs.find((tab) => tab.current).name
   );
-
   const location = useLocation();
-
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
   useEffect(() => {

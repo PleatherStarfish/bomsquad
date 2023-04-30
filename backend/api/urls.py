@@ -2,6 +2,7 @@ from django.urls import path
 from api.views import (
     ModuleDetailView,
     get_user_inventory,
+    get_user_history,
     get_user_me,
     get_built_modules,
     get_wtb_modules,
@@ -22,7 +23,8 @@ from api.views import (
 )
 
 urlpatterns = [
-    path("get-user-me/", get_user_me),
+    path("get-user-me/", get_user_me, name="user-me"),
+    path("get-user-history/", get_user_history, name="user-history"),
     path("get-built-modules/", get_built_modules, name="get-built-modules"),
     path("get-wtb-modules/", get_wtb_modules, name="get-built-modules"),
     path("inventory/", get_user_inventory, name="user-inventory"),
@@ -78,7 +80,8 @@ urlpatterns = [
         name="user-shopping-list",
     ),
     path("components/", get_components, name="component-list"),
-    path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),
+    path("components/<str:pks>/", get_components_by_ids,
+         name="component-list-by-ids"),
     path("module/<slug:slug>/", ModuleDetailView.as_view(), name="module-detail"),
     path(
         "module/<int:module_pk>/bom-list-items/",

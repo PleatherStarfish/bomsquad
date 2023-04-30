@@ -7,7 +7,7 @@ const useUpdateUserInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const { mutate: updateUserInventoryMutate } = useMutation({
     mutationFn: ({ componentPk, ...data }) => {
       return axios.patch(`/api/inventory/${componentPk}/update/`, data, {
         headers: {
@@ -19,9 +19,11 @@ const useUpdateUserInventory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries("inventory");
       queryClient.refetchQueries("inventory");
+      queryClient.invalidateQueries("authenticatedUserHistory");
+      queryClient.refetchQueries("authenticatedUserHistory");
     },
   });
-  return mutation;
+  return updateUserInventoryMutate;
 };
 
 export default useUpdateUserInventory;

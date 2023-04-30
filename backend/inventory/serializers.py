@@ -1,7 +1,7 @@
+import bleach
 from components.serializers import ComponentSerializer
 from rest_framework import serializers
 from inventory.models import UserInventory
-import json
 
 
 class UserInventorySerializer(serializers.ModelSerializer):

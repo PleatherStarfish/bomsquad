@@ -1,17 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
 import { Fragment } from "react";
-import NumericInput from 'react-numeric-input';
+import NumericInput from "react-numeric-input";
 import useAddOrUpdateUserAnonymousShoppingList from "../../services/useAddOrUpdateUserAnonymousShoppingList";
 import useAddOrUpdateUserInventory from "../../services/useAddOrUpdateUserInventory";
 import useAddOrUpdateUserShoppingList from "../../services/useAddOrUpdateUserShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useGetUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
+import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 
 const AddComponentModal = ({
   open,
@@ -23,8 +23,12 @@ const AddComponentModal = ({
   hookArgs = undefined,
   quantityRequired,
 }) => {
-  const [quantity, setQuantity] = React.useState();
+  const [quantity, setQuantity] = useState();
+  const [editMode, setEditMode] = useState(false);
+
   const addOrUpdateUserInventory = useAddOrUpdateUserInventory();
+  const updateUserInventoryMutate = useUpdateUserInventory();
+
   const addOrUpdateUserShoppingList = useAddOrUpdateUserShoppingList();
   const addOrUpdateUserAnonymousShoppingList =
     useAddOrUpdateUserAnonymousShoppingList();
@@ -32,7 +36,7 @@ const AddComponentModal = ({
   const { data: quantityInInventory } =
     useGetUserInventoryQuantity(componentId);
 
-  const { data: quantityInInventoryAnon } =
+  const { data: quantityShoppingListAnon } =
     useGetUserAnonymousShoppingListQuantity(componentId);
 
   const { data: quantityInShoppingList } =
@@ -42,33 +46,57 @@ const AddComponentModal = ({
 
   const handleSubmitQuantity = async () => {
     try {
-      if (type === Types.INVENTORY) {
-        await addOrUpdateUserInventory({ componentId, quantity });
-      } else if (type === Types.SHOPPING) {
-        await addOrUpdateUserShoppingList({
-          componentId,
-          ...hookArgs,
-          quantity,
-        });
-      } else if (type === Types.SHOPPING_ANON) {
-        await addOrUpdateUserAnonymousShoppingList({
-          componentId,
-          quantity,
-        });
+      if (editMode) {
+        if (type === Types.INVENTORY) {
+          await updateUserInventoryMutate({
+            componentPk: componentId,
+            quantity,
+          });
+        } else if (type === Types.SHOPPING) {
+        } else if (type === Types.SHOPPING_ANON) {
+        }
+        setOpen(false);
+      } else {
+        if (type === Types.INVENTORY) {
+          await addOrUpdateUserInventory({ componentId, quantity });
+        } else if (type === Types.SHOPPING) {
+          await addOrUpdateUserShoppingList({
+            componentId,
+            ...hookArgs,
+            quantity,
+          });
+        } else if (type === Types.SHOPPING_ANON) {
+          await addOrUpdateUserAnonymousShoppingList({
+            componentId,
+            quantity,
+          });
+        }
+        setOpen(false);
       }
-      setOpen(false);
     } catch (error) {
       console.error("Failed to update quantity", error);
     }
   };
 
   useEffect(() => {
-    setQuantity(parseInt(quantityRequired));
-  }, [quantityRequired]);
+    let newQuantity = parseInt(quantityRequired);
+
+    if (editMode) {
+      if (type === Types.SHOPPING) {
+        newQuantity = parseInt(quantityInShoppingList);
+      } else if (type === Types.SHOPPING_ANON) {
+        newQuantity = parseInt(quantityShoppingListAnon);
+      } else if (type === Types.INVENTORY) {
+        newQuantity = parseInt(quantityInInventory);
+      }
+    }
+
+    setQuantity(newQuantity);
+  }, [quantityRequired, editMode, type]);
 
   const displayInventoryAlert =
     (!!quantityInInventory && type === Types.INVENTORY) ||
-    (!!quantityInInventoryAnon && type === Types.SHOPPING_ANON) ||
+    (!!quantityShoppingListAnon && type === Types.SHOPPING_ANON) ||
     (!!quantityInShoppingList && type === Types.SHOPPING);
 
   return (
@@ -99,7 +127,7 @@ const AddComponentModal = ({
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:p-6 md:max-w-md">
                 <div>
-                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <div className="mt-3 text-center sm:text-left">
                     <Dialog.Title
                       as="h3"
                       className="text-base font-semibold leading-6 text-gray-900"
@@ -107,47 +135,107 @@ const AddComponentModal = ({
                       {title}
                     </Dialog.Title>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500 py-4">{text}</p>
-                      {displayInventoryAlert && (
-                        <Alert variant="info" padding="compact" icon>
-                          <div>
-                            Your {type} already contains{" "}
-                            <Quantity
-                              type={type}
-                              classNames="pl-1"
-                              useHook={
-                                type === Types.INVENTORY
-                                  ? useGetUserInventoryQuantity
-                                  : type === Types.SHOPPING
-                                  ? useGetUserShoppingListQuantity
-                                  : useGetUserAnonymousShoppingListQuantity
-                              }
-                              hookArgs={
-                                hookArgs
-                                  ? Object.values(hookArgs)
-                                  : [componentId]
-                              }
-                              replaceZero={false}
-                            />
-                            . Add {quantity} more?
-                          </div>
-                        </Alert>
+                      {text && (
+                        <p className="text-sm text-gray-500 pt-3">{text}</p>
                       )}
-                      <div className="w-1/2 md:w-1/4 lg:w-2/5 my-6">
-                        <label
-                          htmlFor="quantityInput"
-                          className="block mb-1 font-medium text-gray-700"
-                        >
-                          Quantity to add:
-                        </label>
-                        <NumericInput
-                          id="quantityInput"
-                          type="number"
-                          value={quantity}
-                          onChange={(e) => setQuantity(e.target.value)}
-                          className="w-full pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
-                        />
-                      </div>
+                      {displayInventoryAlert && (
+                        <div className="pt-3 text-gray-700">
+                          Your{" "}
+                          {type === "shopping_anon" ? "shopping list" : type}{" "}
+                          already contains{" "}
+                          <Quantity
+                            type={type}
+                            useHook={
+                              type === Types.INVENTORY
+                                ? useGetUserInventoryQuantity
+                                : type === Types.SHOPPING
+                                ? useGetUserShoppingListQuantity
+                                : useGetUserAnonymousShoppingListQuantity
+                            }
+                            hookArgs={
+                              hookArgs ? Object.values(hookArgs) : [componentId]
+                            }
+                            replaceZero={false}
+                          />
+                          {editMode
+                            ? `. Edit quantity to be ${quantity}?`
+                            : `. Add ${quantity} more?`}
+                        </div>
+                      )}
+
+                      {editMode ? (
+                        <div className="my-6">
+                          <label
+                            htmlFor="quantityInput"
+                            className="block mb-1 font-medium text-gray-700"
+                          >
+                            {`Edit ${
+                              type === Types.INVENTORY
+                                ? "inventory"
+                                : "shopping list"
+                            } quantity:`}
+                          </label>
+                          <div className="w-full flex items-center gap-2">
+                            <div>
+                              <div className="sm:w-2/5 md:w-1/5">
+                                <NumericInput
+                                  id="quantityInput"
+                                  type="number"
+                                  min={1}
+                                  value={quantity ?? 1}
+                                  onChange={(e) => setQuantity(e)}
+                                  className="pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
+                                />
+                              </div>
+                            </div>
+                            <div
+                              role="button"
+                              className="text-blue-500 hover:text-blue-700"
+                              onClick={() => setEditMode((prev) => !prev)}
+                            >
+                              {`or add to ${
+                                type === Types.INVENTORY
+                                  ? "inventory"
+                                  : "shopping list"
+                              }`}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="my-6">
+                          <label
+                            htmlFor="quantityInput"
+                            className="block mb-1 font-medium text-gray-700"
+                          >
+                            Quantity to add:
+                          </label>
+                          <div className="w-full flex items-center gap-2">
+                            <div>
+                              <div className="sm:w-2/5 md:w-1/5">
+                                <NumericInput
+                                  id="quantityInput"
+                                  type="number"
+                                  min={1}
+                                  value={quantity ?? 1}
+                                  onChange={(e) => setQuantity(e)}
+                                  className="pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
+                                />
+                              </div>
+                            </div>
+                            <div
+                              role="button"
+                              className="text-blue-500 hover:text-blue-700"
+                              onClick={() => setEditMode((prev) => !prev)}
+                            >
+                              {`or edit ${
+                                type === Types.INVENTORY
+                                  ? "inventory"
+                                  : "shopping list"
+                              }`}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -158,7 +246,7 @@ const AddComponentModal = ({
                       handleSubmitQuantity();
                     }}
                   >
-                    Add
+                    {editMode ? "Update" : "Add"}
                   </Button>
                   <Button variant="muted" onClick={() => setOpen(false)}>
                     Cancel

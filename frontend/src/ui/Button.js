@@ -13,11 +13,17 @@ export const ButtonSize = {
 };
 
 export const ButtonSizeIconOnly = {
-  xs: "rounded p-2",
+  xs: "rounded p-1.5",
   sm: "rounded p-2",
   md: "rounded-md p-2.5",
   lg: "rounded-md p-3",
   xl: "rounded-md p-3.5",
+};
+
+export const ButtonSizeIconSize = {
+  xs: "w-3 h-3",
+  sm: "w-4 h-4",
+  md: "w-5 h-5",
 };
 
 export const ButtonVariant = {
@@ -52,10 +58,12 @@ const Button = ({
             "flex items-center justify-center",
             sizeClass,
             variantClass,
+            // ButtonSizeIconSize[size],
             classNames
           )}
+          aria-label={children}
         >
-          <Icon className="w-5 h-5" />
+          <Icon className="w-4 w-4" />
         </button>
       </Tippy>
     );

@@ -2,7 +2,6 @@ import Button from "../ui/Button";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Dropdown from "../ui/Dropdown";
 import { Link } from "react-router-dom";
-import { PaperClipIcon } from "@heroicons/react/20/solid";
 import React from "react";
 
 const CURRENCIES = Object.freeze({

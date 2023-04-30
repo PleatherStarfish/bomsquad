@@ -59,18 +59,20 @@ const Inventory = () => {
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
 
-  const mutation = useUpdateUserInventory();
+  const updateUserInventoryMutate = useUpdateUserInventory();
 
   const deleteMutation = useDeleteUserInventory();
 
-  const handleQuantityChange = useCallback(async (event) => {
-    event.preventDefault();
-    setUpdatedQuantityToSubmit(event.target.value);
+  const handleQuantityChange = useCallback(async (value) => {
+    setUpdatedQuantityToSubmit(value);
   });
 
   const handleSubmitQuantity = useCallback(async (componentPk) => {
     try {
-      await mutation.mutate({ componentPk, quantity: updatedQuantityToSubmit });
+      await updateUserInventoryMutate({
+        componentPk,
+        quantity: updatedQuantityToSubmit,
+      });
       setQuantityIdToEdit(undefined);
       setUpdatedQuantityToSubmit(undefined);
     } catch (error) {
@@ -80,12 +82,15 @@ const Inventory = () => {
 
   const handleLocationChange = useCallback(async (event) => {
     event.preventDefault();
-    setUpdatedLocationToSubmit(event.target.value);
+    setUpdatedLocationToSubmit(event.target.value.trim());
   });
 
   const handleSubmitLocation = useCallback(async (componentPk) => {
     try {
-      await mutation.mutate({ componentPk, location: updatedLocationToSubmit });
+      await updateUserInventoryMutate({
+        componentPk,
+        location: updatedLocationToSubmit,
+      });
       setLocationIdToEdit(undefined);
       setUpdatedLocationToSubmit(undefined);
     } catch (error) {
@@ -108,7 +113,10 @@ const Inventory = () => {
         (el) => el?.component?.id === componentPk
       )?.location;
       location.splice(index, 1);
-      await mutation.mutate({ componentPk, location: location.join(", ") });
+      await updateUserInventoryMutate({
+        componentPk,
+        location: location.join(", "),
+      });
     } catch (error) {
       console.error("Failed to update location", error);
     }

@@ -1,6 +1,6 @@
 import ListSlice from "./shopping_list/listSlice";
 import React from "react";
-import Toggle from "../ui/Toggle"
+import Toggle from "../ui/Toggle";
 import _ from "lodash";
 import useGetUserShoppingList from "../services/useGetUserShoppingList";
 
@@ -10,7 +10,6 @@ const ShoppingList = () => {
     userShoppingListIsLoading,
     userShoppingListIsError,
   } = useGetUserShoppingList();
-
 
   if (userShoppingListIsError) {
     return <div>Error fetching data</div>;
@@ -24,9 +23,24 @@ const ShoppingList = () => {
     <div>
       <Toggle />
       <div className="flex">
-        {[{name: "", data: []}, ...userShoppingListData.groupedByModule, {name: "TOTAL", data: []}].map((value, index) => {
-          const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module?.slug
-          return (<ListSlice key={value.name} name={value.name} slug={moduleSlug} index={index} allModulesData={userShoppingListData.groupedByModule} componentsInModule={value.data} aggregatedComponents={userShoppingListData?.aggregatedComponents} componentsAreLoading={userShoppingListIsLoading} />)
+        {[
+          { name: "", data: [] },
+          ...userShoppingListData.groupedByModule,
+          { name: "TOTAL", data: [] },
+        ].map((value, index) => {
+          const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module?.slug;
+          return (
+            <ListSlice
+              key={value.name}
+              name={value.name}
+              slug={moduleSlug}
+              index={index}
+              allModulesData={userShoppingListData.groupedByModule}
+              componentsInModule={value.data}
+              aggregatedComponents={userShoppingListData?.aggregatedComponents}
+              componentsAreLoading={userShoppingListIsLoading}
+            />
+          );
         })}
       </div>
     </div>
