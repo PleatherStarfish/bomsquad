@@ -5,7 +5,7 @@ import Inventory from "./components/Inventory";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
 import React from "react";
-import Settings from "./components/settings";
+import Settings from "./components/UserSettings";
 import ShoppingList from "./components/ShoppingList";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";

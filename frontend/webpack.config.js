@@ -20,11 +20,12 @@ module.exports = {
         test: /\.(css|sass|scss)$/,
         use: [
           {
-            loader: 'style-loader'
+            loader: "style-loader",
           },
           {
-            loader: 'css-loader'
-          }]
+            loader: "css-loader",
+          },
+        ],
       },
     ],
   },
@@ -33,10 +34,10 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      "React": "react",
+      React: "react",
       "process.env": {
         NODE_ENV: JSON.stringify("development"),
       },
     }),
-  ]
+  ],
 };

@@ -1,0 +1,38 @@
+# Ignore git files and directories
+.git
+.gitignore
+
+# Ignore Python bytecode and cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Django migration files
+*/migrations/*
+
+# Ignore local settings and environment files
+local_settings.py
+.env
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore test and coverage files
+test/
+*.test.py
+.coverage
+.coveragerc
+
+# Ignore IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore node modules and related files (if using node.js for frontend tasks)
+node_modules/
+package.json
+package-lock.json
+yarn.lock
