@@ -6,7 +6,6 @@ import React from "react";
 import cx from "classnames";
 
 const Dropdown = ({ options, defaultText }) => {
-  console.log(options);
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>

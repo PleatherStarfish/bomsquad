@@ -3,15 +3,18 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import Button from "../ui/Button";
 import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
+import Fuse from "fuse.js";
 import { Link } from "react-router-dom";
 import Modal from "../ui/Modal";
 import NumericInput from "react-numeric-input";
 import Pill from "../ui/Pill";
+import SolderingMode from "./SolderingMode";
+import _ from "lodash";
 import { find } from "lodash/find";
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
@@ -56,12 +59,44 @@ const Inventory = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [dataToDelete, setDataToDelete] = useState();
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dataSearched, setDataSearched] = useState(undefined);
+
+  const [openSolderingMode, setOpenSolderingMode] = useState(false);
+
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
 
   const updateUserInventoryMutate = useUpdateUserInventory();
 
   const deleteMutation = useDeleteUserInventory();
+
+  const options = {
+    includeScore: true,
+    shouldSort: true,
+    keys: [
+      "location",
+      "component.description",
+      "component.manufacturer.name",
+      "component.notes",
+      "component.supplier.name",
+      "component.supplier_item_no",
+      "component.type.name",
+    ],
+  };
+
+  const fuse =
+    inventoryData && inventoryData.length > 0
+      ? new Fuse(inventoryData, options)
+      : undefined;
+
+  console.log("dataSearched", dataSearched);
+
+  useEffect(() => {
+    if (fuse) {
+      setDataSearched(fuse.search(searchTerm));
+    }
+  }, [searchTerm]);
 
   const handleQuantityChange = useCallback(async (value) => {
     setUpdatedQuantityToSubmit(value);
@@ -430,10 +465,29 @@ const Inventory = () => {
 
   return (
     <>
-      <div className="w-full flex justify-end gap-2 mb-8">
+      <div className="md:w-full flex flex-col md:flex-row justify-between items-center gap-2 mb-8">
+        <div className="grow md:w-full pr-2">
+          <label htmlFor="search" className="sr-only">
+            Search
+          </label>
+          <input
+            type="text"
+            name="search"
+            id="search"
+            className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] sm:text-sm sm:leading-6"
+            placeholder="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
         {inventoryData && inventoryData.length > 0 && (
-          <>
-            <Button version="primary" Icon={LightBulbIcon} iconLocation="left">
+          <div className="flex flex-nowrap gap-2">
+            <Button
+              version="primary"
+              Icon={LightBulbIcon}
+              iconLocation="left"
+              onClick={() => setOpenSolderingMode(true)}
+            >
               Soldering Mode
             </Button>
             <Link to="version-history/">
@@ -442,7 +496,7 @@ const Inventory = () => {
             <Button version="primary" onClick={handleDownloadCSV}>
               Download CSV
             </Button>
-          </>
+          </div>
         )}
       </div>
       <DataTable
@@ -456,7 +510,11 @@ const Inventory = () => {
           <div className="text-gray-500 animate-pulse">Loading...</div>
         }
         columns={columns}
-        data={inventoryData}
+        data={
+          _.isArray(dataSearched) && !_.isEmpty(dataSearched)
+            ? dataSearched.map((x) => x.item)
+            : inventoryData
+        }
         progressPending={inventoryDataIsLoading}
         customStyles={customStyles}
       />
@@ -470,6 +528,7 @@ const Inventory = () => {
           handleDelete(dataToDelete.id);
         }}
       >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
+      <SolderingMode open={openSolderingMode} setOpen={setOpenSolderingMode} />
     </>
   );
 };

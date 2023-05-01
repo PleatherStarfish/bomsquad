@@ -3,6 +3,7 @@ from api.views import (
     ModuleDetailView,
     get_user_inventory,
     get_user_history,
+    delete_user,
     get_user_me,
     get_built_modules,
     get_wtb_modules,
@@ -25,6 +26,7 @@ from api.views import (
 urlpatterns = [
     path("get-user-me/", get_user_me, name="user-me"),
     path("get-user-history/", get_user_history, name="user-history"),
+    path('delete-user-me/', delete_user, name='delete-user'),
     path("get-built-modules/", get_built_modules, name="get-built-modules"),
     path("get-wtb-modules/", get_wtb_modules, name="get-built-modules"),
     path("inventory/", get_user_inventory, name="user-inventory"),

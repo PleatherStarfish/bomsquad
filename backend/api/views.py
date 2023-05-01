@@ -40,6 +40,14 @@ def get_user_history(request):
     return Response(serializer.data)
 
 
+@api_view(["DELETE"])
+@login_required
+def delete_user(request):
+    user = request.user
+    user.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ModuleDetailView(generics.RetrieveAPIView):
     """
     API endpoint that retrieves a single Module instance by its slug.
