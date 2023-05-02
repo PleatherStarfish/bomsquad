@@ -39,6 +39,7 @@ const UserPage = () => {
   return (
     <>
       <div className="w-full flex items-center py-6 mt-12">
+        <div>HELLO Daniel James Miller</div>
         <div>
           <Gravatar
             className="rounded-full"

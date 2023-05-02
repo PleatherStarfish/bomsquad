@@ -1,34 +1,39 @@
-# Use an official Node runtime as a parent image
-FROM node:14.17.6-alpine AS base
+# Stage 1: Build the app
+FROM node:14.17.6-alpine AS builder
 
-# Set the working directory to /code
+# Set the working directory
 WORKDIR /code
 
-# Copy the package.json and package-lock.json files to the container
+# Copy package.json and package-lock.json files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Install dependencies
+RUN npm ci
 
-# Production stage
-FROM node:14.17.6-alpine
-
-# Set the working directory to /app
-WORKDIR /app
-
-# Copy only the necessary files and production dependencies from the build stage
-COPY --from=base /code/node_modules ./node_modules
+# Copy the rest of the app
 COPY . .
 
 # Run modclean to remove unused modules and files
 RUN npx modclean --path ./node_modules --no-progress --keep-empty
 
-# Copy the entrypoint script and make it executable
-COPY entrypoint.sh entrypoint.sh
+# Build the React app
+RUN npm run build
+
+# Stage 2: Production image
+FROM node:14.17.6-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built app from the builder stage
+COPY --from=builder /code/build /app/build
+
+# Copy entrypoint.sh and make it executable
+COPY --from=builder /code/entrypoint.sh entrypoint.sh
 RUN chmod +x entrypoint.sh
 
 # Expose port 3000 for the React app
 EXPOSE 3000
 
-# Set the entrypoint
-ENTRYPOINT "./entrypoint.sh"
+# Start the app
+ENTRYPOINT ./entrypoint.sh

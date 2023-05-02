@@ -1,9 +1,6 @@
 #!/bin/sh
 
-npm ci
-
-if [ $PRODUCTION = True ]
-then
+if [ "$PRODUCTION" = true ]; then
     npm run build
 else
     npm run start

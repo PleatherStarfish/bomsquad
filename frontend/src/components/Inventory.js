@@ -90,8 +90,6 @@ const Inventory = () => {
       ? new Fuse(inventoryData, options)
       : undefined;
 
-  console.log("dataSearched", dataSearched);
-
   useEffect(() => {
     if (fuse) {
       setDataSearched(fuse.search(searchTerm));

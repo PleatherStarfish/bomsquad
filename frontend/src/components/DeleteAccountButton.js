@@ -7,8 +7,12 @@ import useDeleteUserMe from "../services/useDeleteUserMe";
 const DeleteAccountButton = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [username, setUsername] = useState("");
-  const { currentUser } = useAuthenticatedUser();
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
   const mutation = useDeleteUserMe();
+
+  if (userIsLoading)
+    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+  if (userIsError) return <div>Error!</div>;
 
   const handleDeleteAccount = () => {
     setShowDeleteConfirmation(true);
@@ -29,7 +33,7 @@ const DeleteAccountButton = () => {
       return;
     }
 
-    if (username !== currentUser.username) {
+    if (username !== user.username) {
       alert("Incorrect username. Please try again.");
       return;
     }
@@ -47,8 +51,8 @@ const DeleteAccountButton = () => {
         </Button>
       )}
       {showDeleteConfirmation && (
-        <div className="flex felx-col">
-          <div>
+        <div className="flex flex-col">
+          <div className="flex flex-col gap-2 mb-4">
             <label className="py-4" htmlFor="username">
               Type your username to confirm account deletion:
             </label>
@@ -57,10 +61,10 @@ const DeleteAccountButton = () => {
               id="username"
               className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] sm:text-sm sm:leading-6"
               value={username}
-              onChange={handleUsernameChange}
+              onChange={(e) => handleUsernameChange(e)}
             />
           </div>
-          <div>
+          <div className="flex gap-2">
             <Button variant="danger" onClick={handleConfirmDelete}>
               Confirm deletion
             </Button>

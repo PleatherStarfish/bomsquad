@@ -28,6 +28,7 @@ export const ButtonSizeIconSize = {
 
 export const ButtonVariant = {
   primary: "bg-[#548a6a] hover:bg-[#406a4c] text-white",
+  danger: "bg-red-500 hover:bg-red-700 text-white",
   submit: "bg-blue-500 hover:bg-blue-700 text-white",
   muted: "bg-gray-400 text-white hover:bg-gray-500",
   light:

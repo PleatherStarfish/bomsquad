@@ -23,6 +23,7 @@ const Settings = () => {
   const currencyNames = Object.keys(CURRENCIES).map((currency) => {
     return CURRENCIES[currency];
   });
+
   return (
     <div className="mt-8">
       <Link

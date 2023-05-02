@@ -36,8 +36,9 @@ module.exports = {
     new webpack.DefinePlugin({
       React: "react",
       "process.env": {
-        NODE_ENV: JSON.stringify("development"),
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
       },
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 };
