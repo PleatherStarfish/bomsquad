@@ -5,6 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useCallback, useEffect, useState } from "react";
 
+import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
@@ -461,40 +462,42 @@ const Inventory = () => {
     },
   ];
 
-  return (
+  return !!inventoryData?.length ? (
     <>
       <div className="md:w-full flex flex-col md:flex-row justify-between items-center gap-2 mb-8">
-        <div className="grow md:w-full pr-2">
-          <label htmlFor="search" className="sr-only">
-            Search
-          </label>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] sm:text-sm sm:leading-6"
-            placeholder="search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
         {inventoryData && inventoryData.length > 0 && (
-          <div className="flex flex-nowrap gap-2">
-            <Button
-              version="primary"
-              Icon={LightBulbIcon}
-              iconLocation="left"
-              onClick={() => setOpenSolderingMode(true)}
-            >
-              Soldering Mode
-            </Button>
-            <Link to="version-history/">
-              <Button version="primary">Version History</Button>
-            </Link>
-            <Button version="primary" onClick={handleDownloadCSV}>
-              Download CSV
-            </Button>
-          </div>
+          <>
+            <div className="grow md:w-full pr-2">
+              <label htmlFor="search" className="sr-only">
+                Search
+              </label>
+              <input
+                type="text"
+                name="search"
+                id="search"
+                className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] sm:text-sm sm:leading-6"
+                placeholder="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-nowrap gap-2">
+              <Button
+                version="primary"
+                Icon={LightBulbIcon}
+                iconLocation="left"
+                onClick={() => setOpenSolderingMode(true)}
+              >
+                Soldering Mode
+              </Button>
+              <Link to="version-history/">
+                <Button version="primary">Version History</Button>
+              </Link>
+              <Button version="primary" onClick={handleDownloadCSV}>
+                Download CSV
+              </Button>
+            </div>
+          </>
         )}
       </div>
       <DataTable
@@ -528,6 +531,13 @@ const Inventory = () => {
       >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
       <SolderingMode open={openSolderingMode} setOpen={setOpenSolderingMode} />
     </>
+  ) : (
+    <Alert>
+      There are no components in your inventory.
+      <a className="text-blue-500" href="/components">
+        Add components.
+      </a>
+    </Alert>
   );
 };
 

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_tailwind",
     "rest_framework",
+    "drf_yasg",  # Swagger
     "corsheaders",
     "djmoney",
     "import_export",
@@ -89,6 +90,14 @@ CORS_ALLOW_HEADERS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "100/hour", "user": "1000/hour"},
+}
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"
 
@@ -111,14 +120,6 @@ TEMPLATES = [
         },
     },
 ]
-
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 # For Docker/PostgreSQL usage uncomment this and comment the DATABASES config above
 DATABASES = {
