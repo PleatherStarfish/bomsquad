@@ -22,37 +22,37 @@ frontend_redirect_urls = [
     ),
     path(
         "user/<str:username>/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user",
     ),
     path(
         "user/<str:username>/built/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-built",
     ),
     path(
         "user/<str:username>/want-to-build/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-want-to-build",
     ),
     path(
         "user/<str:username>/inventory/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-inventory",
     ),
     path(
         "user/<str:username>/inventory/version-history/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-inventory-version-history",
     ),
     path(
         "user/<str:username>/shopping-list/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-shopping-list",
     ),
     path(
         "user/<str:username>/settings/",
-        TemplateView.as_view(template_name="frontend.html"),
+        login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-settings",
     ),
     re_path(
