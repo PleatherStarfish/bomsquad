@@ -20,6 +20,7 @@ const useDeleteUser = () => {
   const mutation = useMutation(deleteUser, {
     onSuccess: () => {
       queryClient.removeQueries("authenticatedUser"); // Remove the 'user' query from the cache
+      window.location.href = "/";
     },
   });
 

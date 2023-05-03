@@ -19,7 +19,6 @@ const useDeleteUserInventory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries("inventory");
       queryClient.refetchQueries("inventory");
-      window.location.href = "/";
     },
   });
   return deleteMutation;

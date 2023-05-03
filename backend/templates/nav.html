@@ -3,8 +3,14 @@
   <div class="mx-auto px-8">
 
     <div class="hidden md:block relative">
-      <a href="/">
-        <img class="absolute top-3 hidden sm:block" height="180px" width="180px" src="{% static 'images/logo.png' %}" alt="Bom Squad Logo"/>
+      <a href="{% url 'home' %}">
+        {% with request.path|slice:":5" as path %}
+          {% if path == '/user' %}
+          <img class="absolute top-2.5 left-[-20px] hidden sm:block" height="70px" width="70px" src="{% static 'images/logo_mini.png' %}" alt="Bom Squad Logo"/>  
+          {% else %}
+          <img class="absolute top-3 hidden sm:block" height="180px" width="180px" src="{% static 'images/logo.png' %}" alt="Bom Squad Logo"/>
+          {% endif %}
+        {% endwith %} 
       </a>
     </div>
 
@@ -12,7 +18,22 @@
       <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
         
         <div class="hidden sm:ml-6 sm:block">
-  
+
+        {% with request.path|slice:":5" as path %}
+          {% if path == '/user' %}
+          <ul class="flex space-x-4 text-white ml-[40px]">
+            <li>
+              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a
+                >
+            </li>
+            <li>
+              <a href="{% url 'about' %}" class="nav-link px-2">About</a>
+            </li>
+            <li>
+              <a href="/components/" class="nav-link px-2">Components</a>
+            </li>
+          </ul>
+          {% else %}
           <ul class="flex space-x-4 text-white ml-[180px]">
             <li>
               <a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a
@@ -25,6 +46,9 @@
               <a href="/components/" class="nav-link px-2">Components</a>
             </li>
           </ul>
+          {% endif %}
+        {% endwith %} 
+
         </div>
       </div>
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
