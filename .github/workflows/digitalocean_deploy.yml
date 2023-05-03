@@ -1,22 +1,23 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: build
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches:
+      - deploy/dev
+      - deploy/production
+      - devops-chris
+
+        # This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-
+  build-and-deploy:
+    runs-on: ${{ fromJSON('["ubuntu-latest", "self-hosted"]')[github.repository == 'github/docs-internal'] }}
     steps:
-      - uses: actions/checkout@main
-
-      - name: Copying enviroments
-        run: cp ../.env .env
-
-      - name: Docker UP
-        run: docker-compose up --build -d
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: testing
+        uses: actions/checkout@v3
+         run: |
+           echo chris testing
