@@ -63,6 +63,8 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/preset-env": "^7.21.4",
     "@tailwindcss/line-clamp": "^0.4.4",
+    "on-build-webpack": "^0.1.0",
+    "webpack-command": "^0.5.1",
     "webpack-dev-server": "^4.13.3"
   }
 }

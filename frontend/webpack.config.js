@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const { exec } = require("child_process");
 
 module.exports = {
   entry: "./src/index.js",
@@ -42,3 +43,19 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
   ],
 };
+
+// Re-run the Makefile build-styles command after each build
+module.exports.plugins.push({
+  apply: (compiler) => {
+    compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
+      exec("make -C .. build-styles", (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Makefile execution error: ${error}`);
+          return;
+        }
+        if (stdout) console.log(`Makefile stdout: ${stdout}`);
+        if (stderr) console.error(`Makefile stderr: ${stderr}`);
+      });
+    });
+  },
+});

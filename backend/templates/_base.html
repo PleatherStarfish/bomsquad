@@ -28,10 +28,15 @@
     <header>{% include "nav.html" %}</header>
 
     <div class="flex flex-col min-h-screen">
-      <div class="mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow">
+      {% with request.path|slice:":5" as path %}
+      <div
+        class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
+      >
         {% block content %}{% endblock content %}
       </div>
+      {% if path == '/user' %} {% else %}
       <footer>{% include "footer.html" %}</footer>
+      {% endif %} {% endwith %}
     </div>
 
     <!-- Project JS -->
