@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  frontend:
+    container_name: frontend-${APP_ENV}
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - backend
+
+  backend:
+    container_name: backend-${APP_ENV}
+    build: ./backend
+    volumes:
+      - ./backend:/code
+      - ./frontend/build/:/code/static/frontend
+    env_file:
+      - ./.env.dev
