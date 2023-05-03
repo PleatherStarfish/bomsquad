@@ -10,7 +10,7 @@ services:
       - ./.env.dev
     depends_on:
       - backend
-
+    restart: always
   backend:
     container_name: backend-${APP_ENV}
     build: ./backend
@@ -19,3 +19,4 @@ services:
       - ./frontend/build/:/code/static/frontend
     env_file:
       - ./.env.dev
+    restart: always
