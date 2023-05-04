@@ -2,13 +2,7 @@
 
 # An inventory and search tool for DIY Eurorack synthesizer modules and components
 
-Bom-Squad is a tool to help users source components for DIY SMT Eurorack modules. It allows users to 
--	search modules 
--	add modules to a personal inventory of built or "to build" modules
--	catalog components required for their “to-build” list
--	easily source components from Tayde, Mouser, and other online retailers
--	track a personal inventory of components
--	and version a personal inventory as changes are made, ensuring that mistakes are rare and easily fixed
+Welcome to Bom-Squad, the inventory and search tool for DIY Eurorack synthesizer module builders. Bom-Squad empowers users to explore DIY Eurorack modules, add modules to their personal inventory of built or "to build" modules, and catalog required components to create a customized shopping list for assembling modules. The platform simplifies the process of obtaining components from [Tayda](https://www.taydaelectronics.com/), [Mouser](https://www.mouser.com/), and other online retailers, while also enabling users to effectively manage their personal inventory of components. Moreover, Bom-Squad provides versioning capabilities for a user's personal inventories, ensuring that errors are infrequent and effortlessly rectifiable.
  
 ## Installation
 
