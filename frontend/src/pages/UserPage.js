@@ -37,22 +37,19 @@ const navigation = [
     current: false,
   },
 ];
-const teams = [
-  { id: 1, name: "Heroicons", to: "#", initial: "H", current: false },
-  { id: 2, name: "Tailwind Labs", to: "#", initial: "T", current: false },
-  { id: 3, name: "Workcation", to: "#", initial: "W", current: false },
-];
-const userNavigation = [
-  { name: "Your profile", to: "#" },
-  { name: "Sign out", to: "#" },
-];
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-export default function Example() {
+const UserPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
+
+  if (userIsLoading)
+    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+  if (userIsError) return <div>Error!</div>;
+
+  const handleTabChange = (tabName) => {
+    setSelectedTab(tabName);
+  };
 
   return (
     <div className="mt-20">
@@ -127,18 +124,18 @@ export default function Example() {
                               <li key={item.name}>
                                 <a
                                   href={item.to}
-                                  className={classNames(
+                                  className={cx(
                                     item.current
-                                      ? "bg-gray-50 text-indigo-600"
-                                      : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
+                                      ? "bg-gray-50 text-[#548a6a]"
+                                      : "text-gray-700 hover:text-[#548a6a] hover:bg-gray-50",
                                     "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
                                   )}
                                 >
                                   <item.icon
-                                    className={classNames(
+                                    className={cx(
                                       item.current
-                                        ? "text-indigo-600"
-                                        : "text-gray-400 group-hover:text-indigo-600",
+                                        ? "text-[#548a6a]"
+                                        : "text-gray-400 group-hover:text-[#548a6a]",
                                       "h-6 w-6 shrink-0"
                                     )}
                                     aria-hidden="true"
@@ -155,7 +152,7 @@ export default function Example() {
                             className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
                           >
                             <Cog6ToothIcon
-                              className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-indigo-600"
+                              className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-[#548a6a]"
                               aria-hidden="true"
                             />
                             Settings
@@ -182,18 +179,18 @@ export default function Example() {
                       <li key={item.name}>
                         <a
                           href={item.to}
-                          className={classNames(
+                          className={cx(
                             item.current
-                              ? "bg-gray-100 text-indigo-600"
-                              : "text-gray-700 hover:text-indigo-600 hover:bg-gray-100",
+                              ? "bg-gray-100 text-[#548a6a]"
+                              : "text-gray-700 hover:text-[#548a6a] hover:bg-gray-100",
                             "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
                           )}
                         >
                           <item.icon
-                            className={classNames(
+                            className={cx(
                               item.current
-                                ? "text-indigo-600"
-                                : "text-gray-400 group-hover:text-indigo-600",
+                                ? "text-[#548a6a]"
+                                : "text-gray-400 group-hover:text-[#548a6a]",
                               "h-6 w-6 shrink-0"
                             )}
                             aria-hidden="true"
@@ -204,59 +201,37 @@ export default function Example() {
                     ))}
                   </ul>
                 </li>
-                <li className="mt-auto">
-                  <a
-                    href="#"
-                    className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <Cog6ToothIcon
-                      className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-indigo-600"
-                      aria-hidden="true"
-                    />
-                    Settings
-                  </a>
-                </li>
                 <li className="-mx-6 mt-auto">
-                  <a
-                    href="#"
-                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"
-                  >
-                    <img
-                      className="h-8 w-8 rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                    <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">Tom Cook</span>
-                  </a>
+                  <Link to="settings">
+                    <div className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100">
+                      <Gravatar
+                        className="rounded-full"
+                        email={user.email}
+                        rating="pg"
+                        size={40}
+                      />
+                      <span className="sr-only">Your profile</span>
+                      <span aria-hidden="true">
+                        {user.first_name && user.last_name
+                          ? `${user.first_name} ${user.last_name}`
+                          : user.username}
+                      </span>
+                    </div>
+                  </Link>
                 </li>
               </ul>
             </nav>
           </div>
         </div>
-
-        <div className="lg:pl-72">
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-            <button
-              type="button"
-              className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <span className="sr-only">Open sidebar</span>
-              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-            </button>
+        <main className="py-10">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <Outlet />
           </div>
-
-          <main className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <Outlet />
-            </div>
-          </main>
-        </div>
+        </main>
       </div>
     </div>
   );
-}
+};
 
 // import { Link, Outlet, useLocation } from "react-router-dom";
 // import React, { useEffect, useState } from "react";
@@ -372,4 +347,4 @@ export default function Example() {
 //   );
 // };
 
-// export default UserPage;
+export default UserPage;

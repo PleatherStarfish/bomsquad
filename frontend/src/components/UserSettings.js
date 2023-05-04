@@ -25,7 +25,7 @@ const Settings = () => {
   });
 
   return (
-    <div className="mt-8">
+    <div className="mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48">
       <Link
         to=".."
         relative="path"
