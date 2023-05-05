@@ -25,9 +25,9 @@ jobs:
           if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
             repoDir="/home/devops/app/production"
           elif [ ${GITHUB_REF#refs/heads/} = "deploy/dev" ]; then
-            repoDir="/home/devops/app/dev/bomsquad"
+            repoDir="/home/devops/app/dev"
           elif [ ${GITHUB_REF#refs/heads/} = "devops-chris" ]; then
-            repoDir="/home/devops/app/dev/bomsquad"
+            repoDir="/home/devops/app/dev"
           else
             echo "Invalid environment."
             exit 1
