@@ -3,6 +3,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta
+      name="keywords"
+      content="eurorack, diy, synthesizer, modular, music, hardware, analog synthesizer, modular synth, electronic music, synth building, sound design, music production, audio gear, circuit design"
+    />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta
       name="viewport"
@@ -13,7 +17,10 @@
       name="description"
       content="An inventory and search tool for DIY Eurorack synthesizer modules and components"
     />
-    <meta name="author" content="" />
+    <meta
+      name="author"
+      content="https://github.com/PleatherStarfish/bomsquad"
+    />
     <link
       rel="shortcut icon"
       type="image/x-icon"
@@ -41,6 +48,18 @@
 
     <!-- Project JS -->
     <script src="{% static 'js/base.js' %}"></script>
+
+    <script src="{% static 'js/mixpanel.js' %}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      mixpanel.init("15c80a95c8772b2594906af3875bbb8f");
+
+      mixpanel.track("Page Viewed", {
+        url: window.location.href,
+        path: window.location.pathname,
+        title: document.title,
+      });
+    </script>
 
     {% block javascript %}{% endblock javascript %}
   </body>

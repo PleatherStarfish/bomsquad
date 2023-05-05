@@ -1,0 +1,3879 @@
+[
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2023-04-02T13:10:02.767Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "1",
+    "object_repr": "Nonlinearcircuits",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2023-04-02T13:21:00.560Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Triple Sloth - Nonlinearcircuits",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2023-04-02T13:21:10.622Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Triple Sloth - Nonlinearcircuits",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Image\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2023-04-04T22:11:21.544Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "2",
+    "object_repr": "Digital Filter Simulator - Nonlinearcircuits",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2023-04-04T22:17:39.836Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "3",
+    "object_repr": "Ian Fritz Hypster - Nonlinearcircuits",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2023-04-04T22:22:19.650Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "4",
+    "object_repr": "Poultry in Motion - Nonlinearcircuits",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2023-04-04T23:36:01.237Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Triple Sloth - Nonlinearcircuits",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Manufacturer page link\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2023-04-05T00:42:51.381Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Triple Sloth - Nonlinearcircuits",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Version\", \"Bom link\", \"Modulargrid link\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2023-04-05T00:58:30.311Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Triple Sloth - Nonlinearcircuits",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Slug\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.153Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "14",
+    "object_repr": "Tayda Electronics",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.157Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "13",
+    "object_repr": "Unbranded/Generic",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.159Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "12",
+    "object_repr": "ALPHA",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 13,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.161Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "11",
+    "object_repr": "onsemi / Fairchild",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 14,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.162Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "10",
+    "object_repr": "Taiwan Semiconductor",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 15,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.164Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "9",
+    "object_repr": "GTK",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 16,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.166Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "8",
+    "object_repr": "3M",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 17,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.167Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "7",
+    "object_repr": "SGS-THOMSON",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 18,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.169Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "6",
+    "object_repr": "Texas Instruments",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 19,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.171Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "5",
+    "object_repr": "VARIOUS",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 20,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.173Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "4",
+    "object_repr": "YAGEO",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 21,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.175Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "3",
+    "object_repr": "Royal Ohm",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 22,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.177Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "2",
+    "object_repr": "Murata Electronics",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 23,
+  "fields": {
+    "action_time": "2023-04-06T08:03:18.179Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "1",
+    "object_repr": "Wurth Elektronik",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 24,
+  "fields": {
+    "action_time": "2023-04-06T08:04:38.681Z",
+    "user": 1,
+    "content_type": 16,
+    "object_id": "3",
+    "object_repr": "eBay",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 25,
+  "fields": {
+    "action_time": "2023-04-06T08:04:38.683Z",
+    "user": 1,
+    "content_type": 16,
+    "object_id": "2",
+    "object_repr": "Mouser Electronics",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 26,
+  "fields": {
+    "action_time": "2023-04-06T08:04:38.685Z",
+    "user": 1,
+    "content_type": 16,
+    "object_id": "1",
+    "object_repr": "Tayda Electronics",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 27,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.450Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "1",
+    "object_repr": "Capacitor",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 28,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.454Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "11",
+    "object_repr": "Resistor",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 29,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.456Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "2",
+    "object_repr": "SOIC IC",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 30,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.457Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "6",
+    "object_repr": "4000-Series IC",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 31,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.459Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "8",
+    "object_repr": "Transistor",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 32,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.461Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "12",
+    "object_repr": "Power Connector",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 33,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.463Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "13",
+    "object_repr": "Pin Header Strip",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 34,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.464Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "7",
+    "object_repr": "Diode",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 35,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.466Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "5",
+    "object_repr": "Photoresistor (LDR)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 36,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.467Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "4",
+    "object_repr": "Vactrol",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 37,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.469Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "9",
+    "object_repr": "Potentiometer",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 38,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.471Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "10",
+    "object_repr": "Trimpot",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 39,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.472Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "3",
+    "object_repr": "Knob",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 40,
+  "fields": {
+    "action_time": "2023-04-06T08:21:07.474Z",
+    "user": 1,
+    "content_type": 17,
+    "object_id": "14",
+    "object_repr": "Jack",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 41,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.613Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "34",
+    "object_repr": "test Resistor (Tayda Electronics 123456789)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 42,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.615Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "33",
+    "object_repr": "PJ-3001F 3.5mm Mono Phone Jack Jack (Tayda Electronics A-256)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 43,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.616Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "32",
+    "object_repr": "3.5mm Enclosed Socket Jack (Tayda Electronics A-865)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 44,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.617Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "31",
+    "object_repr": "100pcs, 5mm Dual Bi Color Polar Changing Red/Green Led Diffused Leds Light Lamp Diode (eBay 322050587862)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 45,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.619Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "30",
+    "object_repr": "100pcs, 5mm Dual Bi Color Polar Changing Red/Blue Led Diffused Leds Light Lamp Diode (eBay 321809788090)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 46,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.620Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "29",
+    "object_repr": "100k Ohm Linear Taper Potentiometer Round Shaft PCB 9mm Potentiometer (Tayda Electronics A-1848)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 47,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.621Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "28",
+    "object_repr": "10K Ohm Linear Taper Potentiometer Round Shaft PCB 9mm Potentiometer (Tayda Electronics A-1847)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 48,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.622Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "27",
+    "object_repr": "LL4148 Diode (Mouser Electronics 512-LL4148)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 49,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.623Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "26",
+    "object_repr": "S1JL Diode (Mouser Electronics 821-S1JLR2)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 50,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.625Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "25",
+    "object_repr": "10 Pin 2.54mm Single Row Female Pin Header Pin Header Strip (Tayda Electronics A-1306)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 51,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.626Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "24",
+    "object_repr": "40 Pin 2.54mm Single Row Pin Header Strip Pin Header Strip (Tayda Electronics A-197)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 52,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.627Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "23",
+    "object_repr": "2x40 Pin 2.54mm Double Row Pin Header Strip Power Connector (Tayda Electronics A-198)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 53,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.628Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "22",
+    "object_repr": "10 pin power connector Power Connector (Mouser Electronics 517-30310-6002)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 54,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.629Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "21",
+    "object_repr": "TL074 SOIC IC (Mouser Electronics 595-TL074CDR)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 55,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.630Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "20",
+    "object_repr": "TL074 SOIC IC (Tayda Electronics A-1137)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 56,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.631Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "19",
+    "object_repr": "TL072 SOIC IC (Mouser Electronics 595-TL072CDR)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 57,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.632Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "18",
+    "object_repr": "TL072 SOIC IC (Tayda Electronics A-1136)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 58,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.633Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "17",
+    "object_repr": "100M Resistor (Mouser Electronics 603-RC0805JR-07100ML)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 59,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.634Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "16",
+    "object_repr": "68M Resistor (Mouser Electronics 603-RC0805JR-0768ML)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 60,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.635Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "15",
+    "object_repr": "10M Resistor (Tayda Electronics A-3161)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 61,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.636Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "14",
+    "object_repr": "6.8M Resistor (Tayda Electronics A-3157)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 62,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.637Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "13",
+    "object_repr": "4.7M Resistor (Tayda Electronics A-3153)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 63,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.638Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "12",
+    "object_repr": "1M Resistor (Tayda Electronics A-3137)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 64,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.639Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "11",
+    "object_repr": "470K Resistor (Tayda Electronics A-3129)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 65,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.640Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "10",
+    "object_repr": "220K Resistor (Tayda Electronics A-3121)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 66,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.641Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "9",
+    "object_repr": "100K Ohm Resistor (Tayda Electronics A-3113)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 67,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.642Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "8",
+    "object_repr": "1K Ohm Resistor (Tayda Electronics A-3217)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 68,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.643Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "7",
+    "object_repr": "4.7K Ohm Resistor (Tayda Electronics A-3220)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 69,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.645Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "6",
+    "object_repr": "470 Ohm Resistor (Tayda Electronics A-3057)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 70,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.646Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "5",
+    "object_repr": "1µF Capacitor (Mouser Electronics 81-GRM219R71E105KA8D)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 71,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.647Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "4",
+    "object_repr": "1µF Capacitor (Mouser Electronics 81-GRM21BR71E105KA99)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 72,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.648Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "3",
+    "object_repr": "10µF Capacitor (Mouser Electronics 81-GJ821BR61E106KE1L)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 73,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.649Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "2",
+    "object_repr": "10µF Capacitor (Mouser Electronics 81-GRM21BR61E106KA3L)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 74,
+  "fields": {
+    "action_time": "2023-04-06T22:29:27.650Z",
+    "user": 1,
+    "content_type": 18,
+    "object_id": "1",
+    "object_repr": "1µF Capacitor (Mouser Electronics 710-885012207078)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 75,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.035Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "26",
+    "object_repr": "Poultry in Motion (test)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 76,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.037Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "25",
+    "object_repr": "Triple Sloth (3.5MM SOCKET Kobiconn style)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 77,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.038Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "24",
+    "object_repr": "Triple Sloth (Bipolar two pin LED)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 78,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.040Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "23",
+    "object_repr": "Triple Sloth (100k POT)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 79,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.042Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "22",
+    "object_repr": "Triple Sloth (10k POT)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 80,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.043Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "21",
+    "object_repr": "Triple Sloth (LL4148)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 81,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.045Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "20",
+    "object_repr": "Triple Sloth (S1JL or similar, optional - for reverse voltage protection)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 82,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.047Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "19",
+    "object_repr": "Triple Sloth (10 Pin 2.54mm Single Row Female Pin Header)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 83,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.049Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "18",
+    "object_repr": "Triple Sloth (10 Pin 2.54mm Single Row Pin Header Strip)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 84,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.051Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "17",
+    "object_repr": "Triple Sloth (Eurorack 10 pin power connector)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 85,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.053Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "16",
+    "object_repr": "Triple Sloth (TL074 or TL084)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 86,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.055Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "15",
+    "object_repr": "Triple Sloth (TL072 or TL082)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 87,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.056Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "14",
+    "object_repr": "Triple Sloth (100M)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 88,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.057Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "13",
+    "object_repr": "Triple Sloth (68M)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 89,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.059Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "12",
+    "object_repr": "Triple Sloth (10M)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 90,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.060Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "11",
+    "object_repr": "Triple Sloth (6M8)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 91,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.061Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "10",
+    "object_repr": "Triple Sloth (4M7)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 92,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.063Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "9",
+    "object_repr": "Triple Sloth (1M)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 93,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.064Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "8",
+    "object_repr": "Triple Sloth (470K)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 94,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.065Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "7",
+    "object_repr": "Triple Sloth (220K)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 95,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.067Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "6",
+    "object_repr": "Triple Sloth (100k)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 96,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.069Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "5",
+    "object_repr": "Triple Sloth (1k)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 97,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.070Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "4",
+    "object_repr": "Triple Sloth (470Ω)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 98,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.071Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "3",
+    "object_repr": "Triple Sloth (4.7K)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 99,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.073Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "2",
+    "object_repr": "Triple Sloth (10µF)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 100,
+  "fields": {
+    "action_time": "2023-04-06T22:32:33.074Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "1",
+    "object_repr": "Triple Sloth (1µF)",
+    "action_flag": 1,
+    "change_message": "new through import_export"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 1,
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": 1,
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 2,
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": 1,
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 3,
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": 1,
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 4,
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": 1,
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 5,
+  "fields": {
+    "name": "Can add permission",
+    "content_type": 2,
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 6,
+  "fields": {
+    "name": "Can change permission",
+    "content_type": 2,
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 7,
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": 2,
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 8,
+  "fields": {
+    "name": "Can view permission",
+    "content_type": 2,
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 9,
+  "fields": {
+    "name": "Can add group",
+    "content_type": 3,
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 10,
+  "fields": {
+    "name": "Can change group",
+    "content_type": 3,
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 11,
+  "fields": {
+    "name": "Can delete group",
+    "content_type": 3,
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 12,
+  "fields": {
+    "name": "Can view group",
+    "content_type": 3,
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 13,
+  "fields": {
+    "name": "Can add content type",
+    "content_type": 4,
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 14,
+  "fields": {
+    "name": "Can change content type",
+    "content_type": 4,
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 15,
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": 4,
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 16,
+  "fields": {
+    "name": "Can view content type",
+    "content_type": 4,
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 17,
+  "fields": {
+    "name": "Can add session",
+    "content_type": 5,
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 18,
+  "fields": {
+    "name": "Can change session",
+    "content_type": 5,
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 19,
+  "fields": {
+    "name": "Can delete session",
+    "content_type": 5,
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 20,
+  "fields": {
+    "name": "Can view session",
+    "content_type": 5,
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 21,
+  "fields": {
+    "name": "Can add site",
+    "content_type": 6,
+    "codename": "add_site"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 22,
+  "fields": {
+    "name": "Can change site",
+    "content_type": 6,
+    "codename": "change_site"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 23,
+  "fields": {
+    "name": "Can delete site",
+    "content_type": 6,
+    "codename": "delete_site"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 24,
+  "fields": {
+    "name": "Can view site",
+    "content_type": 6,
+    "codename": "view_site"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 25,
+  "fields": {
+    "name": "Can add email address",
+    "content_type": 7,
+    "codename": "add_emailaddress"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 26,
+  "fields": {
+    "name": "Can change email address",
+    "content_type": 7,
+    "codename": "change_emailaddress"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 27,
+  "fields": {
+    "name": "Can delete email address",
+    "content_type": 7,
+    "codename": "delete_emailaddress"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 28,
+  "fields": {
+    "name": "Can view email address",
+    "content_type": 7,
+    "codename": "view_emailaddress"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 29,
+  "fields": {
+    "name": "Can add email confirmation",
+    "content_type": 8,
+    "codename": "add_emailconfirmation"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 30,
+  "fields": {
+    "name": "Can change email confirmation",
+    "content_type": 8,
+    "codename": "change_emailconfirmation"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 31,
+  "fields": {
+    "name": "Can delete email confirmation",
+    "content_type": 8,
+    "codename": "delete_emailconfirmation"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 32,
+  "fields": {
+    "name": "Can view email confirmation",
+    "content_type": 8,
+    "codename": "view_emailconfirmation"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 33,
+  "fields": {
+    "name": "Can add user",
+    "content_type": 9,
+    "codename": "add_customuser"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 34,
+  "fields": {
+    "name": "Can change user",
+    "content_type": 9,
+    "codename": "change_customuser"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 35,
+  "fields": {
+    "name": "Can delete user",
+    "content_type": 9,
+    "codename": "delete_customuser"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 36,
+  "fields": {
+    "name": "Can view user",
+    "content_type": 9,
+    "codename": "view_customuser"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 37,
+  "fields": {
+    "name": "Can add manufacturer",
+    "content_type": 10,
+    "codename": "add_manufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 38,
+  "fields": {
+    "name": "Can change manufacturer",
+    "content_type": 10,
+    "codename": "change_manufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 39,
+  "fields": {
+    "name": "Can delete manufacturer",
+    "content_type": 10,
+    "codename": "delete_manufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 40,
+  "fields": {
+    "name": "Can view manufacturer",
+    "content_type": 10,
+    "codename": "view_manufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 41,
+  "fields": {
+    "name": "Can add module",
+    "content_type": 11,
+    "codename": "add_module"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 42,
+  "fields": {
+    "name": "Can change module",
+    "content_type": 11,
+    "codename": "change_module"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 43,
+  "fields": {
+    "name": "Can delete module",
+    "content_type": 11,
+    "codename": "delete_module"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 44,
+  "fields": {
+    "name": "Can view module",
+    "content_type": 11,
+    "codename": "view_module"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 45,
+  "fields": {
+    "name": "Can add want to build modules",
+    "content_type": 12,
+    "codename": "add_wanttobuildmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 46,
+  "fields": {
+    "name": "Can change want to build modules",
+    "content_type": 12,
+    "codename": "change_wanttobuildmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 47,
+  "fields": {
+    "name": "Can delete want to build modules",
+    "content_type": 12,
+    "codename": "delete_wanttobuildmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 48,
+  "fields": {
+    "name": "Can view want to build modules",
+    "content_type": 12,
+    "codename": "view_wanttobuildmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 49,
+  "fields": {
+    "name": "Can add built modules",
+    "content_type": 13,
+    "codename": "add_builtmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 50,
+  "fields": {
+    "name": "Can change built modules",
+    "content_type": 13,
+    "codename": "change_builtmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 51,
+  "fields": {
+    "name": "Can delete built modules",
+    "content_type": 13,
+    "codename": "delete_builtmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 52,
+  "fields": {
+    "name": "Can view built modules",
+    "content_type": 13,
+    "codename": "view_builtmodules"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 53,
+  "fields": {
+    "name": "Can add module bom list item",
+    "content_type": 14,
+    "codename": "add_modulebomlistitem"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 54,
+  "fields": {
+    "name": "Can change module bom list item",
+    "content_type": 14,
+    "codename": "change_modulebomlistitem"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 55,
+  "fields": {
+    "name": "Can delete module bom list item",
+    "content_type": 14,
+    "codename": "delete_modulebomlistitem"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 56,
+  "fields": {
+    "name": "Can view module bom list item",
+    "content_type": 14,
+    "codename": "view_modulebomlistitem"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 57,
+  "fields": {
+    "name": "Can add component manufacturer",
+    "content_type": 15,
+    "codename": "add_componentmanufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 58,
+  "fields": {
+    "name": "Can change component manufacturer",
+    "content_type": 15,
+    "codename": "change_componentmanufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 59,
+  "fields": {
+    "name": "Can delete component manufacturer",
+    "content_type": 15,
+    "codename": "delete_componentmanufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 60,
+  "fields": {
+    "name": "Can view component manufacturer",
+    "content_type": 15,
+    "codename": "view_componentmanufacturer"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 61,
+  "fields": {
+    "name": "Can add component supplier",
+    "content_type": 16,
+    "codename": "add_componentsupplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 62,
+  "fields": {
+    "name": "Can change component supplier",
+    "content_type": 16,
+    "codename": "change_componentsupplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 63,
+  "fields": {
+    "name": "Can delete component supplier",
+    "content_type": 16,
+    "codename": "delete_componentsupplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 64,
+  "fields": {
+    "name": "Can view component supplier",
+    "content_type": 16,
+    "codename": "view_componentsupplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 65,
+  "fields": {
+    "name": "Can add types",
+    "content_type": 17,
+    "codename": "add_types"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 66,
+  "fields": {
+    "name": "Can change types",
+    "content_type": 17,
+    "codename": "change_types"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 67,
+  "fields": {
+    "name": "Can delete types",
+    "content_type": 17,
+    "codename": "delete_types"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 68,
+  "fields": {
+    "name": "Can view types",
+    "content_type": 17,
+    "codename": "view_types"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 69,
+  "fields": {
+    "name": "Can add component",
+    "content_type": 18,
+    "codename": "add_component"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 70,
+  "fields": {
+    "name": "Can change component",
+    "content_type": 18,
+    "codename": "change_component"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 71,
+  "fields": {
+    "name": "Can delete component",
+    "content_type": 18,
+    "codename": "delete_component"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 72,
+  "fields": {
+    "name": "Can view component",
+    "content_type": 18,
+    "codename": "view_component"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 73,
+  "fields": {
+    "name": "Can add supplier",
+    "content_type": 19,
+    "codename": "add_supplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 74,
+  "fields": {
+    "name": "Can change supplier",
+    "content_type": 19,
+    "codename": "change_supplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 75,
+  "fields": {
+    "name": "Can delete supplier",
+    "content_type": 19,
+    "codename": "delete_supplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 76,
+  "fields": {
+    "name": "Can view supplier",
+    "content_type": 19,
+    "codename": "view_supplier"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 77,
+  "fields": {
+    "name": "Can add user inventory",
+    "content_type": 20,
+    "codename": "add_userinventory"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 78,
+  "fields": {
+    "name": "Can change user inventory",
+    "content_type": 20,
+    "codename": "change_userinventory"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 79,
+  "fields": {
+    "name": "Can delete user inventory",
+    "content_type": 20,
+    "codename": "delete_userinventory"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 80,
+  "fields": {
+    "name": "Can view user inventory",
+    "content_type": 20,
+    "codename": "view_userinventory"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 81,
+  "fields": {
+    "name": "Can add user shopping list",
+    "content_type": 21,
+    "codename": "add_usershoppinglist"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 82,
+  "fields": {
+    "name": "Can change user shopping list",
+    "content_type": 21,
+    "codename": "change_usershoppinglist"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 83,
+  "fields": {
+    "name": "Can delete user shopping list",
+    "content_type": 21,
+    "codename": "delete_usershoppinglist"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 84,
+  "fields": {
+    "name": "Can view user shopping list",
+    "content_type": 21,
+    "codename": "view_usershoppinglist"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 85,
+  "fields": {
+    "name": "Can add module bom list item rating",
+    "content_type": 22,
+    "codename": "add_modulebomlistitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 86,
+  "fields": {
+    "name": "Can change module bom list item rating",
+    "content_type": 22,
+    "codename": "change_modulebomlistitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 87,
+  "fields": {
+    "name": "Can delete module bom list item rating",
+    "content_type": 22,
+    "codename": "delete_modulebomlistitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 88,
+  "fields": {
+    "name": "Can view module bom list item rating",
+    "content_type": 22,
+    "codename": "view_modulebomlistitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 89,
+  "fields": {
+    "name": "Can add module bom list component for item rating",
+    "content_type": 22,
+    "codename": "add_modulebomlistcomponentforitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 90,
+  "fields": {
+    "name": "Can change module bom list component for item rating",
+    "content_type": 22,
+    "codename": "change_modulebomlistcomponentforitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 91,
+  "fields": {
+    "name": "Can delete module bom list component for item rating",
+    "content_type": 22,
+    "codename": "delete_modulebomlistcomponentforitemrating"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 92,
+  "fields": {
+    "name": "Can view module bom list component for item rating",
+    "content_type": 22,
+    "codename": "view_modulebomlistcomponentforitemrating"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 1,
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 2,
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 3,
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 4,
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 5,
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 6,
+  "fields": {
+    "app_label": "sites",
+    "model": "site"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 7,
+  "fields": {
+    "app_label": "account",
+    "model": "emailaddress"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 8,
+  "fields": {
+    "app_label": "account",
+    "model": "emailconfirmation"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 9,
+  "fields": {
+    "app_label": "accounts",
+    "model": "customuser"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 10,
+  "fields": {
+    "app_label": "modules",
+    "model": "manufacturer"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 11,
+  "fields": {
+    "app_label": "modules",
+    "model": "module"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 12,
+  "fields": {
+    "app_label": "modules",
+    "model": "wanttobuildmodules"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 13,
+  "fields": {
+    "app_label": "modules",
+    "model": "builtmodules"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 14,
+  "fields": {
+    "app_label": "modules",
+    "model": "modulebomlistitem"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 15,
+  "fields": {
+    "app_label": "components",
+    "model": "componentmanufacturer"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 16,
+  "fields": {
+    "app_label": "components",
+    "model": "componentsupplier"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 17,
+  "fields": {
+    "app_label": "components",
+    "model": "types"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 18,
+  "fields": {
+    "app_label": "components",
+    "model": "component"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 19,
+  "fields": {
+    "app_label": "suppliers",
+    "model": "supplier"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 20,
+  "fields": {
+    "app_label": "inventory",
+    "model": "userinventory"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 21,
+  "fields": {
+    "app_label": "shopping_list",
+    "model": "usershoppinglist"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 22,
+  "fields": {
+    "app_label": "modules",
+    "model": "modulebomlistcomponentforitemrating"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "sykudy74n1e1sg2vhsv9f8arcj2qm2m6",
+  "fields": {
+    "session_data": ".eJxVjU0OwiAQhe_C2jRAZWi704uQYRhSYkNNoYnGeHdb04Uu39_3XsLhWke3Fl5cCmIQSpx-PY9047wHOE273SDRvObafDtHXJrLpjjXRFjTnK_H6g81Yhk3DpD10pogAc5ReUMIaFkqFfqIweguIoSWmKjFXjGw7UxsJXoNRoLGHVq4lO3G8eOelqcYlJY9SPn-AHFIRTY:1pipn4:4pBHheu6oBF3e-p2UWJbMCmXYwp9xj48RnT3bzb5epg",
+    "expire_date": "2023-04-16T04:58:06.096Z"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 1,
+  "fields": {
+    "domain": "example.com",
+    "name": "example.com"
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$mImWwbVLJS25SDedab8x1W$P0DS43y62g/1Lyfe9j1WibTfZrJaCrj6lyPPzCYLz84=",
+    "last_login": "2023-04-02T04:58:06.092Z",
+    "is_superuser": true,
+    "first_name": "",
+    "last_name": "",
+    "email": "test@whatever.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2023-04-02T04:57:39.516Z",
+    "username": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "modules.manufacturer",
+  "pk": 1,
+  "fields": {
+    "name": "Nonlinearcircuits",
+    "notes": "",
+    "date_updated": "2023-04-02",
+    "slug": "nonlinearcircuits"
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 1,
+  "fields": {
+    "description": "1µF",
+    "module": 1,
+    "type": "Capacitor",
+    "designators": "C1, C2, C3, C9, C10, C11, C17, C18, C19",
+    "quantity": 9,
+    "notes": "",
+    "components_options": [
+      1,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 2,
+  "fields": {
+    "description": "10µF",
+    "module": 1,
+    "type": "Capacitor",
+    "designators": "C4, C5, C6, C7, C12, C13, C14, C15, C16, C20, C21, C22, C23, C24, C25, C26, C27, C28",
+    "quantity": 18,
+    "notes": "",
+    "components_options": [
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 3,
+  "fields": {
+    "description": "4.7K",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R5, R11, R37, R46, R18, R19 R36, R47",
+    "quantity": 8,
+    "notes": "",
+    "components_options": [
+      7
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 4,
+  "fields": {
+    "description": "470Ω",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R10 (RL), R23 (RL), R33 (RL)",
+    "quantity": 3,
+    "notes": "",
+    "components_options": [
+      6
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 5,
+  "fields": {
+    "description": "1k",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R4, R15, R27, R32, R35, R43, R44",
+    "quantity": 7,
+    "notes": "",
+    "components_options": [
+      8
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 6,
+  "fields": {
+    "description": "100k",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R17, R24, R25, R26, R28, R29, R38, R39, R40, R41, R42, R45, R6, R20",
+    "quantity": 14,
+    "notes": "",
+    "components_options": [
+      9
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 7,
+  "fields": {
+    "description": "220K",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R7",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      10
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 8,
+  "fields": {
+    "description": "470K",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R12, R34",
+    "quantity": 2,
+    "notes": "",
+    "components_options": [
+      11
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 9,
+  "fields": {
+    "description": "1M",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R13, R14, R16, R30",
+    "quantity": 4,
+    "notes": "",
+    "components_options": [
+      12
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 10,
+  "fields": {
+    "description": "4M7",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R31, R48",
+    "quantity": 2,
+    "notes": "",
+    "components_options": [
+      13
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 11,
+  "fields": {
+    "description": "6M8",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R21",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      14
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 12,
+  "fields": {
+    "description": "10M",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R1, R2, R3, R22",
+    "quantity": 4,
+    "notes": "",
+    "components_options": [
+      15
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 13,
+  "fields": {
+    "description": "68M",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R8",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      16
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 14,
+  "fields": {
+    "description": "100M",
+    "module": 1,
+    "type": "Resistor",
+    "designators": "R9",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      17
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 15,
+  "fields": {
+    "description": "TL072 or TL082",
+    "module": 1,
+    "type": "SOIC IC",
+    "designators": "U2, U5",
+    "quantity": 2,
+    "notes": "",
+    "components_options": [
+      18,
+      19
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 16,
+  "fields": {
+    "description": "TL074 or TL084",
+    "module": 1,
+    "type": "SOIC IC",
+    "designators": "U1, U3, U4",
+    "quantity": 3,
+    "notes": "",
+    "components_options": [
+      20,
+      21
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 17,
+  "fields": {
+    "description": "Eurorack 10 pin power connector",
+    "module": 1,
+    "type": "Power Connector",
+    "designators": "",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      22,
+      23
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 18,
+  "fields": {
+    "description": "10 Pin 2.54mm Single Row Pin Header Strip",
+    "module": 1,
+    "type": "Pin Header Strip",
+    "designators": "",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      24
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 19,
+  "fields": {
+    "description": "10 Pin 2.54mm Single Row Female Pin Header",
+    "module": 1,
+    "type": "Pin Header Strip",
+    "designators": "",
+    "quantity": 3,
+    "notes": "",
+    "components_options": [
+      25
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 20,
+  "fields": {
+    "description": "S1JL or similar, optional - for reverse voltage protection",
+    "module": 1,
+    "type": "Diode",
+    "designators": "",
+    "quantity": 2,
+    "notes": "SMD, standard power diode 600V 1A, dot on PCB indicates cathode (stripe)",
+    "components_options": [
+      26
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 21,
+  "fields": {
+    "description": "LL4148",
+    "module": 1,
+    "type": "Diode",
+    "designators": "D1, D2",
+    "quantity": 2,
+    "notes": "SOD-80",
+    "components_options": [
+      27
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 22,
+  "fields": {
+    "description": "10k POT",
+    "module": 1,
+    "type": "Potentiometer",
+    "designators": "P2",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      28
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 23,
+  "fields": {
+    "description": "100k POT",
+    "module": 1,
+    "type": "Potentiometer",
+    "designators": "P1",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      29
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 24,
+  "fields": {
+    "description": "Bipolar two pin LED",
+    "module": 1,
+    "type": "Diode",
+    "designators": "",
+    "quantity": 3,
+    "notes": "5mm",
+    "components_options": [
+      30,
+      31
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 25,
+  "fields": {
+    "description": "3.5MM SOCKET Kobiconn style",
+    "module": 1,
+    "type": "Jack",
+    "designators": "",
+    "quantity": 13,
+    "notes": "Tayda: A-865 (version 5 of the bottom PCB must use Thonkiconns, Tayda: A-2563)",
+    "components_options": [
+      32,
+      33
+    ]
+  }
+},
+{
+  "model": "modules.modulebomlistitem",
+  "pk": 26,
+  "fields": {
+    "description": "test",
+    "module": 4,
+    "type": "Resistor",
+    "designators": "C1, C2, C3, C9, C10, C11, C17, C18, C19",
+    "quantity": 1,
+    "notes": "",
+    "components_options": [
+      34
+    ]
+  }
+},
+{
+  "model": "modules.module",
+  "pk": 1,
+  "fields": {
+    "name": "Triple Sloth",
+    "manufacturer": 1,
+    "version": "2",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "image": "triple_sloth_copy.jpg",
+    "manufacturer_page_link": "https://www.nonlinearcircuits.com/modules/p/triple-sloth?rq=Triple",
+    "bom_link": "https://static1.squarespace.com/static/5e6e99e8bd2f8a6de8454feb/t/62e73c4a3ba1a46b58402a4b/1659321423485/8HP+Sloth+build+and+BOM+%28new%29.pdf",
+    "manual_link": "",
+    "modulargrid_link": "https://www.modulargrid.net/e/nonlinearcircuits-triple-sloths-v2",
+    "slug": "triple-sloth-nonlinearcircuits-2",
+    "date_updated": "2023-04-02"
+  }
+},
+{
+  "model": "modules.module",
+  "pk": 2,
+  "fields": {
+    "name": "Digital Filter Simulator",
+    "manufacturer": 1,
+    "version": "1",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "image": "Digital_Filter_Simulator_BX1DcKp.jpeg",
+    "manufacturer_page_link": "",
+    "bom_link": "",
+    "manual_link": "",
+    "modulargrid_link": "",
+    "slug": "digital-filter-simulator-nonlinearcircuits-1",
+    "date_updated": "2023-04-04"
+  }
+},
+{
+  "model": "modules.module",
+  "pk": 3,
+  "fields": {
+    "name": "Ian Fritz Hypster",
+    "manufacturer": 1,
+    "version": "1",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "image": "hypster_copy.jpeg",
+    "manufacturer_page_link": "",
+    "bom_link": "",
+    "manual_link": "",
+    "modulargrid_link": "",
+    "slug": "ian-fritz-hypster-nonlinearcircuits-1",
+    "date_updated": "2023-04-04"
+  }
+},
+{
+  "model": "modules.module",
+  "pk": 4,
+  "fields": {
+    "name": "Poultry in Motion",
+    "manufacturer": 1,
+    "version": "1",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Magna ac placerat vestibulum lectus. Sed libero enim sed faucibus turpis. Proin fermentum leo vel orci porta non pulvinar. Amet justo donec enim diam vulputate ut pharetra. Phasellus egestas tellus rutrum tellus pellentesque eu. In metus vulputate eu scelerisque felis imperdiet proin. Nam aliquam sem et tortor consequat id. Libero id faucibus nisl tincidunt eget nullam non nisi. Amet facilisis magna etiam tempor. Vitae ultricies leo integer malesuada nunc. Sed egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Semper eget duis at tellus at urna condimentum. Pellentesque elit ullamcorper dignissim cras tincidunt lobortis. Pretium aenean pharetra magna ac placerat vestibulum lectus.\r\n\r\nAmet nisl suscipit adipiscing bibendum est. Et ultrices neque ornare aenean. Fermentum dui faucibus in ornare quam viverra orci. Sed nisi lacus sed viverra tellus. Rhoncus urna neque viverra justo nec. Ut venenatis tellus in metus vulputate eu. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing. Scelerisque in dictum non consectetur a erat. Eu ultrices vitae auctor eu augue. Lectus arcu bibendum at varius. Vitae elementum curabitur vitae nunc sed. Sapien eget mi proin sed libero. Nullam vehicula ipsum a arcu cursus vitae congue. Velit ut tortor pretium viverra suspendisse potenti. Est placerat in egestas erat imperdiet sed euismod nisi. Vitae nunc sed velit dignissim sodales ut eu. Faucibus in ornare quam viverra orci sagittis eu volutpat odio. Ultricies tristique nulla aliquet enim. Amet dictum sit amet justo donec.\r\n\r\nPraesent tristique magna sit amet purus gravida quis blandit turpis. Risus quis varius quam quisque id diam vel quam elementum. Pellentesque diam volutpat commodo sed. Cursus vitae congue mauris rhoncus. Facilisis leo vel fringilla est ullamcorper. Convallis posuere morbi leo urna molestie. Vulputate enim nulla aliquet porttitor lacus luctus accumsan tortor. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Consequat id porta nibh venenatis cras sed felis eget velit. Vestibulum mattis ullamcorper velit sed. Id nibh tortor id aliquet lectus proin nibh nisl condimentum. Erat velit scelerisque in dictum non. Tristique senectus et netus et. Lacinia at quis risus sed vulputate odio. Venenatis lectus magna fringilla urna porttitor rhoncus dolor. Ut etiam sit amet nisl. Scelerisque eu ultrices vitae auctor eu augue.\r\n\r\nLacus vel facilisis volutpat est velit egestas dui. Nullam ac tortor vitae purus faucibus ornare suspendisse sed nisi. Platea dictumst vestibulum rhoncus est. Imperdiet sed euismod nisi porta lorem mollis. Pulvinar sapien et ligula ullamcorper malesuada proin libero nunc. Duis at tellus at urna condimentum mattis pellentesque id nibh. Mauris in aliquam sem fringilla ut morbi tincidunt. At augue eget arcu dictum varius. Ac felis donec et odio pellentesque diam volutpat commodo sed. Elementum eu facilisis sed odio morbi quis commodo odio. Euismod lacinia at quis risus sed vulputate.\r\n\r\nVelit euismod in pellentesque massa placerat duis ultricies. Quam quisque id diam vel quam elementum pulvinar etiam. Integer malesuada nunc vel risus commodo viverra. Semper viverra nam libero justo laoreet sit amet. Orci eu lobortis elementum nibh tellus molestie nunc non blandit. Magna ac placerat vestibulum lectus mauris ultrices eros in cursus. Arcu bibendum at varius vel pharetra vel. Dignissim sodales ut eu sem integer vitae justo eget. Purus in mollis nunc sed. Sodales ut etiam sit amet nisl purus in mollis nunc. Diam vel quam elementum pulvinar etiam non quam lacus. Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique. Quam lacus suspendisse faucibus interdum posuere lorem ipsum dolor. Nisl vel pretium lectus quam id. Sed sed risus pretium quam vulputate dignissim suspendisse.",
+    "image": "Poultry_in_Motion_RRB7Luf.jpeg",
+    "manufacturer_page_link": "",
+    "bom_link": "",
+    "manual_link": "",
+    "modulargrid_link": "",
+    "slug": "poultry-in-motion-nonlinearcircuits-1",
+    "date_updated": "2023-04-04"
+  }
+},
+{
+  "model": "modules.wanttobuildmodules",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "module": 4
+  }
+},
+{
+  "model": "modules.builtmodules",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "module": 2
+  }
+},
+{
+  "model": "components.types",
+  "pk": 1,
+  "fields": {
+    "name": "Capacitor",
+    "order": 0,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 2,
+  "fields": {
+    "name": "SOIC IC",
+    "order": 2,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 3,
+  "fields": {
+    "name": "Knob",
+    "order": 12,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 4,
+  "fields": {
+    "name": "Vactrol",
+    "order": 9,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 5,
+  "fields": {
+    "name": "Photoresistor (LDR)",
+    "order": 8,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 6,
+  "fields": {
+    "name": "4000-Series IC",
+    "order": 3,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 7,
+  "fields": {
+    "name": "Diode",
+    "order": 7,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 8,
+  "fields": {
+    "name": "Transistor",
+    "order": 4,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 9,
+  "fields": {
+    "name": "Potentiometer",
+    "order": 10,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 10,
+  "fields": {
+    "name": "Trimpot",
+    "order": 11,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 11,
+  "fields": {
+    "name": "Resistor",
+    "order": 1,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 12,
+  "fields": {
+    "name": "Power Connector",
+    "order": 5,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 13,
+  "fields": {
+    "name": "Pin Header Strip",
+    "order": 6,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.types",
+  "pk": 14,
+  "fields": {
+    "name": "Jack",
+    "order": 13,
+    "notes": "",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.componentsupplier",
+  "pk": 1,
+  "fields": {
+    "name": "Tayda Electronics",
+    "short_name": "Tayda",
+    "url": "https://www.taydaelectronics.com/"
+  }
+},
+{
+  "model": "components.componentsupplier",
+  "pk": 2,
+  "fields": {
+    "name": "Mouser Electronics",
+    "short_name": "Mouser",
+    "url": "https://www.mouser.com/"
+  }
+},
+{
+  "model": "components.componentsupplier",
+  "pk": 3,
+  "fields": {
+    "name": "eBay",
+    "short_name": "eBay",
+    "url": "https://www.ebay.com/"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 1,
+  "fields": {
+    "name": "Wurth Elektronik"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 2,
+  "fields": {
+    "name": "Murata Electronics"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 3,
+  "fields": {
+    "name": "Royal Ohm"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 4,
+  "fields": {
+    "name": "YAGEO"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 5,
+  "fields": {
+    "name": "VARIOUS"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 6,
+  "fields": {
+    "name": "Texas Instruments"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 7,
+  "fields": {
+    "name": "SGS-THOMSON"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 8,
+  "fields": {
+    "name": "3M"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 9,
+  "fields": {
+    "name": "GTK"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 10,
+  "fields": {
+    "name": "Taiwan Semiconductor"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 11,
+  "fields": {
+    "name": "onsemi / Fairchild"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 12,
+  "fields": {
+    "name": "ALPHA"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 13,
+  "fields": {
+    "name": "Unbranded/Generic"
+  }
+},
+{
+  "model": "components.componentmanufacturer",
+  "pk": 14,
+  "fields": {
+    "name": "Tayda Electronics"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 1,
+  "fields": {
+    "description": "1µF",
+    "manufacturer": 1,
+    "supplier": 2,
+    "supplier_item_no": "710-885012207078",
+    "type": 1,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": "1.0",
+    "farads_unit": "μF",
+    "voltage_rating": "25V",
+    "tolerance": "10%",
+    "price_currency": "USD",
+    "price": "1.00",
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Wurth-Elektronik/885012207078?qs=sGAEpiMZZMvsSlwiRhF8qunkWFWGyo%252BvAPc0uchxowcHZgpfbu8STg==&fbclid=IwAR2reuQ6QQ9_igMwZQvz_1oPD2g5TVCNJcSHEaVO7DKtILvrTxFUb6swtsQ",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 2,
+  "fields": {
+    "description": "10µF",
+    "manufacturer": 2,
+    "supplier": 2,
+    "supplier_item_no": "81-GRM21BR61E106KA3L",
+    "type": 1,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": "10.0",
+    "farads_unit": "μF",
+    "voltage_rating": "25V",
+    "tolerance": "10%",
+    "price_currency": "USD",
+    "price": "0.00",
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Murata-Electronics/GRM21BR61E106KA73L?qs=Uw8ySfEHS7LOsCQEzvRcNg%3D%3D",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 3,
+  "fields": {
+    "description": "10µF",
+    "manufacturer": 2,
+    "supplier": 2,
+    "supplier_item_no": "81-GJ821BR61E106KE1L",
+    "type": 1,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": "10.0",
+    "farads_unit": "μF",
+    "voltage_rating": "25V",
+    "tolerance": "10%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Murata-Electronics/GJ821BR61E106KE11L?qs=qkDYIeTQ%252BEnBuHnNb4Un%2FQ%3D%3D",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 4,
+  "fields": {
+    "description": "1µF",
+    "manufacturer": 2,
+    "supplier": 2,
+    "supplier_item_no": "81-GRM21BR71E105KA99",
+    "type": 1,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": "1.0",
+    "farads_unit": "μF",
+    "voltage_rating": "25V",
+    "tolerance": "10%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Murata-Electronics/GRM21BR71E105KA99L?qs=pAhIg4h%2FqUTk69tB5q7hhg%3D%3D",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 5,
+  "fields": {
+    "description": "1µF",
+    "manufacturer": 2,
+    "supplier": 2,
+    "supplier_item_no": "81-GRM219R71E105KA8D",
+    "type": 1,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": "1.0",
+    "farads_unit": "μF",
+    "voltage_rating": "25V",
+    "tolerance": "10%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Murata-Electronics/GRM219R71E105KA88D?qs=Ilq%252BLDnc%2FNjY4uR2%252B1ncdQ%3D%3D",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 6,
+  "fields": {
+    "description": "470 Ohm",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3057",
+    "type": 11,
+    "ohms": "470.0",
+    "ohms_unit": "Ω",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/50-x-smd-chip-resistors-470-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 7,
+  "fields": {
+    "description": "4.7K Ohm",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3220",
+    "type": 11,
+    "ohms": "4.7",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/50-x-4-7-k-ohm-1-2w-ss-5-1210-smd-chip-resistors.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 8,
+  "fields": {
+    "description": "1K Ohm",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3217",
+    "type": 11,
+    "ohms": "1.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/50-x-1k-ohm-1-4w-1-1206-smd-chip-resistors.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 9,
+  "fields": {
+    "description": "100K Ohm",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3113",
+    "type": 11,
+    "ohms": "100.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/50-x-smd-chip-resistors-100k-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 10,
+  "fields": {
+    "description": "220K",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3121",
+    "type": 11,
+    "ohms": "220.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/50-x-smd-chip-resistors-220k-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 11,
+  "fields": {
+    "description": "470K",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3129",
+    "type": 11,
+    "ohms": "470.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/0805/50-x-smd-chip-resistors-470k-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 12,
+  "fields": {
+    "description": "1M",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3137",
+    "type": 11,
+    "ohms": "1.0",
+    "ohms_unit": "MΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/0805/50-x-smd-chip-resistors-1-0m-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 13,
+  "fields": {
+    "description": "4.7M",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3153",
+    "type": 11,
+    "ohms": "4.7",
+    "ohms_unit": "MΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/0805/50-x-smd-chip-resistors-4-7m-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 14,
+  "fields": {
+    "description": "6.8M",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3157",
+    "type": 11,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/0805/50-x-smd-chip-resistors-6-8m-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 15,
+  "fields": {
+    "description": "10M",
+    "manufacturer": 3,
+    "supplier": 1,
+    "supplier_item_no": "A-3161",
+    "type": 11,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "1%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/resistors/smd-chip-resistors/0805/50-x-smd-chip-resistors-10m-ohm-1-8w-1-0805.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 16,
+  "fields": {
+    "description": "68M",
+    "manufacturer": 4,
+    "supplier": 2,
+    "supplier_item_no": "603-RC0805JR-0768ML",
+    "type": 11,
+    "ohms": "68.0",
+    "ohms_unit": "MΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "5%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/603-RC0805JR-0768ML",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 17,
+  "fields": {
+    "description": "100M",
+    "manufacturer": 4,
+    "supplier": 2,
+    "supplier_item_no": "603-RC0805JR-07100ML",
+    "type": 11,
+    "ohms": "100.0",
+    "ohms_unit": "MΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "5%",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/603-RC0805JR-07100ML",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 18,
+  "fields": {
+    "description": "TL072",
+    "manufacturer": 5,
+    "supplier": 1,
+    "supplier_item_no": "A-1136",
+    "type": 2,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/tl072-dual-operational-amplifier-j-fet-soic-8-tl072acdr.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 19,
+  "fields": {
+    "description": "TL072",
+    "manufacturer": 6,
+    "supplier": 2,
+    "supplier_item_no": "595-TL072CDR",
+    "type": 2,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/595-TL072CDR",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 20,
+  "fields": {
+    "description": "TL074",
+    "manufacturer": 7,
+    "supplier": 1,
+    "supplier_item_no": "A-1137",
+    "type": 2,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/tl074-quad-operational-amplifier-j-fet-soic-14-tl074cdt.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 21,
+  "fields": {
+    "description": "TL074",
+    "manufacturer": 6,
+    "supplier": 2,
+    "supplier_item_no": "595-TL074CDR",
+    "type": 2,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/595-TL074CDR",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 22,
+  "fields": {
+    "description": "10 pin power connector",
+    "manufacturer": 8,
+    "supplier": 2,
+    "supplier_item_no": "517-30310-6002",
+    "type": 12,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/517-30310-6002",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 23,
+  "fields": {
+    "description": "2x40 Pin 2.54mm Double Row Pin Header Strip",
+    "manufacturer": 9,
+    "supplier": 1,
+    "supplier_item_no": "A-198",
+    "type": 12,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/2x40-pin-2-54-mm-double-row-pin-header-strip.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 24,
+  "fields": {
+    "description": "40 Pin 2.54mm Single Row Pin Header Strip",
+    "manufacturer": 9,
+    "supplier": 1,
+    "supplier_item_no": "A-197",
+    "type": 13,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/40-pin-2-54-mm-single-row-pin-header-strip.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 25,
+  "fields": {
+    "description": "10 Pin 2.54mm Single Row Female Pin Header",
+    "manufacturer": 9,
+    "supplier": 1,
+    "supplier_item_no": "A-1306",
+    "type": 13,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/10-pin-2-54-mm-single-row-female-pin-header.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 26,
+  "fields": {
+    "description": "S1JL",
+    "manufacturer": 10,
+    "supplier": 2,
+    "supplier_item_no": "821-S1JLR2",
+    "type": 7,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/821-S1JLR2",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 27,
+  "fields": {
+    "description": "LL4148",
+    "manufacturer": 11,
+    "supplier": 2,
+    "supplier_item_no": "512-LL4148",
+    "type": 7,
+    "ohms": "1.0",
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.co.uk/ProductDetail/512-LL4148",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 28,
+  "fields": {
+    "description": "10K Ohm Linear Taper Potentiometer Round Shaft PCB 9mm",
+    "manufacturer": 12,
+    "supplier": 1,
+    "supplier_item_no": "A-1847",
+    "type": 9,
+    "ohms": "10.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/10k-ohm-linear-taper-potentiometer-round-shaft-pcb-9mm.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 29,
+  "fields": {
+    "description": "100k Ohm Linear Taper Potentiometer Round Shaft PCB 9mm",
+    "manufacturer": 12,
+    "supplier": 1,
+    "supplier_item_no": "A-1848",
+    "type": 9,
+    "ohms": "100.0",
+    "ohms_unit": "kΩ",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/100k-ohm-linear-taper-potentiometer-round-shaft-pcb-9mm.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 30,
+  "fields": {
+    "description": "100pcs, 5mm Dual Bi Color Polar Changing Red/Blue Led Diffused Leds Light Lamp",
+    "manufacturer": 13,
+    "supplier": 3,
+    "supplier_item_no": "321809788090",
+    "type": 7,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.ebay.com.au/itm/100pcs-5mm-Dual-Bi-Color-Polar-Changing-Red-Blue-Led-Diffused-Leds-Light-Lamp-/321809788090?hash=item4aed5bacba%3Ag%3A4w0AAOSw3ydVqRPM&fbclid=IwAR2ELu0oAdBMl2C7V7t3GOlo2NtB",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 31,
+  "fields": {
+    "description": "100pcs, 5mm Dual Bi Color Polar Changing Red/Green Led Diffused Leds Light Lamp",
+    "manufacturer": 13,
+    "supplier": 3,
+    "supplier_item_no": "322050587862",
+    "type": 7,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.ebay.com.au/itm/322050587862?_trkparms=amclksrc%3DITM%26aid%3D1110006%26algo%3DHOMESPLICE.SIM%26ao%3D1%26asc%3D20200818143230%26meid%3D0fc5443979d34c4ea9dd636c2d45e235%26pid%3D101224%26rk%",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 32,
+  "fields": {
+    "description": "3.5mm Enclosed Socket",
+    "manufacturer": 14,
+    "supplier": 1,
+    "supplier_item_no": "A-865",
+    "type": 14,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": null,
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/3-5mm-mono-enclosed-socket.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 33,
+  "fields": {
+    "description": "PJ-3001F 3.5mm Mono Phone Jack",
+    "manufacturer": 14,
+    "supplier": 1,
+    "supplier_item_no": "A-256",
+    "type": 14,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": "0.23",
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.taydaelectronics.com/pj-3001f-3-5-mm-mono-phone-jack.html",
+    "date_updated": "2022-01-02"
+  }
+},
+{
+  "model": "components.component",
+  "pk": 34,
+  "fields": {
+    "description": "test",
+    "manufacturer": 1,
+    "supplier": 1,
+    "supplier_item_no": "123456789",
+    "type": 11,
+    "ohms": null,
+    "ohms_unit": "",
+    "farads": null,
+    "farads_unit": "",
+    "voltage_rating": "",
+    "tolerance": "",
+    "price_currency": "USD",
+    "price": "0.00",
+    "pcs": 1,
+    "notes": "",
+    "link": "https://www.mouser.com/ProductDetail/Wurth-Elektronik/885012207078?qs=sGAEpiMZZMvsSlwiRhF8qunkWFWGyo%252BvAPc0uchxowcHZgpfbu8STg==&fbclid=IwAR2reuQ6QQ9_igMwZQvz_1oPD2g5TVCNJcSHEaVO7DKtILvrTxFUb6swtsQ",
+    "date_updated": "2022-01-17"
+  }
+}
+]
