@@ -11,6 +11,8 @@ services:
     depends_on:
       - backend
     restart: always
+    ports:
+      - ${FRONTEND_MAPPED_PORT}:3000
   backend:
     container_name: backend-${APP_ENV}
     build: ./backend
@@ -20,3 +22,5 @@ services:
     env_file:
       - ./.env.dev
     restart: always
+    ports:
+      - ${BACKEND_MAPPED_PORT}:8000
