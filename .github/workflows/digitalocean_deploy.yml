@@ -26,12 +26,10 @@ jobs:
             repoDir="/home/devops/app/production"
           elif [ ${GITHUB_REF#refs/heads/} = "deploy/dev" ]; then
             repoDir="/home/devops/app/dev"
-          elif [ ${GITHUB_REF#refs/heads/} = "devops-chris" ]; then
-            repoDir="/home/devops/app/dev"
           else
             echo "Invalid environment."
             exit 1
           fi
 
           ssh -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
-            /home/devops/infra/scripts/deploy.sh "$repoDir"
+            /home/devops/infra/scripts/deploy.sh "$repoDir" "$GITHUB_SHA"
