@@ -25,9 +25,6 @@ FROM node:14.17.6-alpine
 # Set the working directory
 WORKDIR /app
 
-# Fix for (sh: webpack: not found)
-RUN npm install
-
 # Copy the built app from the builder stage
 COPY --from=builder /code/build /app/build
 
