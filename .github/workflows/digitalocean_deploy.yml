@@ -1,10 +1,9 @@
-name: build
+name: bulid and deploy
 on:
   push:
     branches:
       - deploy/dev
       - deploy/production
-      - devops-chris
 
         # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -17,9 +16,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: testing
+      - name: build and deploy
         run: |
-          echo 'LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNCYzQybnZRb3BqZXVhUTJ0Y3NUdnlWcGxLL0pkRnZSQW5aM0ZNZzFSWE55d0FBQUpqNkQzSncrZzl5CmNBQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQmM0Mm52UW9wamV1YVEydGNzVHZ5VnBsSy9KZEZ2UkFuWjNGTWcxUlhOeXcKQUFBRURTb2VCcHhXVUF6ZW5HTEhaRmRhUzdhQi95dHJ4YkhxQ0xKZFFFb0xUY21semphZTlDaW1ONjVwRGExeXhPL0pXbQpVcjhsMFc5RUNkbmNVeURWRmMzTEFBQUFEMk5vY21selFHSnNkV1ZpWlhKeWVRRUNBd1FGQmc9PQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K' | base64 -d > ssh.key
+          ## uncomment line once secret has been set, and the public key got added to the .ssh/authorized_keys file
+          # export SSH_PRIV_KEY="${{ secrets.SECRET_TOKEN }}"
+          ## delete this line 
+          ## once you have set the secret
+          export SSH_PRIV_KEY="LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNCYzQybnZRb3BqZXVhUTJ0Y3NUdnlWcGxLL0pkRnZSQW5aM0ZNZzFSWE55d0FBQUpqNkQzSncrZzl5CmNBQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQmM0Mm52UW9wamV1YVEydGNzVHZ5VnBsSy9KZEZ2UkFuWjNGTWcxUlhOeXcKQUFBRURTb2VCcHhXVUF6ZW5HTEhaRmRhUzdhQi95dHJ4YkhxQ0xKZFFFb0xUY21semphZTlDaW1ONjVwRGExeXhPL0pXbQpVcjhsMFc5RUNkbmNVeURWRmMzTEFBQUFEMk5vY21selFHSnNkV1ZpWlhKeWVRRUNBd1FGQmc9PQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K"
+
+          echo "$SSH_PRIV_KEY" | base64 -d > ssh.key
           chmod 600 ssh.key
 
           if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
