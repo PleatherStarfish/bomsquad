@@ -14,19 +14,29 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
+component_types = [
+    {"name": "Surface Mount (SMT)", "value": "smt"},
+    {"name": "Through Hole", "value": "th"},
+]
+
 
 def module_list(request):
     query = request.GET.get("search", "")
-    manufacturer = request.GET.get("manufacturer", None)  # Set default to None
-    module_list = Module.objects.order_by("name")  # Start with all modules
+    manufacturer = request.GET.get("manufacturer", None)
+    component_type = request.GET.get("component_type", None)
+    module_list = Module.objects.order_by("name")
 
     if manufacturer:
         module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
-        print(module_list)
+
+    if component_type:
+        module_list = module_list.filter(component_type=component_type)
 
     if query:
         module_list = module_list.filter(
-            Q(name__icontains=query) | Q(manufacturer__name__icontains=query)
+            Q(name__icontains=query)
+            | Q(manufacturer__name__icontains=query)
+            | Q(description__icontains=query)  # Add this line
         ).order_by("name")
 
     paginator = Paginator(module_list, 10)
@@ -34,8 +44,6 @@ def module_list(request):
     page_obj = paginator.get_page(page_number)
     manufacturers = Manufacturer.objects.values("name").distinct()
 
-    # Add a boolean flag to indicate whether or not the module has been built by the user
-    user = request.user  # Replace with the appropriate user object
     user = request.user if request.user.is_authenticated else None
     if user:
         for module in page_obj:
@@ -50,6 +58,8 @@ def module_list(request):
             "manufacturers": manufacturers,
             "search": query,
             "manufacturer": manufacturer,
+            "component_types": component_types,
+            "user_logged_in": request.user.is_authenticated,
         },
     )
 

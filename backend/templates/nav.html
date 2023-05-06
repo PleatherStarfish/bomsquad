@@ -1,30 +1,40 @@
-{% load static %}
+{% load static custom_tags %}
+
 <nav class="fixed top-0 w-full bg-[#212529] z-40">
   <div class="mx-auto px-8">
-
     <div class="hidden md:block relative">
       <a href="{% url 'home' %}">
-        {% with request.path|slice:":5" as path %}
-          {% if path == '/user' %}
-          <img class="absolute top-2.5 left-[-20px] hidden sm:block" height="70px" width="70px" src="{% static 'images/logo_mini.png' %}" alt="Bom Squad Logo"/>  
-          {% else %}
-          <img class="absolute top-3 hidden sm:block" height="180px" width="180px" src="{% static 'images/logo.png' %}" alt="Bom Squad Logo"/>
-          {% endif %}
-        {% endwith %} 
+        {% with request.path|slice:":5" as path %} {% if path == '/user' %}
+        <img
+          class="absolute top-2.5 left-[-20px] hidden sm:block"
+          height="70px"
+          width="70px"
+          src="{% static 'images/logo_mini.png' %}"
+          alt="Bom Squad Logo"
+        />
+        {% else %}
+        <img
+          class="absolute top-3 hidden sm:block"
+          height="180px"
+          width="180px"
+          src="{% static 'images/logo.png' %}"
+          alt="Bom Squad Logo"
+        />
+        {% endif %} {% endwith %}
       </a>
     </div>
 
     <div class="relative flex h-16 items-center justify-between">
-      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-        
+      <div
+        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
+      >
         <div class="hidden sm:ml-6 sm:block">
-
-        {% with request.path|slice:":5" as path %}
-          {% if path == '/user' %}
+          {% with request.path|slice:":5" as path %} {% if path == '/user' %}
           <ul class="flex space-x-4 text-white ml-[40px]">
             <li>
-              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a
-                >
+              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary"
+                >Home</a
+              >
             </li>
             <li>
               <a href="{% url 'about' %}" class="nav-link px-2">About</a>
@@ -36,8 +46,9 @@
           {% else %}
           <ul class="flex space-x-4 text-white ml-[180px]">
             <li>
-              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a
-                >
+              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary"
+                >Home</a
+              >
             </li>
             <li>
               <a href="{% url 'about' %}" class="nav-link px-2">About</a>
@@ -46,74 +57,31 @@
               <a href="/components/" class="nav-link px-2">Components</a>
             </li>
           </ul>
-          {% endif %}
-        {% endwith %} 
-
+          {% endif %} {% endwith %}
         </div>
       </div>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <!-- Profile dropdown -->
-          <div class="relative text-end">
-            {% if user.is_authenticated %}
-              <button id="menu-button"
-                      class="block text-white text-decoration-none focus:outline-none"
-                      aria-label="User menu"
-                      aria-haspopup="true"
-                      aria-expanded="false">
-                {{ user.email }}
-              </button>
-              <div id="dropdown-menu"
-                   class="absolute z-10 top-full right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg hidden"
-                   x-show.transition="isOpen">
-                <ul class="text-sm text-gray-700">
-                  <li>
-                    <a class="block px-4 py-2 hover:bg-gray-100"
-                       href="{% url 'user' username=user.username %}">Profile</a
-                      >
-                  </li>
-                  <hr class="dropdown-divider" />
-                  <li>
-                    <a class="block px-4 py-2 hover:bg-gray-100"
-                       href="{% url 'account_change_password' %}">Change password</a
-                      >
-                  </li>
-                  <hr class="dropdown-divider" />
-                  <li>
-                    <a class="block px-4 py-2 hover:bg-gray-100"
-                        href="{% url 'account_logout' %}">Sign out</a
-                      >
-                  </li>
-                </ul>
-              </div>
-                {% else %}
-                  <div class="flex items-center text-white space-x-2">
-                    <a href="{% url 'account_login' %}"
-                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">Log in</a
-                      >
-                      <a href="{% url 'account_signup' %}"
-                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">Sign up</a
-                        >
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Mobile menu, show/hide based on menu state. -->
-            <div class="sm:hidden" id="mobile-menu">
-              <div class="space-y-1 px-2 pt-2 pb-3">
-                <a  href="{% url 'home' %}"
-                   class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
-                   aria-current="page">Home</a
-                  >
-                <a  href="{% url 'about' %}"
-                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">About</a
-                  >
-                <a  href="/components/"
-                    class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Components</a>
-              </div>
-            </div>
+      <div
+        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+      >
+        <!-- Profile dropdown -->
+        <div class="relative text-end">
+          {% if user.is_authenticated %} 
+            {% dropdown_items user as dropdown_items %}
+            {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %} 
+          {% else %}
+          <div class="flex items-center space-x-2">
+            <a
+              href="{% url 'account_login' %}"
+              class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
+              >Log in</a
+            >
+            <a
+              href="{% url 'account_signup' %}"
+              class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
+              >Sign up</a
+            >
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

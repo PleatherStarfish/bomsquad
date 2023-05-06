@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .chevron-open {
+            transform: translateY(-50%) rotate(180deg) !important;
+    }
+}

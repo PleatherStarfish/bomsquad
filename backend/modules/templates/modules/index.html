@@ -1,33 +1,31 @@
 {% extends "_base.html" %}
+
 {% block content %}
     <div class="max-w-7xl mx-auto py-12">
         <div id="dataElem" class="bg-gray-100 p-10 mb-10 rounded-lg">
             <form method="get">
-                <div class="flex flex-col -mx-2">
-                    <div class="w-full mb-6 md:w-1/2 lg:w-1/3 px-2 mb-4 md:mb-0">
-                        <label htmlFor="search" class="block text-md font-semibold text-gray-700 mb-2">Search by name</label>
+                <div class="flex flex-col gap-6 -mx-2">
+                    <div class="w-full mb-6 md:w-3/5 lg:w-1/2 px-2 md:mb-0">
+                        <label htmlFor="search" class="block text-md font-semibold text-gray-700 mb-2">Search</label>
                         <input type="text"
                             name="search"
                             placeholder="Search"
                             id="search"
                             autoComplete="off"
-                            class="w-full pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"/>
+                            class="w-full pl-2 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-10 border border-gray-300"/>
                     </div>
-                    <div class="w-48 px-2 mt-6 mb-4 md:mb-0">
-                        <label htmlFor="manufacturer"
-                            class="block text-md font-semibold text-gray-700 mb-2">Manufacturer</label>
-                        <select name="manufacturer"
-                                id="manufacturer"
-                                class="w-full mb-6 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300">
-                            <option value="" class="text-brandgreen-500 hover:bg-brandgreen-100 hover:text-gray-800">
-                                All manufacturers
-                            </option>
-                            {% for manufacturer in manufacturers %}
-                                <option value="{{ manufacturer.name }}" class="text-brandgreen-500 hover:bg-brandgreen-100 hover:text-gray-800">
-                                    {{ manufacturer.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
+                            <label htmlFor="manufacturer"
+                                class="block text-md font-semibold text-gray-700 mb-2">Manufacturer</label>
+
+                            {% include "components/select.html" with select_name="manufacturer" select_id="manufacturer" default_option_text="All" items=manufacturers %}
+                        </div>
+                        <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
+                            <label htmlFor="componentType"
+                                class="block text-md font-semibold text-gray-700 mb-2">Component Type</label>
+                            {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=component_types %}
+                        </div>
                     </div>
                     <div class="w-full md:w-1/2 lg:w-1/3 px-2">
                         <button type="submit"
@@ -41,7 +39,7 @@
         <div class="grid grid-cols-1 gap-6 md:gap-8 lg:gap-12">
             <h1 class="my-6 text-3xl">Modules</h1>
             {% for module in page_obj %}
-                <div class="flex bg-white overflow-hidden rounded-lg flex items-center">
+                <div class="flex bg-white overflow-hidden rounded-lg items-center">
                     <div class="flex justify-center object-contain w-48 h-48">
                         <img class="object-fit w-auto h-full"
                              height="100px"

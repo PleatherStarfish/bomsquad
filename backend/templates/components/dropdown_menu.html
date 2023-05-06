@@ -1,0 +1,25 @@
+{% load static %}
+
+<button
+  class="menu-button block text-white text-decoration-none focus:outline-none"
+  aria-label="User menu"
+  aria-haspopup="true"
+  aria-expanded="false"
+>
+  {{ button_text }}
+</button>
+<div
+  class="absolute z-10 top-full right-0 mt-2 py-2 w-48 bg-gray-50 rounded-md shadow-md hidden"
+>
+  <ul class="text-sm text-gray-700">
+    {% for item in dropdown_items %}
+    <li>
+      <a class="block px-4 py-2 hover:bg-gray-100" href="{{ item.url }}"
+        >{{ item.name }}</a
+      >
+    </li>
+    {% if not forloop.last %}
+    <hr class="dropdown-divider" />
+    {% endif %} {% endfor %}
+  </ul>
+</div>

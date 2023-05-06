@@ -6,6 +6,11 @@ from accounts.models import CustomUser
 from django.db.models import Sum, Q
 from accounts.models import CustomUser
 
+COMPONENT_TYPES = [
+    ("smt", "Surface Mount (SMT)"),
+    ("th", "Through Hole"),
+]
+
 
 class Manufacturer(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -68,6 +73,9 @@ class Module(models.Model):
     bom_link = models.URLField(blank=True)
     manual_link = models.URLField(blank=True)
     modulargrid_link = models.URLField(blank=True)
+    component_type = models.CharField(
+        choices=COMPONENT_TYPES, max_length=50, blank=True, null=True
+    )
     slug = models.SlugField(blank=True)
     date_updated = models.DateField(default=timezone.now, blank=False)
 
