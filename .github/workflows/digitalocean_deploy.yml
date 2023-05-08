@@ -17,13 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: build and deploy
-        env:
-          SSH_PRIV_KEY_BASE64: ${{ secrets.SSH_PRIV_KEY }}
         run: |
 
-          echo "$SSH_PRIV_KEY_BASE64" | wc
-          echo "$SSH_PRIV_KEY_BASE64" | base64 -d | wc
-          echo "$SSH_PRIV_KEY_BASE64" | base64 -d > ssh.key
+          echo "${{ secrets.SSH_PRIV_KEY }}" | wc
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d | wc
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d > ssh.key
           chmod 600 ssh.key
 
           if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
