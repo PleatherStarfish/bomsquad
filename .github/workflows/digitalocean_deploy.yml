@@ -21,6 +21,8 @@ jobs:
           SSH_PRIV_KEY_BASE64: ${{ secrets.SSH_PRIV_KEY }}
         run: |
 
+          echo "$SSH_PRIV_KEY_BASE64" | wc
+          echo "$SSH_PRIV_KEY_BASE64" | base64 -d | wc
           echo "$SSH_PRIV_KEY_BASE64" | base64 -d > ssh.key
           chmod 600 ssh.key
 
