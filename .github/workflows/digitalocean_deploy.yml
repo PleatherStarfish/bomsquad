@@ -19,11 +19,7 @@ jobs:
       - name: build and deploy
         run: |
 
-          echo "${{ secrets.SSH_PRIV_KEY }}" | wc
-          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d | wc
-          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d | head -n 1
           echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d > ssh.key
-          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d | md5sum | cut -c -4
           chmod 600 ssh.key
 
           if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
@@ -35,6 +31,6 @@ jobs:
             exit 1
           fi
 
-          ssh -v -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
+          ssh -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
             /home/devops/infra/scripts/deploy.sh "$repoDir" "$GITHUB_SHA"
 
