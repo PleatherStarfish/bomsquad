@@ -35,6 +35,6 @@ jobs:
             exit 1
           fi
 
-          ssh -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
+          ssh -v -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
             /home/devops/infra/scripts/deploy.sh "$repoDir" "$GITHUB_SHA"
 
