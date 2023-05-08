@@ -17,10 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: build and deploy
+        env:
+          SSH_PRIV_KEY_BASE64: ${{ secrets.SSH_PRIV_KEY }}
         run: |
-          export SSH_PRIV_KEY="${{ secrets.SECRET_TOKEN }}"
 
-          echo "$SSH_PRIV_KEY" | base64 -d > ssh.key
+          echo "$SSH_PRIV_KEY_BASE64" | base64 -d > ssh.key
           chmod 600 ssh.key
 
           if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
@@ -34,3 +35,4 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
             /home/devops/infra/scripts/deploy.sh "$repoDir" "$GITHUB_SHA"
+
