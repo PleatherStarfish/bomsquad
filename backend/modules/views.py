@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
-component_types = [
+mounting_style_options = [
     {"name": "Surface Mount (SMT)", "value": "smt"},
     {"name": "Through Hole", "value": "th"},
 ]
@@ -23,14 +23,14 @@ component_types = [
 def module_list(request):
     query = request.GET.get("search", "")
     manufacturer = request.GET.get("manufacturer", None)
-    component_type = request.GET.get("component_type", None)
+    mounting_style = request.GET.get("mounting_style", None)
     module_list = Module.objects.order_by("name")
 
     if manufacturer:
         module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
 
-    if component_type:
-        module_list = module_list.filter(component_type=component_type)
+    if mounting_style:
+        module_list = module_list.filter(mounting_style=mounting_style)
 
     if query:
         module_list = module_list.filter(
@@ -58,7 +58,7 @@ def module_list(request):
             "manufacturers": manufacturers,
             "search": query,
             "manufacturer": manufacturer,
-            "component_types": component_types,
+            "mounting_style": mounting_style_options,
             "user_logged_in": request.user.is_authenticated,
         },
     )

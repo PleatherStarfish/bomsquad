@@ -1,0 +1,108 @@
+{% load static custom_tags %}
+
+<a href="{% url 'home' %}" class="md:hidden">
+        <img
+                class="absolute top-2.5 left-[-20px]"
+                height="70px"
+                width="70px"
+                src="{% static 'images/logo_mini.png' %}"
+                alt="Bom Squad Logo"
+        />
+</a>
+
+<button
+  class="p-2 text-white md:hidden focus:outline-none"
+  id="full-screen-menu-button"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="w-6 h-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M4 6h16M4 12h16M4 18h16"
+    />
+  </svg>
+</button>
+
+<div
+  class="fixed inset-0 z-50 hidden overflow-hidden transition duration-500 ease-in-out transform -translate-y-full sm:duration-700"
+  id="full-screen-menu"
+  aria-labelledby="slide-over-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="absolute inset-0 bg-gray-500 bg-opacity-75"></div>
+
+  <div class="absolute inset-0">
+    <div class="w-full h-full py-6 bg-[#212529]">
+      <div class="px-4 sm:px-6">
+        <div class="flex items-start justify-end">
+          <h2 class="sr-only" id="slide-over-title">Main menu</h2>
+          <button
+            type="button"
+            class="text-white bg-[#212529] hover:text-gray-100"
+            id="close-full-screen-menu"
+          >
+            <span class="sr-only">Close panel</span>
+            <svg
+              class="w-12 h-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="relative flex-1 px-4 mt-10 sm:px-6">
+        <ul class="flex flex-col gap-4 text-left list-none">
+          <li>
+            <a
+              href="{% url 'home' %}"
+              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="{% url 'about' %}"
+              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
+              >About</a
+            >
+          </li>
+          <li>
+            <a
+              href="/components/"
+              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
+              >Components</a
+            >
+          </li>
+          {% if user.is_authenticated %} 
+              {% dropdown_items user 'suppress_change_password' as dropdown_items %}
+              {% for item in dropdown_items %}
+                <li>
+                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{{ item.url }}">
+                        {{ item.name }}
+                  </a>
+                </li>
+            {% endfor %}
+          {% else %}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

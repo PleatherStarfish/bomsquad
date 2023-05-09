@@ -1,35 +1,35 @@
 {% extends "_base.html" %}
 
 {% block content %}
-    <div class="max-w-7xl mx-auto py-12">
-        <div id="dataElem" class="bg-gray-100 p-10 mb-10 rounded-lg">
+    <div class="py-12 mx-auto">
+        <div id="dataElem" class="p-10 mb-10 bg-gray-100 rounded-lg">
             <form method="get">
                 <div class="flex flex-col gap-6 -mx-2">
-                    <div class="w-full mb-6 md:w-3/5 lg:w-1/2 px-2 md:mb-0">
-                        <label htmlFor="search" class="block text-md font-semibold text-gray-700 mb-2">Search</label>
+                    <div class="w-full px-2 mb-6 md:w-3/5 lg:w-1/2 md:mb-0">
+                        <label htmlFor="search" class="block mb-2 font-semibold text-gray-700 text-md">Search</label>
                         <input type="text"
                             name="search"
                             placeholder="Search"
                             id="search"
                             autoComplete="off"
-                            class="w-full pl-2 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-10 border border-gray-300"/>
+                            class="w-full h-10 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"/>
                     </div>
                     <div class="flex flex-wrap gap-4">
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
                             <label htmlFor="manufacturer"
-                                class="block text-md font-semibold text-gray-700 mb-2">Manufacturer</label>
+                                class="block mb-2 font-semibold text-gray-700 text-md">Manufacturer</label>
 
                             {% include "components/select.html" with select_name="manufacturer" select_id="manufacturer" default_option_text="All" items=manufacturers %}
                         </div>
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
                             <label htmlFor="componentType"
-                                class="block text-md font-semibold text-gray-700 mb-2">Component Type</label>
-                            {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=component_types %}
+                                class="block mb-2 font-semibold text-gray-700 text-md">Mounting Style</label>
+                            {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=mounting_style %}
                         </div>
                     </div>
-                    <div class="w-full md:w-1/2 lg:w-1/3 px-2">
+                    <div class="w-full px-2 md:w-1/2 lg:w-1/3">
                         <button type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500">
+                                class="inline-flex items-center px-4 py-2 text-base font-medium text-white border border-transparent rounded-md bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500">
                             Search
                         </button>
                     </div>
@@ -39,9 +39,9 @@
         <div class="grid grid-cols-1 gap-6 md:gap-8 lg:gap-12">
             <h1 class="my-6 text-3xl">Modules</h1>
             {% for module in page_obj %}
-                <div class="flex bg-white overflow-hidden rounded-lg items-center">
+                <div class="flex items-center overflow-hidden bg-white rounded-lg">
                     <div class="flex justify-center object-contain w-48 h-48">
-                        <img class="object-fit w-auto h-full"
+                        <img class="w-auto h-full object-fit"
                              height="100px"
                              width="100px"
                              src="{{ module.image.url }}"
@@ -98,16 +98,16 @@
             <nav class="flex justify-between">
                 {% if page_obj.has_previous %}
                     <a href="?{% if manufacturer %}manufacturer={{ manufacturer }}&{% endif %}search={{ search }}&page={{ page_obj.previous_page_number }}"
-                       class="text-gray-800 hover:text-gray-500 font-medium inline-block py-2 px-3 rounded-lg">
+                       class="inline-block px-3 py-2 font-medium text-gray-800 rounded-lg hover:text-gray-500">
                         &laquo; Previous
                     </a>
                 {% endif %}
-                <div class="text-gray-800 font-medium inline-block py-2">
+                <div class="inline-block py-2 font-medium text-gray-800">
                     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                 </div>
                 {% if page_obj.has_next %}
                     <a href="?{% if manufacturer %}manufacturer={{ manufacturer }}&{% endif %}search={{ search }}&page={{ page_obj.next_page_number }}"
-                       class="text-gray-800 hover:text-gray-500 font-medium inline-block py-2 px-3 rounded-lg">
+                       class="inline-block px-3 py-2 font-medium text-gray-800 rounded-lg hover:text-gray-500">
                         Next &raquo;
                     </a>
                 {% endif %}

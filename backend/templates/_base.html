@@ -27,6 +27,10 @@
       href="{% static 'images/logo.png' %}"
     />
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.0/dist/cookieconsent.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet">
 
     {% block css %}{% endblock css %}
   </head>
@@ -39,27 +43,57 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
+      {% if path != '/user' and path != '/modu' and path != '/acco' %}
+        <div id="banner" class="hidden">
+          <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-md bg-[#d4e4ea]" role="alert">
+            <div class="flex flex-col w-full">
+                <span class="mb-6 text-5xl text-gray-500 font-display">Support the project</span>
+                <span class="text-gray-500">BOM Squad is an <a class="text-blue-500 hover:text-blue-700" href="https://github.com/PleatherStarfish/bomsquad">open-source</a> tool built and maintained by DIY modular synth hobbyists. We rely on your support to keep us online. Become a Patreon subscriber and get access to premium features!</span>
+            </div>
+            <div class="flex justify-end w-full gap-2 mt-2 sm:mt-0 sm:w-auto">
+              <button id="banner-hide-button" class="w-min flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-400 hover:bg-slate-500 sm:px-3 sm:py-1.5 sm:text-sm">
+                Hide
+              </button>
+              <a href="https://www.patreon.com/BOMSquad" target="_blank" rel="noopener noreferrer" class="w-min flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 sm:px-3 sm:py-1.5 sm:text-sm ml-2 whitespace-nowrap">
+                Support BOM Squad
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
         {% block content %}{% endblock content %}
       </div>
       {% if path == '/user' %} {% else %}
       <footer>{% include "footer.html" %}</footer>
-      {% endif %} {% endwith %}
+      {% endif %} 
+      {% endwith %}
     </div>
 
     <!-- Project JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.0/dist/cookieconsent.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/cc.js' %}"></script>
+    <script src="{% static 'js/mobile_menu.js' %}"></script>
 
-    <script src="{% static 'js/mixpanel.js' %}" type="text/javascript"></script>
-
-    <script type="text/javascript">
-      mixpanel.init("15c80a95c8772b2594906af3875bbb8f");
-
-      mixpanel.track("Page Viewed", {
-        url: window.location.href,
-        path: window.location.pathname,
-        title: document.title,
+    <script>
+      window.addEventListener('load', function() {
+        var banner = cash('#banner');
+        var hideButton = cash('#banner-hide-button');
+        var showAfter = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        var hiddenTime = localStorage.getItem('bannerHiddenTime');
+        
+        // If it's been 24 hours or more since the banner was last hidden, show it
+        if (!hiddenTime || Date.now() - parseInt(hiddenTime) >= showAfter) {
+          banner.removeClass('hidden');
+        }
+        
+        // Add a click event listener to the hide button
+        hideButton.on('click', function() {
+          // Hide the banner by adding the hidden class and store the current time in local storage
+          banner.addClass('hidden');
+          localStorage.setItem('bannerHiddenTime', Date.now());
+        });
       });
     </script>
 

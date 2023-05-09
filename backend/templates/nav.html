@@ -1,8 +1,8 @@
 {% load static custom_tags %}
 
 <nav class="fixed top-0 w-full bg-[#212529] z-40">
-  <div class="mx-auto px-8">
-    <div class="hidden md:block relative">
+  <div class="px-8 mx-auto">
+    <div class="relative hidden md:block">
       <a href="{% url 'home' %}">
         {% with request.path|slice:":5" as path %} {% if path == '/user' %}
         <img
@@ -14,7 +14,7 @@
         />
         {% else %}
         <img
-          class="absolute top-3 hidden sm:block"
+          class="absolute hidden top-3 sm:block"
           height="180px"
           width="180px"
           src="{% static 'images/logo.png' %}"
@@ -24,44 +24,44 @@
       </a>
     </div>
 
-    <div class="relative flex h-16 items-center justify-between">
+    <div class="relative flex items-center justify-between h-16">
       <div
-        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
+        class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start"
       >
-        <div class="hidden sm:ml-6 sm:block">
+        <div class="hidden sm:ml-6 md:block">
           {% with request.path|slice:":5" as path %} {% if path == '/user' %}
           <ul class="flex space-x-4 text-white ml-[40px]">
             <li>
-              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary"
+              <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
                 >Home</a
               >
             </li>
             <li>
-              <a href="{% url 'about' %}" class="nav-link px-2">About</a>
+              <a href="{% url 'about' %}" class="px-2 nav-link">About</a>
             </li>
             <li>
-              <a href="/components/" class="nav-link px-2">Components</a>
+              <a href="/components/" class="px-2 nav-link">Components</a>
             </li>
           </ul>
           {% else %}
           <ul class="flex space-x-4 text-white ml-[180px]">
             <li>
-              <a href="{% url 'home' %}" class="nav-link px-2 text-secondary"
+              <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
                 >Home</a
               >
             </li>
             <li>
-              <a href="{% url 'about' %}" class="nav-link px-2">About</a>
+              <a href="{% url 'about' %}" class="px-2 nav-link">About</a>
             </li>
             <li>
-              <a href="/components/" class="nav-link px-2">Components</a>
+              <a href="/components/" class="px-2 nav-link">Components</a>
             </li>
           </ul>
           {% endif %} {% endwith %}
         </div>
       </div>
       <div
-        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+        class="absolute inset-y-0 right-0 items-center hidden pr-2 md:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0"
       >
         <!-- Profile dropdown -->
         <div class="relative text-end">
@@ -84,6 +84,7 @@
           {% endif %}
         </div>
       </div>
+      {% include 'components/mobile_hamburger_menu.html' %}
     </div>
   </div>
 </nav>
