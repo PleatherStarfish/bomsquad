@@ -13,6 +13,8 @@ const ModuleDetail = () => {
   if (moduleIsLoading) return <div className="text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
 
+  console.log(module)
+
   return (
     <>
       <div className="flex justify-center">
@@ -27,24 +29,22 @@ const ModuleDetail = () => {
         <div>
           <div className="mt-12">
             <div>
-              <h1 className="text-3xl font-semibold py-4">{module.name}</h1>
-              <p>
-                <a>
-                  {module.manufacturer_name}
-                </a>
-              </p>
+              <h1 className="py-4 text-3xl font-semibold">{module.name}</h1>
+              {module.manufacturer.link ? <a href={module.manufacturer.link}>
+                {module.manufacturer.name}
+              </a> : <p>{module.manufacturer.name}</p>}
             </div>
             <div className="mt-6">
               <ModuleLinks module={module} />
             </div>
           </div>
           <div>
-            <h2 className="text-xl py-4 font-semibold ">Description</h2>
+            <h2 className="py-4 text-xl font-semibold ">Description</h2>
             <p className="card-text">{module.description}</p>
           </div>
         </div>
       </div>
-      <h1  className="text-3xl font-semibold py-8">Components</h1>
+      <h1  className="py-8 text-3xl font-semibold">Components</h1>
       <BomList moduleId={module?.id} moduleName={module?.name} />
     </>
   );

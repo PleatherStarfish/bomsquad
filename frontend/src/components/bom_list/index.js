@@ -18,7 +18,7 @@ export const customStyles = {
 };
 
 const BomList = ({ moduleId, moduleName }) => {
-  const { user, userIsLoading } = useAuthenticatedUser();
+  const { user } = useAuthenticatedUser();
 
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
     useModuleBomListItems(moduleId);
@@ -102,17 +102,7 @@ const BomList = ({ moduleId, moduleName }) => {
 
   return (
     <div className="mb-8">
-      {!!user ? (
-        <div className="mb-6 font-semibold">
-          Note: components are added to a shopping list for a particular module,
-          and quantities listed are for this module only. If you need to add
-          components to the shopping list that are not specific to any build, please visit the{" "}
-          <a href="/components/" className="text-blue-500 hover:text-blue-700">
-            Components
-          </a>{" "}
-          page.
-        </div>
-      ) : (
+      {!user && (
         <div className="mb-8">
           <Alert variant="warning">
             <div className="alert alert-warning" role="alert">
@@ -144,17 +134,6 @@ const BomList = ({ moduleId, moduleName }) => {
         progressPending={moduleBomIsLoading}
         customStyles={customStyles}
       />
-      {!userIsLoading && (
-        <p className="text-gray-500 pt-16 italic">
-          Bom Squad is not responsible for the accuracy of the bill of materials
-          or other information about Eurorack modules contained on the site.
-          Please read our full{" "}
-          <a href="/disclaimer/" className="text-blue-500 hover:text-blue-800">
-            Liability Disclaimer
-          </a>{" "}
-          for more information.
-        </p>
-      )}
     </div>
   );
 };

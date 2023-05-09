@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "import_export",
     # Local
     "accounts",
+    "core",
     "pages",
     "modules",
     "components",
@@ -210,6 +211,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 
 # https://django-allauth.readthedocs.io/en/latest/installation.html?highlight=backends
 AUTHENTICATION_BACKENDS = (
+    "core.auth.backends.EmailOrUsernameModelBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
