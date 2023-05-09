@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  backend:
+    container_name: backend-${APP_ENV}
+    build: ./backend
+    volumes:
+      - ./backend:/code
+      - ./frontend/build/:/code/static/frontend
+    env_file:
+      - ./.env
+    restart: always
+    ports:
+      - ${BACKEND_MAPPED_PORT}:8000

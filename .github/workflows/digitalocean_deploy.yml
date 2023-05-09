@@ -1,22 +1,36 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: bulid and deploy
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches:
+      - deploy/dev
+      - deploy/production
+
+        # This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-
+  build-and-deploy:
+    runs-on: ${{ fromJSON('["ubuntu-latest", "self-hosted"]')[github.repository == 'github/docs-internal'] }}
     steps:
-      - uses: actions/checkout@main
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: build and deploy
+        run: |
 
-      - name: Copying enviroments
-        run: cp ../.env .env
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 -d > ssh.key
+          chmod 600 ssh.key
 
-      - name: Docker UP
-        run: docker-compose up --build -d
+          if [ ${GITHUB_REF#refs/heads/} = "deploy/production" ]; then
+            repoDir="/home/devops/app/production"
+          elif [ ${GITHUB_REF#refs/heads/} = "deploy/dev" ]; then
+            repoDir="/home/devops/app/dev"
+          else
+            echo "Invalid environment."
+            exit 1
+          fi
+
+          ssh -o StrictHostKeyChecking=no -i ssh.key devops@134.209.65.8 \
+            /home/devops/infra/scripts/deploy.sh "$repoDir" "$GITHUB_SHA"
+

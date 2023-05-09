@@ -9,7 +9,7 @@ fi
 # Collect static files
 python manage.py collectstatic --noinput --clear
 
-if [ $PRODUCTION = True ]
+if [ "$PRODUCTION" = True ]
 then
   gunicorn django_project.wsgi --bind :8000 --workers 2 --reload
 else
