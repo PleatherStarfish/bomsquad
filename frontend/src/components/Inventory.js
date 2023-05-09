@@ -306,11 +306,11 @@ const Inventory = () => {
       name: <div>Qty.</div>,
       cell: (row) => {
         return (
-          <div className="flex justify-between content-center w-full">
+          <div className="flex content-center justify-between w-full">
             {row.component.id === quantityIdToEdit ? (
               <div>
                 <form
-                  className="w-full flex content-center gap-1"
+                  className="flex content-center w-full gap-1"
                   onSubmit={(e) => e.preventDefault()}
                 >
                   <NumericInput
@@ -319,7 +319,7 @@ const Inventory = () => {
                     value={updatedQuantityToSubmit ?? row.quantity}
                     onChange={(e) => handleQuantityChange(e)}
                   />
-                  <div className="flex gap-1 justify-around">
+                  <div className="flex justify-around gap-1">
                     <Button
                       className="h-full"
                       variant="muted"
@@ -358,7 +358,7 @@ const Inventory = () => {
                 }
                 role="button"
               >
-                <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
+                <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
               </div>
             )}
           </div>
@@ -375,7 +375,7 @@ const Inventory = () => {
             <div className="flex flex-col">
               <div className="flex gap-1.5 pb-1 pt-6">
                 <form
-                  className="w-full flex content-center gap-1"
+                  className="flex content-center w-full gap-1"
                   onSubmit={(e) => e.preventDefault()}
                 >
                   <ControlledInput
@@ -399,7 +399,7 @@ const Inventory = () => {
                   </Button>
                 </form>
               </div>
-              <p className="text-gray-500 text-xs">
+              <p className="text-xs text-gray-500">
                 Separate locations with commas.
               </p>
             </div>
@@ -432,7 +432,7 @@ const Inventory = () => {
               }
               role="button"
             >
-              <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
+              <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
             </div>
           )}
         </div>
@@ -450,7 +450,7 @@ const Inventory = () => {
         return (
           <TrashIcon
             role="button"
-            className="stroke-slate-500 w-5 h-5 hover:stroke-pink-500"
+            className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
               setDataToDelete(row.component);
               setDeleteModalOpen(true);
@@ -464,10 +464,10 @@ const Inventory = () => {
 
   return !!inventoryData?.length ? (
     <>
-      <div className="md:w-full flex flex-col md:flex-row justify-between items-center gap-2 mb-8">
+      <div className="flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
         {inventoryData && inventoryData.length > 0 && (
           <>
-            <div className="grow md:w-full pr-2">
+            <div className="pr-2 grow md:w-full">
               <label htmlFor="search" className="sr-only">
                 Search
               </label>
@@ -481,7 +481,7 @@ const Inventory = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex flex-nowrap gap-2">
+            <div className="flex gap-2 flex-nowrap">
               <Button
                 version="primary"
                 Icon={LightBulbIcon}
@@ -532,11 +532,13 @@ const Inventory = () => {
       <SolderingMode open={openSolderingMode} setOpen={setOpenSolderingMode} />
     </>
   ) : (
-    <Alert>
-      There are no components in your inventory.
+    <Alert variant="transparent" centered>
+      <span>
+      There are no components in your inventory.{" "}
       <a className="text-blue-500" href="/components">
         Add components.
       </a>
+      </span>
     </Alert>
   );
 };

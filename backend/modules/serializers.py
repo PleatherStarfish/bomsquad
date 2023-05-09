@@ -6,11 +6,25 @@ from modules.models import (
     WantToBuildModules,
     Module,
     ModuleBomListItem,
+    Manufacturer,
 )
 
 
+class ManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComponentManufacturer
+        fields = ["name"]
+
+
+class ModuleManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manufacturer
+        fields = ["name", "link"]
+
+
 class ModuleSerializer(serializers.ModelSerializer):
-    manufacturer = serializers.StringRelatedField()
+    manufacturer_name = serializers.CharField(source="manufacturer.name")
+    manufacturer = ModuleManufacturerSerializer()
 
     class Meta:
         model = Module
@@ -43,12 +57,6 @@ class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentSupplier
         fields = ["name", "short_name", "url"]
-
-
-class ManufacturerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ComponentManufacturer
-        fields = ["name"]
 
 
 class ModuleBomListItemSerializer(serializers.ModelSerializer):

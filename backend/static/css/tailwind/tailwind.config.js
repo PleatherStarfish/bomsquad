@@ -1,16 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require("tailwindcss/colors");
+const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   content: [
-    "/Users/danielmiller/dev/BomSquad/backend/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/frontend/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/backend/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/frontend/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/backend/**/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/backend/**/**/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/frontend/**/**/*.{html,js}",
-    "/Users/danielmiller/dev/BomSquad/frontend/**/**/**/*.{html,js}",
+    "../../../../frontend/*.{html,js}",
+    "../../../../backend/*.{html,js}",
+    "../../../../frontend/**/*.{html,js}",
+    "../../../../backend/**/*.{html,js}",
+    "../../../../frontend/**/**/*.{html,js}",
+    "../../../../backend/**/**/*.{html,js}",
+    "../../../../frontend/**/**/**/*.{html,js}",
+    "../../../../backend/**/**/**/*.{html,js}",
+    "../../../../frontend/**/**/**/**/*.{html,js}",
+    "../../../../backend/**/**/**/**/*.{html,js}",
+    "../../../../frontend/**/**/**/**/**/*.{html,js}",
+    "../../../../backend/**/**/**/**/**/*.{html,js}",
+    "../../../../backend/templates/_base.html",
   ],
   theme: {
     screens: {
@@ -21,6 +26,9 @@ module.exports = {
       "2xl": "1536px",
     },
     extend: {
+      fontFamily: {
+        'display': ['Quicksand', ...defaultTheme.fontFamily.sans]
+      },
       colors: {
         transparent: "transparent",
         current: "currentColor",

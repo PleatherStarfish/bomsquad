@@ -35,6 +35,14 @@ const NestedTable = (props) => {
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
 
+  if (props.data.components_options.length < 1) {
+    return (
+      <div className="p-3 ml-[47px] bg-gray-100">
+        No components found for this BOM item.
+      </div>
+    );
+  }
+
   const { user } = useAuthenticatedUser();
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(props.data.components_options);
@@ -241,7 +249,7 @@ const NestedTable = (props) => {
         data={componentsData}
         progressPending={componentsAreLoading}
         progressComponent={
-          <div className="flex justify-center w-full bg-sky-50 p-6">
+          <div className="flex justify-center w-full p-6 bg-sky-50">
             <div className="text-gray-500 animate-pulse">Loading...</div>
           </div>
         }
