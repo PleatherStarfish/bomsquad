@@ -13,7 +13,7 @@ const Component = ({ componentPks }) => {
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -49,7 +49,7 @@ const Supplier = ({ componentPks }) => {
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -62,7 +62,7 @@ const SupplierItemNo = ({ componentPks }) => {
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -87,7 +87,7 @@ const VersionHistory = () => {
     useAuthenticatedUserHistory();
 
   if (userHistoryIsLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (userHistoryIsError) return <div>Error!</div>;
 
   const columns = [
@@ -155,12 +155,12 @@ const VersionHistory = () => {
       <Link
         to=".."
         relative="path"
-        className="flex gap-2 items-center text-gray-400"
+        className="flex items-center gap-2 text-gray-400"
       >
         <ChevronLeftIcon className="w-5 h-5" />
         <span>Back to Account</span>
       </Link>
-      <h1 className="text-gray-700 text-3xl font-bold mb-12 mt-5">
+      <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
         Inventory Version History
       </h1>
       <div>
@@ -176,8 +176,8 @@ const VersionHistory = () => {
           progressPending={userHistoryIsLoading}
           customStyles={customStyles}
           progressComponent={
-            <div className="flex justify-center w-full bg-sky-50 p-6">
-              <div className="text-gray-500 animate-pulse">Loading...</div>
+            <div className="flex justify-center w-full p-6 bg-sky-50">
+              <div className="text-center text-gray-500 animate-pulse">Loading...</div>
             </div>
           }
         />

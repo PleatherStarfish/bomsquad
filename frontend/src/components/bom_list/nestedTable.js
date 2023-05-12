@@ -250,7 +250,7 @@ const NestedTable = (props) => {
         progressPending={componentsAreLoading}
         progressComponent={
           <div className="flex justify-center w-full p-6 bg-sky-50">
-            <div className="text-gray-500 animate-pulse">Loading...</div>
+            <div className="text-center text-gray-500 animate-pulse">Loading...</div>
           </div>
         }
         customStyles={customStyles}

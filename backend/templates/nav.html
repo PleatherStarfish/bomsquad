@@ -29,7 +29,8 @@
         class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start"
       >
         <div class="hidden sm:ml-6 md:block">
-          {% with request.path|slice:":5" as path %} {% if path == '/user' %}
+          {% with request.path|slice:":5" as path %} 
+          {% if path == '/user' %}
           <ul class="flex space-x-4 text-white ml-[40px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
@@ -57,7 +58,8 @@
               <a href="/components/" class="px-2 nav-link">Components</a>
             </li>
           </ul>
-          {% endif %} {% endwith %}
+          {% endif %} 
+          {% endwith %}
         </div>
       </div>
       <div

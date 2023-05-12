@@ -4,14 +4,16 @@
 {% block title %}Sign up{% endblock title %}
 
 {% block content %}
-  <div class="flex justify-center">
-    <div class="w-full max-w-xs">
-      <h2 class="text-2xl font-bold mb-2">Sign up</h2>
-      <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 border border-gray-300">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mt-4 w-full" type="submit">Sign up</button>
-      </form>
-    </div>
+<div class="flex justify-center mt-8">
+  <div class="w-full max-w-md">
+    <h2 class="mb-6 text-2xl font-bold text-center">Sign up</h2>
+
+    <p class="mb-4 text-center">Already have an account? Please <a class="text-blue-500 hover:text-blue-700" href="{% url 'account_login' %}">sign in</a>.</p>
+    <form method="post" class="p-6 border border-gray-300 rounded-lg">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button class="w-full px-4 py-2 mt-4 font-bold text-white rounded-full bg-brandgreen-500 hover:bg-brandgreen-700" type="submit">Sign up</button>
+    </form>
   </div>
+</div>
 {% endblock content %}

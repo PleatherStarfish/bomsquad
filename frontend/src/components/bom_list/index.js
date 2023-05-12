@@ -24,7 +24,7 @@ const BomList = ({ moduleId, moduleName }) => {
     useModuleBomListItems(moduleId);
 
   if (moduleBomIsLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
 
   if (moduleBomIsError) {
     return <div>Error loading components: {moduleBomIsError.message}</div>;
@@ -125,7 +125,7 @@ const BomList = ({ moduleId, moduleName }) => {
         expandableRows
         expandOnRowClicked
         progressComponent={
-          <div className="text-gray-500 animate-pulse">Loading...</div>
+          <div className="text-center text-gray-500 animate-pulse">Loading...</div>
         }
         expandableRowsComponent={NestedTable}
         conditionalRowStyles={conditionalRowStyles}

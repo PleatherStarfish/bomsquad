@@ -10,7 +10,7 @@ const ModuleDetail = () => {
   let { slug } = useParams();
   const { module, moduleIsLoading, moduleIsError } = useModule(slug)
 
-  if (moduleIsLoading) return <div className="text-gray-500 animate-pulse">Loading...</div>;
+  if (moduleIsLoading) return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
 
   console.log(module)

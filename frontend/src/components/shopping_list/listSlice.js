@@ -49,7 +49,7 @@ const ListSlice = ({
 
   const labelColumns = [
     {
-      name: <div className="text-gray-400 font-bold">Description</div>,
+      name: <div className="font-bold text-gray-400">Description</div>,
       selector: (row) => (
         <span
           className={cx({
@@ -65,7 +65,7 @@ const ListSlice = ({
       width: "200px",
     },
     {
-      name: <div className="text-gray-400 font-bold">Supplier</div>,
+      name: <div className="font-bold text-gray-400">Supplier</div>,
       selector: (row) => (
         <span
           className={cx({
@@ -81,7 +81,7 @@ const ListSlice = ({
       width: "100px",
     },
     {
-      name: <div className="text-gray-400 font-bold">Supp. Item #</div>,
+      name: <div className="font-bold text-gray-400">Supp. Item #</div>,
       selector: (row) => (
         <a
           href={row.component.link}
@@ -121,11 +121,11 @@ const ListSlice = ({
       ),
       cell: (row) => {
         return (
-          <div className="flex justify-between content-center w-full">
+          <div className="flex content-center justify-between w-full">
             {row.component.id === quantityIdToEdit ? (
               <div>
                 <form
-                  className="w-full flex content-center gap-1"
+                  className="flex content-center w-full gap-1"
                   onSubmit={(e) => e.preventDefault()}
                 >
                   <NumericInput
@@ -134,7 +134,7 @@ const ListSlice = ({
                     value={updatedQuantityToSubmit ?? row.quantity}
                     onChange={(e) => handleQuantityChange(e)}
                   />
-                  <div className="flex gap-1 justify-around">
+                  <div className="flex justify-around gap-1">
                     <Button
                       className="h-full"
                       variant="muted"
@@ -179,7 +179,7 @@ const ListSlice = ({
                       }
                       role="button"
                     >
-                      <PencilSquareIcon className="stroke-slate-300 w-4 h-4 hover:stroke-pink-500" />
+                      <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
                     </div>
                   )
                 }
@@ -248,8 +248,8 @@ const ListSlice = ({
           data={aggregatedComponents}
           progressPending={componentsAreLoading}
           progressComponent={
-            <div className="flex justify-center w-full bg-sky-50 p-6">
-              <div className="text-gray-500 animate-pulse">Loading...</div>
+            <div className="flex justify-center w-full p-6 bg-sky-50">
+              <div className="text-center text-gray-500 animate-pulse">Loading...</div>
             </div>
           }
         />
