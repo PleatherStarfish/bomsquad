@@ -1,29 +1,30 @@
-import React from "react";
 import { Controller, useWatch } from "react-hook-form";
+
 import Dropdown from "../../ui/Dropdown";
+import React from "react";
 
 const typesRelevantTo = {
-  farads: ["capacitor"],
-  ohms: ["resistor", "photoresistor_(ldr)", "potentiometer", "trimpot"],
-  tolerances: ["capacitor", "resistor", "potentiometer", "trimpot"],
-  voltage_ratings: [
-    "resistor",
-    "capacitor",
-    "jack",
-    "potentiometer",
-    "trimpot",
+  farads: ["Capacitor"],
+  ohms: ["Resistor", "Photoresistor (LDR)", "Potentiometer", "Trimpot"],
+  tolerance: ["Capacitor", "Resistor", "Potentiometer", "Trimpot"],
+  voltage_rating: [
+    "Resistor",
+    "Capacitor",
+    "Jack",
+    "Potentiometer",
+    "Trimpot",
   ],
 };
 
 const SearchForm = ({
-  types,
-  manufacturers,
-  suppliers,
+  type,
+  manufacturer,
+  supplier,
   mounting_style,
   farads,
   ohms,
-  tolerances,
-  voltage_ratings,
+  tolerance,
+  voltage_rating,
   register,
   handleSubmit,
   control,
@@ -55,7 +56,10 @@ const SearchForm = ({
   const currentType = useWatch({
     control,
     name: "type",
+    defaultValue: "",
   });
+
+  console.log(currentType)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -77,22 +81,22 @@ const SearchForm = ({
           />
         </div>
         <div className="flex flex-wrap w-full gap-4 px-2">
-          {renderDropdown("Type", "type", types)}
-          {renderDropdown("Manufacturer", "manufacturer", manufacturers)}
-          {renderDropdown("Supplier", "suppliers", suppliers)}
+          {renderDropdown("Type", "type", type)}
+          {renderDropdown("Manufacturer", "manufacturer", manufacturer)}
+          {renderDropdown("Supplier", "supplier", supplier)}
           {renderDropdown("Mounting style", "mounting_style", mounting_style)}
 
-          {typesRelevantTo["farads"].includes(currentType) &&
+          {typesRelevantTo.farads.includes(currentType) &&
             renderDropdown("Farads", "farads", farads)}
-          {typesRelevantTo["ohms"].includes(currentType) &&
+          {typesRelevantTo.ohms.includes(currentType) &&
             renderDropdown("Ohms", "ohms", ohms)}
-          {typesRelevantTo["tolerances"].includes(currentType) &&
-            renderDropdown("Tolerance", "tolerances", tolerances)}
-          {typesRelevantTo["voltage_ratings"].includes(currentType) &&
+          {typesRelevantTo.tolerance.includes(currentType) &&
+            renderDropdown("Tolerance", "tolerance", tolerance)}
+          {typesRelevantTo.voltage_rating.includes(currentType) &&
             renderDropdown(
               "Voltage ratings",
-              "voltage_ratings",
-              voltage_ratings
+              "voltage_rating",
+              voltage_rating
             )}
         </div>
         <div className="w-full px-2 md:w-1/2 lg:w-1/3">

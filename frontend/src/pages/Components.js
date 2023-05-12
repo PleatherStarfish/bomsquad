@@ -1,16 +1,17 @@
 import Quantity, { Types } from "../components/bom_list/quantity";
-import React, { useState, useEffect } from "react";
-import SearchForm from "../components/components/SearchForm";
+import React, { useEffect, useState } from "react";
+
 import AddComponentModal from "../components/bom_list/addComponentModal";
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import DataTable from "react-data-table-component";
+import Pagination from "../components/components/Pagination";
+import SearchForm from "../components/components/SearchForm";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
+import { useForm } from "react-hook-form";
 import useGetComponents from "../services/useGetComponents";
 import useGetUserAnonymousShoppingListQuantity from "../services/useGetUserAnonymousShoppingListQuantity";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
-import Pagination from "../components/components/Pagination";
-import { useForm, useWatch } from "react-hook-form";
 
 const customStyles = {
   headCells: {
@@ -26,16 +27,21 @@ const customStyles = {
 };
 
 const Components = () => {
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control, watch } = useForm();
   const [currentPage, setCurrentPage] = useState(1); // state for the current page, initially 1
-  
-  const { user } = useAuthenticatedUser();
-  
-  const { componentsData, componentsAreLoading, componentsAreError, refetchComponents } =
-    useGetComponents(currentPage);
+  const [formData, setFormData] = useState({});
   
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
+
+  const { user } = useAuthenticatedUser();
+  
+  const { componentsData, componentsAreLoading, componentsAreError } =
+    useGetComponents({page: currentPage, search: formData?.search, filters: Object.fromEntries(
+      Object.entries(formData).filter(([key]) => key !== 'search')
+    )});
+
+  console.log(watch())
 
   useEffect(() => {
     if (componentsData?.page) {
@@ -52,8 +58,17 @@ const Components = () => {
     );
   }
 
-  const onSubmit = () => {
-    refetchComponents({newPage: 1, newSearch: useWatch(control, "search"), newFilters: undefined, newOrder: undefined})
+  const onSubmit = (data) => {
+    const updatedFormData = Object.fromEntries(
+      Object.entries(data).map(([key, value]) => {
+        if (value === 'all') {
+          return [key, undefined];
+        }
+        return [key, value];
+      })
+    );
+  
+    setFormData(updatedFormData);
   };
 
   const handlePageChange = (newPage) => {
@@ -238,14 +253,14 @@ const Components = () => {
       <div className="w-full py-12">
         <div id="dataElem" className="p-10 bg-gray-100 rounded-lg">
           <SearchForm
-            types={componentsData?.unique_values?.types ?? []}
-            manufacturers={componentsData?.unique_values?.manufacturers ?? []}
-            suppliers={componentsData?.unique_values?.suppliers ?? []}
+            type={componentsData?.unique_values?.type ?? []}
+            manufacturer={componentsData?.unique_values?.manufacturer ?? []}
+            supplier={componentsData?.unique_values?.supplier ?? []}
             mounting_style={componentsData?.unique_values?.mounting_style ?? []}
             ohms={componentsData?.unique_values?.ohms ?? []}
             farads={componentsData?.unique_values?.farads ?? []}
-            tolerances={componentsData?.unique_values?.tolerances ?? []}
-            voltage_ratings={componentsData?.unique_values?.voltage_ratings ?? []}
+            tolerance={componentsData?.unique_values?.tolerance ?? []}
+            voltage_rating={componentsData?.unique_values?.voltage_rating ?? []}
             register={register} 
             handleSubmit={handleSubmit} 
             control={control}

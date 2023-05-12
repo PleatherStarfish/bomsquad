@@ -10,6 +10,8 @@ const customStyles = {
       borderColor: state.isFocused ? "#548a6a" : provided.borderColor,
     },
   }),
+  menuPortal: provided => ({ ...provided, zIndex: 9999 }),
+  menu: provided => ({ ...provided, zIndex: 9999 }),
   option: (provided, state) => ({
     ...provided,
     backgroundColor: state.isSelected
@@ -56,7 +58,7 @@ const Dropdown = ({
   };
 
   const selectOptions = options.map((option) => typeof option == "string" ? ({
-      value: option.toLowerCase().replace(/ /g, "_"),
+      value: option,
       label: formatLabel(option),
     }) : option);
 
@@ -64,6 +66,8 @@ const Dropdown = ({
     <Select
       styles={customStyles}
       className="min-w-[200px] z-30"
+      menuPosition={'fixed'} 
+      menuPortalTarget={document.body} 
       value={selectOptions.find((option) => option.value === value)}
       onChange={(selectedOption) => setValue(selectedOption.value)}
       options={selectOptions}

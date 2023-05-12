@@ -460,6 +460,8 @@ class ComponentView(APIView):
         supplier_filter = request.query_params.get("supplier", None)
         type_filter = request.query_params.get("type", None)
 
+        print(request.query_params)
+
         # Start with a base queryset
         components = Component.objects.all()
 
@@ -494,11 +496,9 @@ class ComponentView(APIView):
                 mounting_style__icontains=mounting_style_filter
             )
         if manufacturer_filter:
-            components = components.filter(
-                manufacturer__name__icontains=manufacturer_filter
-            )
+            components = components.filter(manufacturer__pk=int(manufacturer_filter))
         if supplier_filter:
-            components = components.filter(supplier__name__icontains=supplier_filter)
+            components = components.filter(supplier__pk=int(supplier_filter))
         if type_filter:
             components = components.filter(type__name__icontains=type_filter)
 
@@ -525,15 +525,23 @@ class ComponentView(APIView):
 
         # Get unique manufacturer, supplier, and type names
         unique_manufacturers = list(
-            ComponentManufacturer.objects.values_list("name", flat=True)
+            ComponentManufacturer.objects.values("name", "pk")
             .distinct()
             .order_by("name")
         )
         unique_suppliers = list(
-            ComponentSupplier.objects.values_list("name", flat=True)
-            .distinct()
-            .order_by("name")
+            ComponentSupplier.objects.values("name", "pk").distinct().order_by("name")
         )
+
+        unique_manufacturers = [
+            {"label": manufacturer["name"], "value": manufacturer["pk"]}
+            for manufacturer in unique_manufacturers
+        ]
+        unique_suppliers = [
+            {"label": supplier["name"], "value": supplier["pk"]}
+            for supplier in unique_suppliers
+        ]
+
         unique_types = list(
             Types.objects.values_list("name", flat=True).distinct().order_by("name")
         )
@@ -547,12 +555,12 @@ class ComponentView(APIView):
             "unique_values": {
                 "ohms": unique_ohms,
                 "farads": unique_farads,
-                "voltage_ratings": unique_voltage_ratings,
-                "tolerances": unique_tolerances,
+                "voltage_rating": unique_voltage_ratings,
+                "tolerance": unique_tolerances,
                 "mounting_style": unique_mounting_style,
-                "manufacturers": unique_manufacturers,
-                "suppliers": unique_suppliers,
-                "types": unique_types,
+                "manufacturer": unique_manufacturers,
+                "supplier": unique_suppliers,
+                "type": unique_types,
             },
         }
 

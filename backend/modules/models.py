@@ -5,6 +5,11 @@ from components.models import Component
 from accounts.models import CustomUser
 from django.db.models import Sum, Q
 from accounts.models import CustomUser
+from django.db import models
+from PIL import Image
+import os
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 MOUNTING_STYLE = [
     ("smt", "Surface Mount (SMT)"),
@@ -69,7 +74,10 @@ class Module(models.Model):
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.PROTECT)
     version = models.CharField(max_length=10, default="1")
     description = models.TextField()
-    image = models.ImageField(blank=True)
+    image = models.ImageField(upload_to="module_imgs", blank=True)
+    image_jpeg = models.ImageField(
+        upload_to="module_imgs_jpeg", blank=True
+    )  # JPEG version of the image
     manufacturer_page_link = models.URLField(blank=True)
     bom_link = models.URLField(blank=True)
     manual_link = models.URLField(blank=True)
@@ -97,6 +105,38 @@ class Module(models.Model):
         if not self.slug:
             self.slug = slugify(f"{self.name}-{self.manufacturer}-{self.version}")
             super(Module, self).save(*args, **kwargs)
+
+        if self.image:
+            img = Image.open(self.image.path)
+
+            # Resize image, keeping the aspect ratio
+            max_dimension = max(img.size)
+            if max_dimension > 300:
+                proportion = max_dimension / 300
+                new_width = round(img.width / proportion)
+                new_height = round(img.height / proportion)
+                img = img.resize((new_width, new_height), Image.ANTIALIAS)
+
+            if img.format != "WEBP":
+                # Save as WEBP
+                output_webp = BytesIO()
+                img.save(output_webp, format="WEBP", quality=75)
+                output_webp.seek(0)
+                self.image = ContentFile(
+                    output_webp.read(), f"{os.path.splitext(self.image.name)[0]}.webp"
+                )
+
+            # Also save as JPEG for fallback
+            output_jpeg = BytesIO()
+            img.save(output_jpeg, format="JPEG", quality=75)
+            output_jpeg.seek(0)
+            self.image_jpeg = ContentFile(
+                output_jpeg.read(), f"{os.path.splitext(self.image.name)[0]}.jpg"
+            )
+
+            super(Module, self).save(
+                *args, **kwargs
+            )  # You need to specify the class here as well
 
     def __str__(self):
         return f"{self.name} - {self.manufacturer}"
