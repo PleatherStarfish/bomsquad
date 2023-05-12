@@ -1,11 +1,14 @@
-import Quantity, {Types} from "../components/bom_list/quantity";
-import React, { useState } from "react";
+import Quantity, { Types } from "../components/bom_list/quantity";
+import React, { useEffect, useState } from "react";
 
 import AddComponentModal from "../components/bom_list/addComponentModal";
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import DataTable from "react-data-table-component";
+import Pagination from "../components/components/Pagination";
+import SearchForm from "../components/components/SearchForm";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
+import { useForm } from "react-hook-form";
 import useGetComponents from "../services/useGetComponents";
 import useGetUserAnonymousShoppingListQuantity from "../services/useGetUserAnonymousShoppingListQuantity";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
@@ -24,19 +27,59 @@ const customStyles = {
 };
 
 const Components = () => {
-  const { user } = useAuthenticatedUser();
-  const { componentsData, componentsAreLoading, componentsAreError } =
-    useGetComponents();
+  const { register, handleSubmit, control, watch } = useForm();
+  const [currentPage, setCurrentPage] = useState(1); // state for the current page, initially 1
+  const [formData, setFormData] = useState({});
+  
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
+
+  const { user } = useAuthenticatedUser();
+  
+  const { componentsData, componentsAreLoading, componentsAreError } =
+    useGetComponents({page: currentPage, search: formData?.search, filters: Object.fromEntries(
+      Object.entries(formData).filter(([key]) => key !== 'search')
+    )});
+
+  console.log(watch())
+
+  useEffect(() => {
+    if (componentsData?.page) {
+      // update page number with the current page number from the response
+      setCurrentPage(componentsData?.page); // use setCurrentPage instead of setPage
+    }
+  }, [componentsData?.page]);
 
   if (componentsAreError) {
     return (
       <div className="p-3 ml-[47px] bg-gray-100">
-        Error loading components: {componentsAreError.message}
+        Error: {componentsAreError.message}
       </div>
     );
   }
+
+  const onSubmit = (data) => {
+    const updatedFormData = Object.fromEntries(
+      Object.entries(data).map(([key, value]) => {
+        if (value === 'all') {
+          return [key, undefined];
+        }
+        return [key, value];
+      })
+    );
+  
+    setFormData(updatedFormData);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > componentsData.total_pages) {
+      return;
+    }
+    setCurrentPage(newPage); // use setCurrentPage instead of setPage
+  };
+
+  const resultsPerPage = 10;
+  const totalPages = Math.ceil(componentsData?.count / resultsPerPage);
 
   const columns = [
     {
@@ -120,18 +163,23 @@ const Components = () => {
       cell: (row) => (
         <Quantity
           useHook={useUserInventoryQuantity}
-          hookArgs={{componentId: row.id}}
+          hookArgs={{ componentId: row.id }}
         />
       ),
       sortable: false,
-      omit: !user,
+      omit: !user?.username,
       width: "80px",
     },
     {
-      name: <div>Qty in Shopping List</div>,                                                 // componentPk, moduleBomListItemPk, modulePk
-      selector: (row) => <Quantity useHook={useGetUserAnonymousShoppingListQuantity} hookArgs={{componentId: row.id}} />,
+      name: <div>Qty in Shopping List</div>, // componentPk, moduleBomListItemPk, modulePk
+      selector: (row) => (
+        <Quantity
+          useHook={useGetUserAnonymousShoppingListQuantity}
+          hookArgs={{ componentId: row.id }}
+        />
+      ),
       sortable: false,
-      omit: !user,
+      omit: !user?.username,
       width: "80px",
     },
     {
@@ -160,7 +208,7 @@ const Components = () => {
       },
       button: true,
       sortable: false,
-      omit: !user,
+      omit: !user?.username,
       ignoreRowClick: true,
       width: "95px",
     },
@@ -192,68 +240,36 @@ const Components = () => {
       },
       button: true,
       sortable: false,
-      omit: !user,
+      omit: !user?.username,
       ignoreRowClick: true,
       width: "115px",
     },
   ];
 
+  console.log(componentsData)
+
   return (
     <div className="mb-8">
       <div className="w-full py-12">
-        <div id="dataElem" className="bg-gray-100 p-10 rounded-lg">
-          <form method="get">
-            <div className="flex flex-col -mx-2">
-              <div className="w-full mb-6 md:w-1/2 lg:w-1/3 px-2 mb-4 md:mb-0">
-                <label
-                  htmlFor="search"
-                  className="block text-md font-semibold text-gray-700 mb-2"
-                >
-                  Search by name
-                </label>
-                <input
-                  type="text"
-                  name="search"
-                  placeholder="Search"
-                  id="search"
-                  autoComplete="off"
-                  className="w-full pl-2 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
-                />
-              </div>
-              <div className="w-48 px-2 mt-6 mb-4 md:mb-0">
-                <label
-                  htmlFor="manufacturer"
-                  className="block text-md font-semibold text-gray-700 mb-2"
-                >
-                  Manufacturer
-                </label>
-                <select
-                  name="manufacturer"
-                  id="manufacturer"
-                  className="w-full mb-6 border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-8 border border-gray-300"
-                >
-                  <option
-                    value=""
-                    className="text-brandgreen-500 hover:bg-brandgreen-100 hover:text-gray-800"
-                  >
-                    All manufacturers
-                  </option>
-                </select>
-              </div>
-              <div className="w-full md:w-1/2 lg:w-1/3 px-2">
-                <button
-                  type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500"
-                >
-                  Search
-                </button>
-              </div>
-            </div>
-          </form>
+        <div id="dataElem" className="p-10 bg-gray-100 rounded-lg">
+          <SearchForm
+            type={componentsData?.unique_values?.type ?? []}
+            manufacturer={componentsData?.unique_values?.manufacturer ?? []}
+            supplier={componentsData?.unique_values?.supplier ?? []}
+            mounting_style={componentsData?.unique_values?.mounting_style ?? []}
+            ohms={componentsData?.unique_values?.ohms ?? []}
+            farads={componentsData?.unique_values?.farads ?? []}
+            tolerance={componentsData?.unique_values?.tolerance ?? []}
+            voltage_rating={componentsData?.unique_values?.voltage_rating ?? []}
+            register={register} 
+            handleSubmit={handleSubmit} 
+            control={control}
+            onSubmit={onSubmit}
+          />
         </div>
       </div>
       <h1 className="my-6 text-3xl">Components</h1>
-      {!!user || (
+      {!!user?.username || (
         <div className="mb-8">
           <Alert variant="warning">
             <div className="alert alert-warning" role="alert">
@@ -270,19 +286,60 @@ const Components = () => {
       )}
       <DataTable
         fixedHeader
-        pagination
         responsive
         subHeaderAlign="right"
         subHeaderWrap
         exportHeaders
         progressComponent={
-          <div className="text-gray-500 animate-pulse">Loading...</div>
+          <div className="text-center text-gray-500 animate-pulse">
+            Loading...
+          </div>
         }
         columns={columns}
-        data={componentsData}
+        data={componentsData?.results}
         progressPending={componentsAreLoading}
         customStyles={customStyles}
       />
+      {componentsData?.results && (
+        <div className="flex items-center justify-between py-4 bg-white border-t border-gray-200">
+          <div className="flex justify-between flex-1 sm:hidden">
+            <a
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Previous
+            </a>
+            <a
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Next
+            </a>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing{" "}
+                <span className="font-medium">
+                  {((currentPage || 1) - 1) * 10 + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium">{(currentPage || 1) * 10}</span>{" "}
+                of{" "}
+                <span className="font-medium">
+                  {componentsData?.count || 0}
+                </span>{" "}
+                results
+              </p>
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              navigate={handlePageChange}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

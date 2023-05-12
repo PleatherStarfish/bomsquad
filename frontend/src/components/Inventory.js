@@ -508,7 +508,7 @@ const Inventory = () => {
         subHeaderWrap
         exportHeaders
         progressComponent={
-          <div className="text-gray-500 animate-pulse">Loading...</div>
+          <div className="text-center text-gray-500 animate-pulse">Loading...</div>
         }
         columns={columns}
         data={

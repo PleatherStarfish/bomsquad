@@ -1,7 +1,7 @@
 from shopping_list.serializers import UserShoppingListSerializer
 from shopping_list.models import UserShoppingList
 from components.serializers import ComponentSerializer
-from components.models import Component
+from components.models import Component, ComponentSupplier, Types, ComponentManufacturer
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from modules.models import Module, ModuleBomListItem
@@ -17,6 +17,9 @@ from modules.serializers import (
     ModuleSerializer,
     BuiltModuleSerializer,
     WantTooBuildModuleSerializer,
+    ManufacturerSerializer,
+    SupplierSerializer,
+    TypeSerializer,
 )
 from modules.models import BuiltModules, WantToBuildModules
 from rest_framework import status
@@ -25,10 +28,10 @@ from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q
 from accounts.serializers import UserSerializer, UserHistorySerializer
+from rest_framework.views import APIView
 
 
 @api_view(["GET"])
-@login_required
 def get_user_me(request):
     user = request.user
     serializer = UserSerializer(user)
@@ -36,7 +39,7 @@ def get_user_me(request):
 
 
 @api_view(["GET"])
-@login_required
+@permission_classes([IsAuthenticated])
 def get_user_history(request):
     user = request.user
     serializer = UserHistorySerializer(user)
@@ -44,7 +47,7 @@ def get_user_history(request):
 
 
 @api_view(["DELETE"])
-@login_required
+@permission_classes([IsAuthenticated])
 def delete_user(request):
     user = request.user
     user.delete()
@@ -70,77 +73,56 @@ class ModuleDetailView(generics.RetrieveAPIView):
         return module_instance
 
 
-@api_view(["GET"])
-@login_required
-def get_built_modules(request):
-    # Get all built modules for the current user
-    built_modules = BuiltModules.objects.filter(user=request.user).order_by("-id")
+class UserModulesView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    # Paginate the results
-    paginator = Paginator(built_modules, 10)  # Show 10 built modules per page
-    page = request.GET.get("page")
-    built_modules_page = paginator.get_page(page)
+    def get(self, request, type):
+        # Determine which type of modules to return
+        if type == "built":
+            modules = BuiltModules.objects.filter(user=request.user).order_by(
+                "module__name"
+            )
+            serializer_class = BuiltModuleSerializer
+        elif type == "wtb":
+            modules = WantToBuildModules.objects.filter(user=request.user).order_by(
+                "module__name"
+            )
+            serializer_class = WantTooBuildModuleSerializer
+        else:
+            return Response(
+                {"error": "Invalid type parameter."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-    # Serialize the results and return them in the response
-    serializer = BuiltModuleSerializer(built_modules_page, many=True)
-    data = {
-        "count": paginator.count,
-        "num_pages": paginator.num_pages,
-        "results": serializer.data,
-    }
+        # Paginate the results
+        paginator = Paginator(modules, 10)  # Show 10 modules per page
+        page = request.GET.get("page")
+        modules_page = paginator.get_page(page)
 
-    # Add "is_built" and "is_wtb" fields to each module
-    for module_data in data["results"]:
-        module_slug = module_data["module"]["slug"]
-        module = get_object_or_404(Module, slug=module_slug)
-        is_built = BuiltModules.objects.filter(
-            user=request.user, module=module
-        ).exists()
-        is_wtb = WantToBuildModules.objects.filter(
-            user=request.user, module=module
-        ).exists()
-        module_data["is_built"] = is_built
-        module_data["is_wtb"] = is_wtb
+        # Serialize the results and return them in the response
+        serializer = serializer_class(modules_page, many=True)
+        data = {
+            "count": paginator.count,
+            "num_pages": paginator.num_pages,
+            "results": serializer.data,
+        }
 
-    return Response(data)
+        # Add "is_built" and "is_wtb" fields to each module
+        for module_data in data["results"]:
+            module_slug = module_data["module"]["slug"]
+            module = get_object_or_404(Module, slug=module_slug)
+            is_built = BuiltModules.objects.filter(
+                user=request.user, module=module
+            ).exists()
+            is_wtb = WantToBuildModules.objects.filter(
+                user=request.user, module=module
+            ).exists()
+            module_data["is_built"] = is_built
+            module_data["is_wtb"] = is_wtb
 
-
-@api_view(["GET"])
-@login_required
-def get_wtb_modules(request):
-    # Get all built modules for the current user
-    built_modules = WantToBuildModules.objects.filter(user=request.user).order_by("-id")
-
-    # Paginate the results
-    paginator = Paginator(built_modules, 10)  # Show 10 built modules per page
-    page = request.GET.get("page")
-    built_modules_page = paginator.get_page(page)
-
-    # Serialize the results and return them in the response
-    serializer = WantTooBuildModuleSerializer(built_modules_page, many=True)
-    data = {
-        "count": paginator.count,
-        "num_pages": paginator.num_pages,
-        "results": serializer.data,
-    }
-
-    # Add "is_built" and "is_wtb" fields to each module
-    for module_data in data["results"]:
-        module_slug = module_data["module"]["slug"]
-        module = get_object_or_404(Module, slug=module_slug)
-        is_built = BuiltModules.objects.filter(
-            user=request.user, module=module
-        ).exists()
-        is_wtb = WantToBuildModules.objects.filter(
-            user=request.user, module=module
-        ).exists()
-        module_data["is_built"] = is_built
-        module_data["is_wtb"] = is_wtb
-
-    return Response(data)
+        return Response(data)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_inventory(request):
     """
@@ -186,7 +168,7 @@ def user_inventory_quantity_add_or_create(request, component_pk):
         )
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["PATCH"])
 def user_inventory_update(request, component_pk):
     user = request.user
@@ -208,7 +190,7 @@ def user_inventory_update(request, component_pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["DELETE"])
 def user_inventory_delete(request, component_pk):
     user = request.user
@@ -228,7 +210,7 @@ def user_inventory_delete(request, component_pk):
     )
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list(request):
     """
@@ -240,7 +222,7 @@ def get_user_shopping_list(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_inventory_quantity(request, component_pk):
     inventory = UserInventory.objects.filter(
@@ -257,7 +239,7 @@ def get_user_inventory_quantity(request, component_pk):
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list_quantity_bom_item_agnostic(request, component_pk, module_pk):
     shopping_list_item = UserShoppingList.objects.filter(
@@ -276,7 +258,7 @@ def get_user_shopping_list_quantity_bom_item_agnostic(request, component_pk, mod
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list_quantity(
     request, component_pk, modulebomlistitem_pk, module_pk
@@ -298,7 +280,7 @@ def get_user_shopping_list_quantity(
         return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_anonymous_shopping_list_quantity(request, component_pk):
     aggregate = request.query_params.get("aggregate", True)
@@ -334,14 +316,13 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
             return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["POST"])
 def user_anonymous_shopping_list_add_or_update(request, component_pk):
     user = request.user
     quantity = int(request.data.get("quantity", 0))
     try:
         component = Component.objects.get(pk=component_pk)
-        print(component)
     except Component.DoesNotExist:
         return Response(
             {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
@@ -365,7 +346,7 @@ def user_anonymous_shopping_list_add_or_update(request, component_pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["POST"])
 def user_shopping_list_add_or_update(request, component_pk):
     user = request.user
@@ -412,7 +393,7 @@ def user_shopping_list_add_or_update(request, component_pk):
     return Response(serializer.data, status=status_code)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_pk):
     """
@@ -463,25 +444,127 @@ def get_module_bom_list_items(request, module_pk):
     return Response(serializer.data)
 
 
-@api_view(["GET"])
-def get_components(request):
-    # Get the page number from the request query parameters
-    page_number = request.query_params.get("page", 1)
+class ComponentView(APIView):
+    def get(self, request):
+        # Get the page number and search query from the request query parameters
+        page_number = request.query_params.get("page", 1)
+        search_query = request.query_params.get("search", "")
 
-    # Retrieve only the id and name fields of the Component instances from the database
-    components = Component.objects.all()
+        # Retrieve filter parameters from the request's query parameters
+        ohms_filter = request.query_params.get("ohms", None)
+        farads_filter = request.query_params.get("farads", None)
+        voltage_rating_filter = request.query_params.get("voltage_rating", None)
+        tolerance_filter = request.query_params.get("tolerance", None)
+        mounting_style_filter = request.query_params.get("mounting_style", None)
+        manufacturer_filter = request.query_params.get("manufacturer", None)
+        supplier_filter = request.query_params.get("supplier", None)
+        type_filter = request.query_params.get("type", None)
 
-    # Create a paginator instance
-    paginator = Paginator(components, 10)
+        print(request.query_params)
 
-    # Retrieve the page based on the page number
-    page = paginator.page(page_number)
+        # Start with a base queryset
+        components = Component.objects.all()
 
-    # Serialize the retrieved Component instances
-    serializer = ComponentSerializer(page, many=True)
+        # Apply search query filter if present
+        if search_query:
+            components = components.filter(
+                Q(description__icontains=search_query)
+                | Q(manufacturer__name__icontains=search_query)
+                | Q(supplier__name__icontains=search_query)
+                | Q(supplier_item_no__icontains=search_query)
+                | Q(type__name__icontains=search_query)
+                | Q(ohms__icontains=search_query)
+                | Q(farads__icontains=search_query)
+                | Q(voltage_rating__icontains=search_query)
+                | Q(tolerance__icontains=search_query)
+                | Q(notes__icontains=search_query)
+            )
 
-    # Return the serialized data as a response
-    return Response(serializer.data)
+        # Apply additional filters if present
+        if ohms_filter:
+            components = components.filter(ohms__icontains=ohms_filter)
+        if farads_filter:
+            components = components.filter(farads__icontains=farads_filter)
+        if voltage_rating_filter:
+            components = components.filter(
+                voltage_rating__icontains=voltage_rating_filter
+            )
+        if tolerance_filter:
+            components = components.filter(tolerance__icontains=tolerance_filter)
+        if mounting_style_filter:
+            components = components.filter(
+                mounting_style__icontains=mounting_style_filter
+            )
+        if manufacturer_filter:
+            components = components.filter(manufacturer__pk=int(manufacturer_filter))
+        if supplier_filter:
+            components = components.filter(supplier__pk=int(supplier_filter))
+        if type_filter:
+            components = components.filter(type__name__icontains=type_filter)
+
+        # Sort by description after applying all filters
+        components = components.order_by("description")
+
+        # Create a paginator instance
+        paginator = Paginator(components, 10)
+
+        # Retrieve the page based on the page number
+        page = paginator.get_page(page_number)
+
+        # Serialize the retrieved Component instances
+        serializer = ComponentSerializer(page, many=True)
+
+        # Get unique values
+        unique_ohms = Component.get_unique_ohms_or_farads_values("ohms", "ohms_unit")
+        unique_farads = Component.get_unique_ohms_or_farads_values(
+            "farads", "farads_unit"
+        )
+        unique_voltage_ratings = Component.get_unique_values("voltage_rating", str)
+        unique_tolerances = Component.get_unique_values("tolerance", str)
+        unique_mounting_style = Component.get_mounting_styles()
+
+        # Get unique manufacturer, supplier, and type names
+        unique_manufacturers = list(
+            ComponentManufacturer.objects.values("name", "pk")
+            .distinct()
+            .order_by("name")
+        )
+        unique_suppliers = list(
+            ComponentSupplier.objects.values("name", "pk").distinct().order_by("name")
+        )
+
+        unique_manufacturers = [
+            {"label": manufacturer["name"], "value": manufacturer["pk"]}
+            for manufacturer in unique_manufacturers
+        ]
+        unique_suppliers = [
+            {"label": supplier["name"], "value": supplier["pk"]}
+            for supplier in unique_suppliers
+        ]
+
+        unique_types = list(
+            Types.objects.values_list("name", flat=True).distinct().order_by("name")
+        )
+
+        # Prepare the response data
+        response_data = {
+            "count": paginator.count,
+            "next": page.next_page_number() if page.has_next() else None,
+            "previous": page.previous_page_number() if page.has_previous() else None,
+            "results": serializer.data,
+            "unique_values": {
+                "ohms": unique_ohms,
+                "farads": unique_farads,
+                "voltage_rating": unique_voltage_ratings,
+                "tolerance": unique_tolerances,
+                "mounting_style": unique_mounting_style,
+                "manufacturer": unique_manufacturers,
+                "supplier": unique_suppliers,
+                "type": unique_types,
+            },
+        }
+
+        return Response(response_data)
 
 
 @api_view(["GET"])

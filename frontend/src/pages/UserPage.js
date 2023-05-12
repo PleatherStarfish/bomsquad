@@ -53,7 +53,7 @@ const UserPage = () => {
   }, [location]);
 
   if (userIsLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (userIsError) return <div>Error!</div>;
 
   const handleTabChange = (tabName) => {

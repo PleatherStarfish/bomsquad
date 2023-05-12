@@ -2,25 +2,35 @@
 
 <nav class="fixed top-0 w-full bg-[#212529] z-40">
   <div class="px-8 mx-auto">
-    <div class="relative hidden md:block">
+    <div class="relative z-50 hidden md:block">
       <a href="{% url 'home' %}">
-        {% with request.path|slice:":5" as path %} {% if path == '/user' %}
-        <img
-          class="absolute top-2.5 left-[-20px] hidden sm:block"
-          height="70px"
-          width="70px"
-          src="{% static 'images/logo_mini.png' %}"
-          alt="Bom Squad Logo"
-        />
+        {% with request.path|slice:":5" as path %} 
+        {% if path == '/user' %}
+        <picture>
+            <source srcset="{% static 'images/logo_mini.webp' %}" type="image/webp">
+            <source srcset="{% static 'images/logo_mini.png' %}" type="image/jpeg">
+            <img
+                class="absolute top-2.5 left-[-20px] hidden sm:block"
+                height="70px"
+                width="70px"
+                src="{% static 'images/logo_mini.png' %}"
+                alt="Bom Squad Logo"
+            />
+        </picture>
         {% else %}
-        <img
-          class="absolute hidden top-3 sm:block"
-          height="180px"
-          width="180px"
-          src="{% static 'images/logo.png' %}"
-          alt="Bom Squad Logo"
-        />
-        {% endif %} {% endwith %}
+        <picture>
+            <source srcset="{% static 'images/logo.webp' %}" type="image/webp">
+            <source srcset="{% static 'images/logo.png' %}" type="image/jpeg">
+            <img
+                class="absolute hidden top-3 sm:block"
+                height="180px"
+                width="180px"
+                src="{% static 'images/logo.png' %}"
+                alt="Bom Squad Logo"
+            />
+        </picture>
+        {% endif %} 
+        {% endwith %}
       </a>
     </div>
 
@@ -28,9 +38,10 @@
       <div
         class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start"
       >
-        <div class="hidden sm:ml-6 md:block">
-          {% with request.path|slice:":5" as path %} {% if path == '/user' %}
-          <ul class="flex space-x-4 text-white ml-[40px]">
+        <div class="hidden md:block">
+          {% with request.path|slice:":5" as path %} 
+          {% if path == '/user' %}
+          <ul class="flex space-x-4 text-white ml-[60px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
                 >Home</a
@@ -57,7 +68,8 @@
               <a href="/components/" class="px-2 nav-link">Components</a>
             </li>
           </ul>
-          {% endif %} {% endwith %}
+          {% endif %} 
+          {% endwith %}
         </div>
       </div>
       <div

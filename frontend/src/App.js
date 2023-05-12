@@ -26,8 +26,7 @@ const App = () => {
             index
             element={
               <ModulesList
-                queryName="builtModules"
-                url="/api/get-built-modules/"
+                type="built"
               />
             }
           />
@@ -35,15 +34,14 @@ const App = () => {
             path={`built/`}
             element={
               <ModulesList
-                queryName="builtModules"
-                url="/api/get-built-modules/"
+                type="built"
               />
             }
           />
           <Route
             path={`want-to-build/`}
             element={
-              <ModulesList queryName="wtbModules" url="/api/get-wtb-modules/" />
+              <ModulesList type="wtb" />
             }
           />
           <Route path={`inventory/`} element={<Inventory />} />
