@@ -41,11 +41,17 @@
             {% for module in page_obj %}
                 <div class="flex items-center overflow-hidden bg-white rounded-lg">
                     <div class="flex justify-center object-contain w-48 h-48">
-                        <img class="w-auto h-full object-fit"
-                             height="100px"
-                             width="100px"
-                             src="{{ module.image.url }}"
-                             alt="{{ module.name }}"/>
+                        {% if module.image and module.image_jpeg %}
+                            <picture>
+                                <source srcset="{{ module.image.url }}" type="image/webp">
+                                <source srcset="{{ module.image_jpeg.url }}" type="image/jpeg"> <!-- Fallback image -->
+                                <img class="w-auto h-full object-fit"
+                                    height="100px"
+                                    width="100px"
+                                    src="{{ module.image_jpeg.url }}"
+                                    alt="{{ module.name }}"/>
+                            </picture>
+                        {% endif %}
                     </div>
                     <div class="flex-1">
                         <div class="px-4 py-5 sm:p-6">

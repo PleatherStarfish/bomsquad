@@ -92,7 +92,7 @@ frontend_redirect_urls = [
 
 
 urlpatterns = [
-    path("patchbay/", admin.site.urls),
+    path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),

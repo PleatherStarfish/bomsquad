@@ -11,7 +11,7 @@ const DeleteAccountButton = () => {
   const mutation = useDeleteUserMe();
 
   if (userIsLoading)
-    return <div className="text-gray-500 animate-pulse">Loading...</div>;
+    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (userIsError) return <div>Error!</div>;
 
   const handleDeleteAccount = () => {

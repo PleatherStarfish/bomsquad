@@ -1,5 +1,4 @@
 from components.models import ComponentManufacturer, ComponentSupplier, Types
-from components.models import Component
 from rest_framework import serializers
 from modules.models import (
     BuiltModules,

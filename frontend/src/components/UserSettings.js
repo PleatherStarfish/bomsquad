@@ -25,18 +25,18 @@ const Settings = () => {
   });
 
   return (
-    <div className="mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48">
+    <div className="px-4 py-8 mb-12 mt-36 md:px-24 lg:px-48">
       <Link
         to=".."
         relative="path"
-        className="flex gap-2 items-center text-gray-400"
+        className="flex items-center gap-2 text-gray-400"
       >
         <ChevronLeftIcon className="w-5 h-5" />
         <span>Back to Account</span>
       </Link>
       <div>
         <div className="px-4 sm:px-0">
-          <h1 className="text-gray-700 text-3xl font-bold mb-12 mt-5">
+          <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
             Settings
           </h1>
         </div>
@@ -47,10 +47,12 @@ const Settings = () => {
                 Default Currency
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                <Dropdown
-                  options={currencyNames}
-                  defaultText={CURRENCIES.USD}
-                />
+                <div className="w-[200px]">
+                  <Dropdown
+                    options={currencyNames}
+                    defaultText={CURRENCIES.USD}
+                  />
+                </div>
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

@@ -2,6 +2,8 @@ from djmoney.models.fields import MoneyField
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
+
 
 OHMS_UNITS = (
     ("Ω", "Ω"),
@@ -15,6 +17,11 @@ FARAD_UNITS = (
     ("nF", "nF"),
     ("pF", "pF"),
 )
+
+MOUNTING_STYLE = [
+    ("smt", "Surface Mount (SMT)"),
+    ("th", "Through Hole"),
+]
 
 
 class Types(models.Model):
@@ -61,6 +68,9 @@ class Component(models.Model):
     description = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
+    )
+    mounting_style = models.CharField(
+        choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
     )
     supplier = models.ForeignKey(
         ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
@@ -149,3 +159,39 @@ class Component(models.Model):
                 raise ValidationError(
                     "Farad value and unit must not be set for resistors."
                 )
+
+    @classmethod
+    def get_mounting_styles(cls):
+        return [{"value": choice[0], "label": choice[1]} for choice in MOUNTING_STYLE]
+
+    @classmethod
+    def get_unique_values(cls, field_name, value_type):
+        cache_key = f"unique_{field_name}_values"
+        field_values = cache.get(cache_key)
+
+        if field_values is None:
+            field_values = list(
+                cls.objects.values_list(field_name, flat=True).distinct()
+            )
+            field_values = [value_type(val) for val in field_values if val is not None]
+            cache.set(cache_key, field_values, timeout=60 * 60)
+
+        return field_values
+
+    @classmethod
+    def get_unique_ohms_or_farads_values(cls, field1, field2):
+        values = cache.get(f"unique_{field1}_{field2}_values")
+        if values is None:
+            queryset = (
+                cls.objects.values_list(field1, field2)
+                .order_by(field2, field1)
+                .distinct()
+                .exclude(**{field1: None, field2: None})
+            )
+            values = [
+                f"{float(val[0])} {val[1]}"
+                for val in queryset
+                if val[0] is not None and val[1] is not None
+            ]
+            cache.set(f"unique_{field1}_{field2}_values", values, timeout=60 * 60)
+        return values
