@@ -63,7 +63,7 @@ const UserPage = () => {
 
   const MobileNav = () => (
     <div className="fixed inset-x-0 bottom-0 md:hidden">
-      <nav className="bg-white shadow-md">
+      <nav className="z-50 bg-white shadow-md">
         <ul className="flex justify-between">
           {navigation.map((item) => (
             <li key={item.name}>
@@ -99,14 +99,14 @@ const UserPage = () => {
   );
 
   return (
-    <div className="flex gap-6 mt-[64px]">
-      <div className="z-20 hidden md:block">
+    <div className="relative gap-6 mt-[64px] z-10">
+      <div className="hidden md:block">
         <div
           className="w-[70px] group/slideout hover:w-[200px] bg-gray-100 fixed transition-all duration-300 ease-in"
           style={{ height: "calc(100vh - 64px)" }}
         >
           <div className="flex flex-col h-full px-6 pb-4 overflow-y-auto bg-gray-100 gap-y-5">
-            <nav className="z-50 flex flex-col flex-1 h-full">
+            <nav className="z-20 flex flex-col flex-1 h-full">
               <ul role="list" className="flex flex-col flex-1 h-full gap-y-7">
                 <li>
                   <ul role="list" className="mt-8 -mx-2 space-y-1">
@@ -170,7 +170,7 @@ const UserPage = () => {
         </div>
       </div>
       <MobileNav />
-      <main className="grow py-10 ml-0 md:ml-[70px]">
+      <main className="relative grow py-10 ml-0 md:ml-[70px] pointer-events-auto -z-10">
         <div className="px-4 sm:px-6 lg:px-8">
           <Outlet />
         </div>

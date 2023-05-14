@@ -65,7 +65,7 @@ const Dropdown = ({
   return (
     <Select
       styles={customStyles}
-      className="min-w-[200px] z-30"
+      className="min-w-[200px]"
       menuPosition={'fixed'} 
       menuPortalTarget={document.body} 
       value={selectOptions.find((option) => option.value === value)}

@@ -1,10 +1,9 @@
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import {
-  MoonIcon,
-  SunIcon,
   TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 import React, { useState, useEffect } from "react";
 
 import Alert from "../ui/Alert";
@@ -197,7 +196,7 @@ const SolderingMode = ({
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className={cx("relative z-50", {"dark": darkMode})} onClose={setOpen}>
+      <Dialog as="div" className={cx("relative z-30", {"dark": darkMode})} onClose={setOpen}>
         <div className="fixed inset-0" />
 
         <div className="fixed inset-0 overflow-hidden">
@@ -220,13 +219,13 @@ const SolderingMode = ({
                           <Switch
                             checked={darkMode}
                             onChange={setDarkMode}
-                            className="relative inline-flex flex-shrink-0 w-20 transition-colors duration-200 ease-in-out bg-gray-400 border-2 border-transparent rounded-full cursor-pointer dark:bg-gray-400 h-11 focus:outline-none focus:ring-2 focus:ring-brandgreen-600 dark:focus:ring-white focus:ring-offset-2"
+                            className="relative inline-flex flex-shrink-0 w-20 transition-colors duration-200 ease-in-out bg-white border-2 ring-gray-400 rounded-full cursor-pointer dark:ring-white dark:bg-[#162818] h-11 outline-none ring-0"
                           >
                             <span className="sr-only">Use setting</span>
                             <span
                               className={cx(
                                 darkMode ? "translate-x-9" : "translate-x-0",
-                                "pointer-events-none relative inline-block h-10 w-10 transform rounded-full bg-white dark:bg-[#162818] shadow ring-0 transition duration-200 ease-in-out"
+                                "pointer-events-none relative inline-block h-10 w-10 transform rounded-full border-white dark:border-[#162818] bg-gray-400 dark:bg-white shadow ring-0 transition duration-200 ease-in-out"
                               )}
                             >
                               <span
@@ -238,7 +237,7 @@ const SolderingMode = ({
                                 )}
                                 aria-hidden="true"
                               >
-                                <SunIcon className="w-16 h-16" />
+                                <SunIcon className="w-14 h-14 fill-yellow-300" />
                               </span>
                               <span
                                 className={cx(
@@ -249,7 +248,7 @@ const SolderingMode = ({
                                 )}
                                 aria-hidden="true"
                               >
-                                <MoonIcon className="w-16 h-16" />
+                                <MoonIcon className="w-14 h-14 fill-sky-500" />
                               </span>
                             </span>
                           </Switch>
@@ -284,7 +283,7 @@ const SolderingMode = ({
                           type="text"
                           name="search"
                           id="search"
-                          className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] text-3xl"
+                          className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-gray-200 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:foocus:border-white text-3xl"
                           placeholder="search"
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}

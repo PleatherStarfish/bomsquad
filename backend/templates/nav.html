@@ -1,8 +1,8 @@
 {% load static custom_tags %}
 
-<nav class="fixed top-0 w-full bg-[#212529] z-40">
+<nav class="fixed top-0 w-full bg-[#212529] z-30">
   <div class="px-8 mx-auto">
-    <div class="relative z-50 hidden md:block">
+    <div class="relative hidden md:block">
       <a href="{% url 'home' %}">
         {% with request.path|slice:":5" as path %} 
         {% if path == '/user' %}

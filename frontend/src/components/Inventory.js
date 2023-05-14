@@ -357,7 +357,7 @@ const Inventory = () => {
 
   return !!inventoryData?.length ? (
     <>
-      <div className="flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
+      <div className="z-10 flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
         {inventoryData && inventoryData.length > 0 && (
           <>
             <div className="pr-2 grow md:w-full">
