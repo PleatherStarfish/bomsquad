@@ -100,13 +100,13 @@ const UserPage = () => {
 
   return (
     <div className="flex gap-6 mt-[64px]">
-      <div className="hidden md:block">
+      <div className="z-20 hidden md:block">
         <div
           className="w-[70px] group/slideout hover:w-[200px] bg-gray-100 fixed transition-all duration-300 ease-in"
           style={{ height: "calc(100vh - 64px)" }}
         >
           <div className="flex flex-col h-full px-6 pb-4 overflow-y-auto bg-gray-100 gap-y-5">
-            <nav className="flex flex-col flex-1 h-full">
+            <nav className="z-50 flex flex-col flex-1 h-full">
               <ul role="list" className="flex flex-col flex-1 h-full gap-y-7">
                 <li>
                   <ul role="list" className="mt-8 -mx-2 space-y-1">

@@ -460,10 +460,8 @@ class ComponentView(APIView):
         supplier_filter = request.query_params.get("supplier", None)
         type_filter = request.query_params.get("type", None)
 
-        print(request.query_params)
-
         # Start with a base queryset
-        components = Component.objects.all()
+        components = Component.objects.select_related("manufacturer", "supplier").all()
 
         # Apply search query filter if present
         if search_query:

@@ -17,6 +17,7 @@ module.exports = {
     "../../../../backend/**/**/**/**/**/*.{html,js}",
     "../../../../backend/templates/_base.html",
   ],
+  darkMode: 'class',
   theme: {
     screens: {
       sm: "640px",
