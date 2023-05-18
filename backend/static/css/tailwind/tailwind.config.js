@@ -28,7 +28,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'display': ['Quicksand', ...defaultTheme.fontFamily.sans]
+        'display': ['Quicksand', ...defaultTheme.fontFamily.sans],
+        'roboto': ['Roboto', 'sans-serif'],
       },
       colors: {
         transparent: "transparent",
@@ -51,6 +52,8 @@ module.exports = {
           800: "#32533a",
           900: "#264429",
         },
+        'google-blue': '#4285f4',
+        'button-active-blue': '#1669F2',
       },
     },
   },

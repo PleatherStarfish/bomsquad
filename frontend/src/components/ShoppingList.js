@@ -20,6 +20,8 @@ const ShoppingList = () => {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   }
 
+  console.log("userShoppingListData", userShoppingListData)
+
   return (
   <>
     {!!userShoppingListData.length ? (
@@ -53,7 +55,7 @@ const ShoppingList = () => {
     ) : (
       <Alert variant="transparent" centered>
         <span>
-          There are no components in your inventory.{" "}
+          There are no components in your shopping list.{" "}
           <a className="text-blue-500" href="/components">
             Add components.
           </a>

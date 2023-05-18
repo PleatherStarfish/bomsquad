@@ -98,8 +98,18 @@
                         {{ item.name }}
                   </a>
                 </li>
-            {% endfor %}
+              {% endfor %}
           {% else %}
+                <li>
+                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{% url 'account_login' %}">
+                        Login
+                  </a>
+                </li>
+                <li>
+                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{% url 'account_signup' %}">
+                        Sign up
+                  </a>
+                </li>
           {% endif %}
         </ul>
       </div>

@@ -11,3 +11,7 @@ class AboutPageView(TemplateView):
 
 class DisclaimerPageView(TemplateView):
     template_name = "pages/disclaimer.html"
+
+
+class PremiumPageView(TemplateView):
+    template_name = "pages/premium.html"

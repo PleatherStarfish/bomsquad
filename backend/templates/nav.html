@@ -82,6 +82,13 @@
             {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %} 
           {% else %}
           <div class="flex items-center space-x-2">
+            <div class="border-r border-gray-100">
+              <a
+                href="{% url 'premium' %}"
+                class="text-white hover:text-gray-100 px-4 inline-flex items-center border rounded border-[#212529] transition-all duration-200"
+                >Get premium</a
+              >
+            </div>
             <a
               href="{% url 'account_login' %}"
               class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
