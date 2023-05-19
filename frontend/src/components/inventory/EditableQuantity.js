@@ -3,6 +3,8 @@ import NumericInput from "react-numeric-input";
 import Button from "../../ui/Button";
 import {
   PencilSquareIcon,
+  ArrowPathIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 const EditableQuantity = ({
@@ -36,7 +38,9 @@ const EditableQuantity = ({
               <Button
                 className="h-full"
                 variant="muted"
-                size="sm"
+                size="xs"
+                iconOnly
+                Icon={XMarkIcon}
                 onClick={() => {
                   setQuantityIdToEdit(undefined);
                   setUpdatedQuantityToSubmit(undefined);
@@ -47,7 +51,9 @@ const EditableQuantity = ({
               <Button
                 className="h-full"
                 variant="primary"
-                size="sm"
+                size="xs"
+                iconOnly
+                Icon={ArrowPathIcon}
                 onClick={() => handleSubmitQuantity(componentId)}
               >
                 Update

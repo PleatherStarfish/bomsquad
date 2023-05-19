@@ -1,6 +1,5 @@
 import ListSlice from "./shopping_list/listSlice";
 import React from "react";
-import Toggle from "../ui/Toggle";
 import _ from "lodash";
 import Alert from "../ui/Alert";
 import useGetUserShoppingList from "../services/useGetUserShoppingList";
@@ -24,9 +23,8 @@ const ShoppingList = () => {
 
   return (
   <>
-    {!!userShoppingListData.length ? (
+    {!!userShoppingListData?.groupedByModule.length ? (
       <div>
-        <Toggle />
         <div className="flex">
           {[
             { name: "", data: [] },

@@ -313,7 +313,7 @@ const Inventory = () => {
         />
       ),
       sortable: true,
-      width: quantityIdToEdit ? "230px" : "80px",
+      width: quantityIdToEdit ? "165px" : "100px",
     },
     {
       name: <div>Location</div>,
