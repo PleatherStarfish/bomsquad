@@ -31,13 +31,17 @@ const ShoppingList = () => {
             ...userShoppingListData.groupedByModule,
             { name: "TOTAL", data: [] },
           ].map((value, index) => {
+            console.log("userShoppingListData", userShoppingListData)
             const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module
               ?.slug;
+              const moduleId = Object.values(value.data)?.[0]?.[0]?.module
+              ?.id;
             return (
               <ListSlice
                 key={value.name}
                 name={value.name}
                 slug={moduleSlug}
+                moduleId={moduleId}
                 index={index}
                 allModulesData={userShoppingListData.groupedByModule}
                 componentsInModule={value.data}

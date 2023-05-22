@@ -11,6 +11,8 @@ import NumericInput from "react-numeric-input";
 import cx from "classnames";
 import { get } from "lodash";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
+import useUpdateShoppingList from "../../services/useUpdateShoppingList";
+import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 
 const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
   const compsForModuleThatMatchRow = get(componentsInModule, componentId, []);
@@ -39,6 +41,7 @@ const ListSlice = ({
   name,
   index,
   slug,
+  moduleId,
   allModulesData,
   componentsInModule,
   aggregatedComponents,
@@ -46,6 +49,26 @@ const ListSlice = ({
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
+
+  const updateShoppingListMutate = useUpdateShoppingList();
+  const deleteMutation = useDeleteShoppingListItem();
+
+  const handleQuantityChange = (e) => {
+    setUpdatedQuantityToSubmit(e);
+  };
+
+  const handleSubmitQuantity = (componentId, moduleId) => {
+    const quantity = updatedQuantityToSubmit;
+    const modulebomlistitem = _.find(allModulesData, {moduleId: moduleId}).data[componentId][0].bom_item
+    const data = {
+      quantity,
+      modulebomlistitem_pk: modulebomlistitem,
+      module_pk: moduleId ?? undefined,
+    };
+    updateShoppingListMutate({ componentPk: componentId, ...data });
+    setQuantityIdToEdit(undefined);
+    setUpdatedQuantityToSubmit(undefined);
+  };
 
   const labelColumns = [
     {
@@ -106,13 +129,23 @@ const ListSlice = ({
           {name === "null" ? (
             "Other"
           ) : (
-            <span>
-              <a
-                href={`/module/${slug}`}
-                className="text-blue-500 hover:text-blue-700"
+            <span className="flex flex-wrap gap-1 group">
+              <span>
+                <a
+                  href={`/module/${slug}`}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  {name}
+                </a>
+              </span>
+              <Button
+                classNames="hidden group-hover:inline-flex"
+                variant="danger"
+                size="xs"
+                onClick={() => deleteMutation.mutate({ module_pk: moduleId })}
               >
-                {name}
-              </a>
+                Delete
+              </Button>
             </span>
           )}
         </div>
@@ -120,6 +153,15 @@ const ListSlice = ({
         <div className="text-bold">{name === "null" ? "Other" : name}</div>
       ),
       cell: (row) => {
+        const compsForModuleThatMatchRow = get(
+          componentsInModule,
+          row.component.id,
+          []
+        );
+        const totalQuantity = compsForModuleThatMatchRow.reduce(
+          (acc, obj) => acc + obj.quantity,
+          0
+        );
         return (
           <div className="flex content-center justify-between w-full">
             {row.component.id === quantityIdToEdit ? (
@@ -131,7 +173,7 @@ const ListSlice = ({
                   <NumericInput
                     className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
                     type="number"
-                    value={updatedQuantityToSubmit ?? row.quantity}
+                    value={updatedQuantityToSubmit ?? totalQuantity}
                     onChange={(e) => handleQuantityChange(e)}
                   />
                   <div className="flex justify-around gap-1">
@@ -154,7 +196,10 @@ const ListSlice = ({
                       size="xs"
                       iconOnly
                       Icon={ArrowPathIcon}
-                      onClick={() => handleSubmitQuantity(row.component.id)}
+                      onClick={() => {
+                        console.log("row.component.id", row.component.id);
+                        handleSubmitQuantity(row.component.id, moduleId);
+                      }}
                     >
                       Update
                     </Button>
@@ -168,15 +213,10 @@ const ListSlice = ({
                 pencilComponent={
                   row.component.id !== quantityIdToEdit && (
                     <div
-                      onClick={() =>
-                        handleClick(
-                          row,
-                          "quantity",
-                          quantityIdToEdit,
-                          setQuantityIdToEdit,
-                          setUpdatedQuantityToSubmit
-                        )
-                      }
+                      onClick={() => {
+                        setQuantityIdToEdit(row.component.id);
+                        setUpdatedQuantityToSubmit(totalQuantity);
+                      }}
                       role="button"
                     >
                       <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
@@ -209,22 +249,6 @@ const ListSlice = ({
     },
   ];
 
-  const handleClick = (
-    row,
-    field,
-    fieldIdToEdit,
-    setFieldIdToEdit,
-    setUpdatedFieldToSubmit
-  ) => {
-    const { component, [field]: fieldValue } = row;
-    if (component.id !== fieldIdToEdit) {
-      setFieldIdToEdit(component.id);
-      setUpdatedFieldToSubmit(fieldValue);
-    } else {
-      setFieldIdToEdit(undefined);
-    }
-  };
-
   return (
     <div
       className={cx({
@@ -249,7 +273,9 @@ const ListSlice = ({
           progressPending={componentsAreLoading}
           progressComponent={
             <div className="flex justify-center w-full p-6 bg-sky-50">
-              <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+              <div className="text-center text-gray-500 animate-pulse">
+                Loading...
+              </div>
             </div>
           }
         />

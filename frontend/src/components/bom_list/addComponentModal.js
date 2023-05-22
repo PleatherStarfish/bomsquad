@@ -11,7 +11,6 @@ import useAddOrUpdateUserShoppingList from "../../services/useAddOrUpdateUserSho
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useGetUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
-import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 
 const AddComponentModal = ({
   open,
@@ -27,7 +26,6 @@ const AddComponentModal = ({
   const [editMode, setEditMode] = useState(false);
 
   const addOrUpdateUserInventory = useAddOrUpdateUserInventory();
-  const updateUserInventoryMutate = useUpdateUserInventory();
 
   const addOrUpdateUserShoppingList = useAddOrUpdateUserShoppingList();
   const addOrUpdateUserAnonymousShoppingList =
@@ -46,36 +44,28 @@ const AddComponentModal = ({
 
   const handleSubmitQuantity = async () => {
     try {
-      if (editMode) {
-        if (type === Types.INVENTORY) {
-          await updateUserInventoryMutate({
-            componentPk: componentId,
-            quantity,
-          });
-        } else if (type === Types.SHOPPING) {
-        } else if (type === Types.SHOPPING_ANON) {
-        }
-        setOpen(false);
-      } else {
-        if (type === Types.INVENTORY) {
-          await addOrUpdateUserInventory({ componentId, quantity });
-        } else if (type === Types.SHOPPING) {
-          await addOrUpdateUserShoppingList({
-            componentId,
-            ...hookArgs,
-            quantity,
-          });
-        } else if (type === Types.SHOPPING_ANON) {
-          await addOrUpdateUserAnonymousShoppingList({
-            componentId,
-            quantity,
-          });
-        }
-        setOpen(false);
+      if (type === Types.INVENTORY) {
+        await addOrUpdateUserInventory({
+          componentId,
+          quantity,
+          editMode,
+        });
+      } else if (type === Types.SHOPPING && !editMode) {
+        await addOrUpdateUserShoppingList({
+          componentId,
+          ...hookArgs,
+          quantity,
+        });
+      } else if (type === Types.SHOPPING_ANON && !editMode) {
+        await addOrUpdateUserAnonymousShoppingList({
+          componentId,
+          quantity,
+        });
       }
     } catch (error) {
       console.error("Failed to update quantity", error);
     }
+    setOpen(false);
   };
 
   useEffect(() => {

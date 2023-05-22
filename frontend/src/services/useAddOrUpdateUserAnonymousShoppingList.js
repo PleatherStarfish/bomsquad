@@ -10,7 +10,7 @@ const useAddOrUpdateUserAnonymousShoppingList = () => {
   const {mutate: addOrUpdateUserAnonymousShoppingList} = useMutation({
     mutationFn: ({ componentId, quantity }) => {
       return axios.post(
-        `/api/shopping_list/${componentId}/anonymous-add-or-update/`,
+        `/api/shopping-list/${componentId}/anonymous-add-or-update/`,
         {quantity},
         {
           headers: {

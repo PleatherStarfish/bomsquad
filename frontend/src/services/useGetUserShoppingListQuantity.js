@@ -5,7 +5,7 @@ const useGetUserShoppingListQuantity = (componentPk, moduleBomListItemPk, module
   const fetchUserInventoryQuantity = async () => {
     try {
       const response = await axios.get(
-        `/api/shopping_list/${componentPk}/${moduleBomListItemPk}/${modulePk}/component-quantity/`
+        `/api/shopping-list/${componentPk}/${moduleBomListItemPk}/${modulePk}/component-quantity/`
       );
       return response.data.quantity;
     } catch (error) {

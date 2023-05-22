@@ -13,6 +13,7 @@ from django.middleware import csrf
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.paginator import Paginator
+from django.http import Http404
 from modules.serializers import (
     ModuleSerializer,
     BuiltModuleSerializer,
@@ -134,8 +135,9 @@ def get_user_inventory(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@permission_classes([IsAuthenticated])
 @api_view(["POST"])
-def user_inventory_quantity_add_or_create(request, component_pk):
+def user_inventory_quantity_create_or_update(request, component_pk):
     user = request.user
 
     # Check if the user inventory item exists
@@ -146,9 +148,17 @@ def user_inventory_quantity_add_or_create(request, component_pk):
     except UserInventory.DoesNotExist:
         user_inventory_item = None
 
+    # Determine the editing mode from request
+    edit_mode = request.data.get("editMode", True)
+
     # If the user inventory item exists, update the quantity
     if user_inventory_item is not None:
-        user_inventory_item.quantity += int(request.data.get("quantity", 0))
+        quantity = int(request.data.get("quantity", 0))
+        if edit_mode:
+            user_inventory_item.quantity = quantity
+        else:
+            user_inventory_item.quantity += quantity
+
         user_inventory_item.save()
         serializer = UserInventorySerializer(user_inventory_item)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -391,6 +401,90 @@ def user_shopping_list_add_or_update(request, component_pk):
     serializer = UserShoppingListSerializer(shopping_list_item)
     status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
     return Response(serializer.data, status=status_code)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["PATCH"])
+def user_shopping_list_update(request, component_pk):
+    user = request.user
+    quantity = int(request.data.get("quantity", 0))
+
+    if quantity <= 0:
+        return Response(
+            {"detail": "Quantity must be greater than zero."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    module_bom_list_item_pk = request.data.get("modulebomlistitem_pk", None)
+
+    if module_bom_list_item_pk is not None:
+        module_bom_list_item_pk = int(module_bom_list_item_pk)
+
+    module_pk = request.data.get("module_pk", None)
+
+    if module_pk is not None:
+        module_pk = int(module_pk)
+
+    print(module_bom_list_item_pk)
+    print(module_pk)
+
+    if not module_bom_list_item_pk or not module_pk:
+        shopping_list_item = (
+            UserShoppingList.objects.filter(
+                component__id=component_pk,
+                user=user,
+            )
+            .exclude(module__isnull=False)
+            .exclude(bom_item__isnull=False)
+        ).first()
+        print("anon", shopping_list_item)
+    else:
+        shopping_list_item = (
+            UserShoppingList.objects.filter(
+                user=user,
+                component__id=component_pk,
+                bom_item__id=module_bom_list_item_pk,
+                module__id=module_pk,
+            )
+            .exclude(module__isnull=True)
+            .exclude(bom_item__isnull=True)
+            .first()
+        )
+        print("module", shopping_list_item)
+
+    if not shopping_list_item:
+        return Response(
+            {"detail": "Shopping list item not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    shopping_list_item.quantity = quantity
+    shopping_list_item.save()
+
+    serializer = UserShoppingListSerializer(shopping_list_item)
+
+    return Response(serializer.data)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["DELETE"])
+def user_shopping_list_delete_module(request, module_pk):
+    user = request.user
+    shopping_list_item = UserShoppingList.objects.filter(
+        user=user, module__id=module_pk
+    )
+
+    if not shopping_list_item:
+        return Response(
+            {"detail": "Shopping list item not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    shopping_list_item.delete()
+    return Response(
+        {"detail": "Shopping list item deleted successfully"},
+        status=status.HTTP_204_NO_CONTENT,
+    )
 
 
 @permission_classes([IsAuthenticated])
