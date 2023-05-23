@@ -1,14 +1,14 @@
 {% load static custom_tags %}
 
-<nav class="fixed top-0 w-full bg-[#212529] z-40">
+<nav class="fixed top-0 w-full bg-[#212529] z-30">
   <div class="px-8 mx-auto">
-    <div class="relative z-50 hidden md:block">
+    <div class="relative hidden md:block">
       <a href="{% url 'home' %}">
         {% with request.path|slice:":5" as path %} 
         {% if path == '/user' %}
         <picture>
             <source srcset="{% static 'images/logo_mini.webp' %}" type="image/webp">
-            <source srcset="{% static 'images/logo_mini.png' %}" type="image/jpeg">
+            <source srcset="{% static 'images/logo_mini.png' %}" type="image/png">
             <img
                 class="absolute top-2.5 left-[-20px] hidden sm:block"
                 height="70px"
@@ -20,7 +20,7 @@
         {% else %}
         <picture>
             <source srcset="{% static 'images/logo.webp' %}" type="image/webp">
-            <source srcset="{% static 'images/logo.png' %}" type="image/jpeg">
+            <source srcset="{% static 'images/logo.png' %}" type="image/png">
             <img
                 class="absolute hidden top-3 sm:block"
                 height="180px"
@@ -41,7 +41,7 @@
         <div class="hidden md:block">
           {% with request.path|slice:":5" as path %} 
           {% if path == '/user' %}
-          <ul class="flex space-x-4 text-white ml-[60px]">
+          <ul class="flex space-x-4 text-white hover:text-gray-200 ml-[60px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
                 >Home</a
@@ -55,7 +55,7 @@
             </li>
           </ul>
           {% else %}
-          <ul class="flex space-x-4 text-white ml-[180px]">
+          <ul class="flex space-x-4 text-white hover:text-gray-200 ml-[180px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
                 >Home</a
@@ -82,6 +82,13 @@
             {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %} 
           {% else %}
           <div class="flex items-center space-x-2">
+            <div class="border-r border-gray-100">
+              <a
+                href="{% url 'premium' %}"
+                class="text-white hover:text-gray-100 px-4 inline-flex items-center border rounded border-[#212529] transition-all duration-200"
+                >Get premium</a
+              >
+            </div>
             <a
               href="{% url 'account_login' %}"
               class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"

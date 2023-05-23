@@ -151,7 +151,7 @@ const VersionHistory = () => {
   ];
 
   return (
-    <div className="mt-8">
+    <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
       <Link
         to=".."
         relative="path"

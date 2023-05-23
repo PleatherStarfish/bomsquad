@@ -14,7 +14,7 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
       <a
         href="#"
         onClick={() => navigate(Math.max(1, currentPage - 1))}
-        className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+        className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
       >
         <span className="sr-only">Previous</span>
         <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
@@ -34,9 +34,9 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
               aria-current={currentPage === pageNumber ? "page" : undefined}
               onClick={() => navigate(pageNumber)}
               className={cx(
-                "relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0",
+                "relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:outline-offset-0",
                 {
-                  "z-10 bg-brandgreen-500 text-white":
+                  "bg-brandgreen-500 text-white":
                     currentPage === pageNumber,
                   "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-100":
                     currentPage !== pageNumber,
@@ -62,7 +62,7 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
       <a
         href="#"
         onClick={() => navigate(Math.min(totalPages, currentPage + 1))}
-        className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+        className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
       >
         <span className="sr-only">Next</span>
         <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />

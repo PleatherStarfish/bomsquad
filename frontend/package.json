@@ -23,6 +23,7 @@
     "react-data-table-component": "^7.5.3",
     "react-dom": "^18.2.0",
     "react-gravatar": "^2.6.3",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.43.9",
     "react-numeric-input": "^2.2.3",
     "react-router-dom": "^6.10.0",

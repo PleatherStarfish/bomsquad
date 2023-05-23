@@ -5,7 +5,7 @@ const useGetUserShoppingListQuantityBomItemAgnostic = (componentPk, modulePk) =>
   const fetchUserInventoryQuantity = async () => {
     try {
       const response = await axios.get(
-        `/api/shopping_list/${componentPk}/${modulePk}/component-quantity/`
+        `/api/shopping-list/${componentPk}/${modulePk}/component-quantity/`
       );
       return response.data.quantity;
     } catch (error) {
