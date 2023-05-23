@@ -41,8 +41,6 @@ const Components = () => {
       Object.entries(formData).filter(([key]) => key !== 'search')
     )});
 
-  console.log(watch())
-
   useEffect(() => {
     if (componentsData?.page) {
       // update page number with the current page number from the response
@@ -245,8 +243,6 @@ const Components = () => {
       width: "115px",
     },
   ];
-
-  console.log(componentsData)
 
   return (
     <div className="mb-8">

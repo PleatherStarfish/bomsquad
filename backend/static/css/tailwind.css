@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    .rdt_Table {
+        z-index: 0 !important;
+    }
+    .rdt_TableHead {
+        z-index: 0 !important;
+    }
+    .rdt_TableRow  {
+        z-index: 1 !important;
+    }
+    .rdt_TableCol {
+        z-index: 1 !important;
+    }
+    .rdt_TableHeader {
+        z-index: 1 !important;
+    }
+    .rdt_TableFooter {
+        z-index: 1 !important;
+    }
+    .rdt_TableHeadRow {
+        z-index: 1 !important;
+    }
+}
+
 @layer components {
     .chevron-open {
             transform: translateY(-50%) rotate(180deg) !important;

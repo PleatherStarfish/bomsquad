@@ -1,25 +1,21 @@
-import {
-  LightBulbIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { LightBulbIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useCallback, useEffect, useState } from "react";
 
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
-import ControlledInput from "./ControlledInput";
 import DataTable from "react-data-table-component";
 import Fuse from "fuse.js";
 import { Link } from "react-router-dom";
 import Modal from "../ui/Modal";
-import NumericInput from "react-numeric-input";
-import Pill from "../ui/Pill";
+import EditableQuantity from "./inventory/EditableQuantity";
+import SearchInput from "./inventory/SearchInput";
 import SolderingMode from "./SolderingMode";
 import _ from "lodash";
 import { find } from "lodash/find";
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
+import EditableLocation from "./inventory/EditableLocation";
 
 const customStyles = {
   headCells: {
@@ -116,7 +112,7 @@ const Inventory = () => {
 
   const handleLocationChange = useCallback(async (event) => {
     event.preventDefault();
-    setUpdatedLocationToSubmit(event.target.value.trim());
+    setUpdatedLocationToSubmit(event.target.value);
   });
 
   const handleSubmitLocation = useCallback(async (componentPk) => {
@@ -304,138 +300,35 @@ const Inventory = () => {
     },
     {
       name: <div>Qty.</div>,
-      cell: (row) => {
-        return (
-          <div className="flex content-center justify-between w-full">
-            {row.component.id === quantityIdToEdit ? (
-              <div>
-                <form
-                  className="flex content-center w-full gap-1"
-                  onSubmit={(e) => e.preventDefault()}
-                >
-                  <NumericInput
-                    className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                    type="number"
-                    value={updatedQuantityToSubmit ?? row.quantity}
-                    onChange={(e) => handleQuantityChange(e)}
-                  />
-                  <div className="flex justify-around gap-1">
-                    <Button
-                      className="h-full"
-                      variant="muted"
-                      size="sm"
-                      onClick={() => {
-                        setQuantityIdToEdit(undefined);
-                        setUpdatedQuantityToSubmit(undefined);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      className="h-full"
-                      variant="primary"
-                      size="sm"
-                      onClick={() => handleSubmitQuantity(row.component.id)}
-                    >
-                      Update
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <span className="font-bold">{row.quantity}</span>
-            )}
-            {row.component.id !== quantityIdToEdit && (
-              <div
-                onClick={() =>
-                  handleClick(
-                    row,
-                    "quantity",
-                    quantityIdToEdit,
-                    setQuantityIdToEdit,
-                    setUpdatedQuantityToSubmit
-                  )
-                }
-                role="button"
-              >
-                <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
-              </div>
-            )}
-          </div>
-        );
-      },
+      cell: (row) => (
+        <EditableQuantity
+          row={row}
+          quantityIdToEdit={quantityIdToEdit}
+          updatedQuantityToSubmit={updatedQuantityToSubmit}
+          handleQuantityChange={handleQuantityChange}
+          handleSubmitQuantity={handleSubmitQuantity}
+          setQuantityIdToEdit={setQuantityIdToEdit}
+          setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
+          handleClick={handleClick}
+        />
+      ),
       sortable: true,
-      width: quantityIdToEdit ? "230px" : "80px",
+      width: quantityIdToEdit ? "165px" : "100px",
     },
     {
       name: <div>Location</div>,
       cell: (row) => (
-        <div className="flex justify-between w-full">
-          {row.component.id === locationIdToEdit ? (
-            <div className="flex flex-col">
-              <div className="flex gap-1.5 pb-1 pt-6">
-                <form
-                  className="flex content-center w-full gap-1"
-                  onSubmit={(e) => e.preventDefault()}
-                >
-                  <ControlledInput
-                    type="text"
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                    value={updatedLocationToSubmit ?? row.location}
-                    onChange={(e) => handleLocationChange(e)}
-                  />
-                  <Button
-                    variant="muted"
-                    onClick={() => setLocationIdToEdit(undefined)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    onClick={() => handleSubmitLocation(row.component.id)}
-                  >
-                    Update
-                  </Button>
-                </form>
-              </div>
-              <p className="text-xs text-gray-500">
-                Separate locations with commas.
-              </p>
-            </div>
-          ) : (
-            <ul className="flex flex-wrap w-full">
-              {row.location
-                ? row.location.map((item, index) => (
-                    <Pill
-                      key={index}
-                      showArrow={index !== row.location.length - 1}
-                      onClick={() => handlePillClick(row.component.id, index)}
-                    >
-                      {item}
-                    </Pill>
-                  ))
-                : "-"}
-            </ul>
-          )}
-          {row.component.id !== locationIdToEdit && (
-            <div
-              className="flex flex-col justify-center"
-              onClick={() =>
-                handleClick(
-                  row,
-                  "location",
-                  locationIdToEdit,
-                  setLocationIdToEdit,
-                  setUpdatedLocationToSubmit
-                )
-              }
-              role="button"
-            >
-              <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
-            </div>
-          )}
-        </div>
+        <EditableLocation
+          row={row}
+          locationIdToEdit={locationIdToEdit}
+          updatedLocationToSubmit={updatedLocationToSubmit}
+          handleLocationChange={handleLocationChange}
+          setLocationIdToEdit={setLocationIdToEdit}
+          handleSubmitLocation={handleSubmitLocation}
+          handlePillClick={handlePillClick}
+          handleClick={handleClick}
+          setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+        />
       ),
       sortable: true,
       wrap: true,
@@ -464,21 +357,16 @@ const Inventory = () => {
 
   return !!inventoryData?.length ? (
     <>
-      <div className="flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
+      <div className="z-10 flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
         {inventoryData && inventoryData.length > 0 && (
           <>
             <div className="pr-2 grow md:w-full">
               <label htmlFor="search" className="sr-only">
                 Search
               </label>
-              <input
-                type="text"
-                name="search"
-                id="search"
-                className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] focus:border-[#548a6a] sm:text-sm sm:leading-6"
-                placeholder="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+              <SearchInput
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
               />
             </div>
             <div className="flex gap-2 flex-nowrap">
@@ -508,7 +396,9 @@ const Inventory = () => {
         subHeaderWrap
         exportHeaders
         progressComponent={
-          <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+          <div className="text-center text-gray-500 animate-pulse">
+            Loading...
+          </div>
         }
         columns={columns}
         data={
@@ -518,6 +408,35 @@ const Inventory = () => {
         }
         progressPending={inventoryDataIsLoading}
         customStyles={customStyles}
+      />
+      <SolderingMode
+        open={openSolderingMode}
+        setOpen={setOpenSolderingMode}
+        inventoryData={inventoryData}
+        inventoryDataIsLoading={inventoryDataIsLoading}
+        handleClick={handleClick}
+        locationsSort={locationsSort}
+        quantityIdToEdit={quantityIdToEdit}
+        setQuantityIdToEdit={setQuantityIdToEdit}
+        updatedQuantityToSubmit={updatedQuantityToSubmit}
+        setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
+        locationIdToEdit={locationIdToEdit}
+        setLocationIdToEdit={setLocationIdToEdit}
+        updatedLocationToSubmit={updatedLocationToSubmit}
+        setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+        deleteModalOpen={deleteModalOpen}
+        setDeleteModalOpen={setDeleteModalOpen}
+        dataToDelete={dataToDelete}
+        setDataToDelete={setDataToDelete}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        dataSearched={dataSearched}
+        handleQuantityChange={handleQuantityChange}
+        handleSubmitQuantity={handleSubmitQuantity}
+        handleLocationChange={handleLocationChange}
+        handleSubmitLocation={handleSubmitLocation}
+        handleDelete={handleDelete}
+        handlePillClick={handlePillClick}
       />
       <Modal
         open={deleteModalOpen}
@@ -529,15 +448,14 @@ const Inventory = () => {
           handleDelete(dataToDelete.id);
         }}
       >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
-      <SolderingMode open={openSolderingMode} setOpen={setOpenSolderingMode} />
     </>
   ) : (
     <Alert variant="transparent" centered>
       <span>
-      There are no components in your inventory.{" "}
-      <a className="text-blue-500" href="/components">
-        Add components.
-      </a>
+        There are no components in your inventory.{" "}
+        <a className="text-blue-500" href="/components">
+          Add components.
+        </a>
       </span>
     </Alert>
   );

@@ -13,8 +13,6 @@ const ModuleDetail = () => {
   if (moduleIsLoading) return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
 
-  console.log(module)
-
   return (
     <>
       <div className="flex justify-center">

@@ -59,8 +59,6 @@ const SearchForm = ({
     defaultValue: "",
   });
 
-  console.log(currentType)
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-6 -mx-2">

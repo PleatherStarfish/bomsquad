@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.0/dist/cookieconsent.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&family=Roboto:wght@400&display=swap" rel="stylesheet">
 
     {% block css %}{% endblock css %}
   </head>
@@ -43,7 +43,7 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
-      {% if path != '/user' and path != '/modu' and path != '/acco' %}
+      {% if path != '/user' and path != '/modu' and path != '/acco' and path != '/prem' %}
         <div id="banner" class="hidden">
           <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-lg bg-[#d4e4ea]" role="alert">
             <div class="flex flex-col w-full">

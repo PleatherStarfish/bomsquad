@@ -17,6 +17,7 @@ module.exports = {
     "../../../../backend/**/**/**/**/**/*.{html,js}",
     "../../../../backend/templates/_base.html",
   ],
+  darkMode: 'class',
   theme: {
     screens: {
       sm: "640px",
@@ -27,7 +28,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'display': ['Quicksand', ...defaultTheme.fontFamily.sans]
+        'display': ['Quicksand', ...defaultTheme.fontFamily.sans],
+        'roboto': ['Roboto', 'sans-serif'],
       },
       colors: {
         transparent: "transparent",
@@ -35,6 +37,8 @@ module.exports = {
         black: colors.black,
         white: colors.white,
         gray: colors.gray,
+        yellow: colors.yellow,
+        slate: colors.slate,
         red: colors.red,
         indigo: colors.indigo,
         blue: colors.blue,
@@ -50,6 +54,8 @@ module.exports = {
           800: "#32533a",
           900: "#264429",
         },
+        'google-blue': '#4285f4',
+        'button-active-blue': '#1669F2',
       },
     },
   },

@@ -1,7 +1,7 @@
 {% load static %}
 
 <button
-  class="menu-button block text-white text-decoration-none focus:outline-none"
+  class="block text-white menu-button text-decoration-none focus:outline-none"
   aria-label="User menu"
   aria-haspopup="true"
   aria-expanded="false"
@@ -9,7 +9,7 @@
   {{ button_text }}
 </button>
 <div
-  class="absolute z-10 top-full right-0 mt-2 py-2 w-48 bg-gray-50 rounded-md shadow-md hidden"
+  class="absolute right-0 z-30 hidden w-48 py-2 mt-2 rounded-md shadow-md top-full bg-gray-50"
 >
   <ul class="text-sm text-gray-700">
     {% for item in dropdown_items %}

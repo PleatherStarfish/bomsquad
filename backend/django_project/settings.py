@@ -33,7 +33,10 @@ INSTALLED_APPS = [
     # Third-party
     "allauth",
     "allauth.account",
-    # "allauth.socialaccount.providers.google",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.discord",
+    "captcha",
     "crispy_forms",
     "crispy_tailwind",
     "rest_framework",
@@ -213,9 +216,18 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
+
 # django-allauth config
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
+
+# Additional configuration settings
+SOCIALACCOUNT_QUERY_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_REQUIRED = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
@@ -225,7 +237,6 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 
 # https://django-allauth.readthedocs.io/en/latest/installation.html?highlight=backends
 AUTHENTICATION_BACKENDS = (
-    "core.auth.backends.EmailOrUsernameModelBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
@@ -246,3 +257,5 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_MAX_EMAIL_ADDRESSES = 3
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
+SOCIALACCOUNT_LOGIN_ON_GET = True

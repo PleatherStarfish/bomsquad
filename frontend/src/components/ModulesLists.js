@@ -6,8 +6,6 @@ import useGetUserModulesLists from "../services/useGetUserModulesLists";
 const ModulesList = ({ type }) => {
   const {userModulesList, userModulesListIsLoading, userModulesListIsError, userModulesListError} = useGetUserModulesLists(type);
 
-  console.log(userModulesList)
-
   if (userModulesListIsLoading) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   }
