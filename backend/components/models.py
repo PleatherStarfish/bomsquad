@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
+from core.models import BaseModel
 
 
 OHMS_UNITS = (
@@ -24,12 +25,11 @@ MOUNTING_STYLE = [
 ]
 
 
-class Types(models.Model):
+class Types(BaseModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     order = models.PositiveSmallIntegerField(unique=False)
     notes = models.TextField(blank=True)
-    date_updated = models.DateField(default=timezone.now, blank=False)
 
     class Meta:
         verbose_name_plural = "Types"
@@ -39,7 +39,7 @@ class Types(models.Model):
         return f"{self.name}"
 
 
-class ComponentSupplier(models.Model):
+class ComponentSupplier(BaseModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=30)
@@ -52,7 +52,7 @@ class ComponentSupplier(models.Model):
         return self.name
 
 
-class ComponentManufacturer(models.Model):
+class ComponentManufacturer(BaseModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
 
@@ -63,7 +63,7 @@ class ComponentManufacturer(models.Model):
         return self.name
 
 
-class Component(models.Model):
+class Component(BaseModel):
     id = models.BigAutoField(primary_key=True)
     description = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(
@@ -116,7 +116,6 @@ class Component(models.Model):
     )
     notes = models.TextField(blank=True)
     link = models.URLField(blank=False)
-    date_updated = models.DateField(default=timezone.now, blank=False)
 
     class Meta:
         verbose_name_plural = "Components"

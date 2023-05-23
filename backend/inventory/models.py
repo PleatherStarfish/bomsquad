@@ -1,11 +1,12 @@
 from django.db import models
 from accounts.models import CustomUser
 from components.models import Component
+from core.models import BaseModel
 import json
 import bleach
 
 
-class UserInventory(models.Model):
+class UserInventory(BaseModel):
     id = models.BigAutoField(primary_key=True)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

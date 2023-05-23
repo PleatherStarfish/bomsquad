@@ -54,7 +54,6 @@ const ShoppingList = () => {
               ...userShoppingListData.groupedByModule,
               { name: "TOTAL", data: [] },
             ].map((value, index) => {
-              console.log("userShoppingListData", userShoppingListData);
               const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module
                 ?.slug;
               const moduleId = Object.values(value.data)?.[0]?.[0]?.module?.id;

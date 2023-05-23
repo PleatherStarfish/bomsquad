@@ -10,9 +10,9 @@ import DataTable from "react-data-table-component";
 import NumericInput from "react-numeric-input";
 import cx from "classnames";
 import { get } from "lodash";
+import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
-import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 
 const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
   const compsForModuleThatMatchRow = get(componentsInModule, componentId, []);
@@ -197,7 +197,6 @@ const ListSlice = ({
                       iconOnly
                       Icon={ArrowPathIcon}
                       onClick={() => {
-                        console.log("row.component.id", row.component.id);
                         handleSubmitQuantity(row.component.id, moduleId);
                       }}
                     >

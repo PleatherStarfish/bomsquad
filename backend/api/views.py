@@ -733,36 +733,27 @@ def get_components_by_ids(request, pks):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_all_user_shopping_list_to_inventory(request):
-    try:
-        # Get the authenticated user
-        user = request.user
+    user = request.user
+    shopping_list = UserShoppingList.objects.filter(user=user)
 
-        # Get all shopping list items for the user
-        shopping_list_items = UserShoppingList.objects.filter(user=user)
-
-        if not shopping_list_items.exists():
-            return Response({"error": "No items in shopping list."}, status=404)
-
-        for item in shopping_list_items:
-            # Retrieve the inventory item or create a new one if it does not exist
-            inventory_item, created = UserInventory.objects.get_or_create(
-                user=user,
-                component=item.component,
-                defaults={"quantity": item.quantity, "location": item.location},
+    for shopping_list_item in shopping_list:
+        inventory_item, created = UserInventory.objects.get_or_create(
+            component=shopping_list_item.component,
+            user=user,
+            defaults={
+                "quantity": shopping_list_item.quantity,
+                "location": shopping_list_item.location,
+            },
+        )
+        if not created:
+            inventory_item.old_quantity = inventory_item.quantity
+            inventory_item.old_location = inventory_item.location
+            inventory_item.save()
+            UserInventory.objects.filter(pk=inventory_item.pk).update(
+                quantity=F("quantity") + shopping_list_item.quantity
             )
+            inventory_item.refresh_from_db()
 
-            # If the item already existed in the inventory, add the quantity of the shopping list item to it
-            if not created:
-                inventory_item.quantity = F("quantity") + item.quantity
-                inventory_item.save()
+        shopping_list_item.delete()
 
-        # Get the updated inventory for the user
-        updated_inventory = UserInventory.objects.filter(user=user)
-
-        # Serialize the inventory items to JSON
-        serializer = UserInventorySerializer(updated_inventory, many=True)
-
-        return Response(serializer.data)
-
-    except CustomUser.DoesNotExist:
-        return Response({"error": "User not found."}, status=404)
+    return Response(status=status.HTTP_204_NO_CONTENT)

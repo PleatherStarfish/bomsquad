@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.db.models import Q
+from core.models import BaseModel
 
 from modules.models import Module, ModuleBomListItem
 from components.models import Component
@@ -8,7 +9,7 @@ from accounts.models import CustomUser
 from django.core.exceptions import ValidationError
 
 
-class UserShoppingList(models.Model):
+class UserShoppingList(BaseModel):
     id = models.BigAutoField(primary_key=True)
     module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE)
     bom_item = models.ForeignKey(
@@ -51,7 +52,7 @@ class UserShoppingList(models.Model):
         return f"[ {self.user} ] - {self.component}"
 
 
-class UserSavedLists(models.Model):
+class UserSavedLists(BaseModel):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(
         CustomUser, blank=False, null=False, on_delete=models.CASCADE

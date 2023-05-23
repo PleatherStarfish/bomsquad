@@ -7,6 +7,7 @@ from django.db.models import Sum, Q
 from accounts.models import CustomUser
 from django.db import models
 from PIL import Image
+from core.models import BaseModel
 import os
 from io import BytesIO
 from django.core.files.base import ContentFile
@@ -17,12 +18,11 @@ MOUNTING_STYLE = [
 ]
 
 
-class Manufacturer(models.Model):
+class Manufacturer(BaseModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
     link = models.URLField(blank=True)
     notes = models.TextField(blank=True)
-    date_updated = models.DateField(default=timezone.now, blank=False)
     slug = models.SlugField(blank=True)
 
     def save(self, *args, **kwargs):
@@ -34,7 +34,7 @@ class Manufacturer(models.Model):
         return f"{self.name}"
 
 
-class ModuleBomListItem(models.Model):
+class ModuleBomListItem(BaseModel):
     id = models.BigAutoField(primary_key=True)
     description = models.CharField(max_length=255, blank=False)
     components_options = models.ManyToManyField(
@@ -68,7 +68,7 @@ class ModuleBomListItem(models.Model):
         super(ModuleBomListItem, self).save(*args, **kwargs)
 
 
-class Module(models.Model):
+class Module(BaseModel):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.PROTECT)
@@ -86,7 +86,6 @@ class Module(models.Model):
         choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
     )
     slug = models.SlugField(blank=True)
-    date_updated = models.DateField(default=timezone.now, blank=False)
 
     def is_built_by_user(self, user):
         return self.builtmodules_set.filter(user=user).exists()
@@ -142,7 +141,7 @@ class Module(models.Model):
         return f"{self.name} - {self.manufacturer}"
 
 
-class WantToBuildModules(models.Model):
+class WantToBuildModules(BaseModel):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
@@ -154,7 +153,7 @@ class WantToBuildModules(models.Model):
         ]
 
 
-class BuiltModules(models.Model):
+class BuiltModules(BaseModel):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
@@ -166,7 +165,7 @@ class BuiltModules(models.Model):
         ]
 
 
-class ModuleBomListComponentForItemRating(models.Model):
+class ModuleBomListComponentForItemRating(BaseModel):
     id = models.BigAutoField(primary_key=True)
     module_bom_list_item = models.ForeignKey(
         ModuleBomListItem, blank=False, null=False, on_delete=models.CASCADE
