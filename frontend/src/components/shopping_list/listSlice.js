@@ -13,6 +13,7 @@ import { get } from "lodash";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
+import { useWindowWidth } from "@react-hook/window-size";
 
 const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
   const compsForModuleThatMatchRow = get(componentsInModule, componentId, []);
@@ -49,6 +50,7 @@ const ListSlice = ({
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
+  const onlyWidth = useWindowWidth();
 
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteShoppingListItem();
@@ -59,7 +61,8 @@ const ListSlice = ({
 
   const handleSubmitQuantity = (componentId, moduleId) => {
     const quantity = updatedQuantityToSubmit;
-    const modulebomlistitem = _.find(allModulesData, {moduleId: moduleId}).data[componentId][0].bom_item
+    const modulebomlistitem = _.find(allModulesData, { moduleId: moduleId })
+      .data[componentId][0].bom_item;
     const data = {
       quantity,
       modulebomlistitem_pk: modulebomlistitem,
@@ -85,7 +88,6 @@ const ListSlice = ({
       ),
       sortable: false,
       wrap: false,
-      width: "200px",
     },
     {
       name: <div className="font-bold text-gray-400">Supplier</div>,
@@ -101,7 +103,6 @@ const ListSlice = ({
       ),
       sortable: false,
       wrap: false,
-      width: "100px",
     },
     {
       name: <div className="font-bold text-gray-400">Supp. Item #</div>,
@@ -118,7 +119,6 @@ const ListSlice = ({
       ),
       sortable: false,
       wrap: false,
-      width: "150px",
     },
   ];
 
@@ -228,7 +228,14 @@ const ListSlice = ({
         );
       },
       sortable: false,
-      width: quantityIdToEdit ? "165px" : "100px",
+      width:
+        onlyWidth > 1000 && allModulesData.length < 4
+          ? quantityIdToEdit
+            ? "200px"
+            : "200px"
+          : quantityIdToEdit
+          ? "165px"
+          : "100px",
     },
   ];
 
@@ -243,19 +250,20 @@ const ListSlice = ({
         />
       ),
       sortable: false,
-      width: "100px",
+      width: onlyWidth > 1000 && allModulesData.length < 4 ? "200px" : "100px",
       style: { backgroundColor: "#f0f9ff" },
     },
   ];
 
   return (
-    <div
-      className={cx({
-        "w-[450px]": index === 0,
-        "w-[100px]": index !== 0 && !quantityIdToEdit,
-        "w-[165px]": index !== 0 && quantityIdToEdit,
-      })}
-    >
+    <div className={cx(
+      index === 0
+        ? "w-full grow"
+        : (quantityIdToEdit 
+            ? (!(onlyWidth > 1000 && allModulesData.length < 4) ? "w-[165px]" : "w-[165px]") 
+            : (!(onlyWidth > 1000 && allModulesData.length < 4) ? "w-[100px]" : "w-[200px]")
+        )
+    )}>
       <div className={cx({ "border-r border-gray-300": index === 0 })}>
         <DataTable
           compact

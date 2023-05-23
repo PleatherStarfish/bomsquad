@@ -48,7 +48,7 @@ const ShoppingList = () => {
               Add all to inventory
             </Button>
           </div>
-          <div className="flex justify-start">
+          <div className="flex justify-start w-full">
             {[
               { name: "", data: [] },
               ...userShoppingListData.groupedByModule,
