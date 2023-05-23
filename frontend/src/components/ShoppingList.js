@@ -52,7 +52,8 @@ const ShoppingList = () => {
             {[
               { name: "", data: [] },
               ...userShoppingListData.groupedByModule,
-              { name: "TOTAL", data: [] },
+              { name: "TOTAL QUANTITY", data: [] },
+              { name: "TOTAL PRICE", data: [] },
             ].map((value, index) => {
               const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module
                 ?.slug;

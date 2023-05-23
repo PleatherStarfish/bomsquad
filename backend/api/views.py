@@ -10,8 +10,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 from django.middleware import csrf
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
 from django.core.paginator import Paginator
 from django.http import Http404
 from modules.serializers import (
@@ -31,7 +29,9 @@ from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q
 from accounts.serializers import UserSerializer, UserHistorySerializer
 from rest_framework.views import APIView
-from django.db.models import F
+
+from django.db.models import F, FloatField
+from django.db.models.functions import Cast
 
 
 @api_view(["GET"])
@@ -531,6 +531,29 @@ def user_shopping_list_delete_module(request, module_pk):
         {"detail": "Shopping list item deleted successfully"},
         status=status.HTTP_204_NO_CONTENT,
     )
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def user_shopping_list_total_component_price(request, component_pk):
+    try:
+        component = Component.objects.get(pk=component_pk)
+    except Component.DoesNotExist:
+        return Response(
+            {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    shopping_list_items = UserShoppingList.objects.filter(
+        user=request.user, component=component
+    )
+
+    total_price = shopping_list_items.annotate(
+        total_price=Cast(F("quantity") * F("component__price"), FloatField())
+    ).values_list("total_price", flat=True)
+
+    total = sum(total_price)
+
+    return Response({"total_price": total}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])

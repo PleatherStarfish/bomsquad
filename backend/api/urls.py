@@ -38,6 +38,7 @@ from api.views import (
     get_user_shopping_list_quantity_bom_item_agnostic,
     get_user_shopping_list_quantity,
     add_all_user_shopping_list_to_inventory,
+    user_shopping_list_total_component_price,
 )
 
 # User anonymous shopping list-related views
@@ -118,6 +119,11 @@ urlpatterns = [
         "shopping-list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
         get_user_shopping_list_quantity,
         name="user-shopping-list",
+    ),
+    path(
+        "shopping-list/<int:component_pk>/total-price/",
+        user_shopping_list_total_component_price,
+        name="user-shopping-list-total-price",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),

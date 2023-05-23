@@ -1,23 +1,10 @@
 import Button from "../ui/Button";
+import { CURRENCIES } from "../utils/currencies";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import DeleteAccountButton from "./DeleteAccountButton";
 import Dropdown from "../ui/Dropdown";
 import { Link } from "react-router-dom";
 import React from "react";
-
-const CURRENCIES = Object.freeze({
-  AUD: "Australian Dollar",
-  CAD: "Canadian Dollar",
-  CHF: "Swiss Franc",
-  CNH: "Chinese Yuan",
-  EUR: "Euro",
-  GBP: "British Pound",
-  HKD: "Hong Kong Dollar",
-  INR: "Indian Rupee",
-  JPY: "Japanese Yen",
-  NZD: "New Zealand Dollar",
-  USD: "US Dollar",
-});
 
 const Settings = () => {
   const currencyNames = Object.keys(CURRENCIES).map((currency) => {

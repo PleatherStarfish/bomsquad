@@ -4,6 +4,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
+import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
@@ -12,6 +13,7 @@ import cx from "classnames";
 import { get } from "lodash";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
+import useGetUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
 import { useWindowWidth } from "@react-hook/window-size";
 
@@ -37,6 +39,25 @@ const TotalQuantity = ({ componentId }) => {
     <span className="font-bold">{quantityInInventoryAnon}</span>
   ) : undefined;
 };
+
+const TotalPriceForComponent = ({ componentId, currency }) => {
+  const {totalPrice, totalPriceIsLoading, totalPriceIsError} = useGetUserShoppingListComponentTotalPrice(componentId)
+  console.log(componentId)
+
+  if (totalPriceIsError) {
+    return <div>Error fetching data</div>;
+  }
+
+  if (totalPriceIsLoading) {
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
+  }
+
+  return (
+    <span className="font-bold">{`${getCurrencySymbol(currency)}${roundToCurrency(totalPrice, currency)}`}</span>
+  )
+}
 
 const ListSlice = ({
   name,
@@ -119,6 +140,13 @@ const ListSlice = ({
       ),
       sortable: false,
       wrap: false,
+    },
+    {
+      name: <div className="font-bold text-gray-400">Price</div>,
+      selector: (row) => {
+        return (
+          <span className="text-gray-300">{`${getCurrencySymbol(row.component.price_currency)}${roundToCurrency(row.component.price, row.component.price_currency)}`}</span>)
+        },
     },
   ];
 
@@ -241,7 +269,7 @@ const ListSlice = ({
 
   const totalColumn = [
     {
-      name: <div className="text-bold">TOTAL</div>,
+      name: <div className="text-bold">TOTAL QUANTITY</div>,
       selector: (row) => (
         <TotalQuantity
           componentId={row.component.id}
@@ -254,6 +282,16 @@ const ListSlice = ({
       style: { backgroundColor: "#f0f9ff" },
     },
   ];
+  
+  const priceColumn = [
+    {
+      name: <div className="text-bold">TOTAL PRICE</div>,
+      selector: (row) => <TotalPriceForComponent componentId={row.component.id} currency={row.component.price_currency} />,
+      sortable: false,
+      width: onlyWidth > 1000 && allModulesData.length < 4 ? "200px" : "100px",
+      style: { backgroundColor: "#f0f9ff" },
+    },
+  ]
 
   return (
     <div className={cx(
@@ -273,7 +311,9 @@ const ListSlice = ({
             index === 0
               ? labelColumns
               : index === allModulesData.length + 1
-              ? totalColumn
+              ? totalColumn 
+              : index === allModulesData.length + 2
+              ? priceColumn
               : qtyColumns
           }
           data={aggregatedComponents}

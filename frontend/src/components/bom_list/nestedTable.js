@@ -1,5 +1,6 @@
 import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
+import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
 import AddComponentModal from "./addComponentModal";
 import Button from "../../ui/Button";
@@ -110,8 +111,11 @@ const NestedTable = (props) => {
     },
     {
       name: <div>Price</div>,
-      selector: (row) =>
-      row.price && row.price_currency ? `${row.price} ${row.price_currency}` : row.price,
+      selector: (row) => {
+        return (
+          <span>{row.component?.price_currency && `${getCurrencySymbol(row.component.price_currency)}${roundToCurrency(row.component.price, row.component.price_currency)}`}</span>
+        )
+      },
       sortable: true,
       wrap: true,
       hide: 1700,

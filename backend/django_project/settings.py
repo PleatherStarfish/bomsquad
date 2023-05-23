@@ -103,10 +103,6 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"anon": "1000/hour", "user": "10000/hour"},
 }
 
-MULTI_CAPTCHA_ADMIN = {
-    "engine": "recaptcha2",
-}
-
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"
 
