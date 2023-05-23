@@ -22,6 +22,7 @@ from modules.serializers import (
     SupplierSerializer,
     TypeSerializer,
 )
+from accounts.models import CustomUser
 from modules.models import BuiltModules, WantToBuildModules
 from rest_framework import status
 from inventory.models import UserInventory
@@ -30,6 +31,7 @@ from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q
 from accounts.serializers import UserSerializer, UserHistorySerializer
 from rest_framework.views import APIView
+from django.db.models import F
 
 
 @api_view(["GET"])
@@ -328,9 +330,21 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
 
 @permission_classes([IsAuthenticated])
 @api_view(["POST"])
-def user_anonymous_shopping_list_add_or_update(request, component_pk):
+def user_anonymous_shopping_list_create_or_update(request, component_pk):
+    """
+    Endpoint for creating or updating an anonymous item in the user's shopping list.
+    'Anonymous' refers to items without a module and bom_item.
+    If an anonymous shopping list item with the provided component_pk exists, the quantity of the item is updated based on the 'editMode':
+    - If 'editMode' is True or not provided, the quantity is set to the value provided in 'quantity'.
+    - If 'editMode' is False, the provided 'quantity' is added to the current quantity of the item.
+    If no anonymous shopping list item with the provided component_pk exists, a new item is created with the provided 'quantity'.
+    """
+
     user = request.user
     quantity = int(request.data.get("quantity", 0))
+    # Determine the editing mode from request
+    edit_mode = request.data.get("editMode", True)
+
     try:
         component = Component.objects.get(pk=component_pk)
     except Component.DoesNotExist:
@@ -345,7 +359,10 @@ def user_anonymous_shopping_list_add_or_update(request, component_pk):
         .first()
     )
     if shopping_list_item is not None:
-        shopping_list_item.quantity += quantity
+        if edit_mode:
+            shopping_list_item.quantity = quantity
+        else:
+            shopping_list_item.quantity += quantity
         shopping_list_item.save()
     else:
         shopping_list_item = UserShoppingList.objects.create(
@@ -358,11 +375,23 @@ def user_anonymous_shopping_list_add_or_update(request, component_pk):
 
 @permission_classes([IsAuthenticated])
 @api_view(["POST"])
-def user_shopping_list_add_or_update(request, component_pk):
+def user_shopping_list_create_or_update(request, component_pk):
+    """
+    Endpoint for creating or updating an item in the user's shopping list.
+    If a shopping list item with the provided component_pk, module_pk, and modulebomlistitem_pk exists,
+    the quantity of the item is updated based on the 'editMode':
+    - If 'editMode' is True or not provided, the quantity is set to the value provided in 'quantity'.
+    - If 'editMode' is False, the provided 'quantity' is added to the current quantity of the item.
+    If no shopping list item with the provided parameters exists, a new item is created with the provided 'quantity'.
+    """
+
     user = request.user
     quantity = int(request.data.get("quantity", 0))
     module_bom_list_item_pk = int(request.data.get("modulebomlistitem_pk", None))
     module_pk = int(request.data.get("module_pk", None))
+
+    # Determine the editing mode from request
+    edit_mode = request.data.get("editMode", True)
 
     try:
         component = Component.objects.get(pk=component_pk)
@@ -395,7 +424,10 @@ def user_shopping_list_add_or_update(request, component_pk):
     )
 
     if not created:
-        shopping_list_item.quantity += quantity
+        if edit_mode:
+            shopping_list_item.quantity = quantity
+        else:
+            shopping_list_item.quantity += quantity
         shopping_list_item.save()
 
     serializer = UserShoppingListSerializer(shopping_list_item)
@@ -406,6 +438,20 @@ def user_shopping_list_add_or_update(request, component_pk):
 @permission_classes([IsAuthenticated])
 @api_view(["PATCH"])
 def user_shopping_list_update(request, component_pk):
+    """
+    Endpoint for updating the quantity of an item in the user's shopping list.
+
+    The request should include a 'quantity' that is greater than zero.
+    If 'quantity' is not provided or is less than or equal to zero, a 400 BAD REQUEST response is returned.
+
+    The endpoint also takes an optional 'modulebomlistitem_pk' and 'module_pk'.
+    - If these values are not provided, the endpoint will look for an anonymous item (an item without a module or bom_item) in the shopping list.
+    - If these values are provided, the endpoint will look for a specific item that matches the provided parameters.
+
+    If the shopping list item exists, its quantity is updated to the provided 'quantity' and a 200 OK response with the serialized shopping list item is returned.
+    If the shopping list item does not exist, a 404 NOT FOUND response is returned.
+    """
+
     user = request.user
     quantity = int(request.data.get("quantity", 0))
 
@@ -682,3 +728,41 @@ def get_components_by_ids(request, pks):
     # Serialize and return the components
     serializer = ComponentSerializer(components, many=True)
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_all_user_shopping_list_to_inventory(request):
+    try:
+        # Get the authenticated user
+        user = request.user
+
+        # Get all shopping list items for the user
+        shopping_list_items = UserShoppingList.objects.filter(user=user)
+
+        if not shopping_list_items.exists():
+            return Response({"error": "No items in shopping list."}, status=404)
+
+        for item in shopping_list_items:
+            # Retrieve the inventory item or create a new one if it does not exist
+            inventory_item, created = UserInventory.objects.get_or_create(
+                user=user,
+                component=item.component,
+                defaults={"quantity": item.quantity, "location": item.location},
+            )
+
+            # If the item already existed in the inventory, add the quantity of the shopping list item to it
+            if not created:
+                inventory_item.quantity = F("quantity") + item.quantity
+                inventory_item.save()
+
+        # Get the updated inventory for the user
+        updated_inventory = UserInventory.objects.filter(user=user)
+
+        # Serialize the inventory items to JSON
+        serializer = UserInventorySerializer(updated_inventory, many=True)
+
+        return Response(serializer.data)
+
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User not found."}, status=404)

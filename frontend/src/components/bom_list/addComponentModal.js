@@ -50,16 +50,18 @@ const AddComponentModal = ({
           quantity,
           editMode,
         });
-      } else if (type === Types.SHOPPING && !editMode) {
+      } else if (type === Types.SHOPPING) {
         await addOrUpdateUserShoppingList({
           componentId,
           ...hookArgs,
           quantity,
+          editMode,
         });
-      } else if (type === Types.SHOPPING_ANON && !editMode) {
+      } else if (type === Types.SHOPPING_ANON) {
         await addOrUpdateUserAnonymousShoppingList({
           componentId,
           quantity,
+          editMode
         });
       }
     } catch (error) {

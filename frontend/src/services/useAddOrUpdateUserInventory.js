@@ -9,7 +9,7 @@ const useAddOrUpdateUserInventory = () => {
 
   const { mutate: addOrUpdateUserInventory } = useMutation({
     mutationFn: ({ componentId, ...data }) => {
-      return axios.post(`/api/inventory/${componentId}/add-or-update/`, data, {
+      return axios.post(`/api/inventory/${componentId}/create-or-update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

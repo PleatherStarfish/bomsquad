@@ -33,15 +33,16 @@ from api.views import (
 from api.views import (
     get_user_shopping_list,
     user_shopping_list_update,
-    user_shopping_list_add_or_update,
+    user_shopping_list_create_or_update,
     user_shopping_list_delete_module,
     get_user_shopping_list_quantity_bom_item_agnostic,
     get_user_shopping_list_quantity,
+    add_all_user_shopping_list_to_inventory,
 )
 
 # User anonymous shopping list-related views
 from api.views import (
-    user_anonymous_shopping_list_add_or_update,
+    user_anonymous_shopping_list_create_or_update,
     get_user_anonymous_shopping_list_quantity,
 )
 
@@ -68,9 +69,9 @@ urlpatterns = [
         name="user-inventory-quantity",
     ),
     path(
-        "inventory/<int:component_pk>/add-or-update/",
+        "inventory/<int:component_pk>/create-or-update/",
         user_inventory_quantity_create_or_update,
-        name="user_inventory_add_or_update",
+        name="user_inventory_create_or_update",
     ),
     path(
         "inventory/<int:component_pk>/update/",
@@ -94,14 +95,14 @@ urlpatterns = [
         name="user-shopping-list-delete-module",
     ),
     path(
-        "shopping-list/<int:component_pk>/add-or-update/",
-        user_shopping_list_add_or_update,
-        name="user-shopping-list-add-or-update",
+        "shopping-list/<int:component_pk>/create-or-update/",
+        user_shopping_list_create_or_update,
+        name="user-shopping-list-create-or-update",
     ),
     path(
-        "shopping-list/<int:component_pk>/anonymous-add-or-update/",
-        user_anonymous_shopping_list_add_or_update,
-        name="user-anonymous-shopping-list-add-or-update",
+        "shopping-list/<int:component_pk>/anonymous-create-or-update/",
+        user_anonymous_shopping_list_create_or_update,
+        name="user-anonymous-shopping-list-create-or-update",
     ),
     path(
         "shopping-list/<int:component_pk>/component-quantity/",
@@ -125,5 +126,10 @@ urlpatterns = [
         "module/<int:module_pk>/bom-list-items/",
         get_module_bom_list_items,
         name="module-bom-list-items",
+    ),
+    path(
+        "shopping-list/inventory/add/",
+        add_all_user_shopping_list_to_inventory,
+        name="add_all_user_shopping_list_to_inventory",
     ),
 ]

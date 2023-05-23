@@ -1,8 +1,33 @@
 import { Dialog, Transition } from "@headlessui/react";
+import {
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import { Fragment, useRef } from "react";
 
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import React from "react";
+import cx from "classnames";
+
+export const Types = {
+  danger: (
+    <ExclamationTriangleIcon
+      className="w-6 h-6 text-red-600"
+      aria-hidden="true"
+    />
+  ),
+  warning: (
+    <ExclamationTriangleIcon
+      className="w-6 h-6 text-yellow-500"
+      aria-hidden="true"
+    />
+  ),
+  info: (
+    <InformationCircleIcon
+      className="w-6 h-6 text-blue-600"
+      aria-hidden="true"
+    />
+  ),
+};
 
 const Modal = ({
   open,
@@ -10,9 +35,9 @@ const Modal = ({
   title,
   submitButtonText,
   onSubmit,
+  type = "danger",
   children,
 }) => {
-
   const cancelButtonRef = useRef(null);
 
   return (
@@ -48,11 +73,17 @@ const Modal = ({
             >
               <Dialog.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div className="sm:flex sm:items-start">
-                  <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
-                    <ExclamationTriangleIcon
-                      className="w-6 h-6 text-red-600"
-                      aria-hidden="true"
-                    />
+                  <div
+                    className={cx(
+                      "flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto rounded-full sm:mx-0 sm:h-10 sm:w-10",
+                      {
+                        "bg-red-100": type === "danger",
+                        "bg-yellow-100": type === "warning",
+                        "bg-blue-100": type === "info",
+                      }
+                    )}
+                  >
+                    {Types[type]}
                   </div>
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <Dialog.Title
@@ -67,16 +98,29 @@ const Modal = ({
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                    onClick={() => {
-                      onSubmit();
-                      setOpen(false);
-                    }}
-                  >
-                    {submitButtonText}
-                  </button>
+                  {type === "danger" ? (
+                    <button
+                      type="button"
+                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto"
+                      onClick={() => {
+                        onSubmit();
+                        setOpen(false);
+                      }}
+                    >
+                      {submitButtonText}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-700 sm:ml-3 sm:w-auto"
+                      onClick={() => {
+                        onSubmit();
+                        setOpen(false);
+                      }}
+                    >
+                      {submitButtonText}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
@@ -93,6 +137,6 @@ const Modal = ({
       </Dialog>
     </Transition.Root>
   );
-}
+};
 
 export default Modal;

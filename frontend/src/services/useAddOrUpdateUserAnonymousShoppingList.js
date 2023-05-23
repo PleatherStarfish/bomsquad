@@ -8,10 +8,10 @@ const useAddOrUpdateUserAnonymousShoppingList = () => {
   const queryClient = useQueryClient();
 
   const {mutate: addOrUpdateUserAnonymousShoppingList} = useMutation({
-    mutationFn: ({ componentId, quantity }) => {
+    mutationFn: ({ componentId, quantity, editMode }) => {
       return axios.post(
-        `/api/shopping-list/${componentId}/anonymous-add-or-update/`,
-        {quantity},
+        `/api/shopping-list/${componentId}/anonymous-create-or-update/`,
+        {quantity, editMode},
         {
           headers: {
             "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
