@@ -48,11 +48,12 @@ const ShoppingList = () => {
               Add all to inventory
             </Button>
           </div>
-          <div className="flex justify-start">
+          <div className="flex justify-start w-full">
             {[
               { name: "", data: [] },
               ...userShoppingListData.groupedByModule,
-              { name: "TOTAL", data: [] },
+              { name: "TOTAL QUANTITY", data: [] },
+              { name: "TOTAL PRICE", data: [] },
             ].map((value, index) => {
               const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module
                 ?.slug;

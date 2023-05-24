@@ -112,7 +112,7 @@ const Modal = ({
                   ) : (
                     <button
                       type="button"
-                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-700 sm:ml-3 sm:w-auto"
+                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
                       onClick={() => {
                         onSubmit();
                         setOpen(false);
