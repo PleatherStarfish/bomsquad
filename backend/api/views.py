@@ -26,11 +26,10 @@ from rest_framework import status
 from inventory.models import UserInventory
 from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, F, FloatField
 from accounts.serializers import UserSerializer, UserHistorySerializer
 from rest_framework.views import APIView
 
-from django.db.models import F, FloatField
 from django.db.models.functions import Cast
 
 
@@ -534,8 +533,68 @@ def user_shopping_list_delete_module(request, module_pk):
 
 
 @permission_classes([IsAuthenticated])
+@api_view(["DELETE"])
+def user_shopping_list_delete_anonymous(request):
+    user = request.user
+    shopping_list_item = UserShoppingList.objects.filter(user=user).exclude(
+        module__isnull=False
+    )
+
+    if not shopping_list_item:
+        return Response(
+            {"detail": "Shopping list item not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    shopping_list_item.delete()
+    return Response(
+        {"detail": "Shopping list item deleted successfully"},
+        status=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
-def user_shopping_list_total_component_price(request, component_pk):
+def get_user_shopping_list_total_price(request):
+    """
+    This GET endpoint calculates the total cost of all components
+    in the authenticated user's shopping list.
+
+    It retrieves the user's shopping list items, checks if any exist,
+    calculates the total cost by multiplying quantity and price directly in the database,
+    and returns this total in a JSON response.
+    """
+
+    # Get all the shopping list items for the user
+    shopping_list_items = UserShoppingList.objects.filter(user=request.user)
+
+    # Check if user has any items in shopping list
+    if not shopping_list_items.exists():
+        return Response(
+            {"detail": "No components in shopping list."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Calculate total price of all components for the user
+    total_price = shopping_list_items.aggregate(
+        total_price=Sum(F("quantity") * F("component__price"))
+    )["total_price"]
+
+    return Response({"total_price": total_price}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_user_shopping_list_total_component_price(request, component_pk):
+    """
+    This GET endpoint calculates the total cost of a specific component ('component_pk')
+    in the authenticated user's shopping list.
+
+    It retrieves the component, filters UserShoppingList items for the user and the component,
+    calculates the total cost by multiplying the quantity and price directly in the database,
+    and returns this total in a JSON response.
+    """
+
     try:
         component = Component.objects.get(pk=component_pk)
     except Component.DoesNotExist:
@@ -554,6 +613,27 @@ def user_shopping_list_total_component_price(request, component_pk):
     total = sum(total_price)
 
     return Response({"total_price": total}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_user_shopping_list_total_quantity(request):
+    # Get all the shopping list items for the user
+    shopping_list_items = UserShoppingList.objects.filter(user=request.user)
+
+    # Check if user has any items in shopping list
+    if not shopping_list_items.exists():
+        return Response(
+            {"detail": "No components in shopping list."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Calculate total quantity of all components for the user
+    total_quantity = shopping_list_items.aggregate(total_quantity=Sum("quantity"))[
+        "total_quantity"
+    ]
+
+    return Response({"total_quantity": total_quantity}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])

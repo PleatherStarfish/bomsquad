@@ -9,12 +9,21 @@ const useDeleteShoppingListItem = () => {
 
     const deleteMutation = useMutation({
         mutationFn: ({ module_pk }) => {
-            return axios.delete(`/api/shopping-list/${module_pk}/delete/`, {
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                },
-                withCredentials: true,
-            });
+            if (module_pk) {
+                return axios.delete(`/api/shopping-list/${module_pk}/delete/`, {
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    },
+                    withCredentials: true,
+                });
+            } else {
+                return axios.delete(`/api/shopping-list/delete-anonymous/`, {
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    },
+                    withCredentials: true,
+                });
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries('userShoppingList');

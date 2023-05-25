@@ -1,16 +1,17 @@
 import { FolderPlusIcon, HeartIcon } from "@heroicons/react/24/outline";
+import React, {useState} from "react";
 
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import ListSlice from "./shopping_list/listSlice";
-import Modal from "../ui/Modal"
-import React from "react";
+import Modal from "../ui/Modal";
 import _ from "lodash";
 import useAddAllToInventoryMutation from "../services/useAddAllToInventoryMutation";
 import useGetUserShoppingList from "../services/useGetUserShoppingList";
 
 const ShoppingList = () => {
-  const [addAllModalOpen, setAddAllModalOpen] = React.useState(false);
+  const [addAllModalOpen, setAddAllModalOpen] = useState(false);
+  
   const addAllToInventoryMutation = useAddAllToInventoryMutation();
   const {
     userShoppingListData,
@@ -31,7 +32,7 @@ const ShoppingList = () => {
   return (
     <>
       {!!userShoppingListData?.groupedByModule.length ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="flex justify-end w-full gap-2 flex-nowrap">
             <Button
               version="primary"

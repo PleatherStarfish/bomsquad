@@ -85,6 +85,7 @@ class Module(BaseModel):
     mounting_style = models.CharField(
         choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
     )
+    discontinued = models.BooleanField(default=False)
     slug = models.SlugField(blank=True)
 
     def is_built_by_user(self, user):
