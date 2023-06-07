@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserShoppingList, UserSavedLists
+from .models import UserShoppingList, UserShoppingListSaved
 from core.admin import BaseAdmin
 
 
@@ -7,10 +7,10 @@ class UserShoppingListAdmin(BaseAdmin):
     pass
 
 
-class UserSavedListsAdmin(BaseAdmin):
+class UserShoppingListSavedAdmin(BaseAdmin):
     pass
 
 
 # Register your models here.
 admin.site.register(UserShoppingList, UserShoppingListAdmin)
-admin.site.register(UserSavedLists, UserSavedListsAdmin)
+admin.site.register(UserShoppingListSaved, UserShoppingListSavedAdmin)

@@ -205,7 +205,7 @@ const ListSlice = ({
             </a>
           </span>
           <Button
-            classNames="hidden group-hover/column:inline-flex w-fit mb-2"
+            classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
             variant="danger"
             size="xs"
             onClick={() => {
@@ -223,7 +223,7 @@ const ListSlice = ({
         <div className="flex flex-col gap-2 cursor-pointer">
           <span className="text-bold">{name === "null" ? "Other" : name}</span>
           <Button
-            classNames="hidden group-hover/column:inline-flex w-fit mb-2"
+            classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
             variant="danger"
             size="xs"
             onClick={() => {
