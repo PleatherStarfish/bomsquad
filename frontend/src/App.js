@@ -4,6 +4,7 @@ import Components from "./pages/Components";
 import Inventory from "./components/Inventory";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
+import NotFound from "./components/error/NotFound";
 import React from "react";
 import Settings from "./components/UserSettings";
 import ShoppingList from "./components/ShoppingList";
@@ -46,7 +47,9 @@ const App = () => {
           />
           <Route path={`inventory/`} element={<Inventory />} />
           <Route path={`shopping-list/`} element={<ShoppingList />} />
+          <Route path="*" element={<NotFound/>} />
         </Route>
+        <Route path="*" element={<NotFound/>} />
       </Routes>
     </div>
   );

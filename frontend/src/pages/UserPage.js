@@ -89,7 +89,7 @@ const UserPage = () => {
                   )}
                   aria-hidden="true"
                 />
-                <span>{item.name}</span>
+                <span className="mt-1 text-center">{item.name}</span>
               </Link>
             </li>
           ))}

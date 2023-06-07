@@ -1,20 +1,20 @@
 import { Dialog, Switch, Transition } from "@headlessui/react";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
+import React, { useEffect, useState } from "react";
 import {
   TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
-import React, { useState, useEffect } from "react";
 
 import Alert from "../ui/Alert";
 import DataTable from "react-data-table-component";
+import EditableLocation from "./inventory/EditableLocation";
+import EditableQuantity from "./inventory/EditableQuantity";
 import { Fragment } from "react";
+import { Helmet } from "react-helmet";
 import Modal from "../ui/Modal";
 import _ from "lodash";
 import cx from "classnames";
-import EditableLocation from "./inventory/EditableLocation";
-import EditableQuantity from "./inventory/EditableQuantity";
-import { Helmet } from "react-helmet";
 
 const customStyles = {
   headCells: {
@@ -64,9 +64,9 @@ const SolderingMode = ({
   const [darkMode, setDarkMode] = useState(false);
 
   const darkModeStyles = `
-    .rdt_TableHeadRow { background-color: #162818; color: white; border-color: white; }
-    .rdt_TableRow { background-color: #162818; color: white; }
-    .rdt_Pagination { background-color: #162818; color: white; }
+    .rdt_TableHeadRow { background-color: #212529; color: white; border-color: white; }
+    .rdt_TableRow { background-color: #212529; color: white; }
+    .rdt_Pagination { background-color: #212529; color: white; }
   `;
 
   useEffect(() => {
@@ -76,12 +76,12 @@ const SolderingMode = ({
 
       if (darkMode) {
         if (tableHead) {
-          tableHead.style.backgroundColor = '#162818';
+          tableHead.style.backgroundColor = '#212529';
           tableHead.style.color = 'white';
           tableHead.style.borderColor = "white";
         }
         if (pagination) {
-          pagination.style.backgroundColor = '#162818';
+          pagination.style.backgroundColor = '#212529';
           pagination.style.color = 'white';
         }
       } else {
@@ -108,7 +108,7 @@ const SolderingMode = ({
     {
       when: row => darkMode,
       style: {
-        backgroundColor: '#162818',
+        backgroundColor: '#212529',
         color: 'white',
         borderColor: "white",
       },
@@ -212,20 +212,20 @@ const SolderingMode = ({
                 leaveTo="translate-y-full"
               >
                 <Dialog.Panel className="w-screen h-screen pointer-events-auto">
-                  <div className="flex flex-col h-full py-6 overflow-y-scroll bg-white shadow-xl dark:bg-[#162818]">
+                  <div className="flex flex-col h-full py-6 overflow-y-scroll bg-white shadow-xl dark:bg-[#212529]">
                     <div className="px-4 sm:px-6">
                       <div className="flex flex-row items-center justify-end gap-4">
                         <div className="flex">
                           <Switch
                             checked={darkMode}
                             onChange={setDarkMode}
-                            className="relative inline-flex flex-shrink-0 w-20 transition-colors duration-200 ease-in-out bg-white border-2 ring-gray-400 rounded-full cursor-pointer dark:ring-white dark:bg-[#162818] h-11 outline-none ring-0"
+                            className="relative inline-flex flex-shrink-0 w-20 transition-colors duration-200 ease-in-out bg-white border-2 ring-gray-400 rounded-full cursor-pointer dark:ring-white dark:bg-[#212529] h-11 outline-none ring-0"
                           >
                             <span className="sr-only">Use setting</span>
                             <span
                               className={cx(
                                 darkMode ? "translate-x-9" : "translate-x-0",
-                                "pointer-events-none relative inline-block h-10 w-10 transform rounded-full border-white dark:border-[#162818] bg-gray-400 dark:bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                "pointer-events-none relative inline-block h-10 w-10 transform rounded-full border-white dark:border-[#212529] bg-gray-400 dark:bg-gray-200 shadow ring-0 transition duration-200 ease-in-out"
                               )}
                             >
                               <span
@@ -259,7 +259,7 @@ const SolderingMode = ({
                         <div className="flex items-center justify-end h-20 ml-3">
                           <button
                             type="button"
-                            className="text-gray-400 bg-white rounded-md dark:bg-[#162818] hover:text-gray-500 dark:hover:text-gray-50 focus:outline-none"
+                            className="text-gray-400 bg-white rounded-md dark:bg-[#212529] hover:text-gray-500 dark:hover:text-gray-50 focus:outline-none"
                             onClick={() => {
                               setDarkMode(false)
                               setOpen(false)
@@ -283,14 +283,14 @@ const SolderingMode = ({
                           type="text"
                           name="search"
                           id="search"
-                          className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-gray-200 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:foocus:border-white text-3xl"
+                          className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-[#3a4141] text-gray-900 dark:ring-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:border-0 dark:focus:border-white text-3xl"
                           placeholder="search"
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {!!inventoryData?.length ? (
                           <>
-                            <div className="bg-white dark:bg-[#162818]">
+                            <div className="bg-white dark:bg-[#212529]">
                             <Helmet>
                               <style>{darkMode ? darkModeStyles : ''}</style>
                             </Helmet>

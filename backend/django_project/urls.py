@@ -11,6 +11,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from modules import views as ModuleView
 from django.contrib.auth.views import LoginView
+from django.views import defaults
 
 
 schema_view = get_schema_view(
@@ -92,7 +93,7 @@ frontend_redirect_urls = [
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),
@@ -113,3 +114,11 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Redirect all other URLs to the React app
 urlpatterns.extend(frontend_redirect_urls)
+
+urlpatterns.append(
+    re_path(
+        r"^.*",
+        TemplateView.as_view(template_name="404.html"),
+        {"exception": Exception("Page not Found")},
+    )
+)

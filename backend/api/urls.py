@@ -35,9 +35,15 @@ from api.views import (
     user_shopping_list_update,
     user_shopping_list_create_or_update,
     user_shopping_list_delete_module,
+    user_shopping_list_delete_anonymous,
     get_user_shopping_list_quantity_bom_item_agnostic,
     get_user_shopping_list_quantity,
     add_all_user_shopping_list_to_inventory,
+    get_user_shopping_list_total_price,
+    get_user_shopping_list_total_component_price,
+    get_user_shopping_list_total_quantity,
+    archive_shopping_list,
+    get_archived_shopping_lists,
 )
 
 # User anonymous shopping list-related views
@@ -95,6 +101,11 @@ urlpatterns = [
         name="user-shopping-list-delete-module",
     ),
     path(
+        "shopping-list/delete-anonymous/",
+        user_shopping_list_delete_anonymous,
+        name="user-shopping-list-delete-module",
+    ),
+    path(
         "shopping-list/<int:component_pk>/create-or-update/",
         user_shopping_list_create_or_update,
         name="user-shopping-list-create-or-update",
@@ -118,6 +129,27 @@ urlpatterns = [
         "shopping-list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
         get_user_shopping_list_quantity,
         name="user-shopping-list",
+    ),
+    path(
+        "shopping-list/total-price/",
+        get_user_shopping_list_total_price,
+        name="user-shopping-list-total-price",
+    ),
+    path(
+        "shopping-list/<int:component_pk>/total-price/",
+        get_user_shopping_list_total_component_price,
+        name="user-shopping-list-total-price",
+    ),
+    path(
+        "shopping-list/total-quantity/",
+        get_user_shopping_list_total_quantity,
+        name="user-shopping-list-quantity",
+    ),
+    path("shopping-list/archive/", archive_shopping_list, name="archive-shopping-list"),
+    path(
+        "shopping-list/get-archived/",
+        get_archived_shopping_lists,
+        name="get-archived-shopping-lists",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),

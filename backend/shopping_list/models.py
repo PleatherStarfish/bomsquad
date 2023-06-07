@@ -7,6 +7,7 @@ from modules.models import Module, ModuleBomListItem
 from components.models import Component
 from accounts.models import CustomUser
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class UserShoppingList(BaseModel):
@@ -20,7 +21,6 @@ class UserShoppingList(BaseModel):
         CustomUser, blank=False, null=False, on_delete=models.CASCADE
     )
     quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
-    location = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "User Shopping List"
@@ -52,17 +52,33 @@ class UserShoppingList(BaseModel):
         return f"[ {self.user} ] - {self.component}"
 
 
-class UserSavedLists(BaseModel):
+class UserShoppingListSaved(BaseModel):
     id = models.BigAutoField(primary_key=True)
+    time_saved = models.DateTimeField(default=timezone.now)
+    module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE)
+    bom_item = models.ForeignKey(
+        ModuleBomListItem, null=True, blank=True, on_delete=models.CASCADE
+    )
+    component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(
         CustomUser, blank=False, null=False, on_delete=models.CASCADE
     )
-    lists = models.JSONField(null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
     name = models.CharField(max_length=255, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "User Archived Shopping Lists"
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["user", "time_saved"]),
+            models.Index(fields=["time_saved", "user"]),
+            models.Index(fields=["time_saved"]),
+        ]
+
+    def clean(self):
+        if self.quantity < 1:
+            raise ValidationError("Quantity must be at least 1")
 
     def __str__(self):
-        return self.user.email
+        return f"[ {self.time_saved} ] - {self.user.email}"

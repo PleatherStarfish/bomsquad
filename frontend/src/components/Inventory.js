@@ -4,10 +4,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import DataTable from "react-data-table-component";
+import EditableLocation from "./inventory/EditableLocation";
+import EditableQuantity from "./inventory/EditableQuantity";
 import Fuse from "fuse.js";
 import { Link } from "react-router-dom";
 import Modal from "../ui/Modal";
-import EditableQuantity from "./inventory/EditableQuantity";
 import SearchInput from "./inventory/SearchInput";
 import SolderingMode from "./SolderingMode";
 import _ from "lodash";
@@ -15,7 +16,6 @@ import { find } from "lodash/find";
 import useDeleteUserInventory from "../services/useDeleteUserInventory";
 import useGetUserInventory from "../services/useGetUserInventory";
 import useUpdateUserInventory from "../services/useUpdateUserInventory";
-import EditableLocation from "./inventory/EditableLocation";
 
 const customStyles = {
   headCells: {
@@ -313,7 +313,7 @@ const Inventory = () => {
         />
       ),
       sortable: true,
-      width: quantityIdToEdit ? "165px" : "100px",
+      width: quantityIdToEdit ? "200px" : "100px",
     },
     {
       name: <div>Location</div>,
