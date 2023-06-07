@@ -69,6 +69,7 @@ class Component(BaseModel):
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
     )
+    manufacturer_part_no = models.CharField(max_length=100, blank=True)
     mounting_style = models.CharField(
         choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
     )
@@ -108,12 +109,18 @@ class Component(BaseModel):
     voltage_rating = models.CharField(max_length=3, blank=True)
     tolerance = models.CharField(max_length=3, blank=True)
     price = MoneyField(
-        max_digits=4, decimal_places=2, default_currency="USD", null=True, blank=True
+        max_digits=4,
+        decimal_places=2,
+        default_currency="USD",
+        null=False,
+        blank=False,
+        default=0,
     )
     pcs = models.IntegerField(
         default=1,
         help_text="The number of component that are purchased per price (if they are sold in a set). Defaults to 1.",
     )
+    discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     link = models.URLField(blank=False)
 

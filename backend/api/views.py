@@ -1,5 +1,8 @@
-from shopping_list.serializers import UserShoppingListSerializer
-from shopping_list.models import UserShoppingList
+from shopping_list.serializers import (
+    UserShoppingListSerializer,
+    UserShoppingListSavedSerializer,
+)
+from shopping_list.models import UserShoppingList, UserShoppingListSaved
 from components.serializers import ComponentSerializer
 from components.models import Component, ComponentSupplier, Types, ComponentManufacturer
 from rest_framework import generics
@@ -8,30 +11,23 @@ from modules.models import Module, ModuleBomListItem
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
-from django.middleware import csrf
 from django.core.paginator import Paginator
-from django.http import Http404
 from modules.serializers import (
     ModuleSerializer,
     BuiltModuleSerializer,
     WantTooBuildModuleSerializer,
-    ManufacturerSerializer,
-    SupplierSerializer,
-    TypeSerializer,
 )
-from accounts.models import CustomUser
 from modules.models import BuiltModules, WantToBuildModules
 from rest_framework import status
 from inventory.models import UserInventory
 from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, F, FloatField
 from accounts.serializers import UserSerializer, UserHistorySerializer
 from rest_framework.views import APIView
 
-from django.db.models import F, FloatField
 from django.db.models.functions import Cast
+from django.utils import timezone
 
 
 @api_view(["GET"])
@@ -534,8 +530,68 @@ def user_shopping_list_delete_module(request, module_pk):
 
 
 @permission_classes([IsAuthenticated])
+@api_view(["DELETE"])
+def user_shopping_list_delete_anonymous(request):
+    user = request.user
+    shopping_list_item = UserShoppingList.objects.filter(user=user).exclude(
+        module__isnull=False
+    )
+
+    if not shopping_list_item:
+        return Response(
+            {"detail": "Shopping list item not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    shopping_list_item.delete()
+    return Response(
+        {"detail": "Shopping list item deleted successfully"},
+        status=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
-def user_shopping_list_total_component_price(request, component_pk):
+def get_user_shopping_list_total_price(request):
+    """
+    This GET endpoint calculates the total cost of all components
+    in the authenticated user's shopping list.
+
+    It retrieves the user's shopping list items, checks if any exist,
+    calculates the total cost by multiplying quantity and price directly in the database,
+    and returns this total in a JSON response.
+    """
+
+    # Get all the shopping list items for the user
+    shopping_list_items = UserShoppingList.objects.filter(user=request.user)
+
+    # Check if user has any items in shopping list
+    if not shopping_list_items.exists():
+        return Response(
+            {"detail": "No components in shopping list."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Calculate total price of all components for the user
+    total_price = shopping_list_items.aggregate(
+        total_price=Sum(F("quantity") * F("component__price"))
+    )["total_price"]
+
+    return Response({"total_price": total_price}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_user_shopping_list_total_component_price(request, component_pk):
+    """
+    This GET endpoint calculates the total cost of a specific component ('component_pk')
+    in the authenticated user's shopping list.
+
+    It retrieves the component, filters UserShoppingList items for the user and the component,
+    calculates the total cost by multiplying the quantity and price directly in the database,
+    and returns this total in a JSON response.
+    """
+
     try:
         component = Component.objects.get(pk=component_pk)
     except Component.DoesNotExist:
@@ -554,6 +610,27 @@ def user_shopping_list_total_component_price(request, component_pk):
     total = sum(total_price)
 
     return Response({"total_price": total}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_user_shopping_list_total_quantity(request):
+    # Get all the shopping list items for the user
+    shopping_list_items = UserShoppingList.objects.filter(user=request.user)
+
+    # Check if user has any items in shopping list
+    if not shopping_list_items.exists():
+        return Response(
+            {"detail": "No components in shopping list."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Calculate total quantity of all components for the user
+    total_quantity = shopping_list_items.aggregate(total_quantity=Sum("quantity"))[
+        "total_quantity"
+    ]
+
+    return Response({"total_quantity": total_quantity}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])
@@ -780,3 +857,49 @@ def add_all_user_shopping_list_to_inventory(request):
         shopping_list_item.delete()
 
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def archive_shopping_list(request):
+    user = request.user
+
+    # check if there's something in the shopping list
+    if not UserShoppingList.objects.filter(user=user).exists():
+        return Response({"error": "No items in shopping list."}, status=400)
+
+    shopping_list = UserShoppingList.objects.filter(user=user)
+    time_now = timezone.now()
+
+    # save each item in the shopping list as a UserShoppingListSaved instance
+    for item in shopping_list:
+        saved_item = UserShoppingListSaved()
+        saved_item.time_saved = time_now
+        saved_item.module = item.module
+        saved_item.bom_item = item.bom_item
+        saved_item.component = item.component
+        saved_item.user = item.user
+        saved_item.quantity = item.quantity
+        saved_item.save()
+
+    return Response({"message": "Shopping List saved successfully"}, status=200)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_archived_shopping_lists(request):
+    user = request.user
+
+    # check if there are saved lists for the user
+    if not UserShoppingListSaved.objects.filter(user=user).exists():
+        return Response({"error": "No saved lists available."}, status=400)
+
+    # get UserShoppingListSaved instances for the user, sorted by time_saved
+    saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
+        "-time_saved"
+    )
+
+    # serialize the data
+    serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
+
+    return Response(serializer.data, status=200)

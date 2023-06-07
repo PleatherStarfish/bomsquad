@@ -2,49 +2,10 @@ window.addEventListener("load", function () {
   var cc = initCookieConsent();
   cc.run({
     current_lang: "en",
-    autoclear_cookies: true, // default: false
-    page_scripts: true, // default: false
+    autoclear_cookies: true,
+    page_scripts: true,
     hide_from_bots: true,
     autorun: true,
-
-    onAccept: function (cookie) {
-      if (cookie.categories.analytics) {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = "{% static 'js/mixpanel.js' %}";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
-        mixpanel.init("15c80a95c8772b2594906af3875bbb8f");
-
-        mixpanel.track("Page Viewed", {
-          url: window.location.href,
-          path: window.location.pathname,
-          title: document.title,
-        });
-      }
-    },
-
-    onChange: function (cookie, changed_categories) {
-      if (cookie.categories.analytics) {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = "{% static 'js/mixpanel.js' %}";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
-        mixpanel.init("15c80a95c8772b2594906af3875bbb8f");
-
-        mixpanel.track("Page Viewed", {
-          url: window.location.href,
-          path: window.location.pathname,
-          title: document.title,
-        });
-      } else {
-        mixpanel.reset();
-        mixpanel.disable();
-        mixpanel.cookie.clear();
-        mixpanel.persistence.clear();
-      }
-    },
 
     languages: {
       en: {

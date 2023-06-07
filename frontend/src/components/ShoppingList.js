@@ -1,22 +1,51 @@
-import { FolderPlusIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, FolderPlusIcon, HeartIcon } from "@heroicons/react/24/outline";
+import React, { useCallback, useEffect, useState } from "react";
 
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import ListSlice from "./shopping_list/listSlice";
-import Modal from "../ui/Modal"
-import React from "react";
+import Modal from "../ui/Modal";
+import Notification from "../ui/Notification";
 import _ from "lodash";
 import useAddAllToInventoryMutation from "../services/useAddAllToInventoryMutation";
+import useArchiveShoppingListMutation from "../services/useArchiveUserSavedShoppingList";
 import useGetUserShoppingList from "../services/useGetUserShoppingList";
 
 const ShoppingList = () => {
-  const [addAllModalOpen, setAddAllModalOpen] = React.useState(false);
+  const [addAllModalOpen, setAddAllModalOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [saveListClicked, setSaveListClicked] = useState(false);
+
   const addAllToInventoryMutation = useAddAllToInventoryMutation();
   const {
     userShoppingListData,
     userShoppingListIsLoading,
     userShoppingListIsError,
   } = useGetUserShoppingList();
+
+  const archiveShoppingListMutation = useArchiveShoppingListMutation();
+  const debouncedArchiveMutation = useCallback(
+    _.debounce(() => {
+      archiveShoppingListMutation.mutate();
+    }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    if (archiveShoppingListMutation.isSuccess) {
+      setShowNotification(true);
+    }
+  }, [archiveShoppingListMutation.isSuccess]);
+
+  useEffect(() => {
+    if (saveListClicked) {
+      const timer = setTimeout(() => {
+        setSaveListClicked(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [saveListClicked]);
 
   if (userShoppingListIsError) {
     return <div>Error fetching data</div>;
@@ -30,15 +59,29 @@ const ShoppingList = () => {
 
   return (
     <>
+      <Notification
+        show={showNotification}
+        setShow={setShowNotification}
+        title="Success!"
+        message="Your shopping list was successfully saved."
+      />
       {!!userShoppingListData?.groupedByModule.length ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="flex justify-end w-full gap-2 flex-nowrap">
             <Button
               version="primary"
-              Icon={HeartIcon}
-              onClick={() => setAddAllModalOpen(true)}
             >
-              Save list as favorite
+              Go to saved lists
+            </Button>
+            <Button
+              version="primary"
+              Icon={saveListClicked ? CheckIcon : HeartIcon}
+              onClick={() => {
+                setSaveListClicked(true);
+                debouncedArchiveMutation();
+              }}
+            >
+              Save shopping list
             </Button>
             <Button
               version="primary"
