@@ -44,6 +44,7 @@ from api.views import (
     get_user_shopping_list_total_quantity,
     archive_shopping_list,
     get_archived_shopping_lists,
+    delete_archived_shopping_list,
 )
 
 # User anonymous shopping list-related views
@@ -150,6 +151,11 @@ urlpatterns = [
         "shopping-list/get-archived/",
         get_archived_shopping_lists,
         name="get-archived-shopping-lists",
+    ),
+    path(
+        "shopping-list/delete/<str:timestamp>/",
+        delete_archived_shopping_list,
+        name="delete-shopping-list",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),

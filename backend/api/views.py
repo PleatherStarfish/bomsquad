@@ -2,6 +2,9 @@ from shopping_list.serializers import (
     UserShoppingListSerializer,
     UserShoppingListSavedSerializer,
 )
+from rest_framework.pagination import PageNumberPagination
+from django.core.exceptions import ObjectDoesNotExist
+
 from shopping_list.models import UserShoppingList, UserShoppingListSaved
 from components.serializers import ComponentSerializer
 from components.models import Component, ComponentSupplier, Types, ComponentManufacturer
@@ -28,6 +31,8 @@ from rest_framework.views import APIView
 
 from django.db.models.functions import Cast
 from django.utils import timezone
+
+from collections import defaultdict
 
 
 @api_view(["GET"])
@@ -222,7 +227,7 @@ def user_inventory_delete(request, component_pk):
 @api_view(["GET"])
 def get_user_shopping_list(request):
     """
-    Retrieve the user's own shooping list grouped by module.
+    Retrieve the user's own shoping list grouped by module.
     """
     user = request.user
     inventory = UserShoppingList.objects.filter(user=user).order_by("module__name")
@@ -888,18 +893,80 @@ def archive_shopping_list(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_archived_shopping_lists(request):
-    user = request.user
+    try:
+        user = request.user
 
-    # check if there are saved lists for the user
-    if not UserShoppingListSaved.objects.filter(user=user).exists():
-        return Response({"error": "No saved lists available."}, status=400)
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
-    # get UserShoppingListSaved instances for the user, sorted by time_saved
-    saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
-        "-time_saved"
-    )
+        # Check if there are saved lists for the user
+        saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
+            "-time_saved"
+        )
+        if not saved_lists.exists():
+            return Response(
+                {"error": "No saved lists available."}, status=status.HTTP_404_NOT_FOUND
+            )
 
-    # serialize the data
-    serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
+        # Serialize the data
+        serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
 
-    return Response(serializer.data, status=200)
+        print(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except ObjectDoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_archived_shopping_list(request, timestamp):
+    try:
+        user = request.user
+
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Parse the timestamp string into a datetime object
+        try:
+            timestamp = timezone.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return Response(
+                {
+                    "error": "Invalid timestamp format. Expected format: 'YYYY-MM-DDTHH:MM:SS.ssssssZ'."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Retrieve the archived shopping list with the specified timestamp
+        archived_list = UserShoppingListSaved.objects.filter(
+            user=user, time_saved=timestamp
+        )
+
+        # If archived list with specified timestamp does not exist
+        if not archived_list.exists():
+            return Response(
+                {"error": "Archived list with specified timestamp not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Delete the archived shopping list
+        archived_list.delete()
+
+        return Response(
+            {"message": "Archived list deleted successfully"}, status=status.HTTP_200_OK
+        )
+
+    except ObjectDoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

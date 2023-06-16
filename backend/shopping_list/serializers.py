@@ -1,6 +1,6 @@
 from modules.serializers import ModuleSerializer
 from components.serializers import ComponentSerializer
-from shopping_list.models import UserShoppingList
+from shopping_list.models import UserShoppingList, UserShoppingListSaved
 from rest_framework import serializers
 
 
@@ -20,5 +20,5 @@ class UserShoppingListSavedSerializer(serializers.ModelSerializer):
     component = ComponentSerializer(allow_null=False)
 
     class Meta:
-        model = UserShoppingList
+        model = UserShoppingListSaved
         fields = "__all__"

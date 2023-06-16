@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
+import { Link } from "react-router-dom";
 import ListSlice from "./shopping_list/listSlice";
 import Modal from "../ui/Modal";
 import Notification from "../ui/Notification";
@@ -68,11 +69,13 @@ const ShoppingList = () => {
       {!!userShoppingListData?.groupedByModule.length ? (
         <div className="flex flex-col gap-6">
           <div className="flex justify-end w-full gap-2 flex-nowrap">
-            <Button
-              version="primary"
-            >
-              Go to saved lists
-            </Button>
+            <Link to="saved-lists/">
+              <Button
+                version="primary"
+              >
+                Go to saved lists
+              </Button>
+            </Link>
             <Button
               version="primary"
               Icon={saveListClicked ? CheckIcon : HeartIcon}

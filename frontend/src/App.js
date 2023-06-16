@@ -6,6 +6,7 @@ import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
 import NotFound from "./components/error/NotFound";
 import React from "react";
+import SavedLists from "./components/saved_lists/index";
 import Settings from "./components/UserSettings";
 import ShoppingList from "./components/ShoppingList";
 import UserPage from "./pages/UserPage";
@@ -21,6 +22,10 @@ const App = () => {
         <Route
           path={`/user/:username/inventory/version-history/`}
           element={<VersionHistory />}
+        />
+        <Route
+            path={`/user/:username/shopping-list/saved-lists/`}
+            element={<SavedLists />}
         />
         <Route path="/user/:username" element={<UserPage />}>
           <Route
