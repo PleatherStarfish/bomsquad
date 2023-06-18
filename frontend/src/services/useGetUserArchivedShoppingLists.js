@@ -10,7 +10,7 @@ const useGetArchivedShoppingLists = () => {
 
     // Group by time_saved
     const groupedByTimeSaved = _(data)
-      .groupBy("time_saved")
+      .groupBy("time_saved", ['desc'])
       .toPairs()
       .sortBy(([time_saved]) => new Date(time_saved))
       .value();
@@ -32,11 +32,15 @@ const useGetArchivedShoppingLists = () => {
       // Aggregate components within each time_saved group
       const aggregatedComponents = _(shoppingList).uniqBy("component.id").sortBy("component.supplier.name").value();
 
-      // Return time_saved along with groupedByModule and aggregatedComponents
+      // Extract notes from the first item if available
+      const notes = shoppingList.length > 0 ? shoppingList[0]?.notes?.note : null;
+
+      // Return time_saved along with groupedByModule, aggregatedComponents, and notes
       return {
         time_saved,
         groupedByModule,
-        aggregatedComponents
+        aggregatedComponents,
+        notes
       };
     });
   };

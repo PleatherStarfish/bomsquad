@@ -1,10 +1,11 @@
-import Button from "../../ui/Button";
+import React, {useState} from "react";
+
 import Alert from "../../ui/Alert";
-import Modal from "../../ui/Modal";
 import BackButton from "../../ui/BackButton";
+import Button from "../../ui/Button";
 import { DateTime } from "luxon";
 import ListSlice from "../shopping_list/listSlice";
-import React, {useState} from "react";
+import Modal from "../../ui/Modal";
 import useDeleteArchivedShoppingList from "../../services/useDeleteArchivedShoppingList";
 import useGetArchivedShoppingLists from "../../services/useGetUserArchivedShoppingLists";
 
@@ -41,6 +42,8 @@ const SavedLists = () => {
     );
   }
 
+  console.log(archivedShoppingLists)
+
   return (
     <>
       <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
@@ -53,11 +56,14 @@ const SavedLists = () => {
             return (
               <div key={index} className="flex flex-col justify-center mt-4 mb-8">
                 <div className="flex justify-between py-4">
-                  <h2 className="text-xl font-bold text-gray-700">
-                    {DateTime.fromISO(value?.time_saved).toLocaleString(
-                      DateTime.DATETIME_FULL
-                    )}
-                  </h2>
+                  <div className="flex flex-col justify-between gap-2">
+                    <h2 className="text-xl font-bold text-gray-700">
+                      {value?.notes || DateTime.fromISO(value?.time_saved).toLocaleString(
+                        DateTime.DATETIME_FULL
+                      )}
+                    </h2>
+                    {value?.notes && <h3 className="text-sm text-gray-400 font-display">{DateTime.fromISO(value?.time_saved).toLocaleString(DateTime.DATETIME_FULL)}</h3>}
+                  </div>
                   <div className="flex justify-between gap-3">
                     <Button
                       variant="danger"

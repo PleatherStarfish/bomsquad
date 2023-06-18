@@ -938,6 +938,8 @@ def get_archived_shopping_lists(request):
         if not saved_lists.exists():
             return Response([], status=status.HTTP_200_OK)
 
+        print(saved_lists)
+
         # Serialize the data
         serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
 
@@ -993,5 +995,74 @@ def delete_archived_shopping_list(request, timestamp):
 
     except ObjectDoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_archived_list_to_current_list(request, timestamp):
+    try:
+        user = request.user
+
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Parse the timestamp string into a datetime object
+        try:
+            timestamp = timezone.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return Response(
+                {
+                    "error": "Invalid timestamp format. Expected format: 'YYYY-MM-DDTHH:MM:SS.ssssssZ'."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Retrieve the archived shopping list with the specified timestamp
+        archived_list = UserShoppingListSaved.objects.filter(
+            user=user, time_saved=timestamp
+        )
+
+        # If archived list with specified timestamp does not exist
+        if not archived_list.exists():
+            return Response(
+                {"error": "Archived list with specified timestamp not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Iterate through the items in the archived list
+        for archived_item in archived_list:
+            # Check if an item with the same component and module already exists in the shopping list
+            existing_item = UserShoppingList.objects.filter(
+                user=user,
+                component=archived_item.component,
+                module=archived_item.module,
+            ).first()
+
+            # If the item exists in the shopping list, update the quantity
+            if existing_item:
+                existing_item.quantity = F("quantity") + archived_item.quantity
+                existing_item.save()
+            # If the item does not exist, create a new item in the shopping list
+            else:
+                new_item = UserShoppingList(
+                    user=user,
+                    component=archived_item.component,
+                    module=archived_item.module,
+                    quantity=archived_item.quantity,
+                )
+                new_item.save()
+
+        return Response(
+            {
+                "message": "Archived list added to the current shopping list successfully."
+            },
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
