@@ -1,9 +1,12 @@
+import bleach
 from shopping_list.serializers import (
     UserShoppingListSerializer,
     UserShoppingListSavedSerializer,
 )
 from rest_framework.pagination import PageNumberPagination
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.html import escape
+from django.db import IntegrityError
 
 from shopping_list.models import UserShoppingList, UserShoppingListSaved
 from components.serializers import ComponentSerializer
@@ -26,6 +29,7 @@ from inventory.models import UserInventory
 from inventory.serializers import UserInventorySerializer
 from modules.serializers import ModuleBomListItemSerializer
 from django.db.models import Sum, Q, F, FloatField
+from accounts.models import UserNotes
 from accounts.serializers import UserSerializer, UserHistorySerializer
 from rest_framework.views import APIView
 
@@ -472,9 +476,6 @@ def user_shopping_list_update(request, component_pk):
     if module_pk is not None:
         module_pk = int(module_pk)
 
-    print(module_bom_list_item_pk)
-    print(module_pk)
-
     if not module_bom_list_item_pk or not module_pk:
         shopping_list_item = (
             UserShoppingList.objects.filter(
@@ -484,7 +485,6 @@ def user_shopping_list_update(request, component_pk):
             .exclude(module__isnull=False)
             .exclude(bom_item__isnull=False)
         ).first()
-        print("anon", shopping_list_item)
     else:
         shopping_list_item = (
             UserShoppingList.objects.filter(
@@ -497,7 +497,6 @@ def user_shopping_list_update(request, component_pk):
             .exclude(bom_item__isnull=True)
             .first()
         )
-        print("module", shopping_list_item)
 
     if not shopping_list_item:
         return Response(
@@ -871,12 +870,38 @@ def archive_shopping_list(request):
 
     # check if there's something in the shopping list
     if not UserShoppingList.objects.filter(user=user).exists():
-        return Response({"error": "No items in shopping list."}, status=400)
+        return Response(
+            {"error": "No items in shopping list."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     shopping_list = UserShoppingList.objects.filter(user=user)
     time_now = timezone.now()
 
-    # save each item in the shopping list as a UserShoppingListSaved instance
+    # Get the notes from the request body
+    notes_content = request.data.get("notes", "")
+
+    # Sanitize the input with bleach
+    notes_content = bleach.clean(notes_content)
+
+    # Validate the length of the notes
+    if len(notes_content) > 1000:
+        return Response(
+            {"error": "Notes must be no longer than 1000 characters."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Create a UserNotes instance only if notes_content has length
+    notes = None
+    if len(notes_content) > 0:
+        try:
+            notes = UserNotes.objects.create(user=user, note=notes_content)
+        except IntegrityError:
+            return Response(
+                {"error": "Failed to create UserNotes."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    # Save each item in the shopping list as a UserShoppingListSaved instance
     for item in shopping_list:
         saved_item = UserShoppingListSaved()
         saved_item.time_saved = time_now
@@ -885,9 +910,12 @@ def archive_shopping_list(request):
         saved_item.component = item.component
         saved_item.user = item.user
         saved_item.quantity = item.quantity
+        saved_item.notes = notes  # Associate with the UserNotes instance
         saved_item.save()
 
-    return Response({"message": "Shopping List saved successfully"}, status=200)
+    return Response(
+        {"message": "Shopping List saved successfully"}, status=status.HTTP_200_OK
+    )
 
 
 @api_view(["GET"])
@@ -906,15 +934,12 @@ def get_archived_shopping_lists(request):
         saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
             "-time_saved"
         )
+        # If no saved lists are available, return an empty list
         if not saved_lists.exists():
-            return Response(
-                {"error": "No saved lists available."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response([], status=status.HTTP_200_OK)
 
         # Serialize the data
         serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
-
-        print(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

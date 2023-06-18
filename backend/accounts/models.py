@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from core.models import BaseModel
+import uuid
 
 
 class CustomUser(AbstractUser):
@@ -45,3 +47,12 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class UserNotes(BaseModel):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    note = models.TextField()
+
+    def __str__(self):
+        return self.user.email

@@ -101,6 +101,7 @@ const ListSlice = ({
   componentsAreLoading,
   hideInteraction = false,
   backgroundColor = "bg-white",
+  displayTotals = true
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
@@ -212,7 +213,7 @@ const ListSlice = ({
         <div className="flex flex-col gap-2 cursor-pointer">
           <span>
             <a
-              href={`/module/${slug}`}
+              href={`/module/${slug}/`}
               className="text-blue-500 hover:text-blue-700"
             >
               {name}
@@ -383,6 +384,32 @@ const ListSlice = ({
     },
   ];
 
+  const getColumnsBasedOnIndex = (index, allModulesData) => {
+    switch (index) {
+      case 0:
+        return labelColumns;
+        
+      case allModulesData.length + 1:
+        return totalColumn;
+        
+      case allModulesData.length + 2:
+        return priceColumn;
+        
+      default:
+        return qtyColumns;
+    }
+  };
+
+  const getColumnsBasedOnIndexHideTotals = (index) => {
+    switch (index) {
+      case 0:
+        return labelColumns;
+        
+      default:
+        return qtyColumns;
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -407,14 +434,9 @@ const ListSlice = ({
             compact
             responsive
             noHeader
-            columns={
-              index === 0
-                ? labelColumns
-                : index === allModulesData.length + 1
-                ? totalColumn
-                : index === allModulesData.length + 2
-                ? priceColumn
-                : qtyColumns
+            columns={displayTotals 
+              ? getColumnsBasedOnIndex(index, allModulesData) 
+              : getColumnsBasedOnIndexHideTotals(index)
             }
             data={
               !(index > allModulesData.length)

@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.db.models import Q
 from core.models import BaseModel
+from accounts.models import UserNotes
 
 from modules.models import Module, ModuleBomListItem
 from components.models import Component
@@ -65,7 +66,9 @@ class UserShoppingListSaved(BaseModel):
     )
     quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
     name = models.CharField(max_length=255, null=True, blank=True)
-    notes = models.TextField(null=True, blank=True)
+    notes = models.ForeignKey(
+        UserNotes, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "User Archived Shopping Lists"

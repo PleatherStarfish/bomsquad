@@ -14,8 +14,10 @@ import useGetUserShoppingList from "../services/useGetUserShoppingList";
 
 const ShoppingList = () => {
   const [addAllModalOpen, setAddAllModalOpen] = useState(false);
+  const [saveListModalOpen, setSaveListModalOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [saveListClicked, setSaveListClicked] = useState(false);
+  const [notes, setNotes] = useState('');
 
   const addAllToInventoryMutation = useAddAllToInventoryMutation();
   const {
@@ -26,8 +28,8 @@ const ShoppingList = () => {
 
   const archiveShoppingListMutation = useArchiveShoppingListMutation();
   const debouncedArchiveMutation = useCallback(
-    _.debounce(() => {
-      archiveShoppingListMutation.mutate();
+    _.debounce((notes) => {
+      archiveShoppingListMutation.mutate({notes});
     }, 1000),
     []
   );
@@ -80,8 +82,7 @@ const ShoppingList = () => {
               version="primary"
               Icon={saveListClicked ? CheckIcon : HeartIcon}
               onClick={() => {
-                setSaveListClicked(true);
-                debouncedArchiveMutation();
+                setSaveListModalOpen(true);
               }}
             >
               Save shopping list
@@ -141,6 +142,29 @@ const ShoppingList = () => {
         onSubmit={() => addAllToInventoryMutation.mutate()}
       >
         {`Are you sure you want to add all the components in your shopping list to your inventory? This will clear your shopping list and sum quantities for items already in your inventory (if any).`}
+      </Modal>
+      <Modal
+        open={saveListModalOpen}
+        setOpen={setSaveListModalOpen}
+        title={"Name you saved list?"}
+        submitButtonText={"Save"}
+        type="warning"
+        onSubmit={() => {
+          setSaveListClicked(true);
+          debouncedArchiveMutation(notes);
+        }}
+      >
+        <div className="flex flex-col gap-4">
+          <span>Do you want to give your saved list a descriptive name?</span>
+          <input 
+              type="text" 
+              value={notes} 
+              onChange={(e) => setNotes(e.target.value)} 
+              placeholder="Enter notes (optional)" 
+              maxLength="1000"
+              className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+          />
+        </div>
       </Modal>
     </>
   );
