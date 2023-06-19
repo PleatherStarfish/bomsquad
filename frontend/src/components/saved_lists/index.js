@@ -8,10 +8,16 @@ import ListSlice from "../shopping_list/listSlice";
 import Modal from "../../ui/Modal";
 import useDeleteArchivedShoppingList from "../../services/useDeleteArchivedShoppingList";
 import useGetArchivedShoppingLists from "../../services/useGetUserArchivedShoppingLists";
+import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import useAddArchivedListToShoppingList from '../../services/useAddArchivedListToShoppingList';
+
 
 const SavedLists = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [addToShoppingListModalOpen, setAddToShoppingListModalOpen] = useState(false);
   const [selectedTimestamp, setSelectedTimestamp] = useState(null);
+  const [selectedTitle, setSelectedTitle] = useState(null);
+  const [sortOrder, setSortOrder] = useState("desc");
   const {
     archivedShoppingLists,
     archivedShoppingListsLoading,
@@ -20,10 +26,22 @@ const SavedLists = () => {
   } = useGetArchivedShoppingLists();
 
   const deleteArchivedShoppingList = useDeleteArchivedShoppingList();
+  const addArchivedListToShoppingList = useAddArchivedListToShoppingList();
 
-  const handleDelete = (timestamp) => {
+  const handleAddArchivedList = (timestamp, title) => {
     setSelectedTimestamp(timestamp);
+    setSelectedTitle(title)
+    setAddToShoppingListModalOpen(true);
+};
+
+  const handleDelete = (timestamp, title) => {
+    setSelectedTimestamp(timestamp);
+    setSelectedTitle(title)
     setDeleteModalOpen(true);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "desc" ? "asc" : "desc");
   };
 
   if (archivedShoppingListsLoading) {
@@ -42,7 +60,11 @@ const SavedLists = () => {
     );
   }
 
-  console.log(archivedShoppingLists)
+  const sortedArchivedShoppingLists = [...archivedShoppingLists].sort((a, b) => {
+    const dateA = new Date(a.time_saved);
+    const dateB = new Date(b.time_saved);
+    return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+  });
 
   return (
     <>
@@ -51,8 +73,19 @@ const SavedLists = () => {
         <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
           Saved Lists
         </h1>
-        {archivedShoppingLists.length ? (
-          archivedShoppingLists.map((value, index) => {
+        {sortedArchivedShoppingLists.length && 
+          <div className="flex justify-end w-full">
+            <Button variant="secondary" onClick={toggleSortOrder} className="flex items-center">
+              {sortOrder === "desc" ? (
+                <div className="flex flex-nowrap"><span>Sort ascending</span><ChevronDownIcon className="w-5 h-5 ml-1" /></div>
+              ) : (
+                <div className="flex flex-nowrap"><span>Sort descending</span><ChevronUpIcon className="w-5 h-5 ml-1" /></div>
+              )}
+            </Button>
+          </div>
+        }
+        {sortedArchivedShoppingLists.length ? (
+          sortedArchivedShoppingLists.map((value, index) => {
             return (
               <div key={index} className="flex flex-col justify-center mt-4 mb-8">
                 <div className="flex justify-between py-4">
@@ -67,11 +100,11 @@ const SavedLists = () => {
                   <div className="flex justify-between gap-3">
                     <Button
                       variant="danger"
-                      onClick={() => handleDelete(value.time_saved)}
+                      onClick={() => handleDelete(value.time_saved, value?.notes)}
                     >
                       Delete
                     </Button>
-                    <Button variant="primary">Copy to shopping list</Button>
+                    <Button variant="primary" onClick={() => handleAddArchivedList(value.time_saved, value?.notes)}>Copy to shopping list</Button>
                   </div>
                 </div>
                 <div className="flex w-full p-8 rounded-md flex-nowrap bg-gray-50">
@@ -113,7 +146,7 @@ const SavedLists = () => {
       <Modal
         open={deleteModalOpen}
         setOpen={setDeleteModalOpen}
-        title={`Delete ${DateTime.fromISO(selectedTimestamp).toLocaleString(
+        title={`Delete ${selectedTitle || DateTime.fromISO(selectedTimestamp).toLocaleString(
           DateTime.DATETIME_FULL
         )}?`}
         submitButtonText={"Delete"}
@@ -121,6 +154,18 @@ const SavedLists = () => {
         onSubmit={() => deleteArchivedShoppingList.mutate({timestamp: selectedTimestamp})}
       >
         {`Are you sure you want to delete this list from your saved lists?`}
+      </Modal>
+      <Modal
+        open={addToShoppingListModalOpen}
+        setOpen={setAddToShoppingListModalOpen}
+        title={`Add ${selectedTitle || DateTime.fromISO(selectedTimestamp).toLocaleString(
+          DateTime.DATETIME_FULL
+        )} to shopping list?`}
+        submitButtonText={"Add"}
+        type="warning"
+        onSubmit={() => addArchivedListToShoppingList({timestamp: selectedTimestamp})}
+      >
+        {`Are you sure you want to add this to your shopping list? This action can not be automatically reversed.`}
       </Modal>
     </>
   );

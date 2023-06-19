@@ -1001,7 +1001,16 @@ def delete_archived_shopping_list(request, timestamp):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def add_archived_list_to_current_list(request, timestamp):
+def add_archived_list_to_current_list(request):
+    timestamp = request.data.get("timestamp", "")
+    print(timestamp)
+
+    if not timestamp:
+        return Response(
+            {"error": "No timestamp provided."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     try:
         user = request.user
 

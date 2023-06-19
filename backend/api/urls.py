@@ -45,6 +45,7 @@ from api.views import (
     archive_shopping_list,
     get_archived_shopping_lists,
     delete_archived_shopping_list,
+    add_archived_list_to_current_list,
 )
 
 # User anonymous shopping list-related views
@@ -147,6 +148,11 @@ urlpatterns = [
         name="user-shopping-list-quantity",
     ),
     path("shopping-list/archive/", archive_shopping_list, name="archive-shopping-list"),
+    path(
+        "shopping-list/archive/add/",
+        add_archived_list_to_current_list,
+        name="add-archived-list-to-current-list",
+    ),
     path(
         "shopping-list/get-archived/",
         get_archived_shopping_lists,

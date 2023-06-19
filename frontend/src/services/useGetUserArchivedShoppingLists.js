@@ -10,7 +10,7 @@ const useGetArchivedShoppingLists = () => {
 
     // Group by time_saved
     const groupedByTimeSaved = _(data)
-      .groupBy("time_saved", ['desc'])
+      .groupBy("time_saved")
       .toPairs()
       .sortBy(([time_saved]) => new Date(time_saved))
       .value();
