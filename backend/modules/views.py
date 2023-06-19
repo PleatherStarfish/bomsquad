@@ -1,18 +1,21 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render, redirect
-
-from .models import Module, Manufacturer
-from django.contrib import messages
-from .models import BuiltModules, WantToBuildModules
-from django.contrib.auth.decorators import login_required
-from rest_framework.decorators import api_view
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from modules.models import BuiltModules, Module, WantToBuildModules
+from modules.serializers import (
+    BuiltModuleSerializer,
+    ModuleSerializer,
+    WantTooBuildModuleSerializer,
+)
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
+
+from .models import BuiltModules, Manufacturer, Module, WantToBuildModules
 
 mounting_style_options = [
     {"name": "Surface Mount (SMT)", "value": "smt"},
@@ -120,3 +123,71 @@ def add_module_to_wtb(request, module_id):
     # Redirect back to the previous URL if available, otherwise redirect to "bomsquad:home"
     redirect_url = request.META.get("HTTP_REFERER") or "bomsquad:home"
     return redirect(redirect_url)
+
+
+class UserModulesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, type):
+        # Determine which type of modules to return
+        if type == "built":
+            modules = BuiltModules.objects.filter(user=request.user).order_by(
+                "module__name"
+            )
+            serializer_class = BuiltModuleSerializer
+        elif type == "wtb":
+            modules = WantToBuildModules.objects.filter(user=request.user).order_by(
+                "module__name"
+            )
+            serializer_class = WantTooBuildModuleSerializer
+        else:
+            return Response(
+                {"error": "Invalid type parameter."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Paginate the results
+        paginator = Paginator(modules, 10)  # Show 10 modules per page
+        page = request.GET.get("page")
+        modules_page = paginator.get_page(page)
+
+        # Serialize the results and return them in the response
+        serializer = serializer_class(modules_page, many=True)
+        data = {
+            "count": paginator.count,
+            "num_pages": paginator.num_pages,
+            "results": serializer.data,
+        }
+
+        # Add "is_built" and "is_wtb" fields to each module
+        for module_data in data["results"]:
+            module_slug = module_data["module"]["slug"]
+            module = get_object_or_404(Module, slug=module_slug)
+            is_built = BuiltModules.objects.filter(
+                user=request.user, module=module
+            ).exists()
+            is_wtb = WantToBuildModules.objects.filter(
+                user=request.user, module=module
+            ).exists()
+            module_data["is_built"] = is_built
+            module_data["is_wtb"] = is_wtb
+
+        return Response(data)
+
+
+class ModuleDetailView(generics.RetrieveAPIView):
+    """
+    API endpoint that retrieves a single Module instance by its slug.
+    """
+
+    serializer_class = ModuleSerializer
+
+    def get_object(self):
+        # Extract the `slug` parameter from the URL.
+        slug = self.kwargs.get("slug")
+
+        # Look up the Module instance with the given `slug`.
+        # Raise a 404 error if no such instance exists.
+        module_instance = get_object_or_404(Module, slug=slug)
+
+        # Return the retrieved Module instance.
+        return module_instance
