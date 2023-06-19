@@ -7,25 +7,22 @@ from api.views import (
 )
 
 # User modules-related views
-from api.views import (
+from modules.views import (
     UserModulesView,
     ModuleDetailView,
 )
 
 # Module and components-related views
-from api.views import (
-    get_module_bom_list_items,
+from components.views import (
     ComponentView,
+    get_module_bom_list_items,
     get_components_by_ids,
 )
 
 # User inventory-related views
-from api.views import (
-    get_user_inventory,
-    user_inventory_update,
-    user_inventory_delete,
+from inventory.views import (
+    UserInventoryView,
     get_user_inventory_quantity,
-    user_inventory_quantity_create_or_update,
     get_user_inventory_quantities_for_bom_list_item,
 )
 
@@ -44,6 +41,8 @@ from api.views import (
     get_user_shopping_list_total_quantity,
     archive_shopping_list,
     get_archived_shopping_lists,
+    delete_archived_shopping_list,
+    add_archived_list_to_current_list,
 )
 
 # User anonymous shopping list-related views
@@ -63,7 +62,7 @@ urlpatterns = [
     path("get-user-history/", get_user_history, name="user-history"),
     path("delete-user-me/", delete_user, name="delete-user"),
     path("modules/<str:type>/", UserModulesView.as_view(), name="user-modules"),
-    path("inventory/", get_user_inventory, name="user-inventory"),
+    path("inventory/", UserInventoryView.as_view(), name="user-inventory"),
     path(
         "inventory/bom-list-item/<int:modulebomlistitem_pk>/aggregate-sum/",
         get_user_inventory_quantities_for_bom_list_item,
@@ -76,17 +75,17 @@ urlpatterns = [
     ),
     path(
         "inventory/<int:component_pk>/create-or-update/",
-        user_inventory_quantity_create_or_update,
+        UserInventoryView.as_view(),
         name="user_inventory_create_or_update",
     ),
     path(
         "inventory/<int:component_pk>/update/",
-        user_inventory_update,
+        UserInventoryView.as_view(),
         name="user_inventory_update",
     ),
     path(
         "inventory/<int:component_pk>/delete/",
-        user_inventory_delete,
+        UserInventoryView.as_view(),
         name="user_inventory_delete",
     ),
     path("shopping-list/", get_user_shopping_list, name="user-shopping-list"),
@@ -147,9 +146,19 @@ urlpatterns = [
     ),
     path("shopping-list/archive/", archive_shopping_list, name="archive-shopping-list"),
     path(
+        "shopping-list/archive/add/",
+        add_archived_list_to_current_list,
+        name="add-archived-list-to-current-list",
+    ),
+    path(
         "shopping-list/get-archived/",
         get_archived_shopping_lists,
         name="get-archived-shopping-lists",
+    ),
+    path(
+        "shopping-list/delete/<str:timestamp>/",
+        delete_archived_shopping_list,
+        name="delete-shopping-list",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),

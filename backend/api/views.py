@@ -1,33 +1,24 @@
-from shopping_list.serializers import (
-    UserShoppingListSerializer,
-    UserShoppingListSavedSerializer,
-)
-from shopping_list.models import UserShoppingList, UserShoppingListSaved
-from components.serializers import ComponentSerializer
-from components.models import Component, ComponentSupplier, Types, ComponentManufacturer
-from rest_framework import generics
-from django.shortcuts import get_object_or_404
+import bleach
+from accounts.models import UserNotes
+from accounts.serializers import UserHistorySerializer, UserSerializer
+from components.models import Component
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from django.db.models import F, FloatField, Sum
+from django.db.models.functions import Cast
+from django.utils import timezone
+from inventory.models import UserInventory
+from inventory.serializers import UserInventorySerializer
 from modules.models import Module, ModuleBomListItem
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.core.paginator import Paginator
-from modules.serializers import (
-    ModuleSerializer,
-    BuiltModuleSerializer,
-    WantTooBuildModuleSerializer,
+from shopping_list.models import UserShoppingList, UserShoppingListSaved
+from shopping_list.serializers import (
+    UserShoppingListSavedSerializer,
+    UserShoppingListSerializer,
 )
-from modules.models import BuiltModules, WantToBuildModules
-from rest_framework import status
-from inventory.models import UserInventory
-from inventory.serializers import UserInventorySerializer
-from modules.serializers import ModuleBomListItemSerializer
-from django.db.models import Sum, Q, F, FloatField
-from accounts.serializers import UserSerializer, UserHistorySerializer
-from rest_framework.views import APIView
-
-from django.db.models.functions import Cast
-from django.utils import timezone
 
 
 @api_view(["GET"])
@@ -53,198 +44,16 @@ def delete_user(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ModuleDetailView(generics.RetrieveAPIView):
-    """
-    API endpoint that retrieves a single Module instance by its slug.
-    """
-
-    serializer_class = ModuleSerializer
-
-    def get_object(self):
-        # Extract the `slug` parameter from the URL.
-        slug = self.kwargs.get("slug")
-
-        # Look up the Module instance with the given `slug`.
-        # Raise a 404 error if no such instance exists.
-        module_instance = get_object_or_404(Module, slug=slug)
-
-        # Return the retrieved Module instance.
-        return module_instance
-
-
-class UserModulesView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, type):
-        # Determine which type of modules to return
-        if type == "built":
-            modules = BuiltModules.objects.filter(user=request.user).order_by(
-                "module__name"
-            )
-            serializer_class = BuiltModuleSerializer
-        elif type == "wtb":
-            modules = WantToBuildModules.objects.filter(user=request.user).order_by(
-                "module__name"
-            )
-            serializer_class = WantTooBuildModuleSerializer
-        else:
-            return Response(
-                {"error": "Invalid type parameter."}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Paginate the results
-        paginator = Paginator(modules, 10)  # Show 10 modules per page
-        page = request.GET.get("page")
-        modules_page = paginator.get_page(page)
-
-        # Serialize the results and return them in the response
-        serializer = serializer_class(modules_page, many=True)
-        data = {
-            "count": paginator.count,
-            "num_pages": paginator.num_pages,
-            "results": serializer.data,
-        }
-
-        # Add "is_built" and "is_wtb" fields to each module
-        for module_data in data["results"]:
-            module_slug = module_data["module"]["slug"]
-            module = get_object_or_404(Module, slug=module_slug)
-            is_built = BuiltModules.objects.filter(
-                user=request.user, module=module
-            ).exists()
-            is_wtb = WantToBuildModules.objects.filter(
-                user=request.user, module=module
-            ).exists()
-            module_data["is_built"] = is_built
-            module_data["is_wtb"] = is_wtb
-
-        return Response(data)
-
-
-@permission_classes([IsAuthenticated])
-@api_view(["GET"])
-def get_user_inventory(request):
-    """
-    Retrieve the user's own inventory.
-    """
-    user = request.user
-    inventory = UserInventory.objects.filter(user=user)
-    serializer = UserInventorySerializer(inventory, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@permission_classes([IsAuthenticated])
-@api_view(["POST"])
-def user_inventory_quantity_create_or_update(request, component_pk):
-    user = request.user
-
-    # Check if the user inventory item exists
-    try:
-        user_inventory_item = UserInventory.objects.get(
-            user=user, component_id=component_pk
-        )
-    except UserInventory.DoesNotExist:
-        user_inventory_item = None
-
-    # Determine the editing mode from request
-    edit_mode = request.data.get("editMode", True)
-
-    # If the user inventory item exists, update the quantity
-    if user_inventory_item is not None:
-        quantity = int(request.data.get("quantity", 0))
-        if edit_mode:
-            user_inventory_item.quantity = quantity
-        else:
-            user_inventory_item.quantity += quantity
-
-        user_inventory_item.save()
-        serializer = UserInventorySerializer(user_inventory_item)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # If the user inventory item does not exist, create a new one
-    try:
-        quantity = int(request.data.get("quantity", 0))
-        component = Component.objects.get(id=component_pk)
-        user_inventory = UserInventory.objects.create(
-            user=user, component=component, quantity=quantity
-        )
-        serializer = UserInventorySerializer(user_inventory)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Component.DoesNotExist:
-        return Response(
-            {"detail": "Component not found"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-
-@permission_classes([IsAuthenticated])
-@api_view(["PATCH"])
-def user_inventory_update(request, component_pk):
-    user = request.user
-    user_inventor_item = UserInventory.objects.filter(
-        user=user, component__id=component_pk
-    ).first()
-
-    if not user_inventor_item:
-        return Response(
-            {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    serializer = UserInventorySerializer(
-        user_inventor_item, data=request.data, partial=True
-    )
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@permission_classes([IsAuthenticated])
-@api_view(["DELETE"])
-def user_inventory_delete(request, component_pk):
-    user = request.user
-    user_inventory_item = UserInventory.objects.filter(
-        user=user, component__id=component_pk
-    ).first()
-
-    if not user_inventory_item:
-        return Response(
-            {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    user_inventory_item.delete()
-    return Response(
-        {"detail": "User inventory deleted successfully"},
-        status=status.HTTP_204_NO_CONTENT,
-    )
-
-
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list(request):
     """
-    Retrieve the user's own shooping list grouped by module.
+    Retrieve the user's own shoping list grouped by module.
     """
     user = request.user
     inventory = UserShoppingList.objects.filter(user=user).order_by("module__name")
     serializer = UserShoppingListSerializer(inventory, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@permission_classes([IsAuthenticated])
-@api_view(["GET"])
-def get_user_inventory_quantity(request, component_pk):
-    inventory = UserInventory.objects.filter(
-        component__id=component_pk, user=request.user
-    )
-
-    # Check if inventory exists
-    if inventory.exists():
-        # Access the first inventory object in the QuerySet
-        # and retrieve the 'quantity' attribute
-        quantity = inventory.first().quantity
-        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
-    else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])
@@ -467,9 +276,6 @@ def user_shopping_list_update(request, component_pk):
     if module_pk is not None:
         module_pk = int(module_pk)
 
-    print(module_bom_list_item_pk)
-    print(module_pk)
-
     if not module_bom_list_item_pk or not module_pk:
         shopping_list_item = (
             UserShoppingList.objects.filter(
@@ -479,7 +285,6 @@ def user_shopping_list_update(request, component_pk):
             .exclude(module__isnull=False)
             .exclude(bom_item__isnull=False)
         ).first()
-        print("anon", shopping_list_item)
     else:
         shopping_list_item = (
             UserShoppingList.objects.filter(
@@ -492,7 +297,6 @@ def user_shopping_list_update(request, component_pk):
             .exclude(bom_item__isnull=True)
             .first()
         )
-        print("module", shopping_list_item)
 
     if not shopping_list_item:
         return Response(
@@ -633,203 +437,6 @@ def get_user_shopping_list_total_quantity(request):
     return Response({"total_quantity": total_quantity}, status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
-@api_view(["GET"])
-def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_pk):
-    """
-    Get sum of components in user inventory that fulfill a given bom list item
-    """
-    bom_list_item = ModuleBomListItem.objects.get(id=modulebomlistitem_pk)
-    inventory = UserInventory.objects.filter(
-        component__in=bom_list_item.components_options.all(), user=request.user
-    )
-
-    # Check if inventory exists
-    if inventory.exists():
-        # Use aggregate function to get the sum of 'quantity' attribute
-        quantity_sum = inventory.aggregate(Sum("quantity")).get("quantity__sum")
-        return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
-    else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-def get_module_bom_list_items(request, module_pk):
-    try:
-        # Retrieve the Module instance based on the provided module_pk
-        module = Module.objects.get(pk=module_pk)
-    except Module.DoesNotExist:
-        # Return a response indicating that the module does not exist
-        return Response(
-            {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    # Filter ModuleBomListItem instances based on the retrieved module
-    module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
-
-    if request.user.is_authenticated:
-        # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
-        module_bom_list_items = module_bom_list_items.annotate(
-            sum_of_user_options_from_inventory=Sum(
-                "components_options__userinventory__quantity",
-                filter=Q(components_options__userinventory__user=request.user),
-                distinct=True,
-            )
-        )
-
-    # Serialize the retrieved ModuleBomListItem instances
-    serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
-
-    # Return the serialized data as a response
-    return Response(serializer.data)
-
-
-class ComponentView(APIView):
-    def get(self, request):
-        # Get the page number and search query from the request query parameters
-        page_number = request.query_params.get("page", 1)
-        search_query = request.query_params.get("search", "")
-
-        # Retrieve filter parameters from the request's query parameters
-        ohms_filter = request.query_params.get("ohms", None)
-        farads_filter = request.query_params.get("farads", None)
-        voltage_rating_filter = request.query_params.get("voltage_rating", None)
-        tolerance_filter = request.query_params.get("tolerance", None)
-        mounting_style_filter = request.query_params.get("mounting_style", None)
-        manufacturer_filter = request.query_params.get("manufacturer", None)
-        supplier_filter = request.query_params.get("supplier", None)
-        type_filter = request.query_params.get("type", None)
-
-        # Start with a base queryset
-        components = Component.objects.select_related("manufacturer", "supplier").all()
-
-        # Apply search query filter if present
-        if search_query:
-            components = components.filter(
-                Q(description__icontains=search_query)
-                | Q(manufacturer__name__icontains=search_query)
-                | Q(supplier__name__icontains=search_query)
-                | Q(supplier_item_no__icontains=search_query)
-                | Q(type__name__icontains=search_query)
-                | Q(ohms__icontains=search_query)
-                | Q(farads__icontains=search_query)
-                | Q(voltage_rating__icontains=search_query)
-                | Q(tolerance__icontains=search_query)
-                | Q(notes__icontains=search_query)
-            )
-
-        # Apply additional filters if present
-        if ohms_filter:
-            components = components.filter(ohms__icontains=ohms_filter)
-        if farads_filter:
-            components = components.filter(farads__icontains=farads_filter)
-        if voltage_rating_filter:
-            components = components.filter(
-                voltage_rating__icontains=voltage_rating_filter
-            )
-        if tolerance_filter:
-            components = components.filter(tolerance__icontains=tolerance_filter)
-        if mounting_style_filter:
-            components = components.filter(
-                mounting_style__icontains=mounting_style_filter
-            )
-        if manufacturer_filter:
-            components = components.filter(manufacturer__pk=int(manufacturer_filter))
-        if supplier_filter:
-            components = components.filter(supplier__pk=int(supplier_filter))
-        if type_filter:
-            components = components.filter(type__name__icontains=type_filter)
-
-        # Sort by description after applying all filters
-        components = components.order_by("description")
-
-        # Create a paginator instance
-        paginator = Paginator(components, 10)
-
-        # Retrieve the page based on the page number
-        page = paginator.get_page(page_number)
-
-        # Serialize the retrieved Component instances
-        serializer = ComponentSerializer(page, many=True)
-
-        # Get unique values
-        unique_ohms = Component.get_unique_ohms_or_farads_values("ohms", "ohms_unit")
-        unique_farads = Component.get_unique_ohms_or_farads_values(
-            "farads", "farads_unit"
-        )
-        unique_voltage_ratings = Component.get_unique_values("voltage_rating", str)
-        unique_tolerances = Component.get_unique_values("tolerance", str)
-        unique_mounting_style = Component.get_mounting_styles()
-
-        # Get unique manufacturer, supplier, and type names
-        unique_manufacturers = list(
-            ComponentManufacturer.objects.values("name", "pk")
-            .distinct()
-            .order_by("name")
-        )
-        unique_suppliers = list(
-            ComponentSupplier.objects.values("name", "pk").distinct().order_by("name")
-        )
-
-        unique_manufacturers = [
-            {"label": manufacturer["name"], "value": manufacturer["pk"]}
-            for manufacturer in unique_manufacturers
-        ]
-        unique_suppliers = [
-            {"label": supplier["name"], "value": supplier["pk"]}
-            for supplier in unique_suppliers
-        ]
-
-        unique_types = list(
-            Types.objects.values_list("name", flat=True).distinct().order_by("name")
-        )
-
-        # Prepare the response data
-        response_data = {
-            "count": paginator.count,
-            "next": page.next_page_number() if page.has_next() else None,
-            "previous": page.previous_page_number() if page.has_previous() else None,
-            "results": serializer.data,
-            "unique_values": {
-                "ohms": unique_ohms,
-                "farads": unique_farads,
-                "voltage_rating": unique_voltage_ratings,
-                "tolerance": unique_tolerances,
-                "mounting_style": unique_mounting_style,
-                "manufacturer": unique_manufacturers,
-                "supplier": unique_suppliers,
-                "type": unique_types,
-            },
-        }
-
-        return Response(response_data)
-
-
-@api_view(["GET"])
-def get_components_by_ids(request, pks):
-    # Validate input
-    if not pks:
-        return Response(
-            {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
-    # Split the pks string into a list of integers
-    component_pks = list(map(int, pks.split(",")))
-
-    # Retrieve the Component instances based on the provided component_pks
-    components = Component.objects.filter(pk__in=component_pks)
-
-    # Check if components are found
-    if not components:
-        return Response(
-            {"error": "Components do not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    # Serialize and return the components
-    serializer = ComponentSerializer(components, many=True)
-    return Response(serializer.data)
-
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_all_user_shopping_list_to_inventory(request):
@@ -842,7 +449,6 @@ def add_all_user_shopping_list_to_inventory(request):
             user=user,
             defaults={
                 "quantity": shopping_list_item.quantity,
-                "location": shopping_list_item.location,
             },
         )
         if not created:
@@ -866,12 +472,38 @@ def archive_shopping_list(request):
 
     # check if there's something in the shopping list
     if not UserShoppingList.objects.filter(user=user).exists():
-        return Response({"error": "No items in shopping list."}, status=400)
+        return Response(
+            {"error": "No items in shopping list."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     shopping_list = UserShoppingList.objects.filter(user=user)
     time_now = timezone.now()
 
-    # save each item in the shopping list as a UserShoppingListSaved instance
+    # Get the notes from the request body
+    notes_content = request.data.get("notes", "")
+
+    # Sanitize the input with bleach
+    notes_content = bleach.clean(notes_content)
+
+    # Validate the length of the notes
+    if len(notes_content) > 1000:
+        return Response(
+            {"error": "Notes must be no longer than 1000 characters."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Create a UserNotes instance only if notes_content has length
+    notes = None
+    if len(notes_content) > 0:
+        try:
+            notes = UserNotes.objects.create(user=user, note=notes_content)
+        except IntegrityError:
+            return Response(
+                {"error": "Failed to create UserNotes."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    # Save each item in the shopping list as a UserShoppingListSaved instance
     for item in shopping_list:
         saved_item = UserShoppingListSaved()
         saved_item.time_saved = time_now
@@ -880,26 +512,165 @@ def archive_shopping_list(request):
         saved_item.component = item.component
         saved_item.user = item.user
         saved_item.quantity = item.quantity
+        saved_item.notes = notes  # Associate with the UserNotes instance
         saved_item.save()
 
-    return Response({"message": "Shopping List saved successfully"}, status=200)
+    return Response(
+        {"message": "Shopping List saved successfully"}, status=status.HTTP_200_OK
+    )
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_archived_shopping_lists(request):
-    user = request.user
+    try:
+        user = request.user
 
-    # check if there are saved lists for the user
-    if not UserShoppingListSaved.objects.filter(user=user).exists():
-        return Response({"error": "No saved lists available."}, status=400)
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
-    # get UserShoppingListSaved instances for the user, sorted by time_saved
-    saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
-        "-time_saved"
-    )
+        # Check if there are saved lists for the user
+        saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
+            "-time_saved"
+        )
+        # If no saved lists are available, return an empty list
+        if not saved_lists.exists():
+            return Response([], status=status.HTTP_200_OK)
 
-    # serialize the data
-    serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
+        # Serialize the data
+        serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
 
-    return Response(serializer.data, status=200)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except ObjectDoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_archived_shopping_list(request, timestamp):
+    try:
+        user = request.user
+
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Parse the timestamp string into a datetime object
+        try:
+            timestamp = timezone.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return Response(
+                {
+                    "error": "Invalid timestamp format. Expected format: 'YYYY-MM-DDTHH:MM:SS.ssssssZ'."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Retrieve the archived shopping list with the specified timestamp
+        archived_list = UserShoppingListSaved.objects.filter(
+            user=user, time_saved=timestamp
+        )
+
+        # If archived list with specified timestamp does not exist
+        if not archived_list.exists():
+            return Response(
+                {"error": "Archived list with specified timestamp not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Delete the archived shopping list
+        archived_list.delete()
+
+        return Response(
+            {"message": "Archived list deleted successfully"}, status=status.HTTP_200_OK
+        )
+
+    except ObjectDoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_archived_list_to_current_list(request):
+    timestamp = request.data.get("timestamp", "")
+
+    if not timestamp:
+        return Response(
+            {"error": "No timestamp provided."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        user = request.user
+
+        # Validate user
+        if user is None or not user.is_authenticated:
+            return Response(
+                {"error": "Unauthorized user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Parse the timestamp string into a datetime object
+        try:
+            timestamp = timezone.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return Response(
+                {
+                    "error": "Invalid timestamp format. Expected format: 'YYYY-MM-DDTHH:MM:SS.ssssssZ'."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Retrieve the archived shopping list with the specified timestamp
+        archived_list = UserShoppingListSaved.objects.filter(
+            user=user, time_saved=timestamp
+        )
+
+        # If archived list with specified timestamp does not exist
+        if not archived_list.exists():
+            return Response(
+                {"error": "Archived list with specified timestamp not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Iterate through the items in the archived list
+        for archived_item in archived_list:
+            # Check if an item with the same component and module already exists in the shopping list
+            existing_item = UserShoppingList.objects.filter(
+                user=user,
+                component=archived_item.component,
+                module=archived_item.module,
+            ).first()
+
+            # If the item exists in the shopping list, update the quantity
+            if existing_item:
+                existing_item.quantity = F("quantity") + archived_item.quantity
+                existing_item.save()
+            # If the item does not exist, create a new item in the shopping list
+            else:
+                new_item = UserShoppingList(
+                    user=user,
+                    component=archived_item.component,
+                    module=archived_item.module,
+                    quantity=archived_item.quantity,
+                )
+                new_item.save()
+
+        return Response(
+            {
+                "message": "Archived list added to the current shopping list successfully."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

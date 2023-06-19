@@ -1,12 +1,11 @@
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import DataTable from "react-data-table-component";
 import { DateTime } from "luxon";
 import { JsonDiffComponent } from "json-diff-react";
-import { Link } from "react-router-dom";
 import React from "react";
 import _ from "lodash";
 import useAuthenticatedUserHistory from "../services/useAuthenticatedUserHistory";
 import useGetComponentsByIds from "../services/useGetComponentsByIds";
+import BackButton from "../ui/BackButton";
 
 const Component = ({ componentPks }) => {
   const { componentsData, componentsAreLoading, componentsAreError } =
@@ -152,14 +151,7 @@ const VersionHistory = () => {
 
   return (
     <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
-      <Link
-        to=".."
-        relative="path"
-        className="flex items-center gap-2 text-gray-400"
-      >
-        <ChevronLeftIcon className="w-5 h-5" />
-        <span>Back to Account</span>
-      </Link>
+      <BackButton prevPageName="Account" />
       <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
         Inventory Version History
       </h1>
