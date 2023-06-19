@@ -8,6 +8,7 @@ import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
+import { Helmet } from "react-helmet";
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
 import cx from "classnames";
@@ -19,7 +20,12 @@ import useGetUserShoppingListTotalPrice from "../../services/useGetUserShoppingL
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
 import { useWindowWidth } from "@react-hook/window-size";
 
-const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
+const Quantity = ({
+  componentId,
+  componentsInModule,
+  pencilComponent,
+  hideInteraction,
+}) => {
   const compsForModuleThatMatchRow = get(componentsInModule, componentId, []);
   const totalQuantity = compsForModuleThatMatchRow.reduce(
     (acc, obj) => acc + obj.quantity,
@@ -28,7 +34,7 @@ const Quantity = ({ componentId, componentsInModule, pencilComponent }) => {
   return totalQuantity ? (
     <>
       <span className="font-bold">{totalQuantity}</span>
-      {pencilComponent}
+      {hideInteraction || pencilComponent}
     </>
   ) : undefined;
 };
@@ -93,6 +99,9 @@ const ListSlice = ({
   componentsInModule,
   aggregatedComponents,
   componentsAreLoading,
+  hideInteraction = false,
+  backgroundColor = "bg-white",
+  displayTotals = true
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
@@ -102,6 +111,12 @@ const ListSlice = ({
 
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteShoppingListItem();
+
+  const bgStyles = `
+    .rdt_TableHeadRow { background-color: ${backgroundColor}; }
+    .rdt_TableRow { background-color: ${backgroundColor}; }
+    .rdt_Pagination { background-color: ${backgroundColor}; }
+  `;
 
   useEffect(() => {
     if (deleteMutation.isSuccess) {
@@ -198,44 +213,48 @@ const ListSlice = ({
         <div className="flex flex-col gap-2 cursor-pointer">
           <span>
             <a
-              href={`/module/${slug}`}
+              href={`/module/${slug}/`}
               className="text-blue-500 hover:text-blue-700"
             >
               {name}
             </a>
           </span>
-          <Button
-            classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
-            variant="danger"
-            size="xs"
-            onClick={() => {
-              setDeleteModalModuleDetails({
-                moduleName: name,
-                moduleId: moduleId,
-              });
-              setDeleteModalOpen(true);
-            }}
-          >
-            Delete
-          </Button>
+          {hideInteraction || (
+            <Button
+              classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
+              variant="danger"
+              size="xs"
+              onClick={() => {
+                setDeleteModalModuleDetails({
+                  moduleName: name,
+                  moduleId: moduleId,
+                });
+                setDeleteModalOpen(true);
+              }}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-2 cursor-pointer">
           <span className="text-bold">{name === "null" ? "Other" : name}</span>
-          <Button
-            classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
-            variant="danger"
-            size="xs"
-            onClick={() => {
-              setDeleteModalModuleDetails({
-                moduleName: "undefined modules",
-                moduleId: undefined,
-              });
-              setDeleteModalOpen(true);
-            }}
-          >
-            Delete
-          </Button>
+          {hideInteraction || (
+            <Button
+              classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
+              variant="danger"
+              size="xs"
+              onClick={() => {
+                setDeleteModalModuleDetails({
+                  moduleName: "undefined modules",
+                  moduleId: undefined,
+                });
+                setDeleteModalOpen(true);
+              }}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       ),
       cell: (row) => {
@@ -295,6 +314,7 @@ const ListSlice = ({
               <Quantity
                 componentId={row.component.id}
                 componentsInModule={componentsInModule}
+                hideInteraction={hideInteraction}
                 pencilComponent={
                   row.component.id !== quantityIdToEdit && (
                     <div
@@ -364,8 +384,37 @@ const ListSlice = ({
     },
   ];
 
+  const getColumnsBasedOnIndex = (index, allModulesData) => {
+    switch (index) {
+      case 0:
+        return labelColumns;
+        
+      case allModulesData.length + 1:
+        return totalColumn;
+        
+      case allModulesData.length + 2:
+        return priceColumn;
+        
+      default:
+        return qtyColumns;
+    }
+  };
+
+  const getColumnsBasedOnIndexHideTotals = (index) => {
+    switch (index) {
+      case 0:
+        return labelColumns;
+        
+      default:
+        return qtyColumns;
+    }
+  };
+
   return (
     <>
+      <Helmet>
+        <style>{backgroundColor != "bg-white" ? bgStyles : ""}</style>
+      </Helmet>
       <div
         className={cx(
           "group/column",
@@ -385,14 +434,9 @@ const ListSlice = ({
             compact
             responsive
             noHeader
-            columns={
-              index === 0
-                ? labelColumns
-                : index === allModulesData.length + 1
-                ? totalColumn
-                : index === allModulesData.length + 2
-                ? priceColumn
-                : qtyColumns
+            columns={displayTotals 
+              ? getColumnsBasedOnIndex(index, allModulesData) 
+              : getColumnsBasedOnIndexHideTotals(index)
             }
             data={
               !(index > allModulesData.length)

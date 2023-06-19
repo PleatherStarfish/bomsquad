@@ -76,6 +76,11 @@ frontend_redirect_urls = [
         name="user-inventory-version-history",
     ),
     path(
+        "user/<str:username>/shopping-list/saved-lists/",
+        login_required(TemplateView.as_view(template_name="frontend.html")),
+        name="user-inventory-version-history",
+    ),
+    path(
         "user/<str:username>/shopping-list/",
         login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-shopping-list",

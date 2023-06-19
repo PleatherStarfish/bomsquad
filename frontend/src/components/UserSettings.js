@@ -1,9 +1,8 @@
 import Button from "../ui/Button";
+import BackButton from "../ui/BackButton";
 import { CURRENCIES } from "../utils/currencies";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import DeleteAccountButton from "./DeleteAccountButton";
 import Dropdown from "../ui/Dropdown";
-import { Link } from "react-router-dom";
 import React from "react";
 
 const Settings = () => {
@@ -13,14 +12,7 @@ const Settings = () => {
 
   return (
     <div className="px-4 py-8 mb-12 mt-36 md:px-24 lg:px-48">
-      <Link
-        to=".."
-        relative="path"
-        className="flex items-center gap-2 text-gray-400"
-      >
-        <ChevronLeftIcon className="w-5 h-5" />
-        <span>Back to Account</span>
-      </Link>
+      <BackButton prevPageName="Account" />
       <div>
         <div className="px-4 sm:px-0">
           <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
