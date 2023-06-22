@@ -39,6 +39,7 @@ class CustomUser(AbstractUser):
         ("USD", "US Dollar"),
         ("ZAR", "South African Rand"),
     ]
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     username = models.CharField(max_length=30, unique=True, blank=True, null=True)
     default_currency = models.CharField(
         choices=CURRENCIES, default="USD", max_length=3, null=True, blank=True

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from core.models import BaseModel
-
+import uuid
 
 OHMS_UNITS = (
     ("Ω", "Ω"),
@@ -26,7 +26,7 @@ MOUNTING_STYLE = [
 
 
 class Types(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255, unique=True)
     order = models.PositiveSmallIntegerField(unique=False)
     notes = models.TextField(blank=True)
@@ -40,7 +40,7 @@ class Types(BaseModel):
 
 
 class ComponentSupplier(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=30)
     url = models.URLField(max_length=255)
@@ -53,7 +53,7 @@ class ComponentSupplier(BaseModel):
 
 
 class ComponentManufacturer(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255, unique=True)
 
     class Meta:
@@ -64,7 +64,7 @@ class ComponentManufacturer(BaseModel):
 
 
 class Component(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT

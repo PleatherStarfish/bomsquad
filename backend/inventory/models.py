@@ -4,10 +4,11 @@ from components.models import Component
 from core.models import BaseModel
 import json
 import bleach
+import uuid
 
 
 class UserInventory(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0, blank=False)
