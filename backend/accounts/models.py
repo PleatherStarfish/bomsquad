@@ -39,6 +39,7 @@ class CustomUser(AbstractUser):
         ("USD", "US Dollar"),
         ("ZAR", "South African Rand"),
     ]
+    id = models.BigAutoField(auto_created=True, primary_key=True)
     username = models.CharField(max_length=30, unique=True, blank=True, null=True)
     default_currency = models.CharField(
         choices=CURRENCIES, default="USD", max_length=3, null=True, blank=True
