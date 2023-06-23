@@ -39,17 +39,11 @@ class CustomUser(AbstractUser):
         ("USD", "US Dollar"),
         ("ZAR", "South African Rand"),
     ]
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     username = models.CharField(max_length=30, unique=True, blank=True, null=True)
     default_currency = models.CharField(
         choices=CURRENCIES, default="USD", max_length=3, null=True, blank=True
     )
     history = models.JSONField(default=list, blank=True)
-    premium_until = models.DateField(
-        null=True,
-        blank=True,
-        help_text="Premium expiry date. Is null if not premium or premium via Patreon.",
-    )
 
     def __str__(self):
         return self.email
