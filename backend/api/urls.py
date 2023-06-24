@@ -1,9 +1,10 @@
 from django.urls import path
 
 # User-related views
-from api.views import (
+from accounts.views import (
     delete_user,
     get_user_me,
+    get_user_history,
 )
 
 # User modules-related views
@@ -27,33 +28,17 @@ from inventory.views import (
 )
 
 # User shopping list-related views
-from api.views import (
-    get_user_shopping_list,
-    user_shopping_list_update,
-    user_shopping_list_create_or_update,
-    user_shopping_list_delete_module,
-    user_shopping_list_delete_anonymous,
-    get_user_shopping_list_quantity_bom_item_agnostic,
+from shopping_list.views import (
+    UserShoppingListView,
+    ArchivedShoppingListsView,
+    UserAnonymousShoppingListView,
     get_user_shopping_list_quantity,
     add_all_user_shopping_list_to_inventory,
     get_user_shopping_list_total_price,
     get_user_shopping_list_total_component_price,
     get_user_shopping_list_total_quantity,
     archive_shopping_list,
-    get_archived_shopping_lists,
-    delete_archived_shopping_list,
-    add_archived_list_to_current_list,
-)
-
-# User anonymous shopping list-related views
-from api.views import (
-    user_anonymous_shopping_list_create_or_update,
     get_user_anonymous_shopping_list_quantity,
-)
-
-# User history-related view
-from api.views import (
-    get_user_history,
 )
 
 
@@ -88,41 +73,36 @@ urlpatterns = [
         UserInventoryView.as_view(),
         name="user_inventory_delete",
     ),
-    path("shopping-list/", get_user_shopping_list, name="user-shopping-list"),
+    path("shopping-list/", UserShoppingListView.as_view(), name="user-shopping-list"),
     path(
         "shopping-list/<int:component_pk>/update/",
-        user_shopping_list_update,
+        UserShoppingListView.as_view(),
         name="user-shopping-list-update",
     ),
     path(
         "shopping-list/<int:module_pk>/delete/",
-        user_shopping_list_delete_module,
+        UserShoppingListView.as_view(),
         name="user-shopping-list-delete-module",
     ),
     path(
         "shopping-list/delete-anonymous/",
-        user_shopping_list_delete_anonymous,
+        UserAnonymousShoppingListView.as_view(),
         name="user-shopping-list-delete-module",
     ),
     path(
         "shopping-list/<int:component_pk>/create-or-update/",
-        user_shopping_list_create_or_update,
+        UserShoppingListView.as_view(),
         name="user-shopping-list-create-or-update",
     ),
     path(
         "shopping-list/<int:component_pk>/anonymous-create-or-update/",
-        user_anonymous_shopping_list_create_or_update,
+        UserAnonymousShoppingListView.as_view(),
         name="user-anonymous-shopping-list-create-or-update",
     ),
     path(
         "shopping-list/<int:component_pk>/component-quantity/",
         get_user_anonymous_shopping_list_quantity,
         name="user-shopping-list-anonymous",
-    ),
-    path(
-        "shopping-list/<int:component_pk>/<int:module_pk>/component-quantity/",
-        get_user_shopping_list_quantity_bom_item_agnostic,
-        name="user-shopping-list-bom-item-agnostic",
     ),
     path(
         "shopping-list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
@@ -147,17 +127,17 @@ urlpatterns = [
     path("shopping-list/archive/", archive_shopping_list, name="archive-shopping-list"),
     path(
         "shopping-list/archive/add/",
-        add_archived_list_to_current_list,
+        ArchivedShoppingListsView.as_view(),
         name="add-archived-list-to-current-list",
     ),
     path(
         "shopping-list/get-archived/",
-        get_archived_shopping_lists,
+        ArchivedShoppingListsView.as_view(),
         name="get-archived-shopping-lists",
     ),
     path(
         "shopping-list/delete/<str:timestamp>/",
-        delete_archived_shopping_list,
+        ArchivedShoppingListsView.as_view(),
         name="delete-shopping-list",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),

@@ -9,10 +9,11 @@ from components.models import Component
 from accounts.models import CustomUser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+import uuid
 
 
 class UserShoppingList(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE)
     bom_item = models.ForeignKey(
         ModuleBomListItem, null=True, blank=True, on_delete=models.CASCADE
@@ -54,7 +55,7 @@ class UserShoppingList(BaseModel):
 
 
 class UserShoppingListSaved(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     time_saved = models.DateTimeField(default=timezone.now)
     module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE)
     bom_item = models.ForeignKey(

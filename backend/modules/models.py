@@ -11,6 +11,7 @@ from core.models import BaseModel
 import os
 from io import BytesIO
 from django.core.files.base import ContentFile
+import uuid
 
 MOUNTING_STYLE = [
     ("smt", "Surface Mount (SMT)"),
@@ -19,7 +20,7 @@ MOUNTING_STYLE = [
 
 
 class Manufacturer(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     link = models.URLField(blank=True)
     notes = models.TextField(blank=True)
@@ -35,7 +36,7 @@ class Manufacturer(BaseModel):
 
 
 class ModuleBomListItem(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=False)
     components_options = models.ManyToManyField(
         Component, blank=False, related_name="component_identity_to_component"
@@ -69,7 +70,7 @@ class ModuleBomListItem(BaseModel):
 
 
 class Module(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.PROTECT)
     version = models.CharField(max_length=10, default="1")
@@ -143,7 +144,7 @@ class Module(BaseModel):
 
 
 class WantToBuildModules(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
@@ -155,7 +156,7 @@ class WantToBuildModules(BaseModel):
 
 
 class BuiltModules(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
@@ -167,7 +168,7 @@ class BuiltModules(BaseModel):
 
 
 class ModuleBomListComponentForItemRating(BaseModel):
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     module_bom_list_item = models.ForeignKey(
         ModuleBomListItem, blank=False, null=False, on_delete=models.CASCADE
     )
