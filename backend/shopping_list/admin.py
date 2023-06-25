@@ -4,11 +4,11 @@ from core.admin import BaseAdmin
 
 
 class UserShoppingListAdmin(BaseAdmin):
-    pass
+    model = UserShoppingList
 
 
 class UserShoppingListSavedAdmin(BaseAdmin):
-    pass
+    model = UserShoppingListSaved
 
 
 # Register your models here.
