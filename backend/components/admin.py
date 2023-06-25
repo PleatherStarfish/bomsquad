@@ -1,21 +1,21 @@
 from django.contrib import admin
 from components.models import Component, ComponentSupplier, ComponentManufacturer, Types
-from import_export.admin import ImportExportModelAdmin
+from core.admin import BaseAdmin
 
 
-class ComponentAdmin(ImportExportModelAdmin):
+class ComponentAdmin(BaseAdmin):
     model = Component
 
 
-class TypesAdmin(ImportExportModelAdmin):
+class TypesAdmin(BaseAdmin):
     model = Types
 
 
-class ComponentSupplierAdmin(ImportExportModelAdmin):
+class ComponentSupplierAdmin(BaseAdmin):
     model = ComponentSupplier
 
 
-class ComponentManufacturerAdmin(ImportExportModelAdmin):
+class ComponentManufacturerAdmin(BaseAdmin):
     model = ComponentManufacturer
 
 

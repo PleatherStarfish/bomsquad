@@ -4,7 +4,7 @@ from core.admin import BaseAdmin
 
 
 class UserInventoryAdmin(BaseAdmin):
-    pass
+    model = UserInventory
 
 
 # Register your models here.
