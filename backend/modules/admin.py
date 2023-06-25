@@ -16,23 +16,23 @@ class ModuleBomListItemAdmin(BaseAdmin):
 
 
 class ManufacturerAdmin(BaseAdmin):
-    pass
+    model = Manufacturer
 
 
 class ModuleAdmin(BaseAdmin):
-    pass
+    model = Module
 
 
 class WantToBuildModulesAdmin(BaseAdmin):
-    pass
+    model = WantToBuildModules
 
 
 class BuiltModulesAdmin(BaseAdmin):
-    pass
+    model = BuiltModules
 
 
 class ModuleBomListComponentForItemRatingAdmin(BaseAdmin):
-    pass
+    model = ModuleBomListComponentForItemRating
 
 
 # Register your models here.
