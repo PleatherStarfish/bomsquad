@@ -18,7 +18,7 @@ services:
     build: ./backend
     volumes:
       - ./backend:/code
-      - ./frontend/build/:/code/static/frontend
+      - ./frontend/build/:/code/static/js
     ports:
       - 8000:8000
     depends_on:
