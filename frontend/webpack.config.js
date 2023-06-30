@@ -56,6 +56,14 @@ module.exports.plugins.push({
         if (stdout) console.log(`Makefile stdout: ${stdout}`);
         if (stderr) console.error(`Makefile stderr: ${stderr}`);
       });
+      exec("make -C .. cp-bundle", (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Makefile execution error: ${error}`);
+          return;
+        }
+        if (stdout) console.log(`Makefile stdout: ${stdout}`);
+        if (stderr) console.error(`Makefile stderr: ${stderr}`);
+      })
     });
   },
 });
