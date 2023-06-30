@@ -1,4 +1,5 @@
 bleach==6.0.0
+Brotli==1.0.9
 types-bleach==6.0.0.3
 crispy-tailwind==0.5
 drf-yasg==1.21.5
