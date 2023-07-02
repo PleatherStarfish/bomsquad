@@ -21,6 +21,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bom-squad.com",
     "https://dev.bom-squad.com",
 ]
+COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "collectfast",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.sites",
@@ -261,3 +263,22 @@ ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+LOG_PATH = os.path.join(BASE_DIR, "log")
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": LOG_PATH,
+        },
+    },
+    "root": {
+        "handlers": ["file"],
+        "level": "DEBUG",
+    },
+}
