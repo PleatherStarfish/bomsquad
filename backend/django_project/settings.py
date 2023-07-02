@@ -23,6 +23,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bom-squad.com",
     "https://dev.bom-squad.com",
 ]
+STATICFILES_STORAGE = "django.core.files.storage.FileSystemStorage"
+COLLECTFAST_STRATEGY = "collectfast.strategies.filesystem.FileSystemStrategy"
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -30,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "collectfast",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.sites",
