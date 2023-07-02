@@ -264,8 +264,8 @@ ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-LOG_DIR = os.getenv("DJANGO_LOG_DIR", default="../../logs/")
-LOG_FILE_PATH = os.path.join(LOG_DIR, "django.log")
+LOG_PATH = os.path.join(BASE_DIR, "log")
+
 
 LOGGING = {
     "version": 1,
@@ -274,7 +274,7 @@ LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": LOG_FILE_PATH,
+            "filename": LOG_PATH,
         },
     },
     "root": {

@@ -47,3 +47,6 @@ build/
 **.chunk.js.map
 runtime*.js
 runtime*.js.map
+
+log
+logs
