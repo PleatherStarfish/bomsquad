@@ -25,6 +25,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 STATICFILES_STORAGE = "django.core.files.storage.FileSystemStorage"
 COLLECTFAST_STRATEGY = "collectfast.strategies.filesystem.FileSystemStrategy"
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
