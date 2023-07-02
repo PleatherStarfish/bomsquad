@@ -7,6 +7,9 @@
 {% endblock content %}
 
 {% block javascript %}
-<script src="{% static 'frontend/main.js' %}"></script>
+{% if settings.DEBUG %}
+    <script src="{% static 'frontend/main.js' %}"></script>
+{% else %}
+    <script src="{% static 'js/main.js' %}"></script>
+{% endif %}
 {% endblock javascript %}
-
