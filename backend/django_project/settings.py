@@ -25,6 +25,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 STATICFILES_STORAGE = "django.core.files.storage.FileSystemStorage"
 COLLECTFAST_STRATEGY = "collectfast.strategies.filesystem.FileSystemStrategy"
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -34,7 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "collectfast",
     "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
+    "core.staticfiles_config.MyStaticFilesConfig",
     "django.contrib.sites",
     # Third-party
     "allauth",
@@ -180,13 +181,13 @@ USE_L10N = True
 USE_TZ = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # http://whitenoise.evans.io/en/stable/django.html#add-compression-and-caching-support
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
