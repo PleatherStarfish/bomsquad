@@ -3,7 +3,7 @@
 python manage.py migrate
 
 # Collect static files
-python manage.py collectstatic --noinput --clear --ignore "node_modules" --ignore "rest_framework" --ignore "import_export" --ignore "drf-yasg" --ignore ".DS_Store" --ignore ".DS_Store.*"
+python manage.py collectstatic --noinput --ignore "node_modules" --ignore "rest_framework" --ignore "import_export" --ignore "drf-yasg" --ignore ".DS_Store" --ignore ".DS_Store.*"
 
 if [ "$PRODUCTION" = True ]
 then
