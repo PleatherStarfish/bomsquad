@@ -23,6 +23,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bom-squad.com",
     "https://dev.bom-squad.com",
 ]
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -31,7 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
+    "core.staticfiles_config.MyStaticFilesConfig",
     "django.contrib.sites",
     # Third-party
     "allauth",
@@ -76,6 +77,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://134.209.65.8",
     "https://bom-squad.com",
+    "https://dev.bom-squad.com",
 ]
 CORS_ALLOW_METHODS = [
     "DELETE",

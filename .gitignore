@@ -27,6 +27,7 @@ node_modules
 
 # misc
 .DS_Store
+.DNS_Store
 .env.dev
 .env.prod
 
@@ -47,3 +48,6 @@ build/
 **.chunk.js.map
 runtime*.js
 runtime*.js.map
+
+log
+logs

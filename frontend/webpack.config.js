@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const { exec } = require("child_process");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: "./src/index.js",
@@ -41,6 +42,7 @@ module.exports = {
       },
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new CleanWebpackPlugin(),
   ],
 };
 
@@ -48,7 +50,7 @@ module.exports = {
 module.exports.plugins.push({
   apply: (compiler) => {
     compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
-      exec("make -C .. build-styles", (error, stdout, stderr) => {
+      exec("make build-styles", (error, stdout, stderr) => {
         if (error) {
           console.error(`Makefile execution error: ${error}`);
           return;
@@ -56,6 +58,14 @@ module.exports.plugins.push({
         if (stdout) console.log(`Makefile stdout: ${stdout}`);
         if (stderr) console.error(`Makefile stderr: ${stderr}`);
       });
+      // exec("make cp-bundle", (error, stdout, stderr) => {
+      //   if (error) {
+      //     console.error(`Makefile execution error: ${error}`);
+      //     return;
+      //   }
+      //   if (stdout) console.log(`Makefile stdout: ${stdout}`);
+      //   if (stderr) console.error(`Makefile stderr: ${stderr}`);
+      // })
     });
   },
 });

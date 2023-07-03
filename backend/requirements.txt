@@ -1,4 +1,5 @@
 bleach==6.0.0
+Brotli==1.0.9
 types-bleach==6.0.0.3
 crispy-tailwind==0.5
 drf-yasg==1.21.5
@@ -14,6 +15,7 @@ django-crispy-forms==1.14.0
 django-debug-toolbar==3.8.1
 django-recaptcha==3.0.0
 sendgrid==6.10.0
+sentry-sdk==1.26.0
 whitenoise==6.3.0
 psycopg2-binary==2.9.5
 gunicorn
