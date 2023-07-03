@@ -23,8 +23,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bom-squad.com",
     "https://dev.bom-squad.com",
 ]
-STATICFILES_STORAGE = "django.core.files.storage.FileSystemStorage"
-COLLECTFAST_STRATEGY = "collectfast.strategies.filesystem.FileSystemStrategy"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
@@ -33,7 +31,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "collectfast",
     "whitenoise.runserver_nostatic",
     "core.staticfiles_config.MyStaticFilesConfig",
     "django.contrib.sites",
@@ -80,6 +77,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://134.209.65.8",
     "https://bom-squad.com",
+    "https://dev.bom-squad.com",
 ]
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -181,13 +179,13 @@ USE_L10N = True
 USE_TZ = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # http://whitenoise.evans.io/en/stable/django.html#add-compression-and-caching-support
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
