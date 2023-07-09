@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
+    "core.staticfiles_config.StaticFilesConfig",
     "django.contrib.sites",
     # Third-party
     "allauth",
