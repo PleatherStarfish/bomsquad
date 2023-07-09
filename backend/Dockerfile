@@ -17,6 +17,7 @@ RUN set -ex && \
     rm -rf /root/.cache/
 
 RUN apt update && apt install -y curl
+RUN apt-get update && apt-get install -y make
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt -y install nodejs
 
