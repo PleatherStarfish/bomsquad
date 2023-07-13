@@ -30,7 +30,9 @@ const BomList = ({ moduleId, moduleName }) => {
     return <div>Error loading components: {moduleBomIsError.message}</div>;
   }
 
-  const moduleBomData = moduleBom.map((item) => ({
+  const moduleBomList = Array.isArray(moduleBom) ? moduleBom : [];
+
+  const moduleBomData = moduleBomList.map((item) => ({
     ...item,
     moduleName,
     moduleId,

@@ -103,12 +103,12 @@ urlpatterns = [
     path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),
     path(
-        "add-to-built/<int:module_id>/",
+        "add-to-built/<uuid:module_id>/",
         login_required(ModuleView.add_module_to_built),
         name="add_to_built",
     ),
     path(
-        "add-to-wtb/<int:module_id>/",
+        "add-to-wtb/<uuid:module_id>/",
         login_required(ModuleView.add_module_to_wtb),
         name="add_to_wtb",
     ),
