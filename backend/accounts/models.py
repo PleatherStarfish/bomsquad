@@ -40,9 +40,9 @@ class CustomUser(AbstractUser):
         ("ZAR", "South African Rand"),
     ]
     id = models.BigAutoField(auto_created=True, primary_key=True)
-    username = models.CharField(max_length=30, unique=True, blank=True, null=True)
+    username = models.CharField(max_length=30, unique=True, blank=True)
     default_currency = models.CharField(
-        choices=CURRENCIES, default="USD", max_length=3, null=True, blank=True
+        choices=CURRENCIES, default="USD", max_length=3, blank=True
     )
     history = models.JSONField(default=list, blank=True)
     premium_until = models.DateField(

@@ -39,7 +39,7 @@ class ModuleBomListItem(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=False)
     components_options = models.ManyToManyField(
-        Component, blank=False, related_name="component_identity_to_component"
+        Component, blank=True, null=True, related_name="component_identity_to_component"
     )
     module = models.ForeignKey(
         "Module", blank=False, null=False, on_delete=models.PROTECT
@@ -48,7 +48,6 @@ class ModuleBomListItem(BaseModel):
     designators = models.CharField(
         max_length=255,
         blank=True,
-        null=True,
         help_text="A list of locations on the circuit board.",
     )
     quantity = models.PositiveIntegerField(default=0, blank=False)
@@ -83,9 +82,7 @@ class Module(BaseModel):
     bom_link = models.URLField(blank=True)
     manual_link = models.URLField(blank=True)
     modulargrid_link = models.URLField(blank=True)
-    mounting_style = models.CharField(
-        choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
-    )
+    mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     discontinued = models.BooleanField(default=False)
     slug = models.SlugField(blank=True)
 

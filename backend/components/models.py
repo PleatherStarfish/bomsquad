@@ -70,9 +70,7 @@ class Component(BaseModel):
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
     )
     manufacturer_part_no = models.CharField(max_length=100, blank=True)
-    mounting_style = models.CharField(
-        choices=MOUNTING_STYLE, max_length=50, blank=True, null=True
-    )
+    mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     supplier = models.ForeignKey(
         ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
     )
@@ -89,7 +87,6 @@ class Component(BaseModel):
         max_length=2,
         choices=OHMS_UNITS,
         blank=True,
-        null=True,
         help_text="If the component type involves resistance, this value MUST be set.",
     )
     farads = models.DecimalField(
@@ -103,7 +100,6 @@ class Component(BaseModel):
         max_length=2,
         choices=FARAD_UNITS,
         blank=True,
-        null=True,
         help_text="If the component type involves capacitance, this value MUST be set.",
     )
     voltage_rating = models.CharField(max_length=3, blank=True)
@@ -112,7 +108,6 @@ class Component(BaseModel):
         max_digits=4,
         decimal_places=2,
         default_currency="USD",
-        null=False,
         blank=False,
         default=0,
     )

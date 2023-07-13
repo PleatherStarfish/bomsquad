@@ -66,7 +66,7 @@ class UserShoppingListSaved(BaseModel):
         CustomUser, blank=False, null=False, on_delete=models.CASCADE
     )
     quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255, blank=True)
     notes = models.ForeignKey(
         UserNotes, on_delete=models.CASCADE, null=True, blank=True
     )
