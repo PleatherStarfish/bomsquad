@@ -228,6 +228,8 @@ RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 
+APPEND_SLASH = True
+
 # Additional configuration settings
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True

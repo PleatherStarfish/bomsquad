@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import axios from 'axios';
+import { useQuery } from "@tanstack/react-query";
+
+// TODO - change name to match useGet standard
 
 const useModuleBomListItems = (moduleId) => {
   const { data: moduleBom, isLoading: moduleBomIsLoading, isError: moduleBomIsError } = useQuery(['moduleBomListItems', moduleId], async () => {
@@ -12,6 +14,8 @@ const useModuleBomListItems = (moduleId) => {
       throw new Error("Network response was not ok");
     }
   });
+
+  console.log(moduleBom)
 
   return { moduleBom, moduleBomIsLoading, moduleBomIsError };
 };

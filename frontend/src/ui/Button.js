@@ -33,6 +33,7 @@ export const ButtonVariant = {
   muted: "bg-gray-400 text-white hover:bg-gray-500",
   light:
     "bg-white border-2 border-gray-400 text-gray-500 hover:border-gray-600 hover:text-gray-700",
+  link: "text-gray-500 hover:text-red-500",
 };
 
 const Button = ({
@@ -59,12 +60,11 @@ const Button = ({
             "flex items-center justify-center",
             sizeClass,
             variantClass,
-            // ButtonSizeIconSize[size],
             classNames
           )}
           aria-label={children}
         >
-          <Icon className="w-4 w-4" />
+          <Icon className="w-4 h-4" />
         </button>
       </Tippy>
     );

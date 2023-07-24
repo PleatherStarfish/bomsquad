@@ -1,7 +1,7 @@
 import "tippy.js/dist/tippy.css";
 
 import Alert from "../../ui/Alert";
-import { Check2Circle } from "react-bootstrap-icons";
+import { Check2Circle, Flag } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
 import React from "react";
@@ -43,7 +43,7 @@ const BomList = ({ moduleId, moduleName }) => {
       name: <div className="sr-only">Alerts</div>,
       cell: (row) => {
         return (
-          row.quantity <= row.sum_of_user_options_from_inventory && (
+          (row.quantity <= row.sum_of_user_options_from_inventory  && row.quantity > 0) && (
             <Tippy
               content={
                 "Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
@@ -94,7 +94,7 @@ const BomList = ({ moduleId, moduleName }) => {
 
   const conditionalRowStyles = [
     {
-      when: (row) => row.quantity <= row.sum_of_user_options_from_inventory,
+      when: (row) => row.quantity <= row.sum_of_user_options_from_inventory && row.quantity > 0,
       style: {
         backgroundColor: "#fdf4b3",
         color: "black",

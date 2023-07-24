@@ -8,15 +8,11 @@ from accounts.views import (
 )
 
 # User modules-related views
-from modules.views import (
-    UserModulesView,
-    ModuleDetailView,
-)
+from modules.views import UserModulesView, ModuleDetailView, get_module_bom_list_items
 
 # Module and components-related views
 from components.views import (
     ComponentView,
-    get_module_bom_list_items,
     get_components_by_ids,
 )
 
@@ -33,6 +29,7 @@ from shopping_list.views import (
     ArchivedShoppingListsView,
     UserAnonymousShoppingListView,
     get_user_shopping_list_quantity,
+    add_component_to_inventory,
     add_all_user_shopping_list_to_inventory,
     get_user_shopping_list_total_price,
     get_user_shopping_list_total_component_price,
@@ -54,33 +51,33 @@ urlpatterns = [
         name="user-inventory-quantities-for-bom-list-item",
     ),
     path(
-        "inventory/<int:component_pk>/component-quantity/",
+        "inventory/<uuid:component_pk>/component-quantity/",
         get_user_inventory_quantity,
         name="user-inventory-quantity",
     ),
     path(
-        "inventory/<int:component_pk>/create-or-update/",
+        "inventory/<uuid:component_pk>/create-or-update/",
         UserInventoryView.as_view(),
         name="user_inventory_create_or_update",
     ),
     path(
-        "inventory/<int:component_pk>/update/",
+        "inventory/<uuid:component_pk>/update/",
         UserInventoryView.as_view(),
         name="user_inventory_update",
     ),
     path(
-        "inventory/<int:component_pk>/delete/",
+        "inventory/<uuid:component_pk>/delete/",
         UserInventoryView.as_view(),
         name="user_inventory_delete",
     ),
     path("shopping-list/", UserShoppingListView.as_view(), name="user-shopping-list"),
     path(
-        "shopping-list/<int:component_pk>/update/",
+        "shopping-list/<uuid:component_pk>/update/",
         UserShoppingListView.as_view(),
         name="user-shopping-list-update",
     ),
     path(
-        "shopping-list/<int:module_pk>/delete/",
+        "shopping-list/<uuid:module_pk>/delete/",
         UserShoppingListView.as_view(),
         name="user-shopping-list-delete-module",
     ),
@@ -90,22 +87,22 @@ urlpatterns = [
         name="user-shopping-list-delete-module",
     ),
     path(
-        "shopping-list/<int:component_pk>/create-or-update/",
+        "shopping-list/<uuid:component_pk>/create-or-update/",
         UserShoppingListView.as_view(),
         name="user-shopping-list-create-or-update",
     ),
     path(
-        "shopping-list/<int:component_pk>/anonymous-create-or-update/",
+        "shopping-list/<uuid:component_pk>/anonymous-create-or-update/",
         UserAnonymousShoppingListView.as_view(),
         name="user-anonymous-shopping-list-create-or-update",
     ),
     path(
-        "shopping-list/<int:component_pk>/component-quantity/",
+        "shopping-list/<uuid:component_pk>/component-quantity/",
         get_user_anonymous_shopping_list_quantity,
         name="user-shopping-list-anonymous",
     ),
     path(
-        "shopping-list/<int:component_pk>/<int:modulebomlistitem_pk>/<int:module_pk>/component-quantity/",
+        "shopping-list/<uuid:component_pk>/<uuid:modulebomlistitem_pk>/<uuid:module_pk>/component-quantity/",
         get_user_shopping_list_quantity,
         name="user-shopping-list",
     ),
@@ -115,7 +112,7 @@ urlpatterns = [
         name="user-shopping-list-total-price",
     ),
     path(
-        "shopping-list/<int:component_pk>/total-price/",
+        "shopping-list/<uuid:component_pk>/total-price/",
         get_user_shopping_list_total_component_price,
         name="user-shopping-list-total-price",
     ),
@@ -141,10 +138,10 @@ urlpatterns = [
         name="delete-shopping-list",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
-    path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),
+    path("components/<uuid:pks>/", get_components_by_ids, name="component-list-by-ids"),
     path("module/<slug:slug>/", ModuleDetailView.as_view(), name="module-detail"),
     path(
-        "module/<int:module_pk>/bom-list-items/",
+        "module/<uuid:module_pk>/bom-list-items/",
         get_module_bom_list_items,
         name="module-bom-list-items",
     ),
@@ -152,5 +149,10 @@ urlpatterns = [
         "shopping-list/inventory/add/",
         add_all_user_shopping_list_to_inventory,
         name="add_all_user_shopping_list_to_inventory",
+    ),
+    path(
+        "shopping-list/inventory/<uuid:component_pk>/add/",
+        add_component_to_inventory,
+        name="add_component_to_inventory",
     ),
 ]

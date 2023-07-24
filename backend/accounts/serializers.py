@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from accounts.models import CustomUser, UserNotes
+import json
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,8 +21,13 @@ class UserHistorySerializer(serializers.ModelSerializer):
     history = serializers.SerializerMethodField()
 
     def get_history(self, obj):
+        history_list = (
+            json.loads(obj.history) if isinstance(obj.history, str) else obj.history
+        )
         # Sort the history items by timestamp in descending order
-        sorted_history = sorted(obj.history, key=lambda x: x["timestamp"], reverse=True)
+        sorted_history = sorted(
+            history_list, key=lambda x: x["timestamp"], reverse=True
+        )
         return sorted_history
 
     class Meta:

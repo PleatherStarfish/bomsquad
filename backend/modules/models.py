@@ -12,6 +12,7 @@ import os
 from io import BytesIO
 from django.core.files.base import ContentFile
 import uuid
+from components.models import Types
 
 MOUNTING_STYLE = [
     ("smt", "Surface Mount (SMT)"),
@@ -44,7 +45,7 @@ class ModuleBomListItem(BaseModel):
     module = models.ForeignKey(
         "Module", blank=False, null=False, on_delete=models.PROTECT
     )
-    type = models.CharField(max_length=100, blank=True)
+    type = models.ForeignKey(Types, on_delete=models.PROTECT)
     designators = models.CharField(
         max_length=255,
         blank=True,

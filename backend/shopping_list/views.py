@@ -18,6 +18,7 @@ from shopping_list.serializers import (
     UserShoppingListSerializer,
 )
 from rest_framework.views import APIView
+from uuid import UUID
 
 
 class UserShoppingListView(APIView):
@@ -109,13 +110,7 @@ class UserShoppingListView(APIView):
 
         module_bom_list_item_pk = request.data.get("modulebomlistitem_pk", None)
 
-        if module_bom_list_item_pk is not None:
-            module_bom_list_item_pk = int(module_bom_list_item_pk)
-
         module_pk = request.data.get("module_pk", None)
-
-        if module_pk is not None:
-            module_pk = int(module_pk)
 
         if not module_bom_list_item_pk or not module_pk:
             shopping_list_item = (
@@ -538,6 +533,40 @@ def get_user_shopping_list_total_quantity(request):
     ]
 
     return Response({"total_quantity": total_quantity}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_component_to_inventory(request, component_pk):
+    user = request.user
+    quantity = request.data.get("quantity", None)
+
+    if not quantity:
+        return Response(
+            {"detail": "quantity is a required field."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        quantity = int(quantity)  # make sure the quantity is an integer
+    except ValueError:
+        return Response(
+            {"detail": "Invalid quantity."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    inventory_item, created = UserInventory.objects.get_or_create(
+        component_id=component_pk,
+        user=user,
+        defaults={"quantity": quantity},
+    )
+
+    # If the item already exists in the inventory, update its quantity
+    if not created:
+        UserInventory.objects.filter(pk=inventory_item.pk).update(
+            quantity=F("quantity") + quantity
+        )
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])

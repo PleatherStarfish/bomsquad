@@ -5,10 +5,11 @@ import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 import AddComponentModal from "./addComponentModal";
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
+import { FlagIcon } from "@heroicons/react/24/outline";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
-import useGetUserShoppingListQuantity from '../../services/useGetUserShoppingListQuantity';
-import useUserInventoryQuantity from '../../services/useGetUserInventoryQuantity';
+import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
+import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 
 export const customStyles = {
   headCells: {
@@ -63,7 +64,7 @@ const NestedTable = (props) => {
       sortable: true,
       grow: 1,
       wrap: true,
-      minWidth: "200px"
+      minWidth: "200px",
     },
     {
       name: <div>Type</div>,
@@ -113,8 +114,16 @@ const NestedTable = (props) => {
       name: <div>Price</div>,
       selector: (row) => {
         return (
-          <span>{row.component?.price_currency && `${getCurrencySymbol(row.component.price_currency)}${roundToCurrency(row.component.price, row.component.price_currency)}`}</span>
-        )
+          <span>
+            {row.component?.price_currency &&
+              `${getCurrencySymbol(
+                row.component.price_currency
+              )}${roundToCurrency(
+                row.component.price,
+                row.component.price_currency
+              )}`}
+          </span>
+        );
       },
       sortable: true,
       wrap: true,
@@ -136,14 +145,28 @@ const NestedTable = (props) => {
     },
     {
       name: <div>Qty in User Inv.</div>,
-      cell: (row) => <Quantity useHook={useUserInventoryQuantity} hookArgs={{component_pk: row.id}} />,
+      cell: (row) => (
+        <Quantity
+          useHook={useUserInventoryQuantity}
+          hookArgs={{ component_pk: row.id }}
+        />
+      ),
       sortable: false,
       omit: !user,
       width: "80px",
     },
     {
       name: <div>Qty in Shopping List</div>,
-      selector: (row) => <Quantity useHook={useGetUserShoppingListQuantity} hookArgs={{component_pk: row.id, modulebomlistitem_pk: props.data.id, module_pk: props.data.moduleId}} />,
+      selector: (row) => (
+        <Quantity
+          useHook={useGetUserShoppingListQuantity}
+          hookArgs={{
+            component_pk: row.id,
+            modulebomlistitem_pk: props.data.id,
+            module_pk: props.data.moduleId,
+          }}
+        />
+      ),
       sortable: false,
       omit: !user,
       width: "80px",
@@ -165,22 +188,30 @@ const NestedTable = (props) => {
               setOpen={setInventoryModalOpen}
               title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
               type={Types.INVENTORY}
-              text={<>
-                <span>
-                  {`${props.data.moduleName} requires ${props.data.quantity} x
+              text={
+                <>
+                  <span>
+                    {`${props.data.moduleName} requires ${props.data.quantity} x
                   ${props.data.description}. How many `}
-                </span>
-                <span>
-                  <a
-                    href={row.link}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    {`${row.description} ${props.data.type.toLowerCase()}s by ${row.supplier?.name} `}
-                  </a>
-                </span>
-                <span>would you like to add to your inventory to fulfill this BOM item?
-                </span>
-              </>}
+                  </span>
+                  <span>
+                    <a
+                      href={row.link}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      {`${
+                        row.description
+                      } ${props.data.type.toLowerCase()}s by ${
+                        row.supplier?.name
+                      } `}
+                    </a>
+                  </span>
+                  <span>
+                    would you like to add to your inventory to fulfill this BOM
+                    item?
+                  </span>
+                </>
+              }
               quantityRequired={props.data.quantity}
               componentId={row.id}
             />
@@ -212,7 +243,11 @@ const NestedTable = (props) => {
               setOpen={setShoppingModalOpen}
               title={`Add ${row.description} to Shopping List?`}
               type={Types.SHOPPING}
-              hookArgs={{component_pk: row.id, modulebomlistitem_pk: props.data.id, module_pk: props.data.moduleId}}
+              hookArgs={{
+                component_pk: row.id,
+                modulebomlistitem_pk: props.data.id,
+                module_pk: props.data.moduleId,
+              }}
               text={
                 <>
                   <span>
@@ -224,10 +259,16 @@ const NestedTable = (props) => {
                       href={row.link}
                       className="text-blue-500 hover:text-blue-700"
                     >
-                      {`${row.description} ${props.data.type.toLowerCase()}s by ${row.supplier?.name} `}
+                      {`${
+                        row.description
+                      } ${props.data.type.toLowerCase()}s by ${
+                        row.supplier?.name
+                      } `}
                     </a>
                   </span>
-                  <span>would you like to add to your shopping list to fulfill this BOM item?
+                  <span>
+                    would you like to add to your shopping list to fulfill this
+                    BOM item?
                   </span>
                 </>
               }
@@ -243,6 +284,34 @@ const NestedTable = (props) => {
       ignoreRowClick: true,
       width: "115px",
     },
+    {
+      name: "",
+      cell: (row) => {
+        return (
+          <span className="invisible group-hover/row:visible">
+            <a href="https://forms.gle/5avb2JmrxJT2uw426" target="_blank">
+              <Button
+                variant="link"
+                size="xs"
+                iconOnly
+                Icon={FlagIcon}
+                tooltipText="Report problem with component data"
+              >
+                Report problem with component data
+              </Button>
+            </a>
+          </span>
+        );
+      },
+      width: "70px",
+    },
+  ];
+
+  const conditionalRowStyles = [
+    {
+      when: (row) => true,
+      classNames: ["group/row"],
+    },
   ];
 
   return (
@@ -252,9 +321,12 @@ const NestedTable = (props) => {
         columns={columns}
         data={componentsData}
         progressPending={componentsAreLoading}
+        conditionalRowStyles={conditionalRowStyles}
         progressComponent={
           <div className="flex justify-center w-full p-6 bg-sky-50">
-            <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+            <div className="text-center text-gray-500 animate-pulse">
+              Loading...
+            </div>
           </div>
         }
         customStyles={customStyles}

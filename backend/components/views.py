@@ -1,13 +1,12 @@
 from components.models import Component, ComponentManufacturer, ComponentSupplier, Types
 from components.serializers import ComponentSerializer
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
-from modules.models import Module, ModuleBomListItem
-from modules.serializers import ModuleBomListItemSerializer
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from uuid import UUID
 
 
 class ComponentView(APIView):
@@ -60,9 +59,9 @@ class ComponentView(APIView):
                 mounting_style__icontains=mounting_style_filter
             )
         if manufacturer_filter:
-            components = components.filter(manufacturer__pk=int(manufacturer_filter))
+            components = components.filter(manufacturer__pk=UUID(manufacturer_filter))
         if supplier_filter:
-            components = components.filter(supplier__pk=int(supplier_filter))
+            components = components.filter(supplier__pk=UUID(supplier_filter))
         if type_filter:
             components = components.filter(type__name__icontains=type_filter)
 
@@ -98,11 +97,11 @@ class ComponentView(APIView):
         )
 
         unique_manufacturers = [
-            {"label": manufacturer["name"], "value": manufacturer["pk"]}
+            {"label": manufacturer["name"], "value": str(manufacturer["pk"])}
             for manufacturer in unique_manufacturers
         ]
         unique_suppliers = [
-            {"label": supplier["name"], "value": supplier["pk"]}
+            {"label": supplier["name"], "value": str(supplier["pk"])}
             for supplier in unique_suppliers
         ]
 
@@ -132,37 +131,6 @@ class ComponentView(APIView):
 
 
 @api_view(["GET"])
-def get_module_bom_list_items(request, module_pk):
-    try:
-        # Retrieve the Module instance based on the provided module_pk
-        module = Module.objects.get(pk=module_pk)
-    except Module.DoesNotExist:
-        # Return a response indicating that the module does not exist
-        return Response(
-            {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    # Filter ModuleBomListItem instances based on the retrieved module
-    module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
-
-    if request.user.is_authenticated:
-        # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
-        module_bom_list_items = module_bom_list_items.annotate(
-            sum_of_user_options_from_inventory=Sum(
-                "components_options__userinventory__quantity",
-                filter=Q(components_options__userinventory__user=request.user),
-                distinct=True,
-            )
-        )
-
-    # Serialize the retrieved ModuleBomListItem instances
-    serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
-
-    # Return the serialized data as a response
-    return Response(serializer.data)
-
-
-@api_view(["GET"])
 def get_components_by_ids(request, pks):
     # Validate input
     if not pks:
@@ -170,8 +138,14 @@ def get_components_by_ids(request, pks):
             {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Split the pks string into a list of integers
-    component_pks = list(map(int, pks.split(",")))
+    # Split the pks string into a list of UUIDs
+    try:
+        component_pks = [UUID(pk) for pk in str(pks).split(",")]
+    except ValueError:
+        return Response(
+            {"error": "Invalid UUID format provided"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     # Retrieve the Component instances based on the provided component_pks
     components = Component.objects.filter(pk__in=component_pks)

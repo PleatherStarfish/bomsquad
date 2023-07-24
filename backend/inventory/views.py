@@ -1,3 +1,4 @@
+from uuid import UUID
 from components.models import Component
 from django.db.models import Sum
 from inventory.models import UserInventory
@@ -8,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 
 class UserInventoryView(APIView):
@@ -26,19 +28,17 @@ class UserInventoryView(APIView):
     def post(self, request, component_pk):
         user = request.user
 
-        # Check if the user inventory item exists
-        try:
-            user_inventory_item = UserInventory.objects.get(
-                user=user, component_id=component_pk
-            )
-        except UserInventory.DoesNotExist:
-            user_inventory_item = None
-
         # Determine the editing mode from request
         edit_mode = request.data.get("editMode", True)
 
+        # Filter the user inventory items by user and component_id
+        user_inventory_items = UserInventory.objects.filter(
+            user=user, component__id=component_pk
+        )
+
         # If the user inventory item exists, update the quantity
-        if user_inventory_item is not None:
+        if user_inventory_items.exists():
+            user_inventory_item = user_inventory_items.first()
             quantity = int(request.data.get("quantity", 0))
             if edit_mode:
                 user_inventory_item.quantity = quantity
@@ -50,18 +50,15 @@ class UserInventoryView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         # If the user inventory item does not exist, create a new one
-        try:
-            quantity = int(request.data.get("quantity", 0))
-            component = Component.objects.get(id=component_pk)
-            user_inventory = UserInventory.objects.create(
-                user=user, component=component, quantity=quantity
-            )
-            serializer = UserInventorySerializer(user_inventory)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Component.DoesNotExist:
-            return Response(
-                {"detail": "Component not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+        quantity = int(request.data.get("quantity", 0))
+        component = Component.objects.get(id=component_pk)
+
+        user_inventory = UserInventory.objects.create(
+            user=user, component=component, quantity=quantity
+        )
+
+        serializer = UserInventorySerializer(user_inventory)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, component_pk):
         user = request.user

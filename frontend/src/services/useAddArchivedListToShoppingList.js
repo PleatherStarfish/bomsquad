@@ -9,7 +9,6 @@ const useAddArchivedListToShoppingList = () => {
 
   const { mutate: addArchivedListToShoppingList } = useMutation({
     mutationFn: ({ timestamp }) => {
-      console.log("timestamp", timestamp)
       return axios.post(`/api/shopping-list/archive/add/`, { timestamp }, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request

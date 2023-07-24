@@ -13,6 +13,7 @@ import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
 import cx from "classnames";
 import { get } from "lodash";
+import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useGetUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
@@ -39,9 +40,17 @@ const Quantity = ({
   ) : undefined;
 };
 
-const TotalQuantity = ({ componentId }) => {
+const TotalQuantity = ({ componentId, setIdToTotalQuantityLookup }) => {
   const { data: quantityInInventoryAnon } =
     useGetUserAnonymousShoppingListQuantity(componentId);
+
+  // Cache the total quantity for this component in a lookup table
+  useEffect(() => {
+    setIdToTotalQuantityLookup((prevState) => ({
+      ...prevState,
+      [componentId]: quantityInInventoryAnon,
+    }));
+  }, [quantityInInventoryAnon]);
 
   return quantityInInventoryAnon ? (
     <span className="font-bold">{quantityInInventoryAnon}</span>
@@ -107,10 +116,13 @@ const ListSlice = ({
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState();
+  const [idToTotalQuantityLookup, setIdToTotalQuantityLookup] = useState({});
+  
   const onlyWidth = useWindowWidth();
 
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteShoppingListItem();
+  const addComponentToInventory = useAddComponentToInventory();
 
   const bgStyles = `
     .rdt_TableHeadRow { background-color: ${backgroundColor}; }
@@ -352,8 +364,7 @@ const ListSlice = ({
         return !row?.placeholder ? (
           <TotalQuantity
             componentId={row?.component?.id}
-            componentsInModule={componentsInModule}
-            allModulesData={allModulesData}
+            setIdToTotalQuantityLookup={setIdToTotalQuantityLookup}
           />
         ) : (
           <span className="text-lg font-bold">TOTAL:</span>
@@ -384,6 +395,17 @@ const ListSlice = ({
     },
   ];
 
+  const stateColumn = [
+    {
+      name: <></>,
+      cell: (row) => {
+        return (!row?.placeholder ? <Button size="xs" variant="muted">Add to Inventory</Button> : undefined);
+      },
+      sortable: false,
+      width: "150px",
+    },
+  ];
+
   const getColumnsBasedOnIndex = (index, allModulesData) => {
     switch (index) {
       case 0:
@@ -394,11 +416,14 @@ const ListSlice = ({
         
       case allModulesData.length + 2:
         return priceColumn;
+
+        case allModulesData.length + 3:
+          return stateColumn;
         
       default:
         return qtyColumns;
     }
-  };
+  }
 
   const getColumnsBasedOnIndexHideTotals = (index) => {
     switch (index) {
@@ -408,7 +433,14 @@ const ListSlice = ({
       default:
         return qtyColumns;
     }
-  };
+  }
+
+  const tableRowsNoLines = [
+    {
+      when: (row) => true,
+      classNames: ["!border-0"],
+    },
+  ];
 
   return (
     <>
@@ -429,7 +461,7 @@ const ListSlice = ({
             : "w-[200px]"
         )}
       >
-        <div className={cx({ "border-r border-gray-300": index === 0 })}>
+        <div id={(index == allModulesData.length + 3) ? "shopping-list-slice-state-table" : undefined} className={cx({ "border-r border-gray-300": index === 0 })}>
           <DataTable
             compact
             responsive
@@ -443,6 +475,7 @@ const ListSlice = ({
                 ? aggregatedComponents
                 : [...aggregatedComponents, { placeholder: true }]
             }
+            conditionalRowStyles={index == allModulesData.length + 3 ? tableRowsNoLines : undefined}
             progressPending={componentsAreLoading}
             progressComponent={
               <div className="flex justify-center w-full p-6 bg-sky-50">

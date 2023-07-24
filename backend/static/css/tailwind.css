@@ -24,6 +24,9 @@
     .rdt_TableHeadRow {
         z-index: 1 !important;
     }
+    #shopping-list-slice-state-table .rdt_TableHeadRow {
+        border: 0 !important;
+    }
 }
 
 @layer components {

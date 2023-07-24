@@ -1,13 +1,20 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
-from modules.models import BuiltModules, Module, WantToBuildModules
+from modules.models import (
+    BuiltModules,
+    Manufacturer,
+    Module,
+    WantToBuildModules,
+    ModuleBomListItem,
+)
 from modules.serializers import (
     BuiltModuleSerializer,
     ModuleSerializer,
     WantTooBuildModuleSerializer,
+    ModuleBomListItemSerializer,
 )
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
@@ -15,7 +22,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import BuiltModules, Manufacturer, Module, WantToBuildModules
 
 mounting_style_options = [
     {"name": "Surface Mount (SMT)", "value": "smt"},
@@ -191,3 +197,35 @@ class ModuleDetailView(generics.RetrieveAPIView):
 
         # Return the retrieved Module instance.
         return module_instance
+
+
+@api_view(["GET"])
+def get_module_bom_list_items(request, module_pk):
+    try:
+        # Retrieve the Module instance based on the provided module_pk
+        module = Module.objects.get(pk=module_pk)
+        print(module)
+    except Module.DoesNotExist:
+        # Return a response indicating that the module does not exist
+        return Response(
+            {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Filter ModuleBomListItem instances based on the retrieved module
+    module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
+
+    if request.user.is_authenticated:
+        # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
+        module_bom_list_items = module_bom_list_items.annotate(
+            sum_of_user_options_from_inventory=Sum(
+                "components_options__userinventory__quantity",
+                filter=Q(components_options__userinventory__user=request.user),
+                distinct=True,
+            )
+        )
+
+    # Serialize the retrieved ModuleBomListItem instances
+    serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
+
+    # Return the serialized data as a response
+    return Response(serializer.data)
