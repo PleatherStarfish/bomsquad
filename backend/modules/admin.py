@@ -7,12 +7,14 @@ from .models import (
     BuiltModules,
     ModuleBomListItem,
     ModuleBomListComponentForItemRating,
+    PcbVersion,
 )
 from core.admin import BaseAdmin
 
 
 class ModuleBomListItemAdmin(BaseAdmin):
     model = ModuleBomListItem
+    filter_horizontal = ("components_options", "pcb_version")
 
 
 class ManufacturerAdmin(BaseAdmin):
@@ -35,6 +37,10 @@ class ModuleBomListComponentForItemRatingAdmin(BaseAdmin):
     model = ModuleBomListComponentForItemRating
 
 
+class PcbVersionAdmin(BaseAdmin):
+    model = PcbVersion
+
+
 # Register your models here.
 admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(Module, ModuleAdmin)
@@ -44,3 +50,4 @@ admin.site.register(ModuleBomListItem, ModuleBomListItemAdmin)
 admin.site.register(
     ModuleBomListComponentForItemRating, ModuleBomListComponentForItemRatingAdmin
 )
+admin.site.register(PcbVersion, PcbVersionAdmin)

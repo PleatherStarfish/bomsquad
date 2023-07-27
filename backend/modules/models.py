@@ -36,6 +36,17 @@ class Manufacturer(BaseModel):
         return f"{self.name}"
 
 
+class PcbVersion(BaseModel):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    module = models.ForeignKey(
+        "Module", blank=False, null=False, on_delete=models.PROTECT
+    )
+    version = models.CharField(max_length=50, default="1")
+
+    def __str__(self):
+        return f"{self.module.name} - {self.version}"
+
+
 class ModuleBomListItem(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=False)
@@ -45,6 +56,7 @@ class ModuleBomListItem(BaseModel):
     module = models.ForeignKey(
         "Module", blank=False, null=False, on_delete=models.PROTECT
     )
+    pcb_version = models.ManyToManyField(PcbVersion, related_name="pcb_version")
     type = models.ForeignKey(Types, on_delete=models.PROTECT)
     designators = models.CharField(
         max_length=255,
@@ -61,7 +73,10 @@ class ModuleBomListItem(BaseModel):
         ]
 
     def __str__(self):
-        return f"{self.module.name} ({self.description})"
+        pcb_versions_str = " & ".join(
+            [str(pcb.version) for pcb in self.pcb_version.all()]
+        )
+        return f"{self.module.name} -- {pcb_versions_str} -- ({self.description})"
 
     def save(self, *args, **kwargs):
         if not self.type:
