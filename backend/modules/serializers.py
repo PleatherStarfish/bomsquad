@@ -6,6 +6,7 @@ from modules.models import (
     Module,
     ModuleBomListItem,
     Manufacturer,
+    PcbVersion,
 )
 
 
@@ -58,8 +59,15 @@ class SupplierSerializer(serializers.ModelSerializer):
         fields = ["name", "short_name", "url"]
 
 
+class PCBVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PcbVersion
+        fields = ["id", "module", "version", "order"]
+
+
 class ModuleBomListItemSerializer(serializers.ModelSerializer):
     sum_of_user_options_from_inventory = serializers.IntegerField()
+    pcb_version = PCBVersionSerializer(many=True)
     type = serializers.CharField(source="type.name")
 
     class Meta:

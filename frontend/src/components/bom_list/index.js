@@ -1,10 +1,12 @@
 import "tippy.js/dist/tippy.css";
 
+import React, { useEffect, useMemo } from "react";
+
 import Alert from "../../ui/Alert";
-import { Check2Circle, Flag } from "react-bootstrap-icons";
+import { Check2Circle } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
-import React from "react";
+import Tabs from "../../ui/Tabs";
 import Tippy from "@tippyjs/react";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
@@ -17,18 +19,28 @@ export const customStyles = {
   },
 };
 
+const filterByUniquePCBVersion = (data) => {
+  const sortedUniqueVersions = _(data)
+    .flatMap((item) =>
+      _(item.pcb_version)
+        .sortBy((version) => version.order)
+        .reverse()
+        .map((version) => version.version)
+        .value()
+    )
+    .uniq()
+    .value();
+
+  return sortedUniqueVersions;
+};
+
 const BomList = ({ moduleId, moduleName }) => {
+  const [selectedTab, setSelectedTab] = React.useState();
+  const [uniquePCBVersions, setUniquePCBVersions] = React.useState();
   const { user } = useAuthenticatedUser();
 
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
     useModuleBomListItems(moduleId);
-
-  if (moduleBomIsLoading)
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
-
-  if (moduleBomIsError) {
-    return <div>Error loading components: {moduleBomIsError.message}</div>;
-  }
 
   const moduleBomList = Array.isArray(moduleBom) ? moduleBom : [];
 
@@ -38,12 +50,40 @@ const BomList = ({ moduleId, moduleName }) => {
     moduleId,
   }));
 
+
+  useEffect(() => {
+    setUniquePCBVersions(filterByUniquePCBVersion(moduleBomData));
+  }, [moduleBomData?.length]);
+
+  useEffect(() => {
+    setSelectedTab(uniquePCBVersions ? uniquePCBVersions[0] : undefined);
+  }, [uniquePCBVersions])
+
+  const filteredData = useMemo(() => {
+    return moduleBomData.filter((item) => {
+      return item.pcb_version.some((x) => x.version === selectedTab);
+    }).map((item) => ({
+      ...item,
+      id: `${item.id}-${item.pcb_version.id}`, // Modify the id value with selectedTab
+    }));
+  }, [selectedTab, moduleBomData]);
+
+  if (moduleBomIsLoading)
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
+
+  if (moduleBomIsError) {
+    return <div>Error loading components: {moduleBomIsError.message}</div>;
+  }
+
   const columns = [
     {
       name: <div className="sr-only">Alerts</div>,
       cell: (row) => {
         return (
-          (row.quantity <= row.sum_of_user_options_from_inventory  && row.quantity > 0) && (
+          row.quantity <= row.sum_of_user_options_from_inventory &&
+          row.quantity > 0 && (
             <Tippy
               content={
                 "Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
@@ -94,7 +134,9 @@ const BomList = ({ moduleId, moduleName }) => {
 
   const conditionalRowStyles = [
     {
-      when: (row) => row.quantity <= row.sum_of_user_options_from_inventory && row.quantity > 0,
+      when: (row) =>
+        row.quantity <= row.sum_of_user_options_from_inventory &&
+        row.quantity > 0,
       style: {
         backgroundColor: "#fdf4b3",
         color: "black",
@@ -120,22 +162,36 @@ const BomList = ({ moduleId, moduleName }) => {
           </Alert>
         </div>
       )}
-      <DataTable
-        fixedHeader
-        responsive
-        exportHeaders
-        expandableRows
-        expandOnRowClicked
-        progressComponent={
-          <div className="text-center text-gray-500 animate-pulse">Loading...</div>
-        }
-        expandableRowsComponent={NestedTable}
-        conditionalRowStyles={conditionalRowStyles}
-        columns={columns}
-        data={moduleBomData}
-        progressPending={moduleBomIsLoading}
-        customStyles={customStyles}
-      />
+      {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab && <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>}
+      {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab &&
+        <Tabs
+          onClick={setSelectedTab}
+          tabs={uniquePCBVersions?.map((name) => {
+            return { name: name, current: name === selectedTab };
+          })}
+        />
+      }
+      {filteredData &&
+        <DataTable
+          fixedHeader
+          responsive
+          exportHeaders
+          expandableRows
+          expandOnRowClicked
+          progressComponent={
+            <div className="text-center text-gray-500 animate-pulse">
+              Loading...
+            </div>
+          }
+          expandableRowsComponent={NestedTable}
+          conditionalRowStyles={conditionalRowStyles}
+          columns={columns}
+          data={filteredData}
+          progressPending={moduleBomIsLoading}
+          customStyles={customStyles}
+          keyField="id"
+        />
+      }
     </div>
   );
 };

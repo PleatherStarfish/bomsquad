@@ -1,9 +1,7 @@
 from django.db import models
-from django.utils import timezone
 from django.template.defaultfilters import slugify
 from components.models import Component
 from accounts.models import CustomUser
-from django.db.models import Sum, Q
 from accounts.models import CustomUser
 from django.db import models
 from PIL import Image
@@ -13,6 +11,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 import uuid
 from components.models import Types
+from django.core.cache import cache
+
 
 MOUNTING_STYLE = [
     ("smt", "Surface Mount (SMT)"),
@@ -42,9 +42,10 @@ class PcbVersion(BaseModel):
         "Module", blank=False, null=False, on_delete=models.PROTECT
     )
     version = models.CharField(max_length=50, default="1")
+    order = models.PositiveIntegerField(default=0, blank=False)
 
     def __str__(self):
-        return f"{self.module.name} - {self.version}"
+        return f"{self.module.name} - {self.version} - {self.order}"
 
 
 class ModuleBomListItem(BaseModel):

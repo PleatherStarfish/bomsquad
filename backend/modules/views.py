@@ -212,7 +212,9 @@ def get_module_bom_list_items(request, module_pk):
         )
 
     # Filter ModuleBomListItem instances based on the retrieved module
-    module_bom_list_items = ModuleBomListItem.objects.filter(module=module)
+    module_bom_list_items = ModuleBomListItem.objects.filter(module=module).order_by(
+        "-pcb_version__order"
+    )
 
     if request.user.is_authenticated:
         # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
