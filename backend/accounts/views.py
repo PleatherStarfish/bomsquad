@@ -39,6 +39,7 @@ def delete_user(request):
 
 
 @csrf_exempt
+@api_view(["POST"])
 def kofi_payment_webhook(request):
     verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
     if not verification_token:
