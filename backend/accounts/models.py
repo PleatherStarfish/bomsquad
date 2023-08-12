@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.models import BaseModel
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 
 from datetime import timedelta
 import uuid
@@ -73,10 +72,10 @@ class CustomUser(AbstractUser):
         if self.premium_until and self.premium_until >= timezone.now().date():
             return True
 
-        # Check if the user's email appears in the KofiPayment model within the last month
-        one_month_ago = timezone.now() - relativedelta(months=1)
+        # Check if the user's email appears in the KofiPayment model within the last 31 days
+        thirty_one_days_ago = timezone.now() - timedelta(days=31)
         has_recent_kofi_payment = KofiPayment.objects.filter(
-            email=self.email, timestamp__gte=one_month_ago
+            email=self.email, timestamp__gte=thirty_one_days_ago
         ).exists()
 
         if has_recent_kofi_payment:

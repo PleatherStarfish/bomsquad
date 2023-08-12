@@ -18,10 +18,6 @@ class UserNotesAdmin(BaseAdmin):
     model = UserNotes
 
 
-class KofiPaymentAdmin(BaseAdmin):
-    model = KofiPayment
-
-
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserNotes, UserNotesAdmin)
-admin.site.register(KofiPayment, KofiPaymentAdmin)
+admin.site.register(KofiPayment)
