@@ -295,6 +295,9 @@ TINYMCE_DEFAULT_CONFIG = {
     "removeformat | help",
 }
 
+LOG_DIR = os.path.join(os.path.dirname(BASE_DIR), "log")
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -312,7 +315,7 @@ LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": os.path.join(os.path.dirname(BASE_DIR), "log", "django.log"),
+            "filename": os.path.join(LOG_DIR, "django.log"),
             "formatter": "verbose",
         },
     },
