@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from core.admin import BaseAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser, UserNotes
+from .models import CustomUser, UserNotes, KofiPayment
 
 
 class CustomUserAdmin(UserAdmin):
@@ -18,5 +18,10 @@ class UserNotesAdmin(BaseAdmin):
     model = UserNotes
 
 
+class KofiPaymentAdmin(BaseAdmin):
+    model = KofiPayment
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserNotes, UserNotesAdmin)
+admin.site.register(KofiPayment, KofiPaymentAdmin)
