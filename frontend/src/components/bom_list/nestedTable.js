@@ -37,6 +37,8 @@ const NestedTable = (props) => {
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
 
+  console.log("TEST props.data.components_options", props.data.components_options)
+
   if (props.data.components_options.length < 1) {
     return (
       <div className="p-3 ml-[47px] bg-gray-100">
@@ -56,6 +58,8 @@ const NestedTable = (props) => {
       </div>
     );
   }
+
+  console.log("TEST componentsData", componentsData)
 
   const columns = [
     {

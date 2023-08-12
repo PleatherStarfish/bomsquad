@@ -1,7 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.models import BaseModel
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+
+from datetime import timedelta
 import uuid
+
+
+class KofiPayment(models.Model):
+    kofi_transaction_id = models.UUIDField(primary_key=True)
+    email = models.EmailField()
+    tier_name = models.CharField(max_length=255, null=True, blank=True)
+    timestamp = models.DateTimeField(null=True, blank=True)
 
 
 class CustomUser(AbstractUser):
@@ -53,6 +64,25 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def is_premium(self):
+        """
+        Checks if the user is currently premium.
+        """
+        if self.premium_until and self.premium_until >= timezone.now().date():
+            return True
+
+        # Check if the user's email appears in the KofiPayment model within the last month
+        one_month_ago = timezone.now() - relativedelta(months=1)
+        has_recent_kofi_payment = KofiPayment.objects.filter(
+            email=self.email, timestamp__gte=one_month_ago
+        ).exists()
+
+        if has_recent_kofi_payment:
+            return True
+
+        return False
 
 
 class UserNotes(BaseModel):

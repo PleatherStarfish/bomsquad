@@ -20,7 +20,7 @@ import VersionHistory from "./components/VersionHistory";
 const App = () => {
 
   return (
-    <div className="h-full">
+    <div className="h-fit">
         <Routes>
           <Route path="/components" element={<Components />} />
           <Route path="/module/:slug" element={<ModuleDetail />} />

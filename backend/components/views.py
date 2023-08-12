@@ -9,6 +9,16 @@ from rest_framework.views import APIView
 from uuid import UUID
 
 
+def extract_uuids(pks):
+    """
+    Extract UUIDs from a comma-separated string.
+    """
+    try:
+        return [UUID(uid) for uid in pks.split(",")]
+    except:
+        raise ValueError("Invalid UUIDs provided.")
+
+
 class ComponentView(APIView):
     def get(self, request):
         # Get the page number and search query from the request query parameters
@@ -69,7 +79,7 @@ class ComponentView(APIView):
         components = components.order_by("description")
 
         # Create a paginator instance
-        paginator = Paginator(components, 10)
+        paginator = Paginator(components, 30)
 
         # Retrieve the page based on the page number
         page = paginator.get_page(page_number)
@@ -138,9 +148,9 @@ def get_components_by_ids(request, pks):
             {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Split the pks string into a list of UUIDs
+    # Split the pks string into a list of UUIDs using the extract_uuids function
     try:
-        component_pks = [UUID(pk) for pk in str(pks).split(",")]
+        component_pks = extract_uuids(pks)
     except ValueError:
         return Response(
             {"error": "Invalid UUID format provided"},
@@ -151,7 +161,7 @@ def get_components_by_ids(request, pks):
     components = Component.objects.filter(pk__in=component_pks)
 
     # Check if components are found
-    if not components:
+    if not components.exists():
         return Response(
             {"error": "Components do not exist"}, status=status.HTTP_404_NOT_FOUND
         )

@@ -13,8 +13,10 @@ import SearchInput from "./SearchInput";
 import SolderingMode from "../SolderingMode";
 import _ from "lodash";
 import { find } from "lodash/find";
+import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useDeleteUserInventory from "../../services/useDeleteUserInventory";
 import useGetUserInventory from "../../services/useGetUserInventory";
+import { useNavigate } from 'react-router-dom';
 import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 
 const customStyles = {
@@ -60,6 +62,12 @@ const Inventory = () => {
   const [dataSearched, setDataSearched] = useState(undefined);
 
   const [openSolderingMode, setOpenSolderingMode] = useState(false);
+
+  const [showGetPremiumModal, setShowGetPremiumModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
@@ -152,9 +160,18 @@ const Inventory = () => {
     }
   });
 
-  if (inventoryDataIsError) {
+  if (userIsLoading)
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
+
+  if (inventoryDataIsError || userIsError) {
     return <div>Error fetching data</div>;
   }
+
+  const handleGetPremiumModal = () => {
+    setShowGetPremiumModal(true);
+  };
 
   const handleDownloadCSV = () => {
     const csvData =
@@ -355,109 +372,147 @@ const Inventory = () => {
     },
   ];
 
-  return !!inventoryData?.length ? (
+  return (
     <>
-      <div className="z-10 flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
-        {inventoryData && inventoryData.length > 0 && (
-          <>
-            <div className="pr-2 grow md:w-full">
-              <label htmlFor="search" className="sr-only">
-                Search
-              </label>
-              <SearchInput
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />
-            </div>
-            <div className="flex gap-2 flex-nowrap">
-              <Button
-                version="primary"
-                Icon={LightBulbIcon}
-                iconLocation="left"
-                onClick={() => setOpenSolderingMode(true)}
-              >
-                Soldering Mode
-              </Button>
-              <Link to="version-history/">
-                <Button version="primary">Version History</Button>
-              </Link>
-              <Button version="primary" onClick={handleDownloadCSV}>
-                Download CSV
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-      <DataTable
-        fixedHeader
-        pagination
-        responsive
-        subHeaderAlign="right"
-        subHeaderWrap
-        exportHeaders
-        progressComponent={
-          <div className="text-center text-gray-500 animate-pulse">
-            Loading...
+      {!!inventoryData?.length ? (
+        <>
+          <div className="z-10 flex flex-col items-center justify-between gap-2 mb-8 md:w-full md:flex-row">
+            {inventoryData && inventoryData.length > 0 && (
+              <>
+                <div className="pr-2 grow md:w-full">
+                  <label htmlFor="search" className="sr-only">
+                    Search
+                  </label>
+                  <SearchInput
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                  />
+                </div>
+                <div className="flex gap-2 flex-nowrap">
+                  <Button
+                    version="primary"
+                    Icon={LightBulbIcon}
+                    iconLocation="left"
+                    onClick={() => setOpenSolderingMode(true)}
+                  >
+                    Soldering Mode
+                  </Button>
+                  <Link to="version-history/">
+                    <Button version="primary">Version History</Button>
+                  </Link>
+                  <Button
+                    version="primary"
+                    onClick={
+                      user.is_premium
+                        ? handleDownloadCSV
+                        : handleGetPremiumModal
+                    }
+                  >
+                    Download CSV
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
-        }
-        columns={columns}
-        data={
-          _.isArray(dataSearched) && !_.isEmpty(dataSearched)
-            ? dataSearched.map((x) => x.item)
-            : inventoryData
-        }
-        progressPending={inventoryDataIsLoading}
-        customStyles={customStyles}
-      />
-      <SolderingMode
-        open={openSolderingMode}
-        setOpen={setOpenSolderingMode}
-        inventoryData={inventoryData}
-        inventoryDataIsLoading={inventoryDataIsLoading}
-        handleClick={handleClick}
-        locationsSort={locationsSort}
-        quantityIdToEdit={quantityIdToEdit}
-        setQuantityIdToEdit={setQuantityIdToEdit}
-        updatedQuantityToSubmit={updatedQuantityToSubmit}
-        setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
-        locationIdToEdit={locationIdToEdit}
-        setLocationIdToEdit={setLocationIdToEdit}
-        updatedLocationToSubmit={updatedLocationToSubmit}
-        setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
-        deleteModalOpen={deleteModalOpen}
-        setDeleteModalOpen={setDeleteModalOpen}
-        dataToDelete={dataToDelete}
-        setDataToDelete={setDataToDelete}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        dataSearched={dataSearched}
-        handleQuantityChange={handleQuantityChange}
-        handleSubmitQuantity={handleSubmitQuantity}
-        handleLocationChange={handleLocationChange}
-        handleSubmitLocation={handleSubmitLocation}
-        handleDelete={handleDelete}
-        handlePillClick={handlePillClick}
-      />
-      <Modal
-        open={deleteModalOpen}
-        setOpen={setDeleteModalOpen}
-        title={"Delete component?"}
-        submitButtonText={"Delete"}
-        onSubmit={() => {
-          setDataToDelete(undefined);
-          handleDelete(dataToDelete.id);
-        }}
-      >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
+          <DataTable
+            fixedHeader
+            pagination
+            responsive
+            subHeaderAlign="right"
+            subHeaderWrap
+            exportHeaders
+            progressComponent={
+              <div className="text-center text-gray-500 animate-pulse">
+                Loading...
+              </div>
+            }
+            columns={columns}
+            data={
+              _.isArray(dataSearched) && !_.isEmpty(dataSearched)
+                ? dataSearched.map((x) => x.item)
+                : inventoryData
+            }
+            progressPending={inventoryDataIsLoading}
+            customStyles={customStyles}
+          />
+          <SolderingMode
+            open={openSolderingMode}
+            setOpen={setOpenSolderingMode}
+            inventoryData={inventoryData}
+            inventoryDataIsLoading={inventoryDataIsLoading}
+            handleClick={handleClick}
+            locationsSort={locationsSort}
+            quantityIdToEdit={quantityIdToEdit}
+            setQuantityIdToEdit={setQuantityIdToEdit}
+            updatedQuantityToSubmit={updatedQuantityToSubmit}
+            setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
+            locationIdToEdit={locationIdToEdit}
+            setLocationIdToEdit={setLocationIdToEdit}
+            updatedLocationToSubmit={updatedLocationToSubmit}
+            setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+            deleteModalOpen={deleteModalOpen}
+            setDeleteModalOpen={setDeleteModalOpen}
+            dataToDelete={dataToDelete}
+            setDataToDelete={setDataToDelete}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            dataSearched={dataSearched}
+            handleQuantityChange={handleQuantityChange}
+            handleSubmitQuantity={handleSubmitQuantity}
+            handleLocationChange={handleLocationChange}
+            handleSubmitLocation={handleSubmitLocation}
+            handleDelete={handleDelete}
+            handlePillClick={handlePillClick}
+          />
+          <Modal
+            open={deleteModalOpen}
+            setOpen={setDeleteModalOpen}
+            title={"Delete component?"}
+            submitButtonText={"Delete"}
+            onSubmit={() => {
+              setDataToDelete(undefined);
+              handleDelete(dataToDelete.id);
+            }}
+          >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
+        </>
+      ) : (
+        <Alert variant="transparent" centered>
+          <span>
+            There are no components in your inventory.{" "}
+            <a className="text-blue-500" href="/components">
+              Add components.
+            </a>
+          </span>
+        </Alert>
+      )}
+      {!user.is_premium && (
+        <Modal
+          open={showGetPremiumModal}
+          title={`This is a feature for our Patreon supporters`}
+          type="info"
+          buttons={
+            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
+                  onClick={() => navigate('/premium')}
+                >
+                  Get premium
+                </button>
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                onClick={() => setShowGetPremiumModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          }
+        >
+          {`BOM Squad depends on our Patreon supports to keep our servers online. Please help support the project and get access to version history.`}
+        </Modal>
+      )}
     </>
-  ) : (
-    <Alert variant="transparent" centered>
-      <span>
-        There are no components in your inventory.{" "}
-        <a className="text-blue-500" href="/components">
-          Add components.
-        </a>
-      </span>
-    </Alert>
   );
 };
 

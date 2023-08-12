@@ -77,7 +77,9 @@ class ModuleBomListItem(BaseModel):
         pcb_versions_str = " & ".join(
             [str(pcb.version) for pcb in self.pcb_version.all()]
         )
-        return f"{self.module.name} -- {pcb_versions_str} -- ({self.description})"
+        if not pcb_versions_str or len(pcb_versions_str) <= 1:
+            return f"{self.module.name} -- ({self.description})"
+        return f"{self.module.name} -- {pcb_versions_str} -- {self.description}"
 
     def save(self, *args, **kwargs):
         if not self.type:

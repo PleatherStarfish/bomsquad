@@ -1,3 +1,4 @@
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import React, {useState} from "react";
 
 import Alert from "../../ui/Alert";
@@ -6,11 +7,11 @@ import Button from "../../ui/Button";
 import { DateTime } from "luxon";
 import ListSlice from "../shopping_list/listSlice";
 import Modal from "../../ui/Modal";
+import useAddArchivedListToShoppingList from '../../services/useAddArchivedListToShoppingList';
+import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useDeleteArchivedShoppingList from "../../services/useDeleteArchivedShoppingList";
 import useGetArchivedShoppingLists from "../../services/useGetUserArchivedShoppingLists";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import useAddArchivedListToShoppingList from '../../services/useAddArchivedListToShoppingList';
-
+import { useNavigate } from 'react-router-dom';
 
 const SavedLists = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -24,6 +25,10 @@ const SavedLists = () => {
     archivedShoppingListsError,
     archivedShoppingListsErrorMessage,
   } = useGetArchivedShoppingLists();
+  
+  const navigate = useNavigate();
+
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
   const deleteArchivedShoppingList = useDeleteArchivedShoppingList();
   const addArchivedListToShoppingList = useAddArchivedListToShoppingList();
@@ -44,7 +49,7 @@ const SavedLists = () => {
     setSortOrder(sortOrder === "desc" ? "asc" : "desc");
   };
 
-  if (archivedShoppingListsLoading) {
+  if (archivedShoppingListsLoading || userIsLoading) {
     return (
       <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
         Loading...
@@ -52,7 +57,7 @@ const SavedLists = () => {
     );
   }
 
-  if (archivedShoppingListsError) {
+  if (archivedShoppingListsError || userIsError) {
     return (
       <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
         {archivedShoppingListsErrorMessage?.message}
@@ -167,6 +172,32 @@ const SavedLists = () => {
       >
         {`Are you sure you want to add this to your shopping list? This action can not be automatically reversed.`}
       </Modal>
+      <Modal
+          open={!user.is_premium}
+          title={`This is a feature for our Patreon supporters`}
+          type="info"
+          backdropBlur={"backdrop-blur-sm"}
+          buttons={
+            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
+                  onClick={() => navigate('/premium')}
+                >
+                  Get premium
+                </button>
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                onClick={() => navigate(-1)}
+              >
+                Cancel
+              </button>
+            </div>
+          }
+        >
+          {`BOM Squad depends on our Patreon supports to keep our servers online. Please help support the project and get access to version history.`}
+        </Modal>
     </>
   );
 };

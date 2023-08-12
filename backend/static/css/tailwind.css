@@ -5,6 +5,10 @@
 @layer base {
     .rdt_Table {
         z-index: 0 !important;
+        max-height: none !important;
+    }
+    .rdt_TableBody {
+        max-height: none !important;
     }
     .rdt_TableHead {
         z-index: 0 !important;
@@ -26,6 +30,9 @@
     }
     #shopping-list-slice-state-table .rdt_TableHeadRow {
         border: 0 !important;
+    }
+    #table__wrapper > div:first-child {
+        max-height: none !important;
     }
 }
 

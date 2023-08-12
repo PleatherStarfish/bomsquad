@@ -15,8 +15,6 @@ const useModuleBomListItems = (moduleId) => {
     }
   });
 
-  console.log(moduleBom)
-
   return { moduleBom, moduleBomIsLoading, moduleBomIsError };
 };
 

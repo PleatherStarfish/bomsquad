@@ -31,14 +31,53 @@ export const Types = {
 
 const Modal = ({
   open,
-  setOpen,
+  setOpen = () => {},
   title,
   submitButtonText,
-  onSubmit,
+  onSubmit = () => {},
   type = "danger",
+  buttons = undefined,
+  bgOpacity = "bg-opacity-75",
+  backdropBlur = undefined,
   children,
 }) => {
   const cancelButtonRef = useRef(null);
+
+  const defaultButtons = (
+    <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+      {type === "danger" ? (
+        <button
+          type="button"
+          className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto"
+          onClick={() => {
+            onSubmit();
+            setOpen(false);
+          }}
+        >
+          {submitButtonText}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
+          onClick={() => {
+            onSubmit();
+            setOpen(false);
+          }}
+        >
+          {submitButtonText}
+        </button>
+      )}
+      <button
+        type="button"
+        className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+        onClick={() => setOpen(false)}
+        ref={cancelButtonRef}
+      >
+        Cancel
+      </button>
+    </div>
+  );
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -57,7 +96,7 @@ const Modal = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 z-50 transition-opacity bg-gray-500 bg-opacity-75" />
+          <div className={cx("fixed inset-0 z-50 transition-opacity bg-gray-500", bgOpacity, backdropBlur)} />
         </Transition.Child>
 
         <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -97,39 +136,7 @@ const Modal = ({
                     </div>
                   </div>
                 </div>
-                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                  {type === "danger" ? (
-                    <button
-                      type="button"
-                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto"
-                      onClick={() => {
-                        onSubmit();
-                        setOpen(false);
-                      }}
-                    >
-                      {submitButtonText}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
-                      onClick={() => {
-                        onSubmit();
-                        setOpen(false);
-                      }}
-                    >
-                      {submitButtonText}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
-                    ref={cancelButtonRef}
-                  >
-                    Cancel
-                  </button>
-                </div>
+                {buttons || defaultButtons}
               </Dialog.Panel>
             </Transition.Child>
           </div>

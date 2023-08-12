@@ -5,6 +5,7 @@ from accounts.views import (
     delete_user,
     get_user_me,
     get_user_history,
+    kofi_payment_webhook,
 )
 
 # User modules-related views
@@ -43,6 +44,7 @@ urlpatterns = [
     path("get-user-me/", get_user_me, name="user-me"),
     path("get-user-history/", get_user_history, name="user-history"),
     path("delete-user-me/", delete_user, name="delete-user"),
+    path("kofi/", kofi_payment_webhook, name="kofi_webhook"),
     path("modules/<str:type>/", UserModulesView.as_view(), name="user-modules"),
     path("inventory/", UserInventoryView.as_view(), name="user-inventory"),
     path(
@@ -138,7 +140,7 @@ urlpatterns = [
         name="delete-shopping-list",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
-    path("components/<uuid:pks>/", get_components_by_ids, name="component-list-by-ids"),
+    path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),
     path("module/<slug:slug>/", ModuleDetailView.as_view(), name="module-detail"),
     path(
         "module/<uuid:module_pk>/bom-list-items/",

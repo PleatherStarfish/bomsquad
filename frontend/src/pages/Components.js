@@ -76,7 +76,7 @@ const Components = () => {
     setCurrentPage(newPage); // use setCurrentPage instead of setPage
   };
 
-  const resultsPerPage = 10;
+  const resultsPerPage = 30;
   const totalPages = Math.ceil(componentsData?.count / resultsPerPage);
 
   const columns = [
@@ -280,22 +280,24 @@ const Components = () => {
           </Alert>
         </div>
       )}
-      <DataTable
-        fixedHeader
-        responsive
-        subHeaderAlign="right"
-        subHeaderWrap
-        exportHeaders
-        progressComponent={
-          <div className="text-center text-gray-500 animate-pulse">
-            Loading...
-          </div>
-        }
-        columns={columns}
-        data={componentsData?.results}
-        progressPending={componentsAreLoading}
-        customStyles={customStyles}
-      />
+      <div id="table__wrapper">
+        <DataTable
+          fixedHeader
+          responsive
+          subHeaderAlign="right"
+          subHeaderWrap
+          exportHeaders
+          progressComponent={
+            <div className="text-center text-gray-500 animate-pulse">
+              Loading...
+            </div>
+          }
+          columns={columns}
+          data={componentsData?.results}
+          progressPending={componentsAreLoading}
+          customStyles={customStyles}
+        />
+      </div>
       {componentsData?.results && (
         <div className="flex items-center justify-between py-4 bg-white border-t border-gray-200">
           <div className="flex justify-between flex-1 sm:hidden">

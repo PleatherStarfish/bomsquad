@@ -1,18 +1,23 @@
+import BackButton from "../ui/BackButton";
 import DataTable from "react-data-table-component";
 import { DateTime } from "luxon";
 import { JsonDiffComponent } from "json-diff-react";
+import Modal from "../ui/Modal";
 import React from "react";
 import _ from "lodash";
+import useAuthenticatedUser from "../services/useAuthenticatedUser";
 import useAuthenticatedUserHistory from "../services/useAuthenticatedUserHistory";
 import useGetComponentsByIds from "../services/useGetComponentsByIds";
-import BackButton from "../ui/BackButton";
+import { useNavigate } from 'react-router-dom';
 
 const Component = ({ componentPks }) => {
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -48,7 +53,10 @@ const Supplier = ({ componentPks }) => {
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
+
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -61,7 +69,9 @@ const SupplierItemNo = ({ componentPks }) => {
     useGetComponentsByIds(componentPks);
 
   if (componentsAreLoading)
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
   if (componentsAreError) return <div>Error!</div>;
 
   const component = componentsData?.[0];
@@ -82,12 +92,19 @@ const customStyles = {
 };
 
 const VersionHistory = () => {
+  const navigate = useNavigate();
+  
   const { userHistory, userHistoryIsLoading, userHistoryIsError } =
     useAuthenticatedUserHistory();
 
-  if (userHistoryIsLoading)
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
-  if (userHistoryIsError) return <div>Error!</div>;
+  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
+
+  if (userHistoryIsLoading || userIsLoading)
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
+
+  if (userHistoryIsError || userIsError) return <div>Error!</div>;
 
   const columns = [
     {
@@ -150,31 +167,63 @@ const VersionHistory = () => {
   ];
 
   return (
-    <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
-      <BackButton prevPageName="Account" />
-      <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
-        Inventory Version History
-      </h1>
-      <div>
-        <DataTable
-          compact
-          responsive
-          noHeader
-          pagination
-          paginationPerPage={50}
-          paginationRowsPerPageOptions={[50, 100, 200]}
-          columns={columns}
-          data={userHistory?.history}
-          progressPending={userHistoryIsLoading}
-          customStyles={customStyles}
-          progressComponent={
-            <div className="flex justify-center w-full p-6 bg-sky-50">
-              <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    <>
+      <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
+        <BackButton prevPageName="Account" />
+        <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
+          Inventory Version History
+        </h1>
+        <div>
+          <DataTable
+            compact
+            responsive
+            noHeader
+            pagination
+            paginationPerPage={50}
+            paginationRowsPerPageOptions={[50, 100, 200]}
+            columns={columns}
+            data={userHistory?.history}
+            progressPending={userHistoryIsLoading}
+            customStyles={customStyles}
+            progressComponent={
+              <div className="flex justify-center w-full p-6 bg-sky-50">
+                <div className="text-center text-gray-500 animate-pulse">
+                  Loading...
+                </div>
+              </div>
+            }
+          />
+        </div>
+      </div>
+      {!user.is_premium && (
+        <Modal
+          open={!user.is_premium}
+          title={`This is a feature for our Patreon supporters`}
+          type="info"
+          backdropBlur={"backdrop-blur-sm"}
+          buttons={
+            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
+                  onClick={() => navigate('/premium')}
+                >
+                  Get premium
+                </button>
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                onClick={() => navigate(-1)}
+              >
+                Cancel
+              </button>
             </div>
           }
-        />
-      </div>
-    </div>
+        >
+          {`BOM Squad depends on our Patreon supports to keep our servers online. Please help support the project and get access to version history.`}
+        </Modal>
+      )}
+    </>
   );
 };
 

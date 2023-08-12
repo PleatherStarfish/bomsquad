@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "default_currency",
             "premium_until",
+            "is_premium",
         ]
 
 

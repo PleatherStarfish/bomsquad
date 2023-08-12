@@ -1,25 +1,34 @@
 {% load static %}
 
-<button
-  class="block text-white menu-button text-decoration-none focus:outline-none"
-  aria-label="User menu"
-  aria-haspopup="true"
-  aria-expanded="false"
->
-  {{ button_text }}
-</button>
-<div
-  class="absolute right-0 z-30 hidden w-48 py-2 mt-2 rounded-md shadow-md top-full bg-gray-50"
->
-  <ul class="text-sm text-gray-700">
-    {% for item in dropdown_items %}
-    <li>
-      <a class="block px-4 py-2 hover:bg-gray-100" href="{{ item.url }}"
-        >{{ item.name }}</a
-      >
-    </li>
-    {% if not forloop.last %}
-    <hr class="dropdown-divider" />
-    {% endif %} {% endfor %}
-  </ul>
+<div class="flex items-center space-x-2">
+  <div class="border-r border-gray-100">
+    <a
+      href="{% url 'premium' %}"
+      class="text-white hover:text-gray-100 px-4 inline-flex items-center border rounded border-[#212529] transition-all duration-200"
+      >Get premium</a
+    >
+  </div>
+  <button
+    class="block ml-2 text-white menu-button text-decoration-none focus:outline-none"
+    aria-label="User menu"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    {{ button_text }}
+  </button>
+  <div
+    class="absolute right-0 z-30 hidden w-48 py-2 mt-2 rounded-md shadow-md top-full bg-gray-50"
+  >
+    <ul class="text-sm text-gray-700">
+      {% for item in dropdown_items %}
+      <li>
+        <a class="block px-4 py-2 hover:bg-gray-100" href="{{ item.url }}"
+          >{{ item.name }}</a
+        >
+      </li>
+      {% if not forloop.last %}
+      <hr class="dropdown-divider" />
+      {% endif %} {% endfor %}
+    </ul>
+  </div>
 </div>

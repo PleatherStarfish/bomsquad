@@ -64,7 +64,7 @@ const BomList = ({ moduleId, moduleName }) => {
       return item.pcb_version.some((x) => x.version === selectedTab);
     }).map((item) => ({
       ...item,
-      id: `${item.id}-${item.pcb_version.id}`, // Modify the id value with selectedTab
+      id: `${item.id}_${item.pcb_version.id}`, // Modify the id value with selectedTab
     }));
   }, [selectedTab, moduleBomData]);
 
@@ -125,7 +125,11 @@ const BomList = ({ moduleId, moduleName }) => {
     },
     {
       name: <div>Notes</div>,
-      selector: (row) => row.notes,
+      selector: (row) => {
+        return (
+          <div className="truncate">{row.notes}</div>
+        )
+      },
       sortable: true,
       wrap: true,
       grow: 2,
