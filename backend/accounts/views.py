@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from django.db.transaction import non_atomic_requests
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponse
@@ -42,6 +43,7 @@ def delete_user(request):
 
 @csrf_exempt
 @api_view(["POST"])
+@non_atomic_requests
 def kofi_payment_webhook(request):
     try:
         verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
