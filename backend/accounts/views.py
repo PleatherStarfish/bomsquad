@@ -41,84 +41,56 @@ def delete_user(request):
 
 
 @csrf_exempt
-@swagger_auto_schema(
-    method="post",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "verification_token": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Verification Token"
-            ),
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Email Address"
-            ),
-            "tier_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Tier Name"
-            ),
-            "kofi_transaction_id": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Ko-fi Transaction ID"
-            ),
-            "timestamp": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Timestamp"
-            ),
-            "is_subscription_payment": openapi.Schema(
-                type=openapi.TYPE_BOOLEAN, description="Is Subscription Payment"
-            ),
-        },
-        required=["verification_token", "email", "kofi_transaction_id", "timestamp"],
-    ),
-)
-@api_view(["POST"])
-@permission_classes([AllowAny])
 def kofi_payment_webhook(request):
-    try:
-        verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
+    if request.method == "POST":
+        try:
+            verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
 
-        data_json = json.loads(request.body)
+            data_json = json.loads(request.body)
 
-        received_verification_token = data_json.get("verification_token")
+            received_verification_token = data_json.get("verification_token")
 
-        if received_verification_token != verification_token:
-            logger.warning("Invalid verification token received in webhook")
-            return HttpResponse(status=400)
-
-        email = data_json.get("email")
-
-        tier_name = data_json.get("tier_name")
-
-        kofi_transaction_id_str = data_json.get("kofi_transaction_id")
-
-        timestamp_str = data_json.get("timestamp")
-
-        is_subscription_payment = bool(data_json.get("is_subscription_payment"))
-
-        kofi_transaction_id = (
-            UUID(kofi_transaction_id_str) if kofi_transaction_id_str else None
-        )
-
-        if timestamp_str:
-            timestamp_str = timestamp_str.replace("Z", "+00:00")
-            try:
-                timestamp = datetime.fromisoformat(timestamp_str)
-            except ValueError:
-                logger.warning("Unknown timestamp format in webhook request")
+            if received_verification_token != verification_token:
+                logger.warning("Invalid verification token received in webhook")
                 return HttpResponse(status=400)
 
-        if not email or not timestamp or not kofi_transaction_id:
-            logger.warning("Missing data in webhook request")
-            return Response(status=400)
+            email = data_json.get("email")
+            tier_name = data_json.get("tier_name")
+            kofi_transaction_id_str = data_json.get("kofi_transaction_id")
+            timestamp_str = data_json.get("timestamp")
+            is_subscription_payment = bool(data_json.get("is_subscription_payment"))
 
-        if not is_subscription_payment:
-            logger.info("Non-subscription payment by %s", email)
+            kofi_transaction_id = (
+                UUID(kofi_transaction_id_str) if kofi_transaction_id_str else None
+            )
+
+            if timestamp_str:
+                timestamp_str = timestamp_str.replace("Z", "+00:00")
+                try:
+                    timestamp = datetime.fromisoformat(timestamp_str)
+                except ValueError:
+                    logger.warning("Unknown timestamp format in webhook request")
+                    return HttpResponse(status=400)
+
+            if not email or not timestamp or not kofi_transaction_id:
+                logger.warning("Missing data in webhook request")
+                return Response(status=400)
+
+            if not is_subscription_payment:
+                logger.info("Non-subscription payment by %s", email)
+                return Response(status=200)
+
+            # Create or update the record
+            KofiPayment.objects.update_or_create(
+                kofi_transaction_id=kofi_transaction_id,
+                defaults={
+                    "email": email,
+                    "tier_name": tier_name,
+                    "timestamp": timestamp,
+                },
+            )
             return Response(status=200)
 
-        # Create or update the record
-        KofiPayment.objects.update_or_create(
-            kofi_transaction_id=kofi_transaction_id,
-            defaults={"email": email, "tier_name": tier_name, "timestamp": timestamp},
-        )
-        return Response(status=200)
-
-    except json.JSONDecodeError:
-        logger.warning("Missing data in webhook request")
-        return Response(status=400)
+        except json.JSONDecodeError:
+            logger.warning("Missing data in webhook request")
+            return Response(status=400)
