@@ -1,12 +1,10 @@
 from accounts.serializers import UserHistorySerializer, UserSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.db.transaction import non_atomic_requests
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponse
 from .models import KofiPayment
 from datetime import datetime
@@ -48,18 +46,27 @@ def kofi_payment_webhook(request):
     try:
         verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
 
-        received_verification_token = request.POST.get("verification_token")
+        data_json_str = request.POST.get("data")
+        if not data_json_str:
+            logger.warning("Missing data in webhook request")
+            return HttpResponse(status=400)
+
+        data_json = json.loads(data_json_str)
+
+        received_verification_token = data_json.get("verification_token")
 
         if received_verification_token != verification_token:
             logger.warning("Invalid verification token received in webhook")
             return HttpResponse(status=400)
 
-        email = request.POST.get("email")
-        tier_name = request.POST.get("tier_name")
-        kofi_transaction_id_str = request.POST.get("kofi_transaction_id")
-        timestamp_str = request.POST.get("timestamp")
-        is_subscription_payment = bool(request.POST.get("is_subscription_payment"))
+        # Extract other necessary fields
+        email = data_json.get("email")
+        tier_name = data_json.get("tier_name")
+        kofi_transaction_id_str = data_json.get("kofi_transaction_id")
+        timestamp_str = data_json.get("timestamp")
+        is_subscription_payment = bool(data_json.get("is_subscription_payment"))
 
+        # Convert fields as needed
         kofi_transaction_id = (
             UUID(kofi_transaction_id_str) if kofi_transaction_id_str else None
         )
@@ -70,15 +77,17 @@ def kofi_payment_webhook(request):
                 timestamp = datetime.fromisoformat(timestamp_str)
             except ValueError:
                 logger.warning("Unknown timestamp format in webhook request")
-                return Response(status=400)
+                return HttpResponse(status=400)
 
+        # Validate required fields
         if not email or not timestamp or not kofi_transaction_id:
             logger.warning("Missing data in webhook request")
-            return Response(status=400)
+            return HttpResponse(status=400)
 
+        # Process non-subscription payment if needed
         if not is_subscription_payment:
             logger.info("Non-subscription payment by %s", email)
-            return Response(status=200)
+            return HttpResponse(status=200)
 
         # Create or update the record
         KofiPayment.objects.update_or_create(
@@ -89,7 +98,8 @@ def kofi_payment_webhook(request):
                 "timestamp": timestamp,
             },
         )
-        return Response(status=200)
-    except Exception:
-        logger.exception("Error in webhook request")
-        return Response(status=500)
+        return HttpResponse(status=200)
+
+    except json.JSONDecodeError:
+        logger.warning("Error decoding JSON data in webhook request")
+        return HttpResponse(status=400)
