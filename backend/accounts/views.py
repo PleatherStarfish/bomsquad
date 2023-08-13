@@ -48,19 +48,17 @@ def kofi_payment_webhook(request):
     try:
         verification_token = os.environ.get("KO_FI_VERIFICATION_TOKEN")
 
-        data_json = json.loads(request.body)
-
-        received_verification_token = data_json.get("verification_token")
+        received_verification_token = request.POST.get("verification_token")
 
         if received_verification_token != verification_token:
             logger.warning("Invalid verification token received in webhook")
             return HttpResponse(status=400)
 
-        email = data_json.get("email")
-        tier_name = data_json.get("tier_name")
-        kofi_transaction_id_str = data_json.get("kofi_transaction_id")
-        timestamp_str = data_json.get("timestamp")
-        is_subscription_payment = bool(data_json.get("is_subscription_payment"))
+        email = request.POST.get("email")
+        tier_name = request.POST.get("tier_name")
+        kofi_transaction_id_str = request.POST.get("kofi_transaction_id")
+        timestamp_str = request.POST.get("timestamp")
+        is_subscription_payment = bool(request.POST.get("is_subscription_payment"))
 
         kofi_transaction_id = (
             UUID(kofi_transaction_id_str) if kofi_transaction_id_str else None
@@ -72,7 +70,7 @@ def kofi_payment_webhook(request):
                 timestamp = datetime.fromisoformat(timestamp_str)
             except ValueError:
                 logger.warning("Unknown timestamp format in webhook request")
-                return HttpResponse(status=400)
+                return Response(status=400)
 
         if not email or not timestamp or not kofi_transaction_id:
             logger.warning("Missing data in webhook request")
@@ -92,7 +90,6 @@ def kofi_payment_webhook(request):
             },
         )
         return Response(status=200)
-
-    except json.JSONDecodeError:
-        logger.warning("Missing data in webhook request")
-        return Response(status=400)
+    except Exception:
+        logger.exception("Error in webhook request")
+        return Response(status=500)
