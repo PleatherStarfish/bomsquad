@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.db.transaction import non_atomic_requests
 from django.http import HttpResponse
-from .models import KofiPayment
-from datetime import datetime
+from .models import CustomUser, KofiPayment
+from datetime import datetime, timedelta
 from uuid import UUID
 import logging
 import json
@@ -98,6 +98,14 @@ def kofi_payment_webhook(request):
         if not is_subscription_payment:
             logger.info("Non-subscription payment by %s", email)
             return HttpResponse(status=200)
+
+        # Update user premium_until_via_kofi if a user is found with the given email
+        try:
+            user = CustomUser.objects.get(email=email)
+            user.premium_until_via_kofi = timestamp + timedelta(days=32)
+            user.save()
+        except CustomUser.DoesNotExist:
+            logger.warning("No user found for email %s", email)
 
         # Create or update the record
         KofiPayment.objects.update_or_create(
