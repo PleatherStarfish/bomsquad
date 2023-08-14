@@ -60,20 +60,20 @@ def kofi_payment_webhook(request):
             return HttpResponse(status=400)
 
         # Extract other necessary fields
-        email = data_json.get("email")
-        tier_name = data_json.get("tier_name")
-        kofi_transaction_id_str = data_json.get("kofi_transaction_id")
-        timestamp_str = data_json.get("timestamp")
-        is_subscription_payment = bool(data_json.get("is_subscription_payment"))
-        type = data_json.get("type")
-        is_public = data_json.get("is_public")
-        from_name = data_json.get("from_name")
-        message = data_json.get("message")
-        amount = data_json.get("amount")
-        url = data_json.get("url")
-        currency = data_json.get("currency")
+        email = data_json.get("email", "")
+        tier_name = data_json.get("tier_name", "")
+        kofi_transaction_id_str = data_json.get("kofi_transaction_id", "")
+        timestamp_str = data_json.get("timestamp", "")
+        is_subscription_payment = bool(data_json.get("is_subscription_payment", False))
+        type = data_json.get("type", "")
+        is_public = bool(data_json.get("is_public", False))
+        from_name = data_json.get("from_name", "")
+        message = data_json.get("message", "")
+        amount = data_json.get("amount", "0.00")
+        url = data_json.get("url", "")
+        currency = data_json.get("currency", "")
         is_first_subscription_payment = bool(
-            data_json.get("is_first_subscription_payment")
+            data_json.get("is_first_subscription_payment", False)
         )
 
         # Convert fields as needed
