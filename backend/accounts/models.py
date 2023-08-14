@@ -10,8 +10,16 @@ import uuid
 class KofiPayment(models.Model):
     kofi_transaction_id = models.UUIDField(primary_key=True)
     email = models.EmailField()
-    tier_name = models.CharField(max_length=255, null=True, blank=True)
+    tier_name = models.TextField(null=True, blank=True)
     timestamp = models.DateTimeField(null=True, blank=True)
+    type = models.TextField(blank=True)
+    is_public = models.BooleanField(blank=True, default=False)
+    from_name = models.TextField(blank=True)
+    message = models.TextField(blank=True)
+    amount = models.CharField(max_length=6, blank=True)
+    url = models.URLField(blank=True)
+    currency = models.CharField(max_length=6, blank=True)
+    is_first_subscription_payment = models.BooleanField(blank=True, default=False)
 
 
 class CustomUser(AbstractUser):
@@ -55,10 +63,23 @@ class CustomUser(AbstractUser):
         choices=CURRENCIES, default="USD", max_length=3, blank=True
     )
     history = models.JSONField(default=list, blank=True)
+    premium_admin_override = models.BooleanField(
+        default=False, help_text="Admin override to make the user premium arbitrarily."
+    )
     premium_until = models.DateField(
         null=True,
         blank=True,
-        help_text="Premium expiry date. Is null if not premium or premium via Patreon.",
+        help_text="Premium expiry date. If subscribed through direct payment, such as Stripe, this is the date when the subscription ends if not renewed.",
+    )
+    premium_until_via_kofi = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Premium expiry date. If subscribed through Ko-fi, is the date when the Ko-fi subscription ends if not renewed.",
+    )
+    premium_until_via_patreon = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Premium expiry date. If subscribed through Patreon, is the date when the Ko-fi subscription ends if not renewed.",
     )
 
     def __str__(self):
@@ -69,16 +90,18 @@ class CustomUser(AbstractUser):
         """
         Checks if the user is currently premium.
         """
-        if self.premium_until and self.premium_until >= timezone.now().date():
+        if self.premium_admin_override:
             return True
 
-        # Check if the user's email appears in the KofiPayment model within the last 31 days
-        thirty_one_days_ago = timezone.now() - timedelta(days=31)
-        has_recent_kofi_payment = KofiPayment.objects.filter(
-            email=self.email, timestamp__gte=thirty_one_days_ago
-        ).exists()
+        now = timezone.now().date()
 
-        if has_recent_kofi_payment:
+        if self.premium_until and self.premium_until >= now:
+            return True
+
+        if self.premium_until_via_kofi and self.premium_until_via_kofi >= now:
+            return True
+
+        if self.premium_until_via_patreon and self.premium_until_via_patreon >= now:
             return True
 
         return False

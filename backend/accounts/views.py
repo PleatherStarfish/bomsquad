@@ -65,6 +65,16 @@ def kofi_payment_webhook(request):
         kofi_transaction_id_str = data_json.get("kofi_transaction_id")
         timestamp_str = data_json.get("timestamp")
         is_subscription_payment = bool(data_json.get("is_subscription_payment"))
+        type = data_json.get("type")
+        is_public = data_json.get("is_public")
+        from_name = data_json.get("from_name")
+        message = data_json.get("message")
+        amount = data_json.get("amount")
+        url = data_json.get("url")
+        currency = data_json.get("currency")
+        is_first_subscription_payment = bool(
+            data_json.get("is_first_subscription_payment")
+        )
 
         # Convert fields as needed
         kofi_transaction_id = (
@@ -96,6 +106,14 @@ def kofi_payment_webhook(request):
                 "email": email,
                 "tier_name": tier_name,
                 "timestamp": timestamp,
+                "type": type,
+                "is_public": is_public,
+                "from_name": from_name,
+                "message": message,
+                "amount": amount,
+                "url": url,
+                "currency": currency,
+                "is_first_subscription_payment": is_first_subscription_payment,
             },
         )
         return HttpResponse(status=200)

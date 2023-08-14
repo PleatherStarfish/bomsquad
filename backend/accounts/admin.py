@@ -11,7 +11,27 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    fieldsets = UserAdmin.fieldsets + ((("History"), {"fields": ("history",)}),)
+    list_display = ("username", "email", "is_staff", "is_premium_display")
+    fieldsets = UserAdmin.fieldsets + (
+        (
+            "Premium Information",
+            {
+                "fields": (
+                    "is_premium_display",
+                    "premium_admin_override",
+                    "premium_until",
+                    "premium_until_via_kofi",
+                    "premium_until_via_patreon",
+                )
+            },
+        ),
+        (("History"), {"fields": ("history",)}),
+    )
+
+    def is_premium_display(self, obj):
+        return obj.is_premium
+
+    readonly_fields = ("is_premium_display",)  # Make it read-only
 
 
 class UserNotesAdmin(BaseAdmin):
