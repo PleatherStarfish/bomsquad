@@ -42,6 +42,8 @@ const Button = ({
   onClick,
   classNames = "",
   Icon = undefined,
+  Image = undefined,
+  imageAlt = "",
   iconLocation = "left",
   iconOnly = false,
   tooltipText,
@@ -82,8 +84,10 @@ const Button = ({
       )}
     >
       {Icon && iconLocation === "left" && <Icon className="w-4 h-4" />}
+      {Image && iconLocation === "left" && <img src={Image} alt={imageAlt} className="h-5 w-fit" />}
       <span>{children}</span>
       {Icon && iconLocation === "right" && <Icon className="w-4 h-4" />}
+      {Image && iconLocation === "right" && <img src={Image} alt={imageAlt} className="h-5 w-fit" />}
     </button>
   );
 };

@@ -69,41 +69,6 @@ const SolderingMode = ({
     .rdt_Pagination { background-color: #212529; color: white; }
   `;
 
-  // useEffect(() => {
-  //   const observer = new MutationObserver(() => {
-  //     const tableHead = document.querySelector('.rdt_TableHead');
-  //     const pagination = document.querySelector('.rdt_Pagination');
-
-  //     if (darkMode) {
-  //       if (tableHead) {
-  //         tableHead.style.backgroundColor = '#212529';
-  //         tableHead.style.color = 'white';
-  //         tableHead.style.borderColor = "white";
-  //       }
-  //       if (pagination) {
-  //         pagination.style.backgroundColor = '#212529';
-  //         pagination.style.color = 'white';
-  //       }
-  //     } else {
-  //       if (tableHead) {
-  //         tableHead.style.backgroundColor = '';
-  //         tableHead.style.color = '';
-  //         tableHead.style.borderColor = '';
-  //       }
-  //       if (pagination) {
-  //         pagination.style.backgroundColor = '';
-  //         pagination.style.color = '';
-  //       }
-  //     }
-  //   });
-
-  //   observer.observe(document, { childList: true, subtree: true });
-
-  //   return () => {
-  //     observer.disconnect();
-  //   }
-  // }, [darkMode]);
-
   const conditionalRowStyles = [
     {
       when: row => darkMode,

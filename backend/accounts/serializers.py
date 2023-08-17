@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "default_currency",
-            "premium_until",
+            "end_of_premium_display_date",
             "is_premium",
         ]
 

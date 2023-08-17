@@ -8,12 +8,35 @@ from django.db.transaction import non_atomic_requests
 from django.http import HttpResponse
 from .models import CustomUser, KofiPayment
 from datetime import datetime, timedelta
+from decimal import Decimal
 from uuid import UUID
 import logging
 import json
 import os
 
 logger = logging.getLogger(__name__)
+
+
+def convert_to_usd(amount, currency):
+    # TODO: replace hardcoded conversion rates with API
+    conversion_rates = {
+        "USD": 1.0,
+        "EUR": 0.85,
+        "JPY": 110.5,
+        "GBP": 0.72,
+        "AUD": 1.30,
+        "CAD": 1.25,
+        "CHF": 0.92,
+        "CNY": 6.45,
+        "INR": 73.5,
+        "BRL": 5.25,
+    }
+
+    if currency not in conversion_rates:
+        logger.warning(f"Unknown currency: {currency}")
+        return None  # Handle unknown currencies
+
+    return amount / conversion_rates[currency]
 
 
 @api_view(["GET"])
@@ -99,13 +122,25 @@ def kofi_payment_webhook(request):
             logger.info("Non-subscription payment by %s", email)
             return HttpResponse(status=200)
 
-        # Update user premium_until_via_kofi if a user is found with the given email
-        try:
-            user = CustomUser.objects.get(email=email)
-            user.premium_until_via_kofi = timestamp + timedelta(days=32)
-            user.save()
-        except CustomUser.DoesNotExist:
-            logger.warning("No user found for email %s", email)
+        amount = Decimal(data_json.get("amount", "0.00"))  # Convert string to decimal
+
+        usd_amount = convert_to_usd(
+            amount, currency
+        )  # Convert amount to its USD equivalent
+        if usd_amount is None:
+            logger.warning(f"Failed to convert {amount} {currency} to USD")
+            return HttpResponse(status=400)
+
+        # Update user premium_until_via_kofi if a user is found with the given email AND the amount is greater than $3 USD
+        if usd_amount >= 3:
+            try:
+                user = CustomUser.objects.get(email=email)
+                user.premium_until_via_kofi = timestamp + timedelta(
+                    days=32
+                )  # extra day is free :)
+                user.save()
+            except CustomUser.DoesNotExist:
+                logger.warning("No user found for email %s", email)
 
         # Create or update the record
         KofiPayment.objects.update_or_create(

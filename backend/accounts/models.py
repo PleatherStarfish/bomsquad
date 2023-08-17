@@ -106,6 +106,24 @@ class CustomUser(AbstractUser):
 
         return False
 
+    @property
+    def end_of_premium_display_date(self):
+        """
+        Returns the date when the user's premium expires in a human-readable format.
+        """
+        date = None
+        if self.premium_until:
+            date = self.premium_until
+        elif self.premium_until_via_kofi:
+            date = self.premium_until_via_kofi
+        elif self.premium_until_via_patreon:
+            date = self.premium_until_via_patreon
+
+        if date:
+            return date.strftime("%B %d, %Y")
+        else:
+            return None
+
 
 class UserNotes(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)

@@ -9,16 +9,26 @@ class HomePageView(TemplateView):
 
 class AboutPageView(DetailView):
     model = Page
-    template_name = "pages/about.html"
+    template_name = "pages/page.html"
     context_object_name = "page"
 
     def get_object(self):
         return Page.objects.filter(title="About").first()
 
 
-class DisclaimerPageView(TemplateView):
-    template_name = "pages/disclaimer.html"
+class DisclaimerPageView(DetailView):
+    model = Page
+    template_name = "pages/page.html"
+    context_object_name = "page"
+
+    def get_object(self):
+        return Page.objects.filter(title="Disclaimer").first()
 
 
-class PremiumPageView(TemplateView):
-    template_name = "pages/premium.html"
+class PremiumPageView(DetailView):
+    model = Page
+    template_name = "pages/page.html"
+    context_object_name = "page"
+
+    def get_object(self):
+        return Page.objects.filter(title="Support").first()

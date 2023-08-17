@@ -497,7 +497,7 @@ const Inventory = () => {
                   className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
                   onClick={() => navigate('/premium')}
                 >
-                  Get premium
+                  Support
                 </button>
               <button
                 type="button"
