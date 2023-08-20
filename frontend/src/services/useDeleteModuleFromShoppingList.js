@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useDeleteShoppingListItem = () => {
     const csrftoken = Cookies.get('csrftoken');
@@ -9,8 +10,11 @@ const useDeleteShoppingListItem = () => {
 
     const deleteMutation = useMutation({
         mutationFn: ({ module_pk }) => {
-            if (module_pk) {
-                return axios.delete(`/api/shopping-list/${module_pk}/delete/`, {
+            
+            const module_pkCleaned = removeAfterUnderscore(module_pk)
+
+            if (module_pkCleaned) {
+                return axios.delete(`/api/shopping-list/${module_pkCleaned}/delete/`, {
                     headers: {
                         'X-CSRFToken': csrftoken,
                     },

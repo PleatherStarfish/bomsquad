@@ -31,6 +31,7 @@ export const ButtonVariant = {
   danger: "bg-red-500 hover:bg-red-700 text-white",
   submit: "bg-blue-500 hover:bg-blue-700 text-white",
   muted: "bg-gray-400 text-white hover:bg-gray-500",
+  mutedHoverPrimary: "bg-gray-400 text-white hover:bg-[#548a6a]",
   light:
     "bg-white border-2 border-gray-400 text-gray-500 hover:border-gray-600 hover:text-gray-700",
   link: "text-gray-500 hover:text-red-500",

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useAddComponentToInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
@@ -9,7 +10,11 @@ const useAddComponentToInventory = () => {
 
   const { mutate: addComponentToInventory } = useMutation({
     mutationFn: ({ componentId, quantity }) => {
-      return axios.post(`/shopping-list/inventory/${componentId}/add/`, { quantity }, {
+      const componentIdCleaned = removeAfterUnderscore(componentId)
+
+      const requestData = quantity ? { quantity } : {}; // Only add quantity if it exists
+
+      return axios.post(`/api/shopping-list/inventory/${componentIdCleaned}/add/`, requestData, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

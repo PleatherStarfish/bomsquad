@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useUpdateShoppingList = () => {
   const csrftoken = Cookies.get("csrftoken");
@@ -9,7 +10,8 @@ const useUpdateShoppingList = () => {
 
   const { mutate: updateShoppingListMutate } = useMutation({
     mutationFn: ({ componentPk, ...data }) => {
-      return axios.patch(`/api/shopping-list/${componentPk}/update/`, data, {
+      const componentPkCleaned = removeAfterUnderscore(componentPk)
+      return axios.patch(`/api/shopping-list/${componentPkCleaned}/update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

@@ -1,11 +1,15 @@
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 import { useQuery } from "@tanstack/react-query";
 
 const useGetUserAnonymousShoppingListQuantity = (componentPk) => {
+
+  const componentPkCleaned = removeAfterUnderscore(componentPk)
+
   const fetchUserInventoryQuantity = async () => {
     try {
       const response = await axios.get(
-        `/api/shopping-list/${componentPk}/component-quantity/`
+        `/api/shopping-list/${componentPkCleaned}/component-quantity/`
       );
       return response.data.quantity;
     } catch (error) {
@@ -14,7 +18,7 @@ const useGetUserAnonymousShoppingListQuantity = (componentPk) => {
   };
 
   return useQuery(
-    ["userAnonymousInventoryQuantity", componentPk],
+    ["userAnonymousInventoryQuantity", componentPkCleaned],
     fetchUserInventoryQuantity
   );
 };

@@ -1,7 +1,8 @@
 import {
   ArrowPathIcon,
   PencilSquareIcon,
-  XMarkIcon,
+  PlusIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
@@ -117,6 +118,7 @@ const ListSlice = ({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState();
   const [idToTotalQuantityLookup, setIdToTotalQuantityLookup] = useState({});
+  const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState(false);
   
   const onlyWidth = useWindowWidth();
 
@@ -399,10 +401,10 @@ const ListSlice = ({
     {
       name: <></>,
       cell: (row) => {
-        return (!row?.placeholder ? <Button size="xs" variant="muted">Add to Inventory</Button> : undefined);
+        return (!row?.placeholder ? <Button size="xs" variant="mutedHoverPrimary" Icon={PlusIcon} iconOnly tooltipText={"Add to inventory"} onClick={() => setAddOneToInventoryModalOpen(row?.component)} /> : undefined);
       },
       sortable: false,
-      width: "150px",
+      width: "50px",
     },
   ];
 
@@ -442,24 +444,23 @@ const ListSlice = ({
     },
   ];
 
+  let widthClass;
+
+  if (index === 0) {
+      widthClass = "w-full grow";
+  } else if (quantityIdToEdit) {
+      widthClass = "w-[200px]";
+  } else {
+      widthClass = "w-[100px]";
+  }
+
   return (
     <>
       <Helmet>
         <style>{backgroundColor != "bg-white" ? bgStyles : ""}</style>
       </Helmet>
       <div
-        className={cx(
-          "group/column",
-          index === 0
-            ? "w-full grow"
-            : quantityIdToEdit
-            ? !(onlyWidth > 1000 && allModulesData.length < 4)
-              ? "w-[200px]"
-              : "w-[200px]"
-            : !(onlyWidth > 1000 && allModulesData.length < 4)
-            ? "w-[100px]"
-            : "w-[200px]"
-        )}
+        className={cx("group/column", widthClass)}
       >
         <div id={(index == allModulesData.length + 3) ? "shopping-list-slice-state-table" : undefined} className={cx({ "border-r border-gray-300": index === 0 })}>
           <DataTable
@@ -499,6 +500,19 @@ const ListSlice = ({
         }
       >
         {`Are you sure you want to delete all the components in your shopping list for ${deleteModalModuleDetails?.moduleName}?`}
+      </Modal>
+      <Modal
+        open={!!addOneToInventoryModalOpen?.id}
+        setOpen={setAddOneToInventoryModalOpen}
+        title={"Add to inventory?"}
+        submitButtonText={"Add"}
+        type="warning"
+        onSubmit={() => {
+          addComponentToInventory({
+            componentId: addOneToInventoryModalOpen?.id,
+        })}}
+      >
+        {`Are you sure you want to add ${addOneToInventoryModalOpen?.description} to you inventory? This will remove this item from your shopping list.`}
       </Modal>
     </>
   );

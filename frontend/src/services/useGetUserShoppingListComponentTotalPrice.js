@@ -1,11 +1,15 @@
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 import { useQuery } from "@tanstack/react-query";
 
 const useUserShoppingListTotalPrice = (componentId) => {
+    
+  const componentIdCleaned = removeAfterUnderscore(componentId)
+
   const fetchUserShoppingListTotalPrice = async () => {
     try {
       const response = await axios.get(
-        `/api/shopping-list/${componentId}/total-price/`
+        `/api/shopping-list/${componentIdCleaned}/total-price/`
       );
       return response.data.total_price;
     } catch (error) {
@@ -13,7 +17,7 @@ const useUserShoppingListTotalPrice = (componentId) => {
     }
   };
 
-  const queryKey = ["userShoppingListTotalPrice", componentId];
+  const queryKey = ["userShoppingListTotalPrice", componentIdCleaned];
   const queryOptions = {
     onError: (error) => {
       console.error("Error while fetching total price:", error);

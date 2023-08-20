@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useDeleteUserInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
@@ -9,7 +10,10 @@ const useDeleteUserInventory = () => {
 
   const deleteMutation = useMutation({
     mutationFn: ({ componentPk }) => {
-      return axios.delete(`/api/inventory/${componentPk}/delete/`, {
+      
+      const componentPkCleaned = removeAfterUnderscore(componentPk)
+
+      return axios.delete(`/api/inventory/${componentPkCleaned}/delete/`, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

@@ -17,8 +17,8 @@ from shopping_list.serializers import (
     UserShoppingListSavedSerializer,
     UserShoppingListSerializer,
 )
-from rest_framework.views import APIView
 from uuid import UUID
+from rest_framework.views import APIView
 
 
 class UserShoppingListView(APIView):
@@ -41,8 +41,8 @@ class UserShoppingListView(APIView):
         """
         user = request.user
         quantity = int(request.data.get("quantity", 0))
-        module_bom_list_item_pk = request.data.get("modulebomlistitem_pk", None)
-        module_pk = request.data.get("module_pk", None)
+        module_bom_list_item_pk = UUID(request.data.get("modulebomlistitem_pk", None))
+        module_pk = UUID(request.data.get("module_pk", None))
 
         # Determine the editing mode from request
         edit_mode = request.data.get("editMode", True)
@@ -539,28 +539,37 @@ def get_user_shopping_list_total_quantity(request):
 @permission_classes([IsAuthenticated])
 def add_component_to_inventory(request, component_pk):
     user = request.user
-    quantity = request.data.get("quantity", None)
+    quantity = request.data.get("quantity")
 
-    if not quantity:
-        return Response(
-            {"detail": "quantity is a required field."},
-            status=status.HTTP_400_BAD_REQUEST,
+    if quantity:
+        # Ensure the provided quantity can be casted to an integer
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            return Response(
+                {"detail": "Invalid quantity."}, status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        # Get the total quantity of that component in the user's UserShoppingList
+        total_quantity = (
+            UserShoppingList.objects.filter(
+                user=user, component_id=component_pk
+            ).aggregate(total=Sum("quantity"))["total"]
+            or 0
         )
+        quantity = total_quantity
 
-    try:
-        quantity = int(quantity)  # make sure the quantity is an integer
-    except ValueError:
-        return Response(
-            {"detail": "Invalid quantity."}, status=status.HTTP_400_BAD_REQUEST
-        )
+        # Remove the component from the user's UserShoppingList
+        UserShoppingList.objects.filter(user=user, component_id=component_pk).delete()
 
+    # Get or create the inventory item for the user and component
     inventory_item, created = UserInventory.objects.get_or_create(
         component_id=component_pk,
         user=user,
         defaults={"quantity": quantity},
     )
 
-    # If the item already exists in the inventory, update its quantity
+    # If the item was not newly created, update its quantity
     if not created:
         UserInventory.objects.filter(pk=inventory_item.pk).update(
             quantity=F("quantity") + quantity

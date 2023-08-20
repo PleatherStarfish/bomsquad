@@ -2,15 +2,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useAddOrUpdateUserAnonymousShoppingList = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
   const {mutate: addOrUpdateUserAnonymousShoppingList} = useMutation({
+
     mutationFn: ({ componentId, quantity, editMode }) => {
+      const componentIdCleaned = removeAfterUnderscore(componentId)
+      
       return axios.post(
-        `/api/shopping-list/${componentId}/anonymous-create-or-update/`,
+        `/api/shopping-list/${componentIdCleaned}/anonymous-create-or-update/`,
         {quantity, editMode},
         {
           headers: {
