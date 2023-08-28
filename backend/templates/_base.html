@@ -115,6 +115,17 @@
       });
     </script>
 
+    <script>
+      setTimeout(function() {
+          document.querySelectorAll('.toast').forEach(function(toast) {
+              toast.style.opacity = 0;
+              setTimeout(function() {
+                  toast.remove();
+              }, 300);  // Matches the duration of the transition
+          });
+      }, 5000);  // Toasts will disappear after 5 seconds
+    </script>
+
     {% block javascript %}{% endblock javascript %}
   </body>
 </html>

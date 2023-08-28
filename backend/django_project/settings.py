@@ -8,10 +8,10 @@ from sentry_sdk.integrations.django import DjangoIntegration
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = os.environ.get("DEBUG") == "True"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["*"]
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "import_export",
     # Local
     "accounts",
+    "contact",
     "core",
     "pages",
     "modules",
@@ -135,11 +136,11 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 
@@ -199,6 +200,18 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "core.email.SendgridEmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@bom-squad.com"
+
+CONTACT_EMAIL = os.environ.get("BOM_SQUAD_EMAIL_ADDRESS")
+ADMIN_EMAIL = os.environ.get("BOM_SQUAD_EMAIL_ADDRESS")
+
+
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # django-debug-toolbar
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
@@ -265,7 +278,7 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_MAX_EMAIL_ADDRESSES = 3
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 sentry_sdk.init(

@@ -27,6 +27,8 @@ const useAddComponentToInventory = () => {
       queryClient.refetchQueries("inventory");
       queryClient.invalidateQueries("authenticatedUserHistory");
       queryClient.refetchQueries("authenticatedUserHistory");
+      queryClient.invalidateQueries("userShoppingList");
+      queryClient.refetchQueries("userShoppingList");
     },
   });
 

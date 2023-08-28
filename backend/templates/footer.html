@@ -1,7 +1,7 @@
-<div  class="py-10 px-6 sm:px-24 lg:px-48 grid grid-cols-3 gap-4 w-screen bg-gray-50">
+<div  class="grid w-screen grid-cols-3 gap-4 px-6 py-10 sm:px-24 lg:px-48 bg-gray-50">
     <div>
-        <h1 class="font-semibold text-gray-900 mb-1">About</h1>
-        <ul class="list-none text-sm text-gray-600">
+        <h1 class="mb-1 font-semibold text-gray-900">About</h1>
+        <ul class="text-sm text-gray-600 list-none">
             <li>
                 <a href="/faq/" class="text-gray-400 hover:text-gray-700">FAQ</a>
             </li>
@@ -18,8 +18,8 @@
     </div>
     <div>
         <div>
-            <h1 class="font-semibold text-gray-900 mb-1">Account</h1>
-            <ul class="list-none text-sm text-gray-600">
+            <h1 class="mb-1 font-semibold text-gray-900">Account</h1>
+            <ul class="text-sm text-gray-600 list-none">
                 <li>
                     <a href="/accounts/login/" class="text-gray-400 hover:text-gray-700">Login</a>
                 </li>
@@ -27,18 +27,41 @@
         </div>
         <div>
             <h1 class="sr-only">Contact</h1>
-            <ul class="list-none text-sm text-gray-600">
+            <ul class="text-sm text-gray-600 list-none">
                 <li>
                     <a href="mailto:info@bom-squad.com"
-                       class="text-gray-400 hover:text-gray-700 mt-4">Contact</a>
+                       class="mt-4 text-gray-400 hover:text-gray-700">Contact</a>
                 </li>
             </ul>
         </div>
     </div>
-    <div></div>
     <div>
-        <h1 class="font-semibold text-gray-900 mb-1">Support</h1>
-        <ul class="list-none text-sm text-gray-600">
+        <!--Email subscription Form -->
+        <form method="post" action="{% url 'subscription' %}">
+            {% csrf_token %}
+    
+            <div class="form-group">
+            <label>Subscribe for updates</label> <br>
+            <input type="email" name="email" placeholder="Enter Email to Subscribe">
+            <button class="px-4 py-2 mt-8 text-white rounded bg-brandgreen-500 hover:bg-brandgreen-700" type="submit">Submit</button>
+            </div>
+    
+        </form>
+  
+        <!-- message if email is sent -->
+        {% if messages %}
+        {% for message in messages %}
+            <div class="my-5 alert alert-success">
+            <h5 class="m-0">
+                {{ message }}
+            </h5>
+            </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div>
+        <h1 class="mb-1 font-semibold text-gray-900">Support</h1>
+        <ul class="text-sm text-gray-600 list-none">
             <li>
                 <a href="#" class="text-gray-400 hover:text-gray-700">Donate</a>
             </li>
@@ -54,5 +77,6 @@
                class="text-gray-400 hover:text-gray-700">Black lives matter.</a>
         </div>
     </div>
-    <div></div>
+    <div>
+    </div>
 </div>

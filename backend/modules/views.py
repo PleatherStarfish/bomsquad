@@ -204,7 +204,6 @@ def get_module_bom_list_items(request, module_pk):
     try:
         # Retrieve the Module instance based on the provided module_pk
         module = Module.objects.get(pk=module_pk)
-        print(module)
     except Module.DoesNotExist:
         # Return a response indicating that the module does not exist
         return Response(

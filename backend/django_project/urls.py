@@ -102,6 +102,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),
+    path("contact/", include("contact.urls")),
     path(
         "add-to-built/<uuid:module_id>/",
         login_required(ModuleView.add_module_to_built),
