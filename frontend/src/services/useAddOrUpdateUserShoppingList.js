@@ -10,11 +10,12 @@ const useAddOrUpdateUserShoppingList = () => {
 
   const { mutate: addOrUpdateUserShoppingList } = useMutation({
     mutationFn: ({ componentId, ...data }) => {
-      const componentIdCleaned = removeAfterUnderscore(componentId)
-
+      const cleanedModuleBomListItemPk = removeAfterUnderscore(data.modulebomlistitem_pk);
+      const componentIdCleaned = removeAfterUnderscore(componentId);
+      
       return axios.post(
         `/api/shopping-list/${componentIdCleaned}/create-or-update/`,
-        data,
+        { ...data, modulebomlistitem_pk: cleanedModuleBomListItemPk },
         {
           headers: {
             "X-CSRFToken": csrftoken,

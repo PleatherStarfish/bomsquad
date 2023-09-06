@@ -42,6 +42,7 @@ module.exports = {
         red: colors.red,
         indigo: colors.indigo,
         blue: colors.blue,
+        stone: colors.stone,
         brandgreen: {
           50: "#f7faf6",
           100: "#ecf3ea",

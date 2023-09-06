@@ -13,10 +13,13 @@ import useArchiveShoppingListMutation from "../../services/useArchiveUserSavedSh
 import useGetUserShoppingList from "../../services/useGetUserShoppingList";
 
 const ShoppingList = () => {
+  const textareaRef = React.useRef(null);
+  
   const [addAllModalOpen, setAddAllModalOpen] = useState(false);
   const [saveListModalOpen, setSaveListModalOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [saveListClicked, setSaveListClicked] = useState(false);
+  const [mouserToolModalOpen, setMouserToolModalOpen] = useState(false);
   const [notes, setNotes] = useState('');
 
   const addAllToInventoryMutation = useAddAllToInventoryMutation();
@@ -49,6 +52,21 @@ const ShoppingList = () => {
       return () => clearTimeout(timer);
     }
   }, [saveListClicked]);
+
+  const copyMouserDataToClipboard = () => {
+    let copyString = '';
+    userShoppingListData.aggregatedComponents.forEach((item) => {
+      if (item?.component.supplier.name === "Mouser Electronics") {
+        copyString += `${item?.component.supplier_item_no}|${item?.quantity}\n`;
+      }
+    });
+    
+    navigator.clipboard.writeText(copyString).then(() => {
+      // Handle successful copy, e.g. show a notification or toast
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+  }
 
   if (userShoppingListIsError) {
     return <div>Error fetching data</div>;
@@ -86,6 +104,12 @@ const ShoppingList = () => {
               }}
             >
               Save shopping list
+            </Button>
+            <Button
+              version="primary"
+              onClick={() => setMouserToolModalOpen(true)}
+            >
+              Copy to Mouser
             </Button>
             <Button
               version="primary"
@@ -164,6 +188,36 @@ const ShoppingList = () => {
               placeholder="Name (optional)" 
               maxLength="1000"
               className="block w-full rounded-md border-0 p-2 h-[32px] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+          />
+        </div>
+      </Modal>
+      <Modal
+        open={mouserToolModalOpen}
+        setOpen={setMouserToolModalOpen}
+        title={"Copy to Mouser"}
+        submitButtonText={"Copy"}
+        type="info"
+        onSubmit={copyMouserDataToClipboard}
+      >
+        <div className="flex flex-col space-y-4">
+          <span>
+            <span>{"Copy Mouser products to clipboard and paste them into the "}</span>
+            <a href="https://www.mouser.com/Bom/CopyPaste" className="text-blue-500">Mouser BOM tool</a>
+          </span>
+          <div className="w-full p-4 rounded bg-stone-200">
+            <ul>
+              {userShoppingListData.aggregatedComponents.map((item) => {
+                if (item?.component.supplier.name === "Mouser Electronics") {
+                  return <li key={item?.component.supplier_item_no}>{`${item?.component.supplier_item_no}|${item?.quantity}\n`}</li>
+                }
+                return null; // return null for non Mouser items
+              })}
+            </ul>
+          </div>
+          {/* Hidden textarea for copying */}
+          <textarea
+            ref={textareaRef}
+            style={{ position: 'absolute', left: '-9999px' }}
           />
         </div>
       </Modal>
