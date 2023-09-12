@@ -65,11 +65,8 @@ const Supplier = ({ componentPks }) => {
 };
 
 const SupplierItemNo = ({ componentPks }) => {
-  console.log(componentPks)
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(componentPks);
-
-  console.log(componentsData)
 
   if (componentsAreLoading)
     return (
@@ -99,8 +96,6 @@ const VersionHistory = () => {
   
   const { userHistory, userHistoryIsLoading, userHistoryIsError } =
     useAuthenticatedUserHistory();
-
-  console.log(userHistory)
 
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 

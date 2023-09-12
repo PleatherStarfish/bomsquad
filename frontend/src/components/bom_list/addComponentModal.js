@@ -52,9 +52,6 @@ const AddComponentModal = ({
       : { data: undefined };
 
   const is_premium = user?.is_premium;
-  console.log(`${moduleId}`)
-  console.log(user?.unique_module_ids)
-  console.log(user?.unique_module_ids.includes(`${moduleId}`))
 
   const handleSubmitQuantity = async () => {
     try {
