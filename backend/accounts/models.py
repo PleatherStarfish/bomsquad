@@ -3,7 +3,6 @@ from django.db import models
 from core.models import BaseModel
 from django.utils import timezone
 
-from datetime import timedelta
 import uuid
 
 

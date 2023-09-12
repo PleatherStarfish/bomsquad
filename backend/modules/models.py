@@ -2,7 +2,6 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from components.models import Component
 from accounts.models import CustomUser
-from accounts.models import CustomUser
 from django.db import models
 from PIL import Image
 from core.models import BaseModel

@@ -1,8 +1,6 @@
 import {
-  Navigate,
   Route,
   Routes,
-  useLocation,
 } from 'react-router-dom';
 
 import Components from "./pages/Components";
@@ -18,6 +16,12 @@ import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
 
 const App = () => {
+
+  const RedirectToBackend = () => {
+    const location = useLocation();
+    window.location.href = window.location.origin + location.pathname + location.search;
+    return null; // You can return null for React components that don't render anything.
+  };
 
   return (
     <div className="h-fit">
@@ -58,9 +62,9 @@ const App = () => {
             />
             <Route path={`inventory`} element={<Inventory />} />
             <Route path={`shopping-list`} element={<ShoppingList />} />
-            <Route path="*" element={<NotFound/>} />
+            <Route path="*" element={<RedirectToBackend />} />
           </Route>
-          <Route path="*" element={<NotFound/>} />
+          <Route path="*" element={<RedirectToBackend />} />
         </Routes>
     </div>
   );

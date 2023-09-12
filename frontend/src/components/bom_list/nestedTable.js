@@ -214,6 +214,7 @@ const NestedTable = (props) => {
               }
               quantityRequired={props.data.quantity}
               componentId={row.id}
+              moduleId={props.data.moduleId}
             />
           </>
         );
@@ -274,6 +275,7 @@ const NestedTable = (props) => {
               }
               quantityRequired={props.data.quantity}
               componentId={row.id}
+              moduleId={props.data.moduleId}
             />
           </>
         );

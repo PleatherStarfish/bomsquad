@@ -200,6 +200,7 @@ const Components = () => {
               type={Types.INVENTORY}
               quantityRequired={1}
               componentId={row.id}
+              moduleId={null}
             />
           </>
         );
@@ -232,6 +233,7 @@ const Components = () => {
               // text={`Add ${row.description} to your shopping list?`}
               quantityRequired={1}
               componentId={row.id}
+              moduleId={null}
             />
           </>
         );

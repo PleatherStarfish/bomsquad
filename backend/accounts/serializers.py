@@ -1,9 +1,24 @@
 from rest_framework import serializers
 from accounts.models import CustomUser, UserNotes
+from shopping_list.models import UserShoppingList
 import json
 
 
 class UserSerializer(serializers.ModelSerializer):
+    unique_module_ids = serializers.SerializerMethodField()
+
+    def get_unique_module_ids(self, obj):
+        """
+        Get the IDs of unique modules for the given user in their shopping list.
+        """
+        modules = (
+            UserShoppingList.objects.filter(user=obj)
+            .exclude(module__isnull=True)
+            .values_list("module", flat=True)
+            .distinct()
+        )
+        return list(modules)
+
     class Meta:
         model = CustomUser
         fields = [
@@ -15,6 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
             "default_currency",
             "end_of_premium_display_date",
             "is_premium",
+            "unique_module_ids",
         ]
 
 

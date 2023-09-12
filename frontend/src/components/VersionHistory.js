@@ -65,8 +65,11 @@ const Supplier = ({ componentPks }) => {
 };
 
 const SupplierItemNo = ({ componentPks }) => {
+  console.log(componentPks)
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(componentPks);
+
+  console.log(componentsData)
 
   if (componentsAreLoading)
     return (
@@ -97,6 +100,8 @@ const VersionHistory = () => {
   const { userHistory, userHistoryIsLoading, userHistoryIsError } =
     useAuthenticatedUserHistory();
 
+  console.log(userHistory)
+
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
   if (userHistoryIsLoading || userIsLoading)
@@ -118,16 +123,16 @@ const VersionHistory = () => {
       },
       sortable: false,
     },
-    {
-      name: <div className="font-bold">Component</div>,
-      selector: (row) => <Component componentPks={row.component_id} />,
-      sortable: false,
-    },
-    {
-      name: <div className="font-bold">Supplier</div>,
-      selector: (row) => <Supplier componentPks={row.component_id} />,
-      sortable: false,
-    },
+    // {
+    //   name: <div className="font-bold">Component</div>,
+    //   selector: (row) => <Component componentPks={row.component_id} />,
+    //   sortable: false,
+    // },
+    // {
+    //   name: <div className="font-bold">Supplier</div>,
+    //   selector: (row) => <Supplier componentPks={row.component_id} />,
+    //   sortable: false,
+    // },
     {
       name: <div className="font-bold">Supp. Item #</div>,
       selector: (row) => <SupplierItemNo componentPks={row.component_id} />,
