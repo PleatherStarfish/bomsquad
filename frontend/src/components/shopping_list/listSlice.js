@@ -4,11 +4,12 @@ import {
   PlusIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
+import EditableLocation from "../inventory/EditableLocation"
 import { Helmet } from "react-helmet";
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
@@ -17,9 +18,11 @@ import { get } from "lodash";
 import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
+import useGetUserInventory from "../../services/useGetUserInventory";
 import useGetUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
 import useGetUserShoppingListTotalPrice from "../../services/useGetUserShoppingListTotalPrice";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
+import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 import { useWindowWidth } from "@react-hook/window-size";
 
 const Quantity = ({
@@ -41,17 +44,17 @@ const Quantity = ({
   ) : undefined;
 };
 
-const TotalQuantity = ({ componentId, setIdToTotalQuantityLookup }) => {
+const TotalQuantity = ({ componentId }) => {
   const { data: quantityInInventoryAnon } =
     useGetUserAnonymousShoppingListQuantity(componentId);
 
   // Cache the total quantity for this component in a lookup table
-  useEffect(() => {
-    setIdToTotalQuantityLookup((prevState) => ({
-      ...prevState,
-      [componentId]: quantityInInventoryAnon,
-    }));
-  }, [quantityInInventoryAnon]);
+  // useEffect(() => {
+  //   setIdToTotalQuantityLookup((prevState) => ({
+  //     ...prevState,
+  //     [componentId]: quantityInInventoryAnon,
+  //   }));
+  // }, [quantityInInventoryAnon]);
 
   return quantityInInventoryAnon ? (
     <span className="font-bold">{quantityInInventoryAnon}</span>
@@ -117,8 +120,11 @@ const ListSlice = ({
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState();
-  const [idToTotalQuantityLookup, setIdToTotalQuantityLookup] = useState({});
+  // const [idToTotalQuantityLookup, setIdToTotalQuantityLookup] = useState({});
   const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState(false);
+
+  const [locationIdToEdit, setLocationIdToEdit] = useState();
+  const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
   
   const onlyWidth = useWindowWidth();
 
@@ -126,11 +132,19 @@ const ListSlice = ({
   const deleteMutation = useDeleteShoppingListItem();
   const addComponentToInventory = useAddComponentToInventory();
 
+  const updateUserInventoryMutate = useUpdateUserInventory();
+  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
+    useGetUserInventory();
+
   const bgStyles = `
     .rdt_TableHeadRow { background-color: ${backgroundColor}; }
     .rdt_TableRow { background-color: ${backgroundColor}; }
     .rdt_Pagination { background-color: ${backgroundColor}; }
   `;
+
+  useEffect(() => {
+    console.log("locationIdToEdit", locationIdToEdit);
+  }, [locationIdToEdit]);
 
   useEffect(() => {
     if (deleteMutation.isSuccess) {
@@ -141,9 +155,43 @@ const ListSlice = ({
     }
   }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
+  const handleLocationChange = useCallback(async (event) => {
+    event.preventDefault();
+    setUpdatedLocationToSubmit(event.target.value);
+  });
+
+  const handleSubmitLocation = useCallback(async (inventoryPk) => {
+    try {
+      await updateUserInventoryMutate({
+        inventoryPk,
+        location: updatedLocationToSubmit,
+      });
+      setLocationIdToEdit(undefined);
+      setUpdatedLocationToSubmit(undefined);
+    } catch (error) {
+      console.error("Failed to update location", error);
+    }
+  });
+
   const handleQuantityChange = (e) => {
     setUpdatedQuantityToSubmit(e);
   };
+
+  const handlePillClick = useCallback(async (inventoryPk, index) => {
+    try {
+      const location = find(
+        inventoryData,
+        (el) => el?.component?.id === componentPk
+      )?.location;
+      location.splice(index, 1);
+      await updateUserInventoryMutate({
+        inventoryPk,
+        location: location.join(", "),
+      });
+    } catch (error) {
+      console.error("Failed to update location", error);
+    }
+  });
 
   const handleSubmitQuantity = (componentId, moduleId) => {
     const quantity = updatedQuantityToSubmit;
@@ -157,6 +205,22 @@ const ListSlice = ({
     updateShoppingListMutate({ componentPk: componentId, ...data });
     setQuantityIdToEdit(undefined);
     setUpdatedQuantityToSubmit(undefined);
+  };
+
+  const handleClick = (
+    row,
+    field,
+    fieldIdToEdit,
+    setFieldIdToEdit,
+    setUpdatedFieldToSubmit
+  ) => {
+    const { component, [field]: fieldValue } = row;
+    if (component.id !== fieldIdToEdit) {
+      setFieldIdToEdit(component.id);
+      setUpdatedFieldToSubmit(fieldValue);
+    } else {
+      setFieldIdToEdit(undefined);
+    }
   };
 
   const labelColumns = [
@@ -219,13 +283,33 @@ const ListSlice = ({
         );
       },
     },
+    {
+      name: <div className="font-bold text-gray-400">Inventory Location</div>,
+      selector: (row) => {
+        return (
+          <EditableLocation 
+            row={row}
+            locationIdToEdit={locationIdToEdit}
+            updatedLocationToSubmit={updatedLocationToSubmit}
+            handleLocationChange={handleLocationChange}
+            setLocationIdToEdit={setLocationIdToEdit}
+            handleSubmitLocation={handleSubmitLocation}
+            handlePillClick={handlePillClick}
+            handleClick={handleClick}
+            setUpdatedLocationToSubmit={setUpdatedLocationToSubmit} 
+          />
+        );
+      },
+      width: !!locationIdToEdit ? "350px" : undefined,
+      minWidth: "200px",
+    }
   ];
 
   const qtyColumns = [
     {
       name: slug ? (
         <div className="flex flex-col gap-2 cursor-pointer">
-          <span>
+          <span className="group-hover/column:hidden">
             <a
               href={`/module/${slug}/`}
               className="text-blue-500 hover:text-blue-700"
@@ -233,7 +317,7 @@ const ListSlice = ({
               {name}
             </a>
           </span>
-          {hideInteraction || (
+          {!hideInteraction && (
             <Button
               classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
               variant="danger"
@@ -252,8 +336,8 @@ const ListSlice = ({
         </div>
       ) : (
         <div className="flex flex-col gap-2 cursor-pointer">
-          <span className="text-bold">{name === "null" ? "Other" : name}</span>
-          {hideInteraction || (
+          <span className="text-bold group-hover/column:hidden">{name === "null" ? "Other" : name}</span>
+          {!hideInteraction && (
             <Button
               classNames="hidden group-hover/column:inline-flex w-fit pb-2 transition-opacity duration-300 opacity-0 group-hover/column:opacity-100"
               variant="danger"
@@ -366,7 +450,7 @@ const ListSlice = ({
         return !row?.placeholder ? (
           <TotalQuantity
             componentId={row?.component?.id}
-            setIdToTotalQuantityLookup={setIdToTotalQuantityLookup}
+            // setIdToTotalQuantityLookup={setIdToTotalQuantityLookup}
           />
         ) : (
           <span className="text-lg font-bold">TOTAL:</span>

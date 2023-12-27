@@ -148,7 +148,7 @@ const UserPage = () => {
                     <div className="flex items-center px-6 py-3 text-sm font-semibold leading-6 text-gray-900 group/settings gap-x-4 hover:bg-gray-200">
                       <Gravatar
                         className="rounded-full"
-                        email={user.email}
+                        email={user.emails.filter((e) => e.primary === true)[0].email}
                         rating="pg"
                         size={40}
                       />

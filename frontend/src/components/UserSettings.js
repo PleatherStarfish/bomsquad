@@ -34,6 +34,35 @@ const Settings = () => {
           <dl className="divide-y divide-gray-100">
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
+                Username
+              </dt>
+              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user?.username}
+              </dd>
+            </div>
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-sm font-medium leading-6 text-gray-900">
+                Emails
+              </dt>
+              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.emails.map((item, index) => (
+                  <div key={index} className="mb-1">
+                    {item.email}
+                    {item.primary && (
+                      <>
+                        <span className="ml-2"> - </span>
+                        <span className="ml-2 text-xs font-bold text-black">
+                          Primary
+                        </span>
+                      </>
+                    )}
+                    <a href="#" className="ml-2 text-blue-600">Edit</a>
+                  </div>
+                ))}
+              </dd>
+            </div>
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-sm font-medium leading-6 text-gray-900">
                 Supporter Status
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">

@@ -1,5 +1,5 @@
 import bleach
-from accounts.models import UserNotes
+from accounts.models import UserNotes, CustomUser
 from components.models import Component
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -74,6 +74,30 @@ class UserShoppingListView(APIView):
                     {"detail": "Module BOM list item not found."},
                     status=status.HTTP_404_NOT_FOUND,
                 )
+
+        user_is_premium = request.user.is_premium
+        unique_modules_in_shopping_list = (
+            UserShoppingList.objects.filter(user=user)
+            .exclude(module__isnull=True)
+            .values_list("module", flat=True)
+            .distinct()
+        )
+        # Convert each UUID into a string
+        unique_modules_in_shopping_list_str = [
+            str(uuid) for uuid in unique_modules_in_shopping_list
+        ]
+
+        if (
+            not user_is_premium
+            and len(unique_modules_in_shopping_list) >= 3
+            and not str(module_pk) in unique_modules_in_shopping_list_str
+        ):
+            return Response(
+                {
+                    "detail": "You must be a premium user to add more than 3 module to your shopping list."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         shopping_list_item, created = UserShoppingList.objects.get_or_create(
             user=user,

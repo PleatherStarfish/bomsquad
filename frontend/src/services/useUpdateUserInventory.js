@@ -9,9 +9,9 @@ const useUpdateUserInventory = () => {
   const queryClient = useQueryClient();
 
   const { mutate: updateUserInventoryMutate } = useMutation({
-    mutationFn: ({ componentPk, ...data }) => {
-      const componentPkCleaned = removeAfterUnderscore(componentPk)
-      return axios.patch(`/api/inventory/${componentPkCleaned}/update/`, data, {
+    mutationFn: ({ inventoryPk, ...data }) => {
+      // const componentPkCleaned = removeAfterUnderscore(inventoryPk)
+      return axios.patch(`/api/inventory/${inventoryPk}/update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

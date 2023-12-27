@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 const useGetUserInventory = () => {
   const fetchData = async () => {
@@ -14,6 +14,8 @@ const useGetUserInventory = () => {
     isLoading: inventoryDataIsLoading,
     isError: inventoryDataIsError,
   } = useQuery(["inventory"], fetchData);
+
+  console.log("inventoryData", inventoryData);
 
   return { inventoryData, inventoryDataIsLoading, inventoryDataIsError };
 };

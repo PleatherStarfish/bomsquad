@@ -1,8 +1,8 @@
-import React from "react";
 import Button from "../../ui/Button";
-import Pill from "../../ui/Pill";
 import ControlledInput from "../ControlledInput";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import Pill from "../../ui/Pill";
+import React from "react";
 
 const EditableLocation = ({
     row,
@@ -14,10 +14,13 @@ const EditableLocation = ({
     handlePillClick,
     handleClick,
     setUpdatedLocationToSubmit,
+    showSeparateLocationsWithCommas = true,
   }) => {
+    console.log(row)
+    console.log(row.id === locationIdToEdit)
     return (
       <div className="flex justify-between w-full">
-        {row.component.id === locationIdToEdit ? (
+        {row.id === locationIdToEdit ? (
           <div className="flex flex-col">
             <div className="flex gap-1.5 pb-1 pt-6">
               <form
@@ -39,15 +42,15 @@ const EditableLocation = ({
                 <Button
                   type="submit"
                   variant="primary"
-                  onClick={() => handleSubmitLocation(row.component.id)}
+                  onClick={() => handleSubmitLocation(row.id)}
                 >
                   Update
                 </Button>
               </form>
             </div>
-            <p className="text-xs text-gray-500">
+            {showSeparateLocationsWithCommas && <p className="text-xs text-gray-500">
               Separate locations with commas.
-            </p>
+            </p>}
           </div>
         ) : (
           <ul className="flex flex-wrap w-full">
@@ -56,7 +59,7 @@ const EditableLocation = ({
                   <Pill
                     key={index}
                     showArrow={index !== row.location.length - 1}
-                    onClick={() => handlePillClick(row.component.id, index)}
+                    onClick={() => handlePillClick(row.id, index)}
                   >
                     {item}
                   </Pill>
@@ -64,17 +67,18 @@ const EditableLocation = ({
               : "-"}
           </ul>
         )}
-        {row.component.id !== locationIdToEdit && (
+        {row.id !== locationIdToEdit && (
           <div
             className="flex flex-col justify-center"
-            onClick={() =>
+            onClick={() => {
+              setLocationIdToEdit(row.id)
               handleClick(
                 row,
                 "location",
                 locationIdToEdit,
                 setLocationIdToEdit,
                 setUpdatedLocationToSubmit
-              )
+              )}
             }
             role="button"
           >

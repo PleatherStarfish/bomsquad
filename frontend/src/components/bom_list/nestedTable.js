@@ -60,7 +60,7 @@ const NestedTable = (props) => {
   const columns = [
     {
       name: <div>Name</div>,
-      selector: (row) => row.description,
+      selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : row.description,
       sortable: true,
       grow: 1,
       wrap: true,
@@ -188,6 +188,7 @@ const NestedTable = (props) => {
               setOpen={setInventoryModalOpen}
               title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
               type={Types.INVENTORY}
+              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
               text={
                 <>
                   <span>
@@ -243,6 +244,7 @@ const NestedTable = (props) => {
               open={shoppingModalOpen === row.id}
               setOpen={setShoppingModalOpen}
               title={`Add ${row.description} to Shopping List?`}
+              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
               type={Types.SHOPPING}
               hookArgs={{
                 component_pk: row.id,

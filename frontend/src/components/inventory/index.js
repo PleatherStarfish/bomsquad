@@ -39,9 +39,9 @@ const handleClick = (
   setFieldIdToEdit,
   setUpdatedFieldToSubmit
 ) => {
-  const { component, [field]: fieldValue } = row;
-  if (component.id !== fieldIdToEdit) {
-    setFieldIdToEdit(component.id);
+  const { id, [field]: fieldValue } = row;
+  if (id !== fieldIdToEdit) {
+    setFieldIdToEdit(id);
     setUpdatedFieldToSubmit(fieldValue);
   } else {
     setFieldIdToEdit(undefined);
@@ -76,6 +76,8 @@ const Inventory = () => {
 
   const deleteMutation = useDeleteUserInventory();
 
+  console.log("inventoryData", inventoryData)
+
   const options = {
     includeScore: true,
     shouldSort: true,
@@ -105,10 +107,10 @@ const Inventory = () => {
     setUpdatedQuantityToSubmit(value);
   });
 
-  const handleSubmitQuantity = useCallback(async (componentPk) => {
+  const handleSubmitQuantity = useCallback(async (inventoryPk) => {
     try {
       await updateUserInventoryMutate({
-        componentPk,
+        inventoryPk,
         quantity: updatedQuantityToSubmit,
       });
       setQuantityIdToEdit(undefined);
@@ -123,10 +125,10 @@ const Inventory = () => {
     setUpdatedLocationToSubmit(event.target.value);
   });
 
-  const handleSubmitLocation = useCallback(async (componentPk) => {
+  const handleSubmitLocation = useCallback(async (inventoryPk) => {
     try {
       await updateUserInventoryMutate({
-        componentPk,
+        inventoryPk,
         location: updatedLocationToSubmit,
       });
       setLocationIdToEdit(undefined);
@@ -136,23 +138,23 @@ const Inventory = () => {
     }
   });
 
-  const handleDelete = useCallback(async (componentPk) => {
+  const handleDelete = useCallback(async (inventoryPk) => {
     try {
-      await deleteMutation.mutate({ componentPk });
+      await deleteMutation.mutate({ inventoryPk });
     } catch (error) {
       console.error("Failed to delete item", error);
     }
   });
 
-  const handlePillClick = useCallback(async (componentPk, index) => {
+  const handlePillClick = useCallback(async (inventoryPk, index) => {
     try {
       const location = find(
         inventoryData,
-        (el) => el?.component?.id === componentPk
+        (el) => el?.id === inventoryPk
       )?.location;
       location.splice(index, 1);
       await updateUserInventoryMutate({
-        componentPk,
+        inventoryPk,
         location: location.join(", "),
       });
     } catch (error) {
@@ -362,7 +364,7 @@ const Inventory = () => {
             role="button"
             className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
-              setDataToDelete(row.component);
+              setDataToDelete({id: row.id, component: row.component});
               setDeleteModalOpen(true);
             }}
           />
@@ -471,9 +473,9 @@ const Inventory = () => {
             submitButtonText={"Delete"}
             onSubmit={() => {
               setDataToDelete(undefined);
-              handleDelete(dataToDelete.id);
+              handleDelete(dataToDelete?.id);
             }}
-          >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
+          >{`Are you sure you want to delete ${dataToDelete?.component.description}?`}</Modal>
         </>
       ) : (
         <Alert variant="transparent" centered>

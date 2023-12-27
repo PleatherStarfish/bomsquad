@@ -2,15 +2,19 @@ import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
 import React, { useEffect, useState } from "react";
 
+import Accordion from "../../ui/Accordion";
 import Button from "../../ui/Button";
 import ForOurSubscribersModal from "../modals/ForOurSubscribersModal";
 import { Fragment } from "react";
+import LocationsTable from "./locationsTable";
 import NumericInput from "react-numeric-input";
+import SimpleEditableLocation from "../inventory/SimpleEditableLocation";
 import goToSupport from "../../utils/goToSupport";
 import useAddOrUpdateUserAnonymousShoppingList from "../../services/useAddOrUpdateUserAnonymousShoppingList";
 import useAddOrUpdateUserInventory from "../../services/useAddOrUpdateUserInventory";
 import useAddOrUpdateUserShoppingList from "../../services/useAddOrUpdateUserShoppingList";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
+import useGetInventoryLocations from "../../services/useGetInventoryLocations";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
 import useGetUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
@@ -25,12 +29,14 @@ const AddComponentModal = ({
   moduleId,
   hookArgs = undefined,
   quantityRequired,
+  componentName,
 }) => {
-  const [showForOurSubscribersModal, setShowForOurSubscribersModal] = useState(
-    false
-  );
+  const [showForOurSubscribersModal, setShowForOurSubscribersModal] =
+    useState(false);
   const [quantity, setQuantity] = useState();
   const [editMode, setEditMode] = useState(false);
+  const [locationArray, setlocationArray] = useState("");
+  const [isLocationEditable, setIsLocationEditable] = useState(true);
 
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
@@ -51,7 +57,28 @@ const AddComponentModal = ({
       ? useGetUserShoppingListQuantity(...Object.values(hookArgs))
       : { data: undefined };
 
+  const { data: locations } = useGetInventoryLocations(componentId);
+  const locationsData = locations?.data ?? [];
+
   const is_premium = user?.is_premium;
+
+  const cleanArray = (input) => {
+    return input.map((item) => {
+      if (item === "None") {
+        return [];
+      } else {
+        try {
+          // Parse the string as JSON after replacing single quotes with double quotes
+          return JSON.parse(item.replace(/'/g, '"').trim()).map((element) =>
+            element.trim()
+          );
+        } catch (error) {
+          console.error("Error parsing item:", item, error);
+          return [];
+        }
+      }
+    });
+  };
 
   const handleSubmitQuantity = async () => {
     try {
@@ -59,6 +86,7 @@ const AddComponentModal = ({
         await addOrUpdateUserInventory({
           componentId,
           quantity,
+          location: locationArray.join(","),
           editMode,
         });
       } else if (type === Types.SHOPPING) {
@@ -72,7 +100,7 @@ const AddComponentModal = ({
         await addOrUpdateUserAnonymousShoppingList({
           componentId,
           quantity,
-          editMode
+          editMode,
         });
       }
     } catch (error) {
@@ -107,8 +135,17 @@ const AddComponentModal = ({
   }
 
   if (userIsLoading) {
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
   }
+
+  const savedLocationsData = Array.isArray(locationsData)
+    ? locationsData.map((item) => ({
+        locations: item.location || [],
+        quantity: item.quantity,
+      }))
+    : [];
 
   return (
     <>
@@ -137,7 +174,7 @@ const AddComponentModal = ({
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:p-6 md:max-w-md">
+                <Dialog.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:p-6 md:max-w-lg">
                   <div>
                     <div className="mt-3 text-center sm:text-left">
                       <Dialog.Title
@@ -165,7 +202,9 @@ const AddComponentModal = ({
                                   : useGetUserAnonymousShoppingListQuantity
                               }
                               hookArgs={
-                                hookArgs ? Object.values(hookArgs) : [componentId]
+                                hookArgs
+                                  ? Object.values(hookArgs)
+                                  : [componentId]
                               }
                               replaceZero={false}
                             />
@@ -251,11 +290,55 @@ const AddComponentModal = ({
                       </div>
                     </div>
                   </div>
+                  {type === Types.INVENTORY && (
+                    <div className="p-4 mt-4 mb-2 bg-gray-100 rounded-md">
+                      <p className="my-2 text-xs text-slate-500">
+                        Specify the location where you will store this item in
+                        your inventory. Separate locations with commas.
+                      </p>
+                      <SimpleEditableLocation
+                        locationArray={locationArray}
+                        submitLocationChange={setlocationArray}
+                        isEditable={isLocationEditable}
+                        setIsEditable={setIsLocationEditable}
+                        showSeparateLocationsWithCommas={false}
+                      />
+                    </div>
+                  )}
+                  {type === Types.INVENTORY && savedLocationsData && (
+                    <div>
+                      <Accordion title={`User inventory locations for ${componentName}`}>
+                        <div className="p-4 rounded-md bg-blue-50">
+                          <p className="mb-4 text-xs text-slate-500">
+                            It looks like you already have this component in
+                            your inventory. Click to select a pre-existing
+                            location.
+                          </p>
+                          <LocationsTable
+                            data={savedLocationsData}
+                            onRowClicked={(row) => {
+                              setlocationArray(row.locations);
+                              setIsLocationEditable(false);
+                            }}
+                          />
+                        </div>
+                      </Accordion>
+                    </div>
+                  )}
                   <div className="flex gap-2 mt-5 sm:mt-4 sm:flex-row-reverse flex-nowrap">
                     <Button
                       variant="primary"
                       onClick={() => {
-                        if (is_premium || user?.unique_module_ids.length < 3 || user?.unique_module_ids.includes(`${moduleId}`) || moduleId === null) {
+                        if (type === Types.INVENTORY) {
+                          handleSubmitQuantity();
+                        }
+                        
+                        if (
+                          is_premium ||
+                          user?.unique_module_ids.length < 3 ||
+                          user?.unique_module_ids.includes(`${moduleId}`) ||
+                          moduleId === null
+                        ) {
                           handleSubmitQuantity();
                         } else {
                           setShowForOurSubscribersModal(true);
@@ -274,14 +357,14 @@ const AddComponentModal = ({
           </div>
         </Dialog>
       </Transition.Root>
-      <ForOurSubscribersModal 
-        open={showForOurSubscribersModal} 
-        title="Limit reached: three modules already in shopping list" 
-        message="Please become a subscriber to add more than 3 modules to your shopping list." 
-        onClickSupport={() => goToSupport()} 
-        onClickCancel={() => setShowForOurSubscribersModal(false)} />
+      <ForOurSubscribersModal
+        open={showForOurSubscribersModal}
+        title="Limit reached: three modules already in shopping list"
+        message="Please become a subscriber to add more than 3 modules to your shopping list."
+        onClickSupport={() => goToSupport()}
+        onClickCancel={() => setShowForOurSubscribersModal(false)}
+      />
     </>
-
   );
 };
 

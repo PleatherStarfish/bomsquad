@@ -22,6 +22,7 @@ from inventory.views import (
     UserInventoryView,
     get_user_inventory_quantity,
     get_user_inventory_quantities_for_bom_list_item,
+    get_component_locations,
 )
 
 # User shopping list-related views
@@ -63,14 +64,19 @@ urlpatterns = [
         name="user_inventory_create_or_update",
     ),
     path(
-        "inventory/<uuid:component_pk>/update/",
+        "inventory/<uuid:inventory_pk>/update/",
         UserInventoryView.as_view(),
         name="user_inventory_update",
     ),
     path(
-        "inventory/<uuid:component_pk>/delete/",
+        "inventory/<uuid:inventory_pk>/delete/",
         UserInventoryView.as_view(),
         name="user_inventory_delete",
+    ),
+    path(
+        "inventory/<uuid:component_pk>/locations/",
+        get_component_locations,
+        name="user_inventory_locations",
     ),
     path("shopping-list/", UserShoppingListView.as_view(), name="user-shopping-list"),
     path(

@@ -17,4 +17,4 @@ class UserInventorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInventory
-        fields = ("user", "component", "quantity", "location")
+        fields = ("id", "user", "component", "quantity", "location")

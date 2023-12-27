@@ -1,11 +1,21 @@
 from rest_framework import serializers
 from accounts.models import CustomUser, UserNotes
 from shopping_list.models import UserShoppingList
+from allauth.account.admin import EmailAddress
 import json
+
+
+class EmailAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailAddress
+        fields = ["email", "verified", "primary"]
 
 
 class UserSerializer(serializers.ModelSerializer):
     unique_module_ids = serializers.SerializerMethodField()
+    emails = EmailAddressSerializer(
+        source="emailaddress_set", many=True, read_only=True
+    )
 
     def get_unique_module_ids(self, obj):
         """
@@ -26,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
-            "email",
+            "emails",
             "default_currency",
             "end_of_premium_display_date",
             "is_premium",

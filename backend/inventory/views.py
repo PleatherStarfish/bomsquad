@@ -1,6 +1,7 @@
 from uuid import UUID
 from components.models import Component
-from django.db.models import Sum
+from django.db.models import Sum, Func
+from django.db import models
 from inventory.models import UserInventory
 from inventory.serializers import UserInventorySerializer
 from modules.models import ModuleBomListItem
@@ -9,7 +10,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db import transaction
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
+import json
 
 
 class UserInventoryView(APIView):
@@ -30,11 +34,19 @@ class UserInventoryView(APIView):
 
         # Determine the editing mode from request
         edit_mode = request.data.get("editMode", True)
+        location = request.data.get("location", "")
+        location_list = location.split(",") if location else None
 
-        # Filter the user inventory items by user and component_id
-        user_inventory_items = UserInventory.objects.filter(
-            user=user, component__id=component_pk
-        )
+        # Filter the user inventory items by user, component_id, and location
+        if location_list is not None:
+            # Using __exact lookup for an exact match of the JSON array
+            user_inventory_items = UserInventory.objects.filter(
+                user=user, component__id=component_pk, location__exact=location_list
+            )
+        else:
+            user_inventory_items = UserInventory.objects.filter(
+                user=user, component__id=component_pk, location__isnull=True
+            )
 
         # If the user inventory item exists, update the quantity
         if user_inventory_items.exists():
@@ -54,17 +66,15 @@ class UserInventoryView(APIView):
         component = Component.objects.get(id=component_pk)
 
         user_inventory = UserInventory.objects.create(
-            user=user, component=component, quantity=quantity
+            user=user, component=component, quantity=quantity, location=location_list
         )
 
         serializer = UserInventorySerializer(user_inventory)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, component_pk):
-        user = request.user
-        user_inventory_item = UserInventory.objects.filter(
-            user=user, component__id=component_pk
-        ).first()
+    def delete(self, request, inventory_pk):
+        # Retrieve the user inventory item using the primary key
+        user_inventory_item = UserInventory.objects.filter(pk=inventory_pk).first()
 
         if not user_inventory_item:
             return Response(
@@ -77,42 +87,46 @@ class UserInventoryView(APIView):
             status=status.HTTP_204_NO_CONTENT,
         )
 
-    def patch(self, request, component_pk):
-        user = request.user
-        user_inventory_item = UserInventory.objects.filter(
-            user=user, component__id=component_pk
-        ).first()
+    def patch(self, request, inventory_pk):
+        # Process the location data from the request
+        location = request.data.get("location", "")
+        location_list = location.split(",") if location else None
+
+        # Retrieve the user inventory item by inventory_pk
+        user_inventory_item = UserInventory.objects.filter(pk=inventory_pk).first()
 
         if not user_inventory_item:
             return Response(
                 {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+        # Update the location if it's provided in the request
+        if location_list is not None:
+            user_inventory_item.location = location_list
+            user_inventory_item.save(update_fields=["location"])
+
+        # Serialize and save the rest of the data
         serializer = UserInventorySerializer(
             user_inventory_item, data=request.data, partial=True
         )
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_inventory_quantity(request, component_pk):
-    inventory = UserInventory.objects.filter(
+    total_quantity = UserInventory.objects.filter(
         component__id=component_pk, user=request.user
-    )
+    ).aggregate(total=Sum("quantity"))["total"]
 
-    # Check if inventory exists
-    if inventory.exists():
-        # Access the first inventory object in the QuerySet
-        # and retrieve the 'quantity' attribute
-        quantity = inventory.first().quantity
-        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
-    else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+    # total_quantity will be None if there are no items, so default to 0
+    total_quantity = total_quantity if total_quantity is not None else 0
+
+    return Response({"quantity": total_quantity}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])
@@ -126,10 +140,39 @@ def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_p
         component__in=bom_list_item.components_options.all(), user=request.user
     )
 
-    # Check if inventory exists
-    if inventory.exists():
-        # Use aggregate function to get the sum of 'quantity' attribute
-        quantity_sum = inventory.aggregate(Sum("quantity")).get("quantity__sum")
-        return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
-    else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+    # Use aggregate function to get the sum of 'quantity' attribute
+    quantity_sum = inventory.aggregate(total=Sum("quantity"))["total"]
+
+    # quantity_sum will be None if there are no items, so default to 0
+    quantity_sum = quantity_sum if quantity_sum is not None else 0
+
+    return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_component_locations(request, component_pk):
+    """
+    Get all unique locations for a particular component in the user's inventory,
+    along with the quantity of the component in each location.
+    """
+    # Fetch unique locations and corresponding quantity using Django ORM
+    locations_and_quantities = (
+        UserInventory.objects.filter(component__id=component_pk, user=request.user)
+        .values("location", "quantity")
+        .distinct()
+    )
+
+    if not locations_and_quantities:
+        # Handle empty result
+        return Response(
+            {"message": "No locations found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Prepare the response data
+    locations_with_quantity = [
+        {"location": item["location"], "quantity": item["quantity"]}
+        for item in locations_and_quantities
+    ]
+
+    return Response(locations_with_quantity, status=status.HTTP_200_OK)

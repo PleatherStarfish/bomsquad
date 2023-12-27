@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import CustomUser
 from components.models import Component
 from core.models import BaseModel
+from django.contrib.postgres.indexes import GinIndex
 import json
 import bleach
 import uuid
@@ -21,8 +22,9 @@ class UserInventory(BaseModel):
         indexes = [
             models.Index(fields=["user"]),
             models.Index(fields=["user", "component"]),
+            GinIndex(fields=["location"]),
         ]
-        unique_together = ("user", "component")
+        unique_together = ("user", "component", "location")
 
     def __str__(self):
         return f"[ {self.user} ] - [ {self.location} ] - {self.component}"

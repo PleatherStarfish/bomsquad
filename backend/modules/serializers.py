@@ -66,7 +66,7 @@ class PCBVersionSerializer(serializers.ModelSerializer):
 
 
 class ModuleBomListItemSerializer(serializers.ModelSerializer):
-    sum_of_user_options_from_inventory = serializers.IntegerField()
+    sum_of_user_options_from_inventory = serializers.IntegerField(required=False)
     pcb_version = PCBVersionSerializer(many=True)
     type = serializers.CharField(source="type.name")
 

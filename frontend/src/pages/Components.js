@@ -195,6 +195,7 @@ const Components = () => {
             <AddComponentModal
               open={inventoryModalOpen === row.id}
               setOpen={setInventoryModalOpen}
+              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
               title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
               // text={`Add ${row.description} (${row.supplier?.short_name} ${row.supplier_item_no}) to your inventory?`}
               type={Types.INVENTORY}
@@ -228,6 +229,7 @@ const Components = () => {
             <AddComponentModal
               open={shoppingModalOpen === row.id}
               setOpen={setShoppingModalOpen}
+              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
               title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Shopping List?`}
               type={Types.SHOPPING_ANON}
               // text={`Add ${row.description} to your shopping list?`}

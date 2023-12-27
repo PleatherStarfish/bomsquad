@@ -17,12 +17,11 @@ const EditableQuantity = ({
   setUpdatedQuantityToSubmit,
   handleClick,
 }) => {
-  const { component, quantity } = row;
-  const componentId = component.id; // Use the correct property for component ID
+  const { id, quantity } = row;
 
   return (
     <div className="flex content-center justify-between w-full">
-      {componentId === quantityIdToEdit ? (
+      {id === quantityIdToEdit ? (
         <div>
           <form
             className="flex content-center w-full gap-1"
@@ -54,7 +53,7 @@ const EditableQuantity = ({
                 size="xs"
                 iconOnly
                 Icon={ArrowPathIcon}
-                onClick={() => handleSubmitQuantity(componentId)}
+                onClick={() => handleSubmitQuantity(id)}
               >
                 Update
               </Button>
@@ -64,7 +63,7 @@ const EditableQuantity = ({
       ) : (
         <span className="font-bold">{quantity}</span>
       )}
-      {componentId !== quantityIdToEdit && (
+      {id !== quantityIdToEdit && (
         <div
           onClick={() =>
             handleClick(

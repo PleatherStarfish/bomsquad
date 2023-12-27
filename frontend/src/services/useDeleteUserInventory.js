@@ -9,11 +9,11 @@ const useDeleteUserInventory = () => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: ({ componentPk }) => {
+    mutationFn: ({ inventoryPk }) => {
       
-      const componentPkCleaned = removeAfterUnderscore(componentPk)
+      // const componentPkCleaned = removeAfterUnderscore(inventoryPk)
 
-      return axios.delete(`/api/inventory/${componentPkCleaned}/delete/`, {
+      return axios.delete(`/api/inventory/${inventoryPk}/delete/`, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },
