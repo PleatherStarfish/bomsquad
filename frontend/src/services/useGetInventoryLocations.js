@@ -15,7 +15,7 @@ const useGetInventoryLocations = (componentPk) => {
   };
 
   const { data, isLoading, isError, error } = useQuery(['componentLocations', componentPkCleaned], fetchComponentLocations);
-  console.log('useGetInventoryLocations', data)
+  
   return { data, isLoading, isError, error };
 };
 

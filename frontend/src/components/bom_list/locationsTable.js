@@ -24,6 +24,7 @@ const LocationsTable = ({ data, onRowClicked }) => {
       sortable: false,
       wrap: false,
       maxWidth: "50px",
+      pointerOnHover: true
     },
   ];
 

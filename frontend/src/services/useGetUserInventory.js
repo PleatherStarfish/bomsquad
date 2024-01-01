@@ -15,8 +15,6 @@ const useGetUserInventory = () => {
     isError: inventoryDataIsError,
   } = useQuery(["inventory"], fetchData);
 
-  console.log("inventoryData", inventoryData);
-
   return { inventoryData, inventoryDataIsLoading, inventoryDataIsError };
 };
 

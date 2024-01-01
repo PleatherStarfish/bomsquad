@@ -39,6 +39,7 @@ const Modal = ({
   buttons = undefined,
   bgOpacity = "bg-opacity-75",
   backdropBlur = undefined,
+  disabled = false,
   children,
 }) => {
   const cancelButtonRef = useRef(null);
@@ -53,6 +54,7 @@ const Modal = ({
             onSubmit();
             setOpen(false);
           }}
+          disabled={disabled}
         >
           {submitButtonText}
         </button>
@@ -64,6 +66,7 @@ const Modal = ({
             onSubmit();
             setOpen(false);
           }}
+          disabled={disabled}
         >
           {submitButtonText}
         </button>

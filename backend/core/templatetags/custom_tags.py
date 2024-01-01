@@ -17,3 +17,19 @@ def dropdown_items(user, preset=None):
         )
 
     return items
+
+
+@register.simple_tag
+def query_transform(request, excluding=None):
+    query = request.GET.copy()
+    if excluding:
+        query.pop(excluding, None)
+    return query.urlencode()
+
+
+@register.filter
+def get_mounting_style_name(value, mounting_style_options):
+    for option in mounting_style_options:
+        if option["value"] == value:
+            return option["name"]
+    return value

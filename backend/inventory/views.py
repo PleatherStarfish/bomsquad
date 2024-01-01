@@ -14,6 +14,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 import json
+from django.db.models import Q
 
 
 class UserInventoryView(APIView):
@@ -164,10 +165,8 @@ def get_component_locations(request, component_pk):
     )
 
     if not locations_and_quantities:
-        # Handle empty result
-        return Response(
-            {"message": "No locations found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        # Return an empty JSON object
+        return Response({}, status=status.HTTP_200_OK)
 
     # Prepare the response data
     locations_with_quantity = [
@@ -176,3 +175,45 @@ def get_component_locations(request, component_pk):
     ]
 
     return Response(locations_with_quantity, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_components_locations(request):
+    """
+    Get all unique locations for multiple components in the user's inventory,
+    along with the quantity of each component in each location.
+    """
+    component_pks = request.GET.getlist("component_pks")
+
+    if not component_pks:
+        # Return an empty JSON object if no component_pks provided
+        return Response([], status=status.HTTP_200_OK)
+
+    components_locations = {}
+
+    for component_pk in component_pks:
+        # Fetch unique locations and corresponding quantity for each component using Django ORM
+        locations_and_quantities = (
+            UserInventory.objects.filter(component__id=component_pk, user=request.user)
+            .values(
+                "location",
+                "quantity",
+            )
+            .distinct()
+        )
+
+        # Prepare the response data for each component
+        locations_with_quantity = [
+            {
+                "component": {
+                    "location": item["location"],
+                    "quantity": item["quantity"],
+                }
+            }
+            for item in locations_and_quantities
+        ]
+
+        components_locations[component_pk] = locations_with_quantity
+
+    return Response(components_locations, status=status.HTTP_200_OK)

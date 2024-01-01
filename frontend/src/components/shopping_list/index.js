@@ -1,6 +1,7 @@
 import { CheckIcon, FolderPlusIcon, HeartIcon } from "@heroicons/react/24/outline";
 import React, { useCallback, useEffect, useState } from "react";
 
+import AddAllModal from "./addAllModal";
 import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
 import { Link } from "react-router-dom";
@@ -158,16 +159,12 @@ const ShoppingList = () => {
           </span>
         </Alert>
       )}
-      <Modal
-        open={addAllModalOpen}
-        setOpen={setAddAllModalOpen}
-        title={"Add to inventory?"}
-        submitButtonText={"Add"}
-        type="warning"
-        onSubmit={() => addAllToInventoryMutation.mutate()}
-      >
-        {`Are you sure you want to add all the components in your shopping list to your inventory? This will clear your shopping list and sum quantities for items already in your inventory (if any).`}
-      </Modal>
+      <AddAllModal
+        addAllModalOpen={addAllModalOpen}
+        setAddAllModalOpen={setAddAllModalOpen}
+        addAllToInventoryMutation={addAllToInventoryMutation}
+        userShoppingListData={userShoppingListData}
+      />
       <Modal
         open={saveListModalOpen}
         setOpen={setSaveListModalOpen}

@@ -42,8 +42,6 @@ const BomList = ({ moduleId, moduleName }) => {
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
     useModuleBomListItems(moduleId);
 
-  console.log(moduleBom)
-
   const moduleBomList = Array.isArray(moduleBom) ? moduleBom : [];
 
   const moduleBomData = moduleBomList.map((item) => ({

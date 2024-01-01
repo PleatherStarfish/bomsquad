@@ -9,12 +9,13 @@ const useAddComponentToInventory = () => {
   const queryClient = useQueryClient();
 
   const { mutate: addComponentToInventory } = useMutation({
-    mutationFn: ({ componentId, quantity }) => {
+    mutationFn: ({ componentId, quantity, location }) => {
       const componentIdCleaned = removeAfterUnderscore(componentId)
 
-      const requestData = quantity ? { quantity } : {}; // Only add quantity if it exists
+      const quantityData = quantity ? { quantity } : {}; // Only add quantity if it exists
+      const locationData = location ? { location } : {}; // Only add location if it exists
 
-      return axios.post(`/api/shopping-list/inventory/${componentIdCleaned}/add/`, requestData, {
+      return axios.post(`/api/shopping-list/inventory/${componentIdCleaned}/add/`, {...quantityData, ...locationData}, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },

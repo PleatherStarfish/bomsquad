@@ -4,25 +4,22 @@ import {
   PlusIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
+import AddOneModal from "./addOneModal";
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
-import EditableLocation from "../inventory/EditableLocation"
 import { Helmet } from "react-helmet";
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
 import cx from "classnames";
 import { get } from "lodash";
-import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
-import useGetUserInventory from "../../services/useGetUserInventory";
 import useGetUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
 import useGetUserShoppingListTotalPrice from "../../services/useGetUserShoppingListTotalPrice";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
-import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 import { useWindowWidth } from "@react-hook/window-size";
 
 const Quantity = ({
@@ -122,29 +119,17 @@ const ListSlice = ({
   const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState();
   // const [idToTotalQuantityLookup, setIdToTotalQuantityLookup] = useState({});
   const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState(false);
-
-  const [locationIdToEdit, setLocationIdToEdit] = useState();
-  const [updatedLocationToSubmit, setUpdatedLocationToSubmit] = useState();
   
   const onlyWidth = useWindowWidth();
 
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteShoppingListItem();
-  const addComponentToInventory = useAddComponentToInventory();
-
-  const updateUserInventoryMutate = useUpdateUserInventory();
-  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
-    useGetUserInventory();
 
   const bgStyles = `
     .rdt_TableHeadRow { background-color: ${backgroundColor}; }
     .rdt_TableRow { background-color: ${backgroundColor}; }
     .rdt_Pagination { background-color: ${backgroundColor}; }
   `;
-
-  useEffect(() => {
-    console.log("locationIdToEdit", locationIdToEdit);
-  }, [locationIdToEdit]);
 
   useEffect(() => {
     if (deleteMutation.isSuccess) {
@@ -155,43 +140,9 @@ const ListSlice = ({
     }
   }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
-  const handleLocationChange = useCallback(async (event) => {
-    event.preventDefault();
-    setUpdatedLocationToSubmit(event.target.value);
-  });
-
-  const handleSubmitLocation = useCallback(async (inventoryPk) => {
-    try {
-      await updateUserInventoryMutate({
-        inventoryPk,
-        location: updatedLocationToSubmit,
-      });
-      setLocationIdToEdit(undefined);
-      setUpdatedLocationToSubmit(undefined);
-    } catch (error) {
-      console.error("Failed to update location", error);
-    }
-  });
-
   const handleQuantityChange = (e) => {
     setUpdatedQuantityToSubmit(e);
   };
-
-  const handlePillClick = useCallback(async (inventoryPk, index) => {
-    try {
-      const location = find(
-        inventoryData,
-        (el) => el?.component?.id === componentPk
-      )?.location;
-      location.splice(index, 1);
-      await updateUserInventoryMutate({
-        inventoryPk,
-        location: location.join(", "),
-      });
-    } catch (error) {
-      console.error("Failed to update location", error);
-    }
-  });
 
   const handleSubmitQuantity = (componentId, moduleId) => {
     const quantity = updatedQuantityToSubmit;
@@ -205,22 +156,6 @@ const ListSlice = ({
     updateShoppingListMutate({ componentPk: componentId, ...data });
     setQuantityIdToEdit(undefined);
     setUpdatedQuantityToSubmit(undefined);
-  };
-
-  const handleClick = (
-    row,
-    field,
-    fieldIdToEdit,
-    setFieldIdToEdit,
-    setUpdatedFieldToSubmit
-  ) => {
-    const { component, [field]: fieldValue } = row;
-    if (component.id !== fieldIdToEdit) {
-      setFieldIdToEdit(component.id);
-      setUpdatedFieldToSubmit(fieldValue);
-    } else {
-      setFieldIdToEdit(undefined);
-    }
   };
 
   const labelColumns = [
@@ -282,26 +217,6 @@ const ListSlice = ({
           )}`}</span>
         );
       },
-    },
-    {
-      name: <div className="font-bold text-gray-400">Inventory Location</div>,
-      selector: (row) => {
-        return (
-          <EditableLocation 
-            row={row}
-            locationIdToEdit={locationIdToEdit}
-            updatedLocationToSubmit={updatedLocationToSubmit}
-            handleLocationChange={handleLocationChange}
-            setLocationIdToEdit={setLocationIdToEdit}
-            handleSubmitLocation={handleSubmitLocation}
-            handlePillClick={handlePillClick}
-            handleClick={handleClick}
-            setUpdatedLocationToSubmit={setUpdatedLocationToSubmit} 
-          />
-        );
-      },
-      width: !!locationIdToEdit ? "350px" : undefined,
-      minWidth: "200px",
     }
   ];
 
@@ -485,7 +400,7 @@ const ListSlice = ({
     {
       name: <></>,
       cell: (row) => {
-        return (!row?.placeholder ? <Button size="xs" variant="mutedHoverPrimary" Icon={PlusIcon} iconOnly tooltipText={"Add to inventory"} onClick={() => setAddOneToInventoryModalOpen(row?.component)} /> : undefined);
+        return (!row?.placeholder ? <Button size="xs" variant="primary" Icon={PlusIcon} iconOnly tooltipText={"Add to inventory"} onClick={() => setAddOneToInventoryModalOpen(row?.component)} /> : undefined);
       },
       sortable: false,
       width: "50px",
@@ -585,19 +500,10 @@ const ListSlice = ({
       >
         {`Are you sure you want to delete all the components in your shopping list for ${deleteModalModuleDetails?.moduleName}?`}
       </Modal>
-      <Modal
-        open={!!addOneToInventoryModalOpen?.id}
-        setOpen={setAddOneToInventoryModalOpen}
-        title={"Add to inventory?"}
-        submitButtonText={"Add"}
-        type="warning"
-        onSubmit={() => {
-          addComponentToInventory({
-            componentId: addOneToInventoryModalOpen?.id,
-        })}}
-      >
-        {`Are you sure you want to add ${addOneToInventoryModalOpen?.description} to you inventory? This will remove this item from your shopping list.`}
-      </Modal>
+      <AddOneModal
+        addOneToInventoryModalOpen={addOneToInventoryModalOpen}
+        setAddOneToInventoryModalOpen={setAddOneToInventoryModalOpen}
+      />
     </>
   );
 };

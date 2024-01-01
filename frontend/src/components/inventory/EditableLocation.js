@@ -16,8 +16,6 @@ const EditableLocation = ({
     setUpdatedLocationToSubmit,
     showSeparateLocationsWithCommas = true,
   }) => {
-    console.log(row)
-    console.log(row.id === locationIdToEdit)
     return (
       <div className="flex justify-between w-full">
         {row.id === locationIdToEdit ? (

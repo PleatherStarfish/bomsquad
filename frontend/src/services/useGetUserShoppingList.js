@@ -15,10 +15,22 @@ const useUserShoppingList = () => {
       .sortBy(([key]) => (key === "null" ? "" : key)) // key by component id
       .map(([key, value]) => ({ name: key, moduleId: value[0]?.module?.id, data: _.groupBy(value, "component.id") }))
       .value();
-
+    
     const aggregatedComponents = _(response.data).uniqBy("component.id").sortBy("component.supplier.name").value();
+    const componentModuleMap = _(response.data)
+      .groupBy("component.id")
+      .mapValues((components, componentId) => {
+        return {
+          componentId,
+          modules: _.uniqBy(components, "module_name"),
+        };
+      })
+      .values()
+      .value();
 
-    return { groupedByModule, aggregatedComponents };
+    // TODO: depricate aggregatedComponents and switch to componentModuleMap
+    
+    return { groupedByModule, aggregatedComponents, componentModuleMap };
   });
   return {
     userShoppingListData,

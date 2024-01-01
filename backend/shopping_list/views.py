@@ -19,6 +19,7 @@ from shopping_list.serializers import (
 )
 from uuid import UUID
 from rest_framework.views import APIView
+from django.db import transaction
 
 
 class UserShoppingListView(APIView):
@@ -564,40 +565,47 @@ def get_user_shopping_list_total_quantity(request):
 def add_component_to_inventory(request, component_pk):
     user = request.user
     quantity = request.data.get("quantity")
+    location = request.data.get("location")
 
+    # Convert location string to a list, if provided
+    location_list = location.split(",") if location else None
+
+    # Validate and set quantity
     if quantity:
-        # Ensure the provided quantity can be casted to an integer
         try:
             quantity = int(quantity)
         except ValueError:
             return Response(
                 {"detail": "Invalid quantity."}, status=status.HTTP_400_BAD_REQUEST
             )
-    else:
-        # Get the total quantity of that component in the user's UserShoppingList
-        total_quantity = (
-            UserShoppingList.objects.filter(
-                user=user, component_id=component_pk
-            ).aggregate(total=Sum("quantity"))["total"]
-            or 0
-        )
-        quantity = total_quantity
 
-        # Remove the component from the user's UserShoppingList
+    # Use a database transaction to ensure atomicity
+    with transaction.atomic():
+        # Check for existing inventory item with the specified location
+        if location_list is not None:
+            user_inventory_items = UserInventory.objects.filter(
+                user=user, component_id=component_pk, location__exact=location_list
+            )
+        else:
+            user_inventory_items = UserInventory.objects.filter(
+                user=user, component__id=component_pk, location__isnull=True
+            )
+
+        if user_inventory_items.exists():
+            inventory_item = user_inventory_items.first()
+            inventory_item.quantity += quantity
+            inventory_item.save()
+        else:
+            # Create a new inventory item with the specified location and quantity
+            UserInventory.objects.create(
+                user=user,
+                component_id=component_pk,
+                quantity=quantity,
+                location=location_list,
+            )
+
+        # Delete the item from the shopping list
         UserShoppingList.objects.filter(user=user, component_id=component_pk).delete()
-
-    # Get or create the inventory item for the user and component
-    inventory_item, created = UserInventory.objects.get_or_create(
-        component_id=component_pk,
-        user=user,
-        defaults={"quantity": quantity},
-    )
-
-    # If the item was not newly created, update its quantity
-    if not created:
-        UserInventory.objects.filter(pk=inventory_item.pk).update(
-            quantity=F("quantity") + quantity
-        )
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 

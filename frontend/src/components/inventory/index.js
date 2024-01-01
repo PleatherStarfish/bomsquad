@@ -76,8 +76,6 @@ const Inventory = () => {
 
   const deleteMutation = useDeleteUserInventory();
 
-  console.log("inventoryData", inventoryData)
-
   const options = {
     includeScore: true,
     shouldSort: true,
