@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
-const Accordion = ({ title, children }) => {
+const Accordion = ({ title, headerClasses="", children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -11,7 +11,7 @@ const Accordion = ({ title, children }) => {
         className={`flex items-center w-full py-2 space-x-1 font-medium text-left text-gray-900 focus:outline-none ${isOpen ? 'justify-between' : 'justify-start'}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <h4>{title}</h4>
+        <h4 className={headerClasses}>{title}</h4>
         <div className="flex flex-col justify-center h-full">
           <ChevronDownIcon
             className={`h-6 w-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}

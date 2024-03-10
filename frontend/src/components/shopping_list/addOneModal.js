@@ -13,7 +13,6 @@ const AddOneModal = ({
   setAddOneToInventoryModalOpen,
 }) => {
   const [locationArray, setLocationArray] = useState([]);
-  const [isLocationEditable, setIsLocationEditable] = useState(true);
   const {
     data: quantityInInventoryAnon,
     isLoading: isLoadingQuantity,
@@ -74,15 +73,13 @@ const AddOneModal = ({
             <SimpleEditableLocation
               locationArray={locationArray}
               submitLocationChange={setLocationArray}
-              isEditable={isLocationEditable}
-              setIsEditable={setIsLocationEditable}
               showSeparateLocationsWithCommas={false}
             />
           </div>
           {savedLocationsData.length > 0 && (
             <div>
               <Accordion
-                title={`User inventory locations for ${addOneToInventoryModalOpen.supplier?.short_name} ${addOneToInventoryModalOpen.supplier_item_no}`}
+                title={`Your inventory locations for ${addOneToInventoryModalOpen.supplier?.short_name} ${addOneToInventoryModalOpen.supplier_item_no}`}
               >
                 <div className="p-4 rounded-md bg-blue-50">
                   <p className="mb-4 text-xs text-slate-500">
@@ -93,7 +90,6 @@ const AddOneModal = ({
                     data={savedLocationsData}
                     onRowClicked={(row) => {
                       setLocationArray(row.locations);
-                      setIsLocationEditable(false);
                     }}
                   />
                 </div>

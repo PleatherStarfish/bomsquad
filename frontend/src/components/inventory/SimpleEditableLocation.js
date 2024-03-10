@@ -1,16 +1,30 @@
+import React, {useEffect, useState} from "react";
+
 import Button from "../../ui/Button";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import Pill from "../../ui/Pill";
-import React from "react";
 
 const SimpleEditableLocation = ({
   locationArray,
-  isEditable,
-  setIsEditable,
   submitLocationChange,
   showSeparateLocationsWithCommas = true,
 }) => {
-  const [localLocationArray, setLocalLocationArray] = React.useState(null);
+  const [localLocationString, setLocalLocationString] = useState([]);
+  const [isEditable, setIsEditable] = useState(true);
+
+  useEffect(() => {
+    if (locationArray.length > 0) {
+      setLocalLocationString(locationArray.join(", "))
+      setIsEditable(false);
+    }
+  }, [locationArray]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newLocationArray = localLocationString.split(',').map(item => item.trim());
+    submitLocationChange(newLocationArray);
+    setIsEditable(false);
+  };
 
   return (
     <div className="flex justify-between w-full">
@@ -21,15 +35,14 @@ const SimpleEditableLocation = ({
               <input
                 type="text"
                 className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                value={localLocationArray ? localLocationArray.join(", ") : ""}
-                onChange={(e) => {
-                  setLocalLocationArray(e.target.value.split(",").map((item) => item.trim()));
-                }}
+                value={localLocationString}
+                onChange={(e) => setLocalLocationString(e.target.value)}
               />
               <Button
                 variant="muted"
                 onClick={() => {
-                  setLocalLocationArray(locationArray);
+                  setLocalLocationString([]);
+                  submitLocationChange([])
                   setIsEditable(false);
                 }}
               >
@@ -38,10 +51,7 @@ const SimpleEditableLocation = ({
               <Button
                 type="submit"
                 variant="primary"
-                onClick={() => {
-                  submitLocationChange(localLocationArray);
-                  setIsEditable(false);
-                }} // Send local location to the parent component
+                onClick={handleSubmit}
               >
                 Update
               </Button>

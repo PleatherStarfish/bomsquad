@@ -616,24 +616,48 @@ def add_all_user_shopping_list_to_inventory(request):
     user = request.user
     shopping_list = UserShoppingList.objects.filter(user=user)
 
-    for shopping_list_item in shopping_list:
-        inventory_item, created = UserInventory.objects.get_or_create(
-            component=shopping_list_item.component,
-            user=user,
-            defaults={
-                "quantity": shopping_list_item.quantity,
-            },
-        )
-        if not created:
-            inventory_item.old_quantity = inventory_item.quantity
-            inventory_item.old_location = inventory_item.location
-            inventory_item.save()
-            UserInventory.objects.filter(pk=inventory_item.pk).update(
-                quantity=F("quantity") + shopping_list_item.quantity
-            )
-            inventory_item.refresh_from_db()
+    # Extract location_list from the request; it's expected to be a dictionary
+    location_list = request.data
 
-        shopping_list_item.delete()
+    with transaction.atomic():
+        for shopping_list_item in shopping_list:
+            # Retrieve the location for this specific shopping list item, if provided
+            item_location = location_list.get(shopping_list_item.id)
+
+            # Determine if a specific location is provided
+            specific_location_provided = item_location is not None
+
+            # Find or create the inventory item based on location availability
+            if specific_location_provided:
+                item_location_list = item_location.split(",") if item_location else None
+                inventory_item = UserInventory.objects.filter(
+                    user=user,
+                    component=shopping_list_item.component,
+                    location__in=item_location_list,
+                ).first()
+            else:
+                inventory_item = UserInventory.objects.filter(
+                    user=user,
+                    component=shopping_list_item.component,
+                    location__isnull=True,
+                ).first()
+
+            if inventory_item:
+                # Update the existing inventory item
+                inventory_item.quantity += shopping_list_item.quantity
+                inventory_item.old_quantity = inventory_item.quantity
+                inventory_item.old_location = inventory_item.location
+                inventory_item.save()
+            else:
+                # Create a new inventory item with the specified location or null location
+                UserInventory.objects.create(
+                    user=user,
+                    component=shopping_list_item.component,
+                    quantity=shopping_list_item.quantity,
+                    location=item_location.split(",") if item_location else None,
+                )
+
+            shopping_list_item.delete()
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 

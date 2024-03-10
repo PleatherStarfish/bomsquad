@@ -185,6 +185,7 @@ def get_components_locations(request):
     along with the quantity of each component in each location.
     """
     component_pks = request.GET.getlist("component_pks")
+    print("component_pks", component_pks)
 
     if not component_pks:
         # Return an empty JSON object if no component_pks provided
@@ -202,18 +203,22 @@ def get_components_locations(request):
             )
             .distinct()
         )
+        print(locations_and_quantities)
 
         # Prepare the response data for each component
         locations_with_quantity = [
             {
                 "component": {
+                    "id": component_pk,
                     "location": item["location"],
                     "quantity": item["quantity"],
                 }
             }
             for item in locations_and_quantities
         ]
+        print("TEST", locations_with_quantity)
 
         components_locations[component_pk] = locations_with_quantity
+        print("TEST2", components_locations)
 
     return Response(components_locations, status=status.HTTP_200_OK)

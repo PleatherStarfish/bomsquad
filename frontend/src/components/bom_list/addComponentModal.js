@@ -307,7 +307,7 @@ const AddComponentModal = ({
                   )}
                   {type === Types.INVENTORY && savedLocationsData && (
                     <div>
-                      <Accordion title={`User inventory locations for ${componentName}`}>
+                      <Accordion title={`Your inventory locations for ${componentName}`}>
                         <div className="p-4 rounded-md bg-blue-50">
                           <p className="mb-4 text-xs text-slate-500">
                             It looks like you already have this component in

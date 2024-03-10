@@ -434,6 +434,8 @@ const Inventory = () => {
             }
             progressPending={inventoryDataIsLoading}
             customStyles={customStyles}
+            paginationPerPage={30}
+            paginationRowsPerPageOptions={[30, 50, 100]}
           />
           <SolderingMode
             open={openSolderingMode}

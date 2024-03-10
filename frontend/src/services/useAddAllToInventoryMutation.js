@@ -8,8 +8,10 @@ const useAddAllToInventoryMutation = () => {
   const queryClient = useQueryClient(); // Get queryClient instance
 
   return useMutation(
-    async () => {
-      const response = await axios.post(`/api/shopping-list/inventory/add/`, {}, {
+    // Accept optional data parameter
+    async (data = {}) => {
+      console.log("data", data)
+      const response = await axios.post(`/api/shopping-list/inventory/add/`, data, {
         headers: {
           'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
         },
