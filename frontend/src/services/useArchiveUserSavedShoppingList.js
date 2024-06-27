@@ -7,12 +7,11 @@ const useArchiveShoppingListMutation = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async ({notes}) => {
-
+  return useMutation({
+    mutationFn: async ({ notes }) => {
       const response = await axios.post(
         "/api/shopping-list/archive/",
-        {notes},
+        { notes },
         {
           headers: {
             "X-CSRFToken": csrftoken,
@@ -23,13 +22,15 @@ const useArchiveShoppingListMutation = () => {
       );
       return response.data;
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("userSavedLists");
-        queryClient.refetchQueries("userSavedLists");
-      },
+    onSuccess: () => {
+      // Invalidate and refetch the user saved lists queries after mutation
+      queryClient.invalidateQueries(["userSavedLists"]);
+    },
+    onError: (error) => {
+      // Optionally handle error, perhaps logging or displaying a notification
+      console.error('Error archiving shopping list:', error);
     }
-  );
+  });
 };
 
 export default useArchiveShoppingListMutation;

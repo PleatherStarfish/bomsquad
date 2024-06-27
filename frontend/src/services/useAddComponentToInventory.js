@@ -8,7 +8,7 @@ const useAddComponentToInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const { mutate: addComponentToInventory } = useMutation({
+  const { mutateAsync: addComponentToInventory, isPending } = useMutation({
     mutationFn: ({ componentId, quantity, location }) => {
       const componentIdCleaned = removeAfterUnderscore(componentId)
 
@@ -23,17 +23,13 @@ const useAddComponentToInventory = () => {
       });
     },
     onSuccess: () => {
-      // Invalidate and refetch the relevant queries after the mutation is successful
-      queryClient.invalidateQueries("inventory");
-      queryClient.refetchQueries("inventory");
-      queryClient.invalidateQueries("authenticatedUserHistory");
-      queryClient.refetchQueries("authenticatedUserHistory");
-      queryClient.invalidateQueries("userShoppingList");
-      queryClient.refetchQueries("userShoppingList");
+      queryClient.invalidateQueries(["inventory"]);
+      queryClient.invalidateQueries(["authenticatedUserHistory"]);
+      queryClient.invalidateQueries(["userShoppingList"]);
     },
   });
 
-  return addComponentToInventory;
+  return { addComponentToInventory, isPending };
 };
 
 export default useAddComponentToInventory;

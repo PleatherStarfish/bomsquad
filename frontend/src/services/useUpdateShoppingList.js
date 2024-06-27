@@ -10,19 +10,20 @@ const useUpdateShoppingList = () => {
 
   const { mutate: updateShoppingListMutate } = useMutation({
     mutationFn: ({ componentPk, ...data }) => {
-      const componentPkCleaned = removeAfterUnderscore(componentPk)
+      const componentPkCleaned = removeAfterUnderscore(componentPk);
       return axios.patch(`/api/shopping-list/${componentPkCleaned}/update/`, data, {
         headers: {
-          "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
+          "X-CSRFToken": csrftoken,
         },
-        withCredentials: true, // enable sending cookies with CORS requests
+        withCredentials: true,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("userShoppingList");
-      queryClient.refetchQueries("userShoppingList");
+      // Only invalidate the queries, which will trigger a refetch automatically if observers are active
+      queryClient.invalidateQueries(["userShoppingList"]);
     },
   });
+
   return updateShoppingListMutate;
 };
 

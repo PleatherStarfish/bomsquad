@@ -3,7 +3,7 @@ import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 import { useQuery } from "@tanstack/react-query";
 
 const useGetUserInventoryQuantity = (componentPk) => {
-  const componentPkCleaned = removeAfterUnderscore(componentPk)
+  const componentPkCleaned = removeAfterUnderscore(componentPk);
   
   const fetchUserInventoryQuantity = async () => {
     try {
@@ -14,9 +14,12 @@ const useGetUserInventoryQuantity = (componentPk) => {
     }
   };
 
-  const {data, isLoading, isError, error} = useQuery(['userInventoryQuantity', componentPkCleaned], fetchUserInventoryQuantity);
+  const {data, isLoading, isError, error} = useQuery({
+    queryKey: ['userInventoryQuantity', componentPkCleaned],
+    queryFn: fetchUserInventoryQuantity
+  });
 
-  return {data, isLoading, isError, error}
+  return {data, isLoading, isError, error};
 };
 
 export default useGetUserInventoryQuantity;

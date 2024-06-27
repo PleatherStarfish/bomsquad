@@ -27,7 +27,7 @@ const MultiPageModal = ({
   submitButtonText = 'Submit',
   onSubmit = () => {},
   disabled = false,
-  pagesTitles = []
+  pagesTitles = [], 
 }) => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const cancelButtonRef = useRef(null);

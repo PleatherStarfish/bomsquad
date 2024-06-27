@@ -8,24 +8,24 @@ const useDeleteUserInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const deleteMutation = useMutation({
+  const { mutate, isSuccess, isError, isLoading } = useMutation({
     mutationFn: ({ inventoryPk }) => {
-      
-      // const componentPkCleaned = removeAfterUnderscore(inventoryPk)
+      const componentPkCleaned = removeAfterUnderscore(inventoryPk);
 
-      return axios.delete(`/api/inventory/${inventoryPk}/delete/`, {
+      return axios.delete(`/api/inventory/${componentPkCleaned}/delete/`, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
         },
-        withCredentials: true, // enable sending cookies with CORS requests
+        withCredentials: true, // Enable sending cookies with CORS requests
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("inventory");
-      queryClient.refetchQueries("inventory");
+      // Using only invalidateQueries as it automatically refetches the queries if observers are active
+      queryClient.invalidateQueries(["inventory"]);
     },
   });
-  return deleteMutation;
+
+  return { mutate, isSuccess, isError, isLoading };
 };
 
 export default useDeleteUserInventory;

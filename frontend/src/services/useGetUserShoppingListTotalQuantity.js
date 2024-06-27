@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query"; // Note the updated import path for v5
 
 const useGetUserShoppingListTotalQuantity = () => {
   const fetchUserShoppingListTotalQuantity = async () => {
@@ -11,16 +11,13 @@ const useGetUserShoppingListTotalQuantity = () => {
     }
   };
 
-  const queryKey = ["userShoppingListTotalQuantity"];
-  const queryOptions = {
+  const { data: totalQuantity, isLoading: totalQuantityIsLoading, isError: totalQuantityIsError } = useQuery({
+    queryKey: ["userShoppingListTotalQuantity"],
+    queryFn: fetchUserShoppingListTotalQuantity,
     onError: (error) => {
       console.error("Error while fetching total quantity:", error);
     },
-  };
-
-  const query = useQuery(queryKey, fetchUserShoppingListTotalQuantity, queryOptions);
-
-  const { data: totalQuantity, isLoading: totalQuantityIsLoading, isError: totalQuantityIsError } = query;
+  });
 
   return { totalQuantity, totalQuantityIsLoading, totalQuantityIsError };
 };

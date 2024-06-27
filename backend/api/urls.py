@@ -39,6 +39,7 @@ from shopping_list.views import (
     get_user_shopping_list_total_quantity,
     archive_shopping_list,
     get_user_anonymous_shopping_list_quantity,
+    get_all_unique_component_ids,
 )
 
 
@@ -150,6 +151,11 @@ urlpatterns = [
         "shopping-list/delete/<str:timestamp>/",
         ArchivedShoppingListsView.as_view(),
         name="delete-shopping-list",
+    ),
+    path(
+        "shopping-list/unique-components/",
+        get_all_unique_component_ids,
+        name="unique-components",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),

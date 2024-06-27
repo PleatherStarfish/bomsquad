@@ -17,9 +17,7 @@ const useAddArchivedListToShoppingList = () => {
       });
     },
     onSuccess: () => {
-      // Invalidate and refetch queries that might be affected by this mutation
-      queryClient.invalidateQueries("userShoppingList");
-      queryClient.refetchQueries("userShoppingList");
+      queryClient.invalidateQueries(["userShoppingList"]);
     },
   });
   return addArchivedListToShoppingList;

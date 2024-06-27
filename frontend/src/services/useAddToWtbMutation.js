@@ -7,11 +7,10 @@ import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 const useAddToWtbMutation = (moduleId) => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient(); // Get queryClient instance
-
   const moduleIdCleaned = removeAfterUnderscore(moduleId);
 
-  return useMutation(
-    async () => {
+  return useMutation({
+    mutationFn: async () => {
       const response = await axios.post(
         `/add-to-wtb/${moduleIdCleaned}/`,
         {},
@@ -24,14 +23,15 @@ const useAddToWtbMutation = (moduleId) => {
       );
       return response.data;
     },
-    {
-      // Use onSuccess to invalidate and refetch the related query after mutation
-      onSuccess: () => {
-        queryClient.invalidateQueries("wtbModules");
-        queryClient.refetchQueries("wtbModules");
-      },
+    onSuccess: () => {
+      // Invalidate and refetch the wtbModules query after mutation
+      queryClient.invalidateQueries(["wtbModules"]);
+    },
+    onError: (error) => {
+      // Optionally handle error, such as logging or user notifications
+      console.error('Error adding to WTB modules:', error);
     }
-  );
+  });
 };
 
 export default useAddToWtbMutation;

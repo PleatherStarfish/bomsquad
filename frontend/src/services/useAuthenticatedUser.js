@@ -18,7 +18,10 @@ const useAuthenticatedUser = () => {
     data: user,
     isLoading: userIsLoading,
     isError: userIsError,
-  } = useQuery(queryKey, fetchData);
+  } = useQuery({
+    queryKey,
+    queryFn: fetchData,
+  });
 
   return { user, userIsLoading, userIsError };
 };

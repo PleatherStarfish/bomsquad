@@ -17,8 +17,7 @@ const useDeleteArchivedShoppingList = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("archivedShoppingLists");
-      queryClient.refetchQueries("archivedShoppingLists");
+      queryClient.invalidateQueries(["archivedShoppingLists"]);
     },
   });
   return deleteMutation;

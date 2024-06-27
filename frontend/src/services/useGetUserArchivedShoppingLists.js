@@ -50,7 +50,10 @@ const useGetArchivedShoppingLists = () => {
     isLoading: archivedShoppingListsLoading,
     isError: archivedShoppingListsError,
     error: archivedShoppingListsErrorMessage,
-  } = useQuery(["archivedShoppingLists"], fetchData);
+  } = useQuery({
+    queryKey: ["archivedShoppingLists"],
+    queryFn: fetchData
+  });
 
   return {
     archivedShoppingLists,

@@ -5,12 +5,11 @@ import axios from 'axios';
 
 const useAddAllToInventoryMutation = () => {
   const csrftoken = Cookies.get('csrftoken');
-  const queryClient = useQueryClient(); // Get queryClient instance
+  const queryClient = useQueryClient();
 
-  return useMutation(
-    // Accept optional data parameter
-    async (data = {}) => {
-      console.log("data", data)
+  const { mutateAsync: addAllToInventory, isPending } = useMutation({
+    mutationFn: async (data = {}) => {
+      console.log(data)
       const response = await axios.post(`/api/shopping-list/inventory/add/`, data, {
         headers: {
           'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
@@ -19,14 +18,18 @@ const useAddAllToInventoryMutation = () => {
       });
       return response.data;
     },
-    {
-      // Use onSuccess to invalidate and refetch the related query after mutation
-      onSuccess: () => {
-        queryClient.invalidateQueries('inventory');
-        queryClient.refetchQueries('inventory');
-      },
+    onSuccess: () => {
+      // Invalidate and refetch the inventory queries after mutation
+      queryClient.invalidateQueries(['inventory']);
+      queryClient.invalidateQueries(['userShoppingList']); // Added if you want to also update the shopping list view
+    },
+    onError: (error) => {
+      // Optionally handle error, perhaps logging or displaying a notification
+      console.error('Error adding all to inventory:', error);
     }
-  );
+  });
+
+  return { addAllToInventory, isPending };
 };
 
 export default useAddAllToInventoryMutation;

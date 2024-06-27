@@ -9,12 +9,13 @@ import ListSlice from "./listSlice";
 import Modal from "../../ui/Modal";
 import Notification from "../../ui/Notification";
 import _ from "lodash";
-import useAddAllToInventoryMutation from "../../services/useAddAllToInventoryMutation";
+import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useArchiveShoppingListMutation from "../../services/useArchiveUserSavedShoppingList";
 import useGetUserShoppingList from "../../services/useGetUserShoppingList";
 
 const ShoppingList = () => {
   const textareaRef = React.useRef(null);
+  const { isPending } = useAddComponentToInventory();
   
   const [addAllModalOpen, setAddAllModalOpen] = useState(false);
   const [saveListModalOpen, setSaveListModalOpen] = useState(false);
@@ -23,7 +24,6 @@ const ShoppingList = () => {
   const [mouserToolModalOpen, setMouserToolModalOpen] = useState(false);
   const [notes, setNotes] = useState('');
 
-  const addAllToInventoryMutation = useAddAllToInventoryMutation();
   const {
     userShoppingListData,
     userShoppingListIsLoading,
@@ -68,6 +68,12 @@ const ShoppingList = () => {
       console.error('Could not copy text: ', err);
     });
   }
+
+  const LoadingOverlay = () => (
+    <div className="fixed top-0 bottom-0 left-0 right-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="animate-pulse">Updating...</div>
+    </div>
+  );
 
   if (userShoppingListIsError) {
     return <div>Error fetching data</div>;
@@ -162,7 +168,6 @@ const ShoppingList = () => {
       <AddAllModal
         addAllModalOpen={addAllModalOpen}
         setAddAllModalOpen={setAddAllModalOpen}
-        addAllToInventoryMutation={addAllToInventoryMutation}
         userShoppingListData={userShoppingListData}
       />
       <Modal
@@ -218,6 +223,7 @@ const ShoppingList = () => {
           />
         </div>
       </Modal>
+      {isPending && <LoadingOverlay />}
     </>
   );
 };

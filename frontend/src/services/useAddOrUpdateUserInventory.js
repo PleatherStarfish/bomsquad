@@ -20,10 +20,8 @@ const useAddOrUpdateUserInventory = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("inventory");
-      queryClient.refetchQueries("inventory");
-      queryClient.invalidateQueries("authenticatedUserHistory");
-      queryClient.refetchQueries("authenticatedUserHistory");
+      queryClient.invalidateQueries(["inventory"]);
+      queryClient.invalidateQueries(["authenticatedUserHistory"]);
     },
   });
   return addOrUpdateUserInventory;

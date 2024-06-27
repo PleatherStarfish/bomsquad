@@ -17,14 +17,15 @@ const useDeleteUser = () => {
     return response.data;
   };
 
-  const mutation = useMutation(deleteUser, {
+  const { mutate, isSuccess, isError, isLoading } = useMutation({
+    mutationFn: deleteUser,
     onSuccess: () => {
-      queryClient.removeQueries("authenticatedUser"); // Remove the 'user' query from the cache
+      queryClient.removeQueries(["authenticatedUser"]); // Adjusted to use array-based keys for better consistency
       window.location.href = "/";
-    },
+    }
   });
 
-  return mutation;
+  return { mutate, isSuccess, isError, isLoading };
 };
 
 export default useDeleteUser;

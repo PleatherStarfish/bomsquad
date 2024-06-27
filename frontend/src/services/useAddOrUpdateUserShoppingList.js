@@ -25,8 +25,7 @@ const useAddOrUpdateUserShoppingList = () => {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("shoppingList");
-      queryClient.refetchQueries("shoppingList");
+      queryClient.invalidateQueries(["shoppingList"]);
     },
   });
 

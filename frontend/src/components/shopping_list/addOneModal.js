@@ -1,31 +1,31 @@
 import React, { useState } from "react";
 
-import Accordion from "../../ui/Accordion";
-import LocationsTable from "../bom_list/locationsTable";
+import InventoryModalContent from "./inventoryModalContent";
 import Modal from "../../ui/Modal";
-import SimpleEditableLocation from "../inventory/SimpleEditableLocation";
 import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useGetInventoryLocations from "../../services/useGetInventoryLocations";
 import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAnonymousShoppingListQuantity";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AddOneModal = ({
-  addOneToInventoryModalOpen,
-  setAddOneToInventoryModalOpen,
+  component,
+  setComponent,
 }) => {
   const [locationArray, setLocationArray] = useState([]);
+  const queryClient = useQueryClient();
   const {
     data: quantityInInventoryAnon,
     isLoading: isLoadingQuantity,
     isError: isErrorQuantity,
-  } = useGetUserAnonymousShoppingListQuantity(addOneToInventoryModalOpen?.id);
+  } = useGetUserAnonymousShoppingListQuantity(component?.id);
 
-  const addComponentToInventory = useAddComponentToInventory();
+  const { addComponentToInventory } = useAddComponentToInventory();
 
   const {
     data: locations,
     isLoading: isLoadingLocation,
     isError: isErrorLocation,
-  } = useGetInventoryLocations(addOneToInventoryModalOpen?.id);
+  } = useGetInventoryLocations(component?.id);
 
   const locationsData = locations?.data ?? [];
   const savedLocationsData = Array.isArray(locationsData)
@@ -35,69 +35,45 @@ const AddOneModal = ({
       }))
     : [];
 
-  const handleAddToInventory = () => {
+  const handleAddToInventory = async () => {
     const locationString = locationArray.join(",");
-    addComponentToInventory({
-      componentId: addOneToInventoryModalOpen?.id,
+    await addComponentToInventory({
+      componentId: component?.id,
       location: locationString,
       quantity: quantityInInventoryAnon,
     });
-    setAddOneToInventoryModalOpen(false); // Close the modal after adding
+    setComponent(false); // Close the modal after adding
+    // Invalidate and refetch queries
+    queryClient.invalidateQueries(["inventory"]);
+    queryClient.refetchQueries(["inventory"]);
+    queryClient.invalidateQueries(["authenticatedUserHistory"]);
+    queryClient.refetchQueries(["authenticatedUserHistory"]);
+    queryClient.invalidateQueries(["userShoppingList"]);
+    queryClient.refetchQueries(["userShoppingList"]);
   };
 
   return (
     <Modal
-      open={!!addOneToInventoryModalOpen?.id}
-      setOpen={setAddOneToInventoryModalOpen}
+      open={!!component?.id}
+      setOpen={setComponent}
       title={"Add to inventory?"}
       submitButtonText={"Add"}
       type="warning"
       onSubmit={handleAddToInventory}
     >
-      {isLoadingQuantity || isLoadingLocation ? (
-        <div className="text-center text-gray-500 animate-pulse">
-          Loading...
-        </div>
-      ) : isErrorQuantity || isErrorLocation ? (
-        <div>Error: {isErrorQuantity.message || isErrorLocation.message}</div>
-      ) : (
-        <>
-          <div>
-            {`Are you sure you want to add ${addOneToInventoryModalOpen.supplier?.short_name} ${addOneToInventoryModalOpen.supplier_item_no} to your inventory? This will remove this item from your shopping list.`}
-          </div>
-          <div className="p-4 mt-4 mb-2 bg-gray-100 rounded-md">
-            <p className="my-2 text-xs text-slate-500">
-              Specify the location where you will store this item in your
-              inventory. Separate locations with commas.
-            </p>
-            <SimpleEditableLocation
-              locationArray={locationArray}
-              submitLocationChange={setLocationArray}
-              showSeparateLocationsWithCommas={false}
-            />
-          </div>
-          {savedLocationsData.length > 0 && (
-            <div>
-              <Accordion
-                title={`Your inventory locations for ${addOneToInventoryModalOpen.supplier?.short_name} ${addOneToInventoryModalOpen.supplier_item_no}`}
-              >
-                <div className="p-4 rounded-md bg-blue-50">
-                  <p className="mb-4 text-xs text-slate-500">
-                    It looks like you already have this component in your
-                    inventory. Click to select a pre-existing location.
-                  </p>
-                  <LocationsTable
-                    data={savedLocationsData}
-                    onRowClicked={(row) => {
-                      setLocationArray(row.locations);
-                    }}
-                  />
-                </div>
-              </Accordion>
-            </div>
-          )}
-        </>
-      )}
+      <div>
+        {`Are you sure you want to add ${component?.supplier?.short_name} ${component?.supplier_item_no} to your inventory? This will remove this item from your shopping list.`}
+      </div>
+      <InventoryModalContent 
+        isLoadingQuantity={isLoadingQuantity} 
+        isErrorQuantity={isErrorQuantity} 
+        isLoadingLocation={isLoadingLocation} 
+        isErrorLocation={isErrorLocation} 
+        component={component}
+        locationArray={locationArray}
+        setLocationArray={setLocationArray}
+        savedLocationsData={savedLocationsData}
+      />
     </Modal>
   );
 };

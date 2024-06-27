@@ -501,8 +501,8 @@ const ListSlice = ({
         {`Are you sure you want to delete all the components in your shopping list for ${deleteModalModuleDetails?.moduleName}?`}
       </Modal>
       <AddOneModal
-        addOneToInventoryModalOpen={addOneToInventoryModalOpen}
-        setAddOneToInventoryModalOpen={setAddOneToInventoryModalOpen}
+        component={addOneToInventoryModalOpen}
+        setComponent={setAddOneToInventoryModalOpen}
       />
     </>
   );

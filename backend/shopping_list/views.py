@@ -616,50 +616,62 @@ def add_all_user_shopping_list_to_inventory(request):
     user = request.user
     shopping_list = UserShoppingList.objects.filter(user=user)
 
-    # Extract location_list from the request; it's expected to be a dictionary
+    # Ensure location_list is a dictionary
+    if not isinstance(request.data, dict):
+        return Response(
+            {"detail": "Invalid data format; expected a dictionary of locations."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     location_list = request.data
 
-    with transaction.atomic():
-        for shopping_list_item in shopping_list:
-            # Retrieve the location for this specific shopping list item, if provided
-            item_location = location_list.get(shopping_list_item.id)
+    for shopping_list_item in shopping_list:
+        component_id = str(shopping_list_item.component.id)
+        shopping_list_item_location = location_list.get(component_id, None)
 
-            # Determine if a specific location is provided
-            specific_location_provided = item_location is not None
+        if shopping_list_item_location is not None:
+            user_inventory_items = UserInventory.objects.filter(
+                user=user,
+                component_id=shopping_list_item.component.id,
+                location__exact=shopping_list_item_location,
+            )
+        else:
+            user_inventory_items = UserInventory.objects.filter(
+                user=user,
+                component__id=shopping_list_item.component.id,
+                location__isnull=True,
+            )
 
-            # Find or create the inventory item based on location availability
-            if specific_location_provided:
-                item_location_list = item_location.split(",") if item_location else None
-                inventory_item = UserInventory.objects.filter(
-                    user=user,
-                    component=shopping_list_item.component,
-                    location__in=item_location_list,
-                ).first()
-            else:
-                inventory_item = UserInventory.objects.filter(
-                    user=user,
-                    component=shopping_list_item.component,
-                    location__isnull=True,
-                ).first()
+        # Get the total quantity of a component from user's shopping list
+        shopping_list_quantity = UserShoppingList.objects.filter(
+            user=user, component__id=shopping_list_item.component.id
+        )
 
-            if inventory_item:
-                # Update the existing inventory item
-                inventory_item.quantity += shopping_list_item.quantity
-                inventory_item.old_quantity = inventory_item.quantity
-                inventory_item.old_location = inventory_item.location
-                inventory_item.save()
-            else:
-                # Create a new inventory item with the specified location or null location
-                UserInventory.objects.create(
-                    user=user,
-                    component=shopping_list_item.component,
-                    quantity=shopping_list_item.quantity,
-                    location=item_location.split(",") if item_location else None,
-                )
+        quantity = sum(item.quantity for item in shopping_list_quantity)
 
-            shopping_list_item.delete()
+        # If the user has that item in their inventory
+        if user_inventory_items.exists():
+            inventory_item = user_inventory_items.first()
+            inventory_item.quantity += quantity
+            inventory_item.save()
+        else:
+            # Create a new inventory item with the specified location and quantity
+            UserInventory.objects.create(
+                user=user,
+                component_id=shopping_list_item.component.id,
+                quantity=quantity,
+                location=shopping_list_item_location,
+            )
 
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    UserShoppingList.objects.filter(user=user).delete()
+
+    return Response(
+        {
+            "detail": "Inventory updated successfully.",
+            "processed_items": len(shopping_list),
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["POST"])
@@ -715,3 +727,12 @@ def archive_shopping_list(request):
     return Response(
         {"message": "Shopping List saved successfully"}, status=status.HTTP_200_OK
     )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_all_unique_component_ids(request):
+    user = request.user
+    shopping_list = UserShoppingList.objects.filter(user=user)
+    component_ids = shopping_list.values_list("component_id", flat=True).distinct()
+    return Response(component_ids, status=status.HTTP_200_OK)

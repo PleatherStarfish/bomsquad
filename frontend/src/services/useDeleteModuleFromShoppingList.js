@@ -30,8 +30,7 @@ const useDeleteShoppingListItem = () => {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries('userShoppingList');
-            queryClient.refetchQueries('userShoppingList');
+            queryClient.invalidateQueries(['userShoppingList']);
         },
     });
 

@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Cookies from "js-cookie";
 import axios from "axios";
-import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 const useUpdateUserInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
@@ -10,7 +9,6 @@ const useUpdateUserInventory = () => {
 
   const { mutate: updateUserInventoryMutate } = useMutation({
     mutationFn: ({ inventoryPk, ...data }) => {
-      // const componentPkCleaned = removeAfterUnderscore(inventoryPk)
       return axios.patch(`/api/inventory/${inventoryPk}/update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
@@ -19,12 +17,11 @@ const useUpdateUserInventory = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("inventory");
-      queryClient.refetchQueries("inventory");
-      queryClient.invalidateQueries("authenticatedUserHistory");
-      queryClient.refetchQueries("authenticatedUserHistory");
+      queryClient.invalidateQueries(["inventory"]);
+      queryClient.invalidateQueries(["authenticatedUserHistory"]);
     },
   });
+
   return updateUserInventoryMutate;
 };
 

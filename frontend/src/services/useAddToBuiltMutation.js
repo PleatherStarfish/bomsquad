@@ -7,11 +7,10 @@ import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 const useAddToBuiltMutation = (moduleId) => {
   const csrftoken = Cookies.get('csrftoken');
   const queryClient = useQueryClient(); // Get queryClient instance
-
   const moduleIdCleaned = removeAfterUnderscore(moduleId);
 
-  return useMutation(
-    async () => {
+  return useMutation({
+    mutationFn: async () => {
       const response = await axios.post(`/add-to-built/${moduleIdCleaned}/`, {}, {
         headers: {
           'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request
@@ -20,14 +19,15 @@ const useAddToBuiltMutation = (moduleId) => {
       });
       return response.data;
     },
-    {
-      // Use onSuccess to invalidate and refetch the related query after mutation
-      onSuccess: () => {
-        queryClient.invalidateQueries('builtModules');
-        queryClient.refetchQueries('builtModules');
-      },
+    onSuccess: () => {
+      // Invalidate and refetch the builtModules query after mutation
+      queryClient.invalidateQueries(['builtModules']);
+    },
+    onError: (error) => {
+      // Optionally handle error, such as logging or user notifications
+      console.error('Error adding to built modules:', error);
     }
-  );
+  });
 };
 
 export default useAddToBuiltMutation;

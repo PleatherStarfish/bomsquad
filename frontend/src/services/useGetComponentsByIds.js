@@ -13,16 +13,13 @@ export const getComponentsByIds = async (componentPks) => {
 
 const useGetComponentsByIds = (componentPks) => {
 
-  const queryKey = ["getComponentsByIds", componentPks];
-  const queryOptions = {
+  const { data: componentsData, isLoading: componentsAreLoading, isError: componentsAreError } = useQuery({
+    queryKey: ["getComponentsByIds", componentPks],
+    queryFn: () => getComponentsByIds(componentPks),
     onError: (error) => {
       console.error("Error while fetching components:", error);
     },
-  };
-
-  const query = useQuery(queryKey, () => getComponentsByIds(componentPks), queryOptions);
-
-  const { data: componentsData, isLoading: componentsAreLoading, isError: componentsAreError } = query;
+  });
 
   return { componentsData, componentsAreLoading, componentsAreError };
 };

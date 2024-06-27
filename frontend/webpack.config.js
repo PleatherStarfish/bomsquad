@@ -3,21 +3,24 @@ const webpack = require("webpack");
 const { exec } = require("child_process");
 const Dotenv = require('dotenv-webpack');
 
-
 module.exports = {
   entry: "./src/index.js",
-
   output: {
     path: path.resolve(__dirname, "./build"), // container path
     filename: "main.js",
   },
-
   module: {
     rules: [
       {
-        test: /\.js|.jsx$/,
-        exclude: /node_modules/,
-        use: "babel-loader",
+        test: /\.js|\.jsx$/,
+        exclude: /node_modules\/(?!(\/@tanstack\/query-core|\/@tanstack\/react-query|\/@tanstack\/react-table|\/@tanstack\/virtual-core)\/).*/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react'], // Ensure you have the necessary presets installed
+            plugins: ['@babel/plugin-proposal-nullish-coalescing-operator', '@babel/plugin-proposal-optional-chaining'] // Ensure these plugins are installed and configured
+          }
+        },
       },
       {
         test: /\.(css|sass|scss)$/,
@@ -36,18 +39,19 @@ module.exports = {
     minimize: true,
   },
   plugins: [
-    new webpack.DefinePlugin({
-      React: "react",
-      "process.env": {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
-      },
+    new Dotenv({
+      path: '../.env.prod',
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new Dotenv({path: '../.env.prod'})
   ],
+  resolve: {
+    fallback: {
+      assert: require.resolve('assert'),
+    },
+  },
 };
 
-// Re-run the Makefile build-styles command after each build
+// Add the AfterEmitPlugin configuration back as it was
 module.exports.plugins.push({
   apply: (compiler) => {
     compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
