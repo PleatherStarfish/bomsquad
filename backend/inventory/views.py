@@ -22,7 +22,7 @@ class UserInventoryView(APIView):
     Handles GET, POST, DELETE, and PATCH methods for the user's inventory.
     """
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -89,6 +89,8 @@ class UserInventoryView(APIView):
         )
 
     def patch(self, request, inventory_pk):
+        user = request.user
+
         # Process the location data from the request
         location = request.data.get("location", "")
         location_list = location.split(",") if location else None
@@ -96,13 +98,24 @@ class UserInventoryView(APIView):
         # Retrieve the user inventory item by inventory_pk
         user_inventory_item = UserInventory.objects.filter(pk=inventory_pk).first()
 
-        if not user_inventory_item:
-            return Response(
-                {"detail": "User inventory not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Update the location if it's provided in the request
+        # Check if the location already exists for this user and component
         if location_list is not None:
+
+            existing_inventory_items = UserInventory.objects.filter(
+                user=user_inventory_item.user,
+                component=user_inventory_item.component,
+                location__exact=location_list,
+            ).exclude(pk=inventory_pk)
+
+            if existing_inventory_items.exists():
+                return Response(
+                    {
+                        "error": "A user inventory item with this location already exists."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Update the location if it doesn't already exist
             user_inventory_item.location = location_list
             user_inventory_item.save(update_fields=["location"])
 
@@ -202,7 +215,6 @@ def get_components_locations(request):
             )
             .distinct()
         )
-        print(locations_and_quantities)
 
         # Prepare the response data for each component
         locations_with_quantity = [

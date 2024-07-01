@@ -58,46 +58,28 @@ const AddComponentModal = ({
       : { data: undefined };
 
   const { data: locations } = useGetInventoryLocations(componentId);
-  const locationsData = locations?.data ?? [];
+  const locationsData = locations ?? [];
 
   const is_premium = user?.is_premium;
-
-  const cleanArray = (input) => {
-    return input.map((item) => {
-      if (item === "None") {
-        return [];
-      } else {
-        try {
-          // Parse the string as JSON after replacing single quotes with double quotes
-          return JSON.parse(item.replace(/'/g, '"').trim()).map((element) =>
-            element.trim()
-          );
-        } catch (error) {
-          console.error("Error parsing item:", item, error);
-          return [];
-        }
-      }
-    });
-  };
 
   const handleSubmitQuantity = async () => {
     try {
       if (type === Types.INVENTORY) {
-        await addOrUpdateUserInventory({
+        addOrUpdateUserInventory({
           componentId,
           quantity,
           location: locationArray.join(","),
           editMode,
         });
       } else if (type === Types.SHOPPING) {
-        await addOrUpdateUserShoppingList({
+        addOrUpdateUserShoppingList({
           componentId,
           ...hookArgs,
           quantity,
           editMode,
         });
       } else if (type === Types.SHOPPING_ANON) {
-        await addOrUpdateUserAnonymousShoppingList({
+        addOrUpdateUserAnonymousShoppingList({
           componentId,
           quantity,
           editMode,

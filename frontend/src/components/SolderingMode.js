@@ -131,6 +131,7 @@ const SolderingMode = ({
           handleSubmitLocation={handleSubmitLocation}
           handlePillClick={handlePillClick}
           handleClick={handleClick}
+          textSize={"text-lg"}
           setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
         />
       ),

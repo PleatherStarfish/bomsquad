@@ -9,7 +9,6 @@ const useAddAllToInventoryMutation = () => {
 
   const { mutateAsync: addAllToInventory, isPending } = useMutation({
     mutationFn: async (data = {}) => {
-      console.log(data)
       const response = await axios.post(`/api/shopping-list/inventory/add/`, data, {
         headers: {
           'X-CSRFToken': csrftoken, // Include the csrftoken as a header in the request

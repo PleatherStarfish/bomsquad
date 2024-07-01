@@ -222,7 +222,12 @@ def get_module_bom_list_items(request, module_pk):
                 "components_options__userinventory__quantity",
                 filter=Q(components_options__userinventory__user=request.user),
                 distinct=True,
-            )
+            ),
+            sum_of_user_options_from_shopping_list=Sum(
+                "components_options__usershoppinglist__quantity",
+                filter=Q(components_options__usershoppinglist__user=request.user),
+                distinct=True,
+            ),
         )
 
     # Serialize the retrieved ModuleBomListItem instances

@@ -1,9 +1,9 @@
 import "tippy.js/dist/tippy.css";
 
+import { Cart, Folder2 } from "react-bootstrap-icons";
 import React, { useEffect, useMemo } from "react";
 
 import Alert from "../../ui/Alert";
-import { Check2Circle } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
 import Tabs from "../../ui/Tabs";
@@ -82,16 +82,26 @@ const BomList = ({ moduleId, moduleName }) => {
       name: <div className="sr-only">Alerts</div>,
       cell: (row) => {
         return (
-          row.quantity <= row.sum_of_user_options_from_inventory &&
-          row.quantity > 0 && (
-            <Tippy
-              content={
-                "Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
-              }
-            >
-              <Check2Circle className="fill-[#548a6a] w-8 h-8" />
-            </Tippy>
-          )
+          <div className="flex items-center space-x-2">
+            {row.quantity <= row.sum_of_user_options_from_inventory && row.quantity > 0 && (
+              <Tippy
+                content={
+                  "Your inventory has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
+                }
+              >
+                <Folder2 className="fill-[#548a6a] w-4 h-4" />
+              </Tippy>
+            )}
+            {row.quantity <= row.sum_of_user_options_from_shopping_list && row.quantity > 0 && (
+              <Tippy
+                content={
+                  "Your shopping list has an adequate quantity of one or more components to fulfill this Bill of Materials (BOM) list item."
+                }
+              >
+                <Cart className="fill-[#548a6a] w-4 h-4" />
+              </Tippy>
+            )}
+          </div>
         );
       },
       sortable: false,
@@ -139,6 +149,25 @@ const BomList = ({ moduleId, moduleName }) => {
   const conditionalRowStyles = [
     {
       when: (row) =>
+        row.quantity <= row.sum_of_user_options_from_inventory &&
+        row.quantity > 0,
+      style: {
+        backgroundColor: "#fefad9",
+        color: "black",
+      },
+    },
+    {
+      when: (row) =>
+        row.quantity <= row.sum_of_user_options_from_shopping_list &&
+        row.quantity > 0,
+      style: {
+        backgroundColor: "#fefad9",
+        color: "black",
+      },
+    },
+    {
+      when: (row) =>
+        row.quantity <= row.sum_of_user_options_from_shopping_list && 
         row.quantity <= row.sum_of_user_options_from_inventory &&
         row.quantity > 0,
       style: {

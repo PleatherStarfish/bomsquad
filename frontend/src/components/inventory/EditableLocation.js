@@ -15,6 +15,7 @@ const EditableLocation = ({
     handleClick,
     setUpdatedLocationToSubmit,
     showSeparateLocationsWithCommas = true,
+    textSize = "",
   }) => {
     return (
       <div className="flex justify-between w-full">
@@ -58,6 +59,7 @@ const EditableLocation = ({
                     key={index}
                     showArrow={index !== row.location.length - 1}
                     onClick={() => handlePillClick(row.id, index)}
+                    textSize={textSize}
                   >
                     {item}
                   </Pill>

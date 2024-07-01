@@ -8,7 +8,7 @@ const Pill = ({ color = "bg-slate-500", border = "border-slate-500", textColor =
     <li className="flex my-0.5">
       <div
         className={cx(
-          "flex py-0.5 px-1.5 no-underline rounded-full font-sans font-semibold btn-primary",
+          "flex pt-1 pb-1 pl-2 pr-2 no-underline rounded-full font-sans font-semibold btn-primary",
           border,
           color,
           textColor,
@@ -16,13 +16,13 @@ const Pill = ({ color = "bg-slate-500", border = "border-slate-500", textColor =
         )}
       >
         {children}
-        {showXMark && <XMarkIcon
+        {/* {showXMark && <XMarkIcon
           className="w-4 h-4 fill-white"
           onClick={onClick}
           role="button"
-        />}
+        />} */}
       </div>
-      {showArrow && <ArrowLongRightIcon className="w-5 h-5" />}
+      {showArrow && <div className="flex flex-col justify-center h-full"><ArrowLongRightIcon className="w-5 h-5" /></div>}
     </li>
   );
 };

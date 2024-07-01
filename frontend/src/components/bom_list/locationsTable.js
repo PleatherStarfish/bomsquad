@@ -3,7 +3,6 @@ import Pill from "../../ui/Pill";
 import React from "react";
 
 const LocationsTable = ({ data, onRowClicked }) => {
-  console.log("data", data)
   const columns = [
     {
       name: "Location",

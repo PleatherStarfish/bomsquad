@@ -49,6 +49,7 @@ const handleClick = (
 };
 
 const Inventory = () => {
+  const [error, setError] = useState(null)
   const [quantityIdToEdit, setQuantityIdToEdit] = useState();
   const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState();
 
@@ -72,7 +73,7 @@ const Inventory = () => {
   const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
     useGetUserInventory();
 
-  const updateUserInventoryMutate = useUpdateUserInventory();
+  const {updateUserInventoryMutate, error: mutateError} = useUpdateUserInventory();
 
   const deleteMutation = useDeleteUserInventory();
 
@@ -131,8 +132,9 @@ const Inventory = () => {
       });
       setLocationIdToEdit(undefined);
       setUpdatedLocationToSubmit(undefined);
-    } catch (error) {
-      console.error("Failed to update location", error);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.error || "An error occurred");
     }
   });
 
@@ -155,8 +157,10 @@ const Inventory = () => {
         inventoryPk,
         location: location.join(", "),
       });
+      setError(null);
     } catch (error) {
       console.error("Failed to update location", error);
+      setError(err.response?.data?.error || "An error occurred");
     }
   });
 
@@ -335,17 +339,22 @@ const Inventory = () => {
     {
       name: <div>Location</div>,
       cell: (row) => (
-        <EditableLocation
-          row={row}
-          locationIdToEdit={locationIdToEdit}
-          updatedLocationToSubmit={updatedLocationToSubmit}
-          handleLocationChange={handleLocationChange}
-          setLocationIdToEdit={setLocationIdToEdit}
-          handleSubmitLocation={handleSubmitLocation}
-          handlePillClick={handlePillClick}
-          handleClick={handleClick}
-          setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
-        />
+        <div className="flex flex-col w-full">
+            <EditableLocation
+              row={row}
+              locationIdToEdit={locationIdToEdit}
+              updatedLocationToSubmit={updatedLocationToSubmit}
+              handleLocationChange={handleLocationChange}
+              setLocationIdToEdit={setLocationIdToEdit}
+              handleSubmitLocation={handleSubmitLocation}
+              handlePillClick={handlePillClick}
+              handleClick={handleClick}
+              setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+            />
+          {error && row.id === locationIdToEdit && (
+            <div className="mt-1 text-xs text-red-500">{error}</div>
+          )}
+        </div>
       ),
       sortable: true,
       wrap: true,
