@@ -21,8 +21,15 @@ const SimpleEditableLocation = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newLocationArray = localLocationString.split(',').map(item => item.trim());
-    submitLocationChange(newLocationArray);
+    const newLocationArray = localLocationString
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item); // Filter out empty strings
+    if (newLocationArray.length > 0) {
+      submitLocationChange(newLocationArray);
+    } else {
+      submitLocationChange([]);
+    }
     setIsEditable(false);
   };
 

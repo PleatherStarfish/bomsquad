@@ -40,36 +40,39 @@ const Modal = ({
   bgOpacity = "bg-opacity-75",
   backdropBlur = undefined,
   disabled = false,
+  onlyCancelButton = false,
   children,
 }) => {
   const cancelButtonRef = useRef(null);
 
   const defaultButtons = (
     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-      {type === "danger" ? (
-        <button
-          type="button"
-          className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto"
-          onClick={() => {
-            onSubmit();
-            setOpen(false);
-          }}
-          disabled={disabled}
-        >
-          {submitButtonText}
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
-          onClick={() => {
-            onSubmit();
-            setOpen(false);
-          }}
-          disabled={disabled}
-        >
-          {submitButtonText}
-        </button>
+      {!onlyCancelButton && (
+        type === "danger" ? (
+          <button
+            type="button"
+            className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-red-500 rounded-md shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto"
+            onClick={() => {
+              onSubmit();
+              setOpen(false);
+            }}
+            disabled={disabled}
+          >
+            {submitButtonText}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
+            onClick={() => {
+              onSubmit();
+              setOpen(false);
+            }}
+            disabled={disabled}
+          >
+            {submitButtonText}
+          </button>
+        )
       )}
       <button
         type="button"

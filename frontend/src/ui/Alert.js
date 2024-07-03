@@ -36,7 +36,7 @@ const Alert = ({
     <div className={cx("p-6 rounded w-full", AlertVariant[variant], AlertVariantPadding[padding])} role="alert">
       <div className="flex w-full">
         {icon && AlertVariantIcon[variant]}
-        <div className={cx("flex-1 ml-3 md:flex", {"md:justify-between": !centered, "md:justify-center": centered})}>
+        <div className={cx("flex-1 md:flex", {"md:justify-between": !centered, "md:justify-center": centered, "ml-3": icon})}>
           {children}
         </div>
       </div>

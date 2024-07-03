@@ -77,6 +77,8 @@ const Inventory = () => {
 
   const deleteMutation = useDeleteUserInventory();
 
+  useEffect(() => console.log("TEST", updatedLocationToSubmit), [updatedLocationToSubmit])
+
   const options = {
     includeScore: true,
     shouldSort: true,

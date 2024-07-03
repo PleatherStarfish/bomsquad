@@ -102,10 +102,12 @@ class UserInventoryView(APIView):
         if location_list is not None:
 
             existing_inventory_items = UserInventory.objects.filter(
-                user=user_inventory_item.user,
+                user=user,
                 component=user_inventory_item.component,
                 location__exact=location_list,
             ).exclude(pk=inventory_pk)
+
+            print(existing_inventory_items)
 
             if existing_inventory_items.exists():
                 return Response(

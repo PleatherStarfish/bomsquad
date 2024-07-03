@@ -85,6 +85,10 @@ const ShoppingList = () => {
     );
   }
 
+  const mouserItems = userShoppingListData.aggregatedComponents.filter(
+    (item) => item?.component.supplier.name === "Mouser Electronics"
+  );
+
   return (
     <>
       <Notification
@@ -200,21 +204,31 @@ const ShoppingList = () => {
         submitButtonText={"Copy"}
         type="info"
         onSubmit={copyMouserDataToClipboard}
+        onlyCancelButton={mouserItems.length === 0}
       >
         <div className="flex flex-col space-y-4">
           <span>
             <span>{"Copy Mouser products to clipboard and paste them into the "}</span>
             <a href="https://www.mouser.com/Bom/CopyPaste" className="text-blue-500">Mouser BOM tool</a>
           </span>
-          <div className="w-full p-4 rounded bg-stone-200">
-            <ul>
-              {userShoppingListData.aggregatedComponents.map((item) => {
-                if (item?.component.supplier.name === "Mouser Electronics") {
-                  return <li key={item?.component.supplier_item_no}>{`${item?.component.supplier_item_no}|${item?.quantity}\n`}</li>
-                }
-                return null; // return null for non Mouser items
-              })}
-            </ul>
+          <div>
+            {mouserItems.length > 0 ? (
+              <div className="w-full p-4 rounded bg-stone-200">
+                <ul>
+                  {mouserItems.map((item) => (
+                    <li key={item?.component.supplier_item_no}>
+                      {`${item?.component.supplier_item_no}|${item?.quantity}\n`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <Alert variant="muted" centered>
+                <span className="text-red-500">
+                  No items from Mouser Electronics in the cart.
+                </span>
+              </Alert>
+            )}
           </div>
           {/* Hidden textarea for copying */}
           <textarea

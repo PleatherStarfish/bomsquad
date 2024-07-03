@@ -287,7 +287,7 @@ const AddComponentModal = ({
                       />
                     </div>
                   )}
-                  {type === Types.INVENTORY && savedLocationsData && (
+                  {type === Types.INVENTORY && savedLocationsData.length > 0 && (
                     <div>
                       <Accordion title={`Your inventory locations for ${componentName}`}>
                         <div className="p-4 rounded-md bg-blue-50">
@@ -302,6 +302,7 @@ const AddComponentModal = ({
                               setlocationArray(row.locations);
                               setIsLocationEditable(false);
                             }}
+                            pointerEvents="pointer-events-none"
                           />
                         </div>
                       </Accordion>
