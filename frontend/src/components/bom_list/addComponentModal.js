@@ -1,11 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 
 import Accordion from "../../ui/Accordion";
 import Button from "../../ui/Button";
 import ForOurSubscribersModal from "../modals/ForOurSubscribersModal";
-import { Fragment } from "react";
 import LocationsTable from "./locationsTable";
 import NumericInput from "react-numeric-input";
 import SimpleEditableLocation from "../inventory/SimpleEditableLocation";
@@ -31,6 +30,7 @@ const AddComponentModal = ({
   quantityRequired,
   componentName,
 }) => {
+  const [error, setError] = useState();
   const [showForOurSubscribersModal, setShowForOurSubscribersModal] =
     useState(false);
   const [quantity, setQuantity] = useState();
@@ -41,7 +41,6 @@ const AddComponentModal = ({
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
 
   const addOrUpdateUserInventory = useAddOrUpdateUserInventory();
-
   const addOrUpdateUserShoppingList = useAddOrUpdateUserShoppingList();
   const addOrUpdateUserAnonymousShoppingList =
     useAddOrUpdateUserAnonymousShoppingList();
@@ -60,36 +59,60 @@ const AddComponentModal = ({
   const { data: locations } = useGetInventoryLocations(componentId);
   const locationsData = locations ?? [];
 
-  const is_premium = user?.is_premium;
+  // const is_premium = user?.is_premium;
 
-  const handleSubmitQuantity = async () => {
+  const handleSubmitQuantity = useCallback(async () => {
     try {
       if (type === Types.INVENTORY) {
-        addOrUpdateUserInventory({
+        await addOrUpdateUserInventory.mutateAsync({
           componentId,
           quantity,
-          location: locationArray.join(","),
+          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
           editMode,
+        }, {
+          onSuccess: () => {
+            setOpen(false);
+          },
+          onError: (error) => {
+            console.error("Failed to update quantity", error);
+            setError("Failed to update quantity: ", error)
+          }
         });
       } else if (type === Types.SHOPPING) {
-        addOrUpdateUserShoppingList({
+        await addOrUpdateUserShoppingList.mutateAsync({
           componentId,
           ...hookArgs,
           quantity,
           editMode,
+        }, {
+          onSuccess: () => {
+            setOpen(false);
+          },
+          onError: (error) => {
+            console.error("Failed to update quantity", error);
+            setError("Failed to update quantity: ", error)
+          }
         });
       } else if (type === Types.SHOPPING_ANON) {
-        addOrUpdateUserAnonymousShoppingList({
+        await addOrUpdateUserAnonymousShoppingList.mutateAsync({
           componentId,
           quantity,
           editMode,
+        }, {
+          onSuccess: () => {
+            setOpen(false);
+          },
+          onError: (error) => {
+            console.error("Failed to update quantity", error);
+            setError("Failed to update quantity: ", error)
+          }
         });
       }
     } catch (error) {
       console.error("Failed to update quantity", error);
+      setError("Failed to update quantity: ", error)
     }
-    setOpen(false);
-  };
+  });
 
   useEffect(() => {
     let newQuantity = parseInt(quantityRequired);
@@ -312,20 +335,18 @@ const AddComponentModal = ({
                     <Button
                       variant="primary"
                       onClick={() => {
-                        if (type === Types.INVENTORY) {
-                          handleSubmitQuantity();
-                        }
+                        handleSubmitQuantity();
                         
-                        if (
-                          is_premium ||
-                          user?.unique_module_ids.length < 3 ||
-                          user?.unique_module_ids.includes(`${moduleId}`) ||
-                          moduleId === null
-                        ) {
-                          handleSubmitQuantity();
-                        } else {
-                          setShowForOurSubscribersModal(true);
-                        }
+                        // if (
+                        //   is_premium ||
+                        //   user?.unique_module_ids.length < 3 ||
+                        //   user?.unique_module_ids.includes(`${moduleId}`) ||
+                        //   moduleId === null
+                        // ) {
+                        //   handleSubmitQuantity();
+                        // } else {
+                        //   setShowForOurSubscribersModal(true);
+                        // }
                       }}
                     >
                       {editMode ? "Update" : "Add"}
@@ -334,6 +355,7 @@ const AddComponentModal = ({
                       Cancel
                     </Button>
                   </div>
+                  <div className="bg-red-500">{error}</div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

@@ -8,15 +8,14 @@ const useAddOrUpdateUserInventory = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const { mutate: addOrUpdateUserInventory } = useMutation({
+  const mutation = useMutation({
     mutationFn: ({ componentId, ...data }) => {
-      const componentIdCleaned = removeAfterUnderscore(componentId)
-      
+      const componentIdCleaned = removeAfterUnderscore(componentId);
       return axios.post(`/api/inventory/${componentIdCleaned}/create-or-update/`, data, {
         headers: {
-          "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
+          "X-CSRFToken": csrftoken,
         },
-        withCredentials: true, // enable sending cookies with CORS requests
+        withCredentials: true,
       });
     },
     onSuccess: () => {
@@ -24,7 +23,8 @@ const useAddOrUpdateUserInventory = () => {
       queryClient.invalidateQueries(["authenticatedUserHistory"]);
     },
   });
-  return addOrUpdateUserInventory;
+
+  return mutation;
 };
 
 export default useAddOrUpdateUserInventory;

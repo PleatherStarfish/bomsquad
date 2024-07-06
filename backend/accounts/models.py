@@ -87,23 +87,25 @@ class CustomUser(AbstractUser):
     @property
     def is_premium(self):
         """
-        Checks if the user is currently premium.
+        Checks if the user is currently premium. Set to true for all users currently.
         """
-        if self.premium_admin_override:
-            return True
+        return True
 
-        now = timezone.now().date()
+        # if self.premium_admin_override:
+        #     return True
 
-        if self.premium_until and self.premium_until >= now:
-            return True
+        # now = timezone.now().date()
 
-        if self.premium_until_via_kofi and self.premium_until_via_kofi >= now:
-            return True
+        # if self.premium_until and self.premium_until >= now:
+        #     return True
 
-        if self.premium_until_via_patreon and self.premium_until_via_patreon >= now:
-            return True
+        # if self.premium_until_via_kofi and self.premium_until_via_kofi >= now:
+        #     return True
 
-        return False
+        # if self.premium_until_via_patreon and self.premium_until_via_patreon >= now:
+        #     return True
+
+        # return False
 
     @property
     def end_of_premium_display_date(self):

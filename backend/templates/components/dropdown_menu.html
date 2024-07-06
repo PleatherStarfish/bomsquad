@@ -1,12 +1,14 @@
 {% load static %}
 
 <div class="flex items-center space-x-2">
-  <div class="border-r border-gray-100">
-    <a
-      href="{% url 'premium' %}"
-      class="text-white hover:text-gray-100 px-4 inline-flex items-center border rounded border-[#212529] transition-all duration-200"
-      >Support</a
-    >
+  <div class="pr-4 border-r border-gray-100">
+    <a href="https://ko-fi.com/bomsquad">
+      <img
+        width="150px"
+        src="{% static 'images/kofi_button_blue.png' %}"
+        alt="Support on Ko-fi"
+      />
+    </a>
   </div>
   <button
     class="block ml-4 text-white menu-button text-decoration-none focus:outline-none"

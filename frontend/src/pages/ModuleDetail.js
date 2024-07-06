@@ -27,7 +27,7 @@ const ModuleDetail = () => {
         <div>
           <div className="mt-12">
             <div>
-              <h1 className="py-4 text-3xl font-semibold">{module.name}</h1>
+              <h1 className="py-8 text-3xl font-semibold">{module.name}</h1>
               {module.manufacturer.link ? <a href={module.manufacturer.link}>
                 {module.manufacturer.name}
               </a> : <p>{module.manufacturer.name}</p>}
@@ -42,7 +42,7 @@ const ModuleDetail = () => {
           </div>
         </div>
       </div>
-      <h1  className="py-8 text-3xl font-semibold">Components</h1>
+      <h1  className="py-8 text-xl font-semibold">Components</h1>
       <BomList moduleId={module?.id} moduleName={module?.name} />
     </>
   );

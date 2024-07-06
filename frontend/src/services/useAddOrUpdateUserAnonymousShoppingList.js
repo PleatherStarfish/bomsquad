@@ -8,14 +8,13 @@ const useAddOrUpdateUserAnonymousShoppingList = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const {mutate: addOrUpdateUserAnonymousShoppingList} = useMutation({
-
+  const mutation = useMutation({
     mutationFn: ({ componentId, quantity, editMode }) => {
-      const componentIdCleaned = removeAfterUnderscore(componentId)
+      const componentIdCleaned = removeAfterUnderscore(componentId);
       
       return axios.post(
         `/api/shopping-list/${componentIdCleaned}/anonymous-create-or-update/`,
-        {quantity, editMode},
+        { quantity, editMode },
         {
           headers: {
             "X-CSRFToken": csrftoken, // Include the csrftoken as a header in the request
@@ -28,7 +27,8 @@ const useAddOrUpdateUserAnonymousShoppingList = () => {
       queryClient.invalidateQueries(["shoppingList"]);
     },
   });
-  return addOrUpdateUserAnonymousShoppingList;
+
+  return mutation;
 };
 
 export default useAddOrUpdateUserAnonymousShoppingList;

@@ -8,7 +8,7 @@ const useAddOrUpdateUserShoppingList = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const { mutate: addOrUpdateUserShoppingList } = useMutation({
+  const mutation = useMutation({
     mutationFn: ({ componentId, ...data }) => {
       const cleanedModuleBomListItemPk = removeAfterUnderscore(data.modulebomlistitem_pk);
       const componentIdCleaned = removeAfterUnderscore(componentId);
@@ -29,7 +29,7 @@ const useAddOrUpdateUserShoppingList = () => {
     },
   });
 
-  return addOrUpdateUserShoppingList;
+  return mutation;
 };
 
 export default useAddOrUpdateUserShoppingList;

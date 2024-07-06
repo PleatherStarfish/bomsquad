@@ -347,14 +347,7 @@ const ListSlice = ({
         );
       },
       sortable: false,
-      width:
-        onlyWidth > 1000 && allModulesData.length < 4
-          ? quantityIdToEdit
-            ? "200px"
-            : "200px"
-          : quantityIdToEdit
-          ? "200px"
-          : "100px",
+      width: quantityIdToEdit ? "200px" : "100px",
     },
   ];
 
@@ -372,7 +365,7 @@ const ListSlice = ({
         );
       },
       sortable: false,
-      width: onlyWidth > 1000 && allModulesData.length < 4 ? "200px" : "100px",
+      width: "100px",
       style: { backgroundColor: "#f0f9ff" },
     },
   ];
@@ -391,7 +384,7 @@ const ListSlice = ({
         );
       },
       sortable: false,
-      width: onlyWidth > 1000 && allModulesData.length < 4 ? "200px" : "100px",
+      width: "100px",
       style: { backgroundColor: "#f0f9ff" },
     },
   ];

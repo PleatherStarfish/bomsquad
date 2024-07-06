@@ -5,15 +5,15 @@ import Alert from "../../ui/Alert";
 import BackButton from "../../ui/BackButton";
 import Button from "../../ui/Button";
 import { DateTime } from "luxon";
+import ForOurSubscribersModal from "../modals/ForOurSubscribersModal";
 import ListSlice from "../shopping_list/listSlice";
 import Modal from "../../ui/Modal";
+import goToSupport from "../../utils/goToSupport";
 import useAddArchivedListToShoppingList from '../../services/useAddArchivedListToShoppingList';
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useDeleteArchivedShoppingList from "../../services/useDeleteArchivedShoppingList";
 import useGetArchivedShoppingLists from "../../services/useGetUserArchivedShoppingLists";
 import { useNavigate } from 'react-router-dom';
-import ForOurSubscribersModal from "../modals/ForOurSubscribersModal";
-import goToSupport from "../../utils/goToSupport";
 
 const SavedLists = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -80,7 +80,7 @@ const SavedLists = () => {
         <h1 className="mt-5 mb-12 text-3xl font-bold text-gray-700">
           Saved Lists
         </h1>
-        {sortedArchivedShoppingLists.length && 
+        {!!sortedArchivedShoppingLists.length && 
           <div className="flex justify-end w-full">
             <Button variant="secondary" onClick={toggleSortOrder} className="flex items-center">
               {sortOrder === "desc" ? (

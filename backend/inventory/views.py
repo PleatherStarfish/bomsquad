@@ -36,6 +36,7 @@ class UserInventoryView(APIView):
         # Determine the editing mode from request
         edit_mode = request.data.get("editMode", True)
         location = request.data.get("location", "")
+
         location_list = location.split(",") if location else None
 
         # Filter the user inventory items by user, component_id, and location
@@ -64,6 +65,8 @@ class UserInventoryView(APIView):
 
         # If the user inventory item does not exist, create a new one
         quantity = int(request.data.get("quantity", 0))
+        print("quantity", quantity)
+
         component = Component.objects.get(id=component_pk)
 
         user_inventory = UserInventory.objects.create(
