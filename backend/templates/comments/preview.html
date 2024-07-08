@@ -1,0 +1,50 @@
+{% extends "django_comments_xtd/base.html" %}
+{% load comments_xtd %}
+
+{% block title %}Preview your comment{% endblock %}
+
+{% block content %}
+<div class="container px-4 mx-auto">
+  <div class="flex justify-center my-4">
+    <div class="w-full text-center">
+      <h3 class="text-xl font-semibold">
+        Preview of your comment for:<br/>
+        <a href="{{ form.target_object.get_absolute_url }}" class="text-blue-500 hover:underline">{{ form.target_object }}</a>
+      </h3>
+    </div>
+  </div>
+  <div class="flex justify-center">
+    <div class="w-2/3">
+      <hr class="my-4"/>
+      {% if not comment %}
+      <em class="text-gray-500">Empty comment</em>
+      {% else %}
+      <div class="flex space-x-4">
+        <div>
+          {{ form.cleaned_data.email|xtd_comment_gravatar }}
+        </div>
+        <div class="flex flex-col pb-3">
+          <span class="text-sm text-gray-500">
+            {% now "N j, Y, P" %}&nbsp;-&nbsp;
+            {% if form.cleaned_data.url %}
+            <a href="{{ form.cleaned_data.url }}" target="_new" class="text-blue-500 hover:underline">
+              {{ form.cleaned_data.name }}
+            </a>
+            {% else %}
+              {{ form.cleaned_data.name }}
+            {% endif %}
+          </span>
+          <div class="py-2">{{ comment }}</div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="mt-4 mb-5 bg-white rounded-lg shadow">
+        <div class="p-6">
+          <h4 class="pb-3 text-lg font-semibold text-center">Post your comment</h4>
+          {% include "comments/form.html" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

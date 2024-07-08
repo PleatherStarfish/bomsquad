@@ -1,0 +1,63 @@
+{% load comments %}
+{% load widget_tweaks %}
+
+{% if request.user.is_authenticated %}
+<form method="POST" action="{% comment_form_target %}" onsubmit="post.disabled = true; return true;" class="w-full max-w-3xl mx-auto">
+  {% csrf_token %}
+  <fieldset>
+    <input type="hidden" name="next" value="{{ request.path }}" />
+    <div class="hidden alert alert-danger" data-comment-element="errors"></div>
+    {% for field in form %}
+    {% if field.is_hidden %}<div>{{ field }}</div>{% endif %}
+    {% endfor %}
+    <div class="hidden">{{ form.honeypot }}</div>
+    <div class="my-3 {% if 'comment' in form.errors %}has-danger{% endif %}">
+      <div class="w-full">
+        {{ form.comment|add_class:"w-full p-3 border rounded-lg" }}
+      </div>
+    </div>
+
+    {% if not request.user.email %}
+    <div class="my-3 {% if 'email' in form.errors %}has-danger{% endif %}">
+      <div class="flex">
+        <label for="id_email" class="block w-1/4 text-sm font-medium text-right text-gray-700">{{ form.email.label }}</label>
+        <div class="w-3/4">
+          {{ form.email|add_class:"w-full p-3 border rounded-lg" }}
+          <span class="text-sm text-gray-500">{{ form.email.help_text }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if not request.user.is_authenticated %}
+    <div class="my-3 {% if 'url' in form.errors %}has-error{% endif %}">
+      <div class="flex">
+        <label for="id_url" class="block w-1/4 text-sm font-medium text-right text-gray-700">{{ form.url.label }}</label>
+        <div class="w-3/4">
+          {{ form.url|add_class:"w-full p-3 border rounded-lg" }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="my-4">
+      <div class="flex justify-left">
+        <div class="w-3/4">
+          <div class="form-check">
+            {{ form.followup }}
+            <label for="id_followup{% if cid %}_{{ cid }}{% endif %}" class="form-check-label">{{ form.followup.label }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="flex mt-2 mb-4 justify-left">
+    <div class="flex space-x-2">
+      <input type="submit" name="post" value="Post comment" class="px-4 py-2 text-white bg-blue-500 rounded cursor-pointer" />
+    </div>
+  </div>
+</form>
+{% else %}
+<p class="text-center">You must be logged in to post a comment.</p>
+{% endif %}

@@ -2,7 +2,6 @@ from pathlib import Path
 import socket
 import os
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +29,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django_comments_xtd",
+    "django_comments",
     "whitenoise.runserver_nostatic",
     "core.staticfiles_config.StaticFilesConfig",
     "django.contrib.sites",
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
     "components",
     "inventory",
     "shopping_list",
+    "widget_tweaks",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
@@ -191,6 +193,20 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # http://whitenoise.evans.io/en/stable/django.html#add-compression-and-caching-support
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+COMMENTS_APP = "django_comments_xtd"
+COMMENTS_XTD_CONFIRM_EMAIL = False
+COMMENTS_XTD_THREADED_EMAILS = False
+
+COMMENTS_XTD_MAX_THREAD_LEVEL = 1
+
+COMMENTS_XTD_APP_MODEL_OPTIONS = {
+    "default": {
+        "allow_flagging": False,
+        "allow_feedback": False,
+        "show_feedback": False,
+        "who_can_post": "users",
+    }
+}
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
@@ -274,20 +290,6 @@ ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
-
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN"),
-    integrations=[
-        DjangoIntegration(),
-    ],
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True,
-)
 
 TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",

@@ -12,6 +12,7 @@ from drf_yasg import openapi
 from modules import views as ModuleView
 from django.contrib.auth.views import LoginView
 from django.views import defaults
+from comments.views import edit_comment, delete_comment
 
 
 schema_view = get_schema_view(
@@ -45,6 +46,7 @@ frontend_redirect_urls = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
+    path(r"comments/", include("django_comments_xtd.urls")),
     path(
         "module/<slug:slug>/",
         TemplateView.as_view(template_name="frontend.html"),
@@ -114,6 +116,8 @@ urlpatterns = [
         name="add_to_wtb",
     ),
     path("", include("pages.urls")),
+    path("comments/edit/<int:comment_id>/", edit_comment, name="comments-edit"),
+    path("comments/delete/<int:comment_id>/", delete_comment, name="comments-delete"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

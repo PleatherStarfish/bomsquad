@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from core.models import BaseModel
+from django.urls import reverse
 import uuid
 
 OHMS_UNITS = (
@@ -118,6 +119,7 @@ class Component(BaseModel):
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     link = models.URLField(blank=False)
+    allow_comments = models.BooleanField("allow comments", default=True)
 
     class Meta:
         verbose_name_plural = "Components"
@@ -160,6 +162,14 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for resistors."
                 )
+
+    def get_absolute_url(self):
+        return reverse(
+            "component-detail",
+            kwargs={
+                "pk": self.pk,
+            },
+        )
 
     @classmethod
     def get_mounting_styles(cls):

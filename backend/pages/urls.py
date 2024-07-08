@@ -1,8 +1,12 @@
 from django.urls import path
 from modules.views import module_list
-from .views import AboutPageView, DisclaimerPageView, PremiumPageView
+from .views import (
+    AboutPageView,
+    DisclaimerPageView,
+    PremiumPageView,
+    ComponentDetailView,
+)
 from django.views.generic import TemplateView
-from contact import views
 
 urlpatterns = [
     path("", module_list, name="home"),
@@ -13,5 +17,8 @@ urlpatterns = [
         "thanks_for_subscribing/",
         TemplateView.as_view(template_name="pages/thanks_for_subscribing.html"),
         name="thanks_for_subscribing",
+    ),
+    path(
+        "components/<uuid:pk>/", ComponentDetailView.as_view(), name="component-detail"
     ),
 ]

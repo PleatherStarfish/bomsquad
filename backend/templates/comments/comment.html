@@ -1,0 +1,28 @@
+{% load comments %}
+{% load comments_xtd %}
+
+<div id="c{{ comment.id }}" class="flex"><a id="c{{ comment.id }}"></a>
+  <img src="{{ comment.user_email|xtd_comment_gravatar_url }}"
+       alt="{{ comment.user_email }}"
+       height="48" width="48" class="mr-3 rounded-full" />
+  <div class="flex-grow">
+    <div class="pb-3">
+      <h6 class="flex mb-1 text-sm">
+        <span class="flex-grow">Posted to&nbsp;<a href="{{ comment.content_object.get_absolute_url }}" class="text-blue-500 hover:underline">{{ comment.content_object }}</a>&nbsp;-&nbsp;{{ comment.submit_date|timesince }}&nbsp;-&nbsp;{% if comment.url and not comment.is_removed %}<a href="{{ comment.url }}" target="_new" class="text-blue-500 hover:underline">{% endif %}{{ comment.name }}{% if comment.url %}</a>{% endif %}&nbsp;&nbsp;<a class="text-blue-500 permalink hover:underline" title="comment permalink" href="{% get_comment_permalink comment %}">¶</a></span>
+        <span class="flex items-center space-x-2">
+          {% if comment.user == request.user %}
+          <a href="{% url 'comments-edit' comment.id %}" class="text-sm text-blue-500 hover:underline">Edit</a>
+          <a href="{% url 'comments-delete' comment.id %}" class="text-sm text-red-500 hover:underline">Delete</a>
+          {% endif %}
+        </span>
+      </h6>
+      <div class="content">
+        {% if comment.is_removed %}
+        <p class="text-gray-500">This comment has been removed.</p>
+        {% else %}
+        {% include "includes/django_comments_xtd/comment_content.html" with content=comment.comment %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

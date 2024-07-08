@@ -1,0 +1,41 @@
+{% load comments %}
+{% load comments_xtd %}
+
+<div id="comments" class="space-y-4">
+  {% for comment in comment_list %}
+  <div id="c{{ comment.id }}" class="flex p-4 py-2 space-x-4 bg-white rounded-lg shadow-sm comment">
+    <img src="{{ comment.user_email|xtd_comment_gravatar_url }}"
+         class="w-12 h-12 rounded-full" alt="{{ comment.user_email }}" />
+    <div class="flex flex-col flex-grow">
+      <h6 class="flex items-center justify-between mb-2 text-sm comment-header">
+        <div class="flex-grow">
+          <span>{{ comment.submit_date }}&nbsp;-&nbsp;{% if comment.url and not comment.is_removed %}<a href="{{ comment.url }}" target="_new" class="text-blue-500 hover:underline">{% endif %}{{ comment.name }}{% if comment.url %}</a>{% endif %}</span>
+          <span>
+            {% if comment.user and comment.user|has_permission:"django_comments.can_moderate" %}
+              &nbsp;<span class="text-gray-500">(moderator)</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="flex items-center space-x-2">
+          {% if comment.user == request.user %}
+          <a href="{% url 'comments-edit' comment.id %}" class="text-sm text-blue-500 hover:underline">Edit</a>
+          <a href="{% url 'comments-delete' comment.id %}" class="text-sm text-red-500 hover:underline">Delete</a>
+          {% endif %}
+          {% if not comment.is_removed and perms.comments.can_moderate %}
+          <a class="text-gray-500 hover:text-red-500" href="{% url 'comments-delete' comment.id %}"><i class="bi bi-trash" title="remove comment"></i></a>
+          {% endif %}
+        </div>
+      </h6>
+      {% if comment.is_removed %}
+      <p class="pb-3 text-gray-500">
+        <em>This comment has been removed.</em>
+      </p>
+      {% else %}
+      <div class="pt-1 pb-3 content">
+        {% include "includes/django_comments_xtd/comment_content.html" with content=comment.comment %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>

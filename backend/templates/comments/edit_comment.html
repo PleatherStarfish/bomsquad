@@ -1,0 +1,24 @@
+{% extends "_base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container py-12 mx-auto">
+  <div class="max-w-md p-6 mx-auto">
+    <h2 class="mb-4 text-xl font-semibold">Edit Comment</h2>
+    <form method="POST" action="{% url 'comments-edit' comment_id=comment.id %}">
+      {% csrf_token %}
+      <div class="mb-4">
+        {{ form.comment.label_tag }}<br>
+        {{ form.comment|add_class:"w-full p-3 border rounded-lg h-32" }}  <!-- Adjust the height as needed -->
+        {% if form.comment.errors %}
+          <div class="text-red-500">{{ form.comment.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="flex justify-between mt-6">
+        <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded">Save changes</button>
+        <a href="{{ comment.content_object.get_absolute_url }}" class="px-4 py-2 text-white bg-gray-500 rounded">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

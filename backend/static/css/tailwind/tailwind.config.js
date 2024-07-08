@@ -16,6 +16,8 @@ module.exports = {
     "../../../../frontend/**/**/**/**/**/*.{html,js}",
     "../../../../backend/**/**/**/**/**/*.{html,js}",
     "../../../../backend/templates/_base.html",
+    "../../../../frontend/**/**/**/**/**/**/*.{html,js}",
+    "../../../../backend/**/**/**/**/**/**/*.{html,js}",
   ],
   darkMode: 'class',
   theme: {

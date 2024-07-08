@@ -33,6 +33,11 @@ export const customStyles = {
   },
 };
 
+const getBaseUrl = () => {
+  const { protocol, hostname, port } = window.location;
+  return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+};
+
 const NestedTable = (props) => {
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
@@ -60,7 +65,7 @@ const NestedTable = (props) => {
   const columns = [
     {
       name: <div>Name</div>,
-      selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : row.description,
+      selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : <a href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
       sortable: true,
       grow: 1,
       wrap: true,
