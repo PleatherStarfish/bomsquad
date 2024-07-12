@@ -1,6 +1,5 @@
 from djmoney.models.fields import MoneyField
 from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from core.models import BaseModel

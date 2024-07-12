@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import redirect
 from django.views.generic import RedirectView, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path
@@ -10,9 +9,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from modules import views as ModuleView
-from django.contrib.auth.views import LoginView
-from django.views import defaults
 from comments.views import edit_comment, delete_comment
+from pages.views import module_detail
 
 
 schema_view = get_schema_view(
@@ -49,7 +47,7 @@ frontend_redirect_urls = [
     path(r"comments/", include("django_comments_xtd.urls")),
     path(
         "module/<slug:slug>/",
-        TemplateView.as_view(template_name="frontend.html"),
+        module_detail,
         name="module",
     ),
     path(

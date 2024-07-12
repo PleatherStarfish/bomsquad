@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "inventory",
     "shopping_list",
     "widget_tweaks",
+    "comments",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware

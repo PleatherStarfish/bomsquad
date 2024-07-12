@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Avg, DecimalField
+from django.db.models.functions import Cast
+
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
     BuiltModules,
@@ -9,18 +11,22 @@ from modules.models import (
     Module,
     WantToBuildModules,
     ModuleBomListItem,
+    ModuleBomListComponentForItemRating,
 )
 from modules.serializers import (
     BuiltModuleSerializer,
     ModuleSerializer,
     WantTooBuildModuleSerializer,
     ModuleBomListItemSerializer,
+    ModuleBomListComponentForItemRatingSerializer,
 )
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .models import Component
 
 
 mounting_style_options = [
@@ -235,3 +241,47 @@ def get_module_bom_list_items(request, module_pk):
 
     # Return the serialized data as a response
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def rate_component(request):
+    serializer = ModuleBomListComponentForItemRatingSerializer(data=request.data)
+    if serializer.is_valid():
+        rating_instance, created = (
+            ModuleBomListComponentForItemRating.objects.update_or_create(
+                user=request.user,
+                module_bom_list_item_id=request.data["module_bom_list_item"],
+                component_id=request.data["component"],
+                defaults={"rating": request.data["rating"]},
+            )
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+def get_average_rating(request, module_bom_list_item_id, component_id):
+    try:
+        ratings = ModuleBomListComponentForItemRating.objects.filter(
+            module_bom_list_item_id=module_bom_list_item_id, component_id=component_id
+        )
+        if ratings.exists():
+            total_rating = sum(rating.rating for rating in ratings)
+            count = ratings.count()
+            average_rating = total_rating / count if count > 0 else 0
+            average_rating = round(average_rating, 2)  # rounding to 2 decimal places
+            return Response(
+                {"average_rating": average_rating, "number_of_ratings": count},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"detail": "Not rated"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+    except Exception as e:
+        return Response(
+            {"detail": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

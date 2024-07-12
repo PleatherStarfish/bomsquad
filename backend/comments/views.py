@@ -1,8 +1,26 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponseForbidden
 from django_comments_xtd.models import XtdComment
+from .models import CustomXtdComment
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.core.paginator import Paginator
+
+
+def latest_comments(request):
+    comments = (
+        XtdComment.objects.all()
+        .select_related("customxtdcomment")
+        .order_by("-submit_date")
+    )
+    paginator = Paginator(comments, 10)  # 10 comments per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "pages/latest_comments.html", {"page_obj": page_obj})
+
+    return render(request, "pages/latest_comments.html", {"page_obj": page_obj})
 
 
 class CustomXtdCommentForm(forms.ModelForm):

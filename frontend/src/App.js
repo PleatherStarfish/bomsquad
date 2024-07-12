@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Route,
   Routes,
@@ -7,7 +8,6 @@ import Components from "./pages/Components";
 import Inventory from "./components/inventory/index";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
-import NotFound from "./components/error/NotFound";
 import React from "react";
 import SavedLists from "./components/saved_lists/index";
 import Settings from "./components/UserSettings";

@@ -9,7 +9,13 @@ from accounts.views import (
 )
 
 # User modules-related views
-from modules.views import UserModulesView, ModuleDetailView, get_module_bom_list_items
+from modules.views import (
+    UserModulesView,
+    ModuleDetailView,
+    get_module_bom_list_items,
+    rate_component,
+    get_average_rating,
+)
 
 # Module and components-related views
 from components.views import (
@@ -41,7 +47,6 @@ from shopping_list.views import (
     get_user_anonymous_shopping_list_quantity,
     get_all_unique_component_ids,
 )
-
 
 urlpatterns = [
     path("get-user-me/", get_user_me, name="user-me"),
@@ -174,5 +179,11 @@ urlpatterns = [
         "shopping-list/inventory/<uuid:component_pk>/add/",
         add_component_to_inventory,
         name="add_component_to_inventory",
+    ),
+    path("rate/", rate_component, name="rate-component"),
+    path(
+        "average-rating/<uuid:module_bom_list_item_id>/<uuid:component_id>/",
+        get_average_rating,
+        name="get-average-rating",
     ),
 ]

@@ -10,7 +10,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 import uuid
 from components.models import Types
-from django.core.cache import cache
+from django.urls import reverse
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 MOUNTING_STYLE = [
@@ -103,12 +104,21 @@ class Module(BaseModel):
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     discontinued = models.BooleanField(default=False)
     slug = models.SlugField(blank=True)
+    allow_comments = models.BooleanField("allow comments", default=True)
 
     def is_built_by_user(self, user):
         return self.builtmodules_set.filter(user=user).exists()
 
     def is_wtb_by_user(self, user):
         return self.wanttobuildmodules_set.filter(user=user).exists()
+
+    def get_absolute_url(self):
+        return reverse(
+            "module",
+            kwargs={
+                "slug": self.slug,
+            },
+        )
 
     class Meta:
         verbose_name_plural = "Modules"
@@ -193,7 +203,9 @@ class ModuleBomListComponentForItemRating(BaseModel):
     user = models.ForeignKey(
         CustomUser, blank=False, null=False, on_delete=models.CASCADE
     )
-    rating = models.IntegerField(default=0)
+    rating = models.PositiveSmallIntegerField(
+        default=0, validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
 
     class Meta:
         indexes = [

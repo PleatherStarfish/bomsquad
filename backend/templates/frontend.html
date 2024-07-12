@@ -1,11 +1,48 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load comments %}
+{% load comments_xtd %}
 
 {% block content %}
 <div id="root"></div>
+
+{% if request.resolver_match.url_name == 'module' %}
+
+<!-- Comments Section -->
+<div class="container py-12 mx-auto transition-opacity duration-500 opacity-0" id="comments-section">
+  <div id="comments">
+    {% get_comment_count for module as comment_count %}
+    {% if comment_count %}
+      <h5 class="text-center">There are {{ comment_count }} comments below.</h5>
+    {% endif %}
+
+    {% if module.allow_comments %}
+    <div class="p-6 mb-5 card card-block">
+      <div class="card-body">
+        <h2 class="pt-6 pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
+        {% render_comment_form for module %}
+      </div>
+    </div>
+    {% else %}
+    <h2 class="mt-4 mb-5 text-center text-secondary">Comments are disabled on this page.</h2>
+    {% endif %}
+
+    {% if comment_count %}
+    {% render_comment_list for module %}
+    {% endif %}
+  </div>
+</div>
+{% endif %}
 {% endblock content %}
 
 {% block javascript %}
 <script src="{% static 'js/main.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      const commentsSection = document.getElementById('comments-section');
+      commentsSection.classList.remove('opacity-0');
+    }, 1500);
+  });
+</script>
 {% endblock javascript %}
-

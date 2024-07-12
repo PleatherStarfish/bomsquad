@@ -1,0 +1,62 @@
+{% extends '_base.html' %}
+
+{% load comments %}
+{% load comments_xtd %}
+
+{% block title %}
+  Community Notes
+{% endblock title %}
+
+{% block content %}
+<div id="comments">
+    {% for comment in page_obj %}
+        <div class="p-4 mb-4 bg-white rounded comment">
+            <p><strong>{{ comment.user_name }}</strong>: {{ comment.comment }}</p>
+            <a href="{{ comment.customxtdcomment.comment_url }}" class="text-blue-500 hover:text-blue-700">View Comment</a>
+        </div>
+    {% endfor %}
+</div>
+<div class="loading" style="display: none;">
+    <p>Loading...</p>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        var page = 1;
+        var loading = false;
+
+        $(window).on('scroll', function() {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !loading) {
+                loading = true;
+                page++;
+                loadMoreComments(page);
+            }
+        });
+
+        function loadMoreComments(page) {
+            $.ajax({
+                url: '?page=' + page,
+                type: 'get',
+                beforeSend: function() {
+                    $('.loading').show();
+                },
+                success: function(data) {
+                    if (data.trim().length === 0) {
+                        $('.loading').html("No more comments!");
+                        return;
+                    }
+                    $('.loading').hide();
+                    $('#comments').append(data);
+                    loading = false;
+                },
+                error: function(jqXHR, ajaxOptions, thrownError) {
+                    console.log('Server error occurred');
+                    loading = false;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

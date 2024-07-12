@@ -7,6 +7,7 @@ from modules.models import (
     ModuleBomListItem,
     Manufacturer,
     PcbVersion,
+    ModuleBomListComponentForItemRating,
 )
 
 
@@ -74,3 +75,10 @@ class ModuleBomListItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModuleBomListItem
         fields = "__all__"
+
+
+class ModuleBomListComponentForItemRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModuleBomListComponentForItemRating
+        fields = ["module_bom_list_item", "component", "rating"]
+        extra_kwargs = {"rating": {"min_value": 1, "max_value": 5}}

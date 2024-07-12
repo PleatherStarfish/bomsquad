@@ -4,9 +4,11 @@ from .views import (
     AboutPageView,
     DisclaimerPageView,
     PremiumPageView,
-    ComponentDetailView,
+    component_detail,
 )
 from django.views.generic import TemplateView
+from comments.views import latest_comments
+
 
 urlpatterns = [
     path("", module_list, name="home"),
@@ -18,7 +20,6 @@ urlpatterns = [
         TemplateView.as_view(template_name="pages/thanks_for_subscribing.html"),
         name="thanks_for_subscribing",
     ),
-    path(
-        "components/<uuid:pk>/", ComponentDetailView.as_view(), name="component-detail"
-    ),
+    path("components/<uuid:component_id>/", component_detail, name="component-detail"),
+    path("community/", latest_comments, name="fetch_comments"),
 ]

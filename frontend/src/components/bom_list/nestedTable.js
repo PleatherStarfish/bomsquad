@@ -1,7 +1,6 @@
 import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
 import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
-
 import AddComponentModal from "./addComponentModal";
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
@@ -10,6 +9,7 @@ import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
+import UserRating from "./UserRating";
 
 export const customStyles = {
   headCells: {
@@ -38,11 +38,21 @@ const getBaseUrl = () => {
   return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
 };
 
-const NestedTable = (props) => {
+const NestedTable = ({ data }) => {
+  const {
+    components_options,
+    type,
+    id: modulebomlistitem_pk,
+    moduleId: module_pk,
+    moduleName,
+    quantity,
+    description,
+  } = data;
+
   const [shoppingModalOpen, setShoppingModalOpen] = useState();
   const [inventoryModalOpen, setInventoryModalOpen] = useState();
 
-  if (props.data.components_options.length < 1) {
+  if (components_options.length < 1) {
     return (
       <div className="p-3 ml-[47px] bg-gray-100">
         No components found for this BOM item.
@@ -52,7 +62,7 @@ const NestedTable = (props) => {
 
   const { user } = useAuthenticatedUser();
   const { componentsData, componentsAreLoading, componentsAreError } =
-    useGetComponentsByIds(props.data.components_options);
+    useGetComponentsByIds(components_options);
 
   if (componentsAreError) {
     return (
@@ -65,7 +75,7 @@ const NestedTable = (props) => {
   const columns = [
     {
       name: <div>Name</div>,
-      selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : <a href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
+      selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
       sortable: true,
       grow: 1,
       wrap: true,
@@ -106,14 +116,14 @@ const NestedTable = (props) => {
       selector: (row) => row.farads,
       sortable: true,
       wrap: true,
-      omit: props.data.type !== "Capacitor",
+      omit: type !== "Capacitor",
     },
     {
       name: <div>Ohms</div>,
       selector: (row) => row.ohms,
       sortable: true,
       wrap: true,
-      omit: props.data.type !== "Resistor",
+      omit: type !== "Resistor",
     },
     {
       name: <div>Price</div>,
@@ -167,14 +177,30 @@ const NestedTable = (props) => {
           useHook={useGetUserShoppingListQuantity}
           hookArgs={{
             component_pk: row.id,
-            modulebomlistitem_pk: props.data.id,
-            module_pk: props.data.moduleId,
+            modulebomlistitem_pk,
+            module_pk,
           }}
         />
       ),
       sortable: false,
       omit: !user,
       width: "80px",
+    },
+    {
+      name: "",
+      cell: (row) => (
+        <UserRating 
+          moduleBomListItemId={modulebomlistitem_pk} 
+          componentId={row.id} 
+          initialRating={0}
+          moduleName={moduleName}
+          bomItemName={description}
+          tooltipText="Click to rate component. User ratings represent how well a component works for a specific BOM list item for a specific project. Rating are not a subjective measure of the quality of a component in abstract."
+          transition
+        />
+      ),
+      sortable: false,
+      width: "90px",
     },
     {
       name: "",
@@ -197,8 +223,8 @@ const NestedTable = (props) => {
               text={
                 <>
                   <span>
-                    {`${props.data.moduleName} requires ${props.data.quantity} x
-                  ${props.data.description}. How many `}
+                    {`${moduleName} requires ${quantity} x
+                  ${description}. How many `}
                   </span>
                   <span>
                     <a
@@ -207,7 +233,7 @@ const NestedTable = (props) => {
                     >
                       {`${
                         row.description
-                      } ${props.data.type.toLowerCase()}s by ${
+                      } ${type.toLowerCase()}s by ${
                         row.supplier?.name
                       } `}
                     </a>
@@ -218,9 +244,9 @@ const NestedTable = (props) => {
                   </span>
                 </>
               }
-              quantityRequired={props.data.quantity}
+              quantityRequired={quantity}
               componentId={row.id}
-              moduleId={props.data.moduleId}
+              moduleId={module_pk}
             />
           </>
         );
@@ -253,14 +279,14 @@ const NestedTable = (props) => {
               type={Types.SHOPPING}
               hookArgs={{
                 component_pk: row.id,
-                modulebomlistitem_pk: props.data.id,
-                module_pk: props.data.moduleId,
+                modulebomlistitem_pk,
+                module_pk,
               }}
               text={
                 <>
                   <span>
-                    {`${props.data.moduleName} requires ${props.data.quantity} x
-                    ${props.data.description}. How many `}
+                    {`${moduleName} requires ${quantity} x
+                    ${description}. How many `}
                   </span>
                   <span>
                     <a
@@ -269,7 +295,7 @@ const NestedTable = (props) => {
                     >
                       {`${
                         row.description
-                      } ${props.data.type.toLowerCase()}s by ${
+                      } ${type.toLowerCase()}s by ${
                         row.supplier?.name
                       } `}
                     </a>
@@ -280,9 +306,9 @@ const NestedTable = (props) => {
                   </span>
                 </>
               }
-              quantityRequired={props.data.quantity}
+              quantityRequired={quantity}
               componentId={row.id}
-              moduleId={props.data.moduleId}
+              moduleId={module_pk}
             />
           </>
         );

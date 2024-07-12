@@ -2,6 +2,7 @@ import BomList from "../components/bom_list";
 import ModuleLinks from '../components/ModuleLinks'
 import React from "react";
 import useModule from '../services/useModule'
+import AddModuleButtons from '../components/AddModuleButtons';
 import {
   useParams
 } from "react-router-dom";
@@ -32,8 +33,11 @@ const ModuleDetail = () => {
                 {module.manufacturer.name}
               </a> : <p>{module.manufacturer.name}</p>}
             </div>
-            <div className="mt-6">
+            <div className="flex justify-between mt-6">
               <ModuleLinks module={module} />
+              <div className="flex space-x-4">
+                <AddModuleButtons module={module} moduleId={module.id} queryName="builtModules" />
+              </div>
             </div>
           </div>
           <div>
