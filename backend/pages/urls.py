@@ -20,6 +20,10 @@ urlpatterns = [
         TemplateView.as_view(template_name="pages/thanks_for_subscribing.html"),
         name="thanks_for_subscribing",
     ),
-    path("components/<uuid:component_id>/", component_detail, name="component-detail"),
+    path(
+        "components/<uuid:component_id>/",
+        component_detail,
+        name="component-detail",
+    ),
     path("community/", latest_comments, name="fetch_comments"),
 ]

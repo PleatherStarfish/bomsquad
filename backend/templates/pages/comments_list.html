@@ -1,0 +1,27 @@
+{% for comment in page_obj %}
+    <div class="block p-4 mb-4 bg-white border border-gray-300 rounded-lg group hover:bg-gray-100">
+        <a href="{{ comment.customxtdcomment.comment_url }}" class="block no-underline">
+            <div class="mb-2 text-sm text-gray-500">
+                <span>
+                    {% if 'module' in comment.customxtdcomment.comment_url %}
+                        {{ comment.content_object.name }}
+                    {% elif 'component' in comment.customxtdcomment.comment_url %}
+                        {{ comment.content_object.description }}
+                    {% else %}
+                        {{ comment.content_object }}
+                    {% endif %}
+                </span>
+                | <span>{{ comment.user_name }}</span>
+                | <span>{{ comment.submit_date }}</span>
+            </div>
+            <p class="mb-2">{{ comment.comment }}</p>
+            <div class="text-right">
+                <i class="transition-opacity duration-300 opacity-0 bi bi-box-arrow-up-right group-hover:opacity-100"></i>
+            </div>
+        </a>
+    </div>
+{% endfor %}
+
+{% if end_of_comments %}
+    <div id="end-of-comments" style="display: none;"></div>
+{% endif %}

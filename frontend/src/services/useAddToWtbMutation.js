@@ -23,6 +23,7 @@ const useAddToWtbMutation = (moduleId) => {
       );
       return response.data;
     },
+    mutationKey: ["wtbModules"],
     onSuccess: () => {
       // Invalidate and refetch the wtbModules query after mutation
       queryClient.invalidateQueries(["wtbModules"]);

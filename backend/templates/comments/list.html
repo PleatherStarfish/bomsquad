@@ -18,8 +18,7 @@
         </div>
         <div class="flex items-center space-x-2">
           {% if comment.user == request.user %}
-          <a href="{% url 'comments-edit' comment.id %}" class="text-sm text-blue-500 hover:underline">Edit</a>
-          <a href="{% url 'comments-delete' comment.id %}" class="text-sm text-red-500 hover:underline">Delete</a>
+          <a href="{% url 'comments-edit' comment.id %}" class="text-sm text-gray-500 hover:text-blue-500">Edit</a>
           {% endif %}
           {% if not comment.is_removed and perms.comments.can_moderate %}
           <a class="text-gray-500 hover:text-red-500" href="{% url 'comments-delete' comment.id %}"><i class="bi bi-trash" title="remove comment"></i></a>

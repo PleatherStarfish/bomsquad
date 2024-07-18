@@ -19,6 +19,7 @@ const useAddToBuiltMutation = (moduleId) => {
       });
       return response.data;
     },
+    mutationKey: ["builtModules"],
     onSuccess: () => {
       // Invalidate and refetch the builtModules query after mutation
       queryClient.invalidateQueries(['builtModules']);

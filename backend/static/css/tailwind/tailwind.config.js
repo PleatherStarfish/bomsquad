@@ -2,6 +2,7 @@
 const colors = require("tailwindcss/colors");
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
+  relative: true,
   content: [
     "../../../../frontend/*.{html,js}",
     "../../../../backend/*.{html,js}",

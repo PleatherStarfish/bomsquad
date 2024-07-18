@@ -196,6 +196,7 @@ const NestedTable = ({ data }) => {
           moduleName={moduleName}
           bomItemName={description}
           tooltipText="Click to rate component. User ratings represent how well a component works for a specific BOM list item for a specific project. Rating are not a subjective measure of the quality of a component in abstract."
+          moduleId={module_pk}
           transition
         />
       ),

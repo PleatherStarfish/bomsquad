@@ -33,10 +33,13 @@ const ModuleDetail = () => {
                 {module.manufacturer.name}
               </a> : <p>{module.manufacturer.name}</p>}
             </div>
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between h-full mt-6">
               <ModuleLinks module={module} />
-              <div className="flex space-x-4">
-                <AddModuleButtons module={module} moduleId={module.id} queryName="builtModules" />
+              <div className="flex flex-col justify-center h-full">
+                <div className="flex space-x-4">
+                  <AddModuleButtons moduleId={module.id} queryName="builtModules" />
+                  <AddModuleButtons moduleId={module.id} queryName="wtbModules" />
+                </div>
               </div>
             </div>
           </div>

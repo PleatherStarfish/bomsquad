@@ -13,6 +13,11 @@ import useGetComponents from "../services/useGetComponents";
 import useGetUserAnonymousShoppingListQuantity from "../services/useGetUserAnonymousShoppingListQuantity";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
 
+const getBaseUrl = () => {
+  const { protocol, hostname, port } = window.location;
+  return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+};
+
 const customStyles = {
   headCells: {
     style: {
@@ -82,7 +87,7 @@ const Components = () => {
   const columns = [
     {
       name: "Name",
-      selector: (row) => row.description,
+      selector: (row) => <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
       sortable: true,
       wrap: true,
       grow: 1,

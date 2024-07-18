@@ -61,7 +61,7 @@ const Settings = () => {
                 ))}
               </dd>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 Supporter Status
               </dt>
@@ -73,7 +73,7 @@ const Settings = () => {
                 </a> : `Until ${user?.end_of_premium_display_date}`}
                 {user?.is_premium && <small className="block mt-2 text-xs text-gray-500">May renew if subscribed through crowdfunding platform</small>}
               </dd>
-            </div>
+            </div> */}
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 Default Currency

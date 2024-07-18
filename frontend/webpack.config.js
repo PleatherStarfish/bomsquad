@@ -8,6 +8,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "./build"), // container path
     filename: "main.js",
+    clean: true,
   },
   module: {
     rules: [

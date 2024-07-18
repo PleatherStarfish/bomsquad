@@ -166,7 +166,7 @@ class Component(BaseModel):
         return reverse(
             "component-detail",
             kwargs={
-                "pk": self.pk,
+                "component_id": self.pk,
             },
         )
 

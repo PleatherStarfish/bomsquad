@@ -53,7 +53,7 @@ const SavedLists = () => {
 
   if (archivedShoppingListsLoading || userIsLoading) {
     return (
-      <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48">
+      <div className="px-4 py-8 mt-16 mb-12 sm:mt-36 md:px-24 lg:px-48 animate-pulse">
         Loading...
       </div>
     );

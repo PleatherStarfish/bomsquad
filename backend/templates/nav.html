@@ -41,10 +41,10 @@
         <div class="hidden md:block">
           {% with request.path|slice:":5" as path %} 
           {% if path == '/user' %}
-          <ul class="flex space-x-4 text-white hover:text-gray-200 ml-[60px]">
+          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[60px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
-                >Home</a
+                ><i class="bi bi-house"></i></a
               >
             </li>
             <li>
@@ -52,13 +52,16 @@
             </li>
             <li>
               <a href="/components/" class="px-2 nav-link">Components</a>
+            </li>
+            <li>
+              <a href="/community/" class="px-2 nav-link">Community</a>
             </li>
           </ul>
           {% else %}
-          <ul class="flex space-x-4 text-white hover:text-gray-200 ml-[180px]">
+          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[200px]">
             <li>
               <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
-                >Home</a
+                ><i class="bi bi-house"></i></a
               >
             </li>
             <li>
@@ -66,6 +69,9 @@
             </li>
             <li>
               <a href="/components/" class="px-2 nav-link">Components</a>
+            </li>
+            <li>
+              <a href="/community/" class="px-2 nav-link">Community</a>
             </li>
           </ul>
           {% endif %} 

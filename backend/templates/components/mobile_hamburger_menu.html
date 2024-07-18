@@ -90,6 +90,13 @@
               >Components</a
             >
           </li>
+          <li>
+            <a
+              href="/community/"
+              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
+              >Community</a
+            >
+          </li>
           {% if user.is_authenticated %} 
               {% dropdown_items user 'suppress_change_password' as dropdown_items %}
               {% for item in dropdown_items %}

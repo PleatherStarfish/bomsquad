@@ -13,7 +13,7 @@ const ComponentIdItem = ({ componentId, locationArrays, setLocationArrays }) => 
   const { data: quantityInInventoryAnon, isLoading: isLoadingQuantity, isError: isErrorQuantity } = useGetUserAnonymousShoppingListQuantity(componentId);
 
   if (componentsAreLoading || isLoadingLocation || isLoadingQuantity) {
-    return <div className="text-center">Loading...</div>;
+    return <div className="text-center animate-pulse">Loading...</div>;
   }
 
   if (componentsAreError || isErrorLocation || isErrorQuantity || !componentsData?.length) {
@@ -46,7 +46,7 @@ const UniqueComponentIdsList = ({locationArrays, setLocationArrays}) => {
     useGetAllUniqueComponentIds();
 
   if (isLoading) {
-    return <div className="text-center">Loading...</div>;
+    return <div className="text-center animate-pulse">Loading...</div>;
   }
 
   if (isError) {

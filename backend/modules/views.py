@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Avg, DecimalField
 from django.db.models.functions import Cast
+from uuid import UUID
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -285,3 +286,14 @@ def get_average_rating(request, module_bom_list_item_id, component_id):
             {"detail": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_module_status(request, module_pk):
+    user = request.user
+    module = get_object_or_404(Module, pk=module_pk)
+    is_built = BuiltModules.objects.filter(user=user, module=module).exists()
+    is_wtb = WantToBuildModules.objects.filter(user=user, module=module).exists()
+
+    return Response({"is_built": is_built, "is_wtb": is_wtb}, status=status.HTTP_200_OK)

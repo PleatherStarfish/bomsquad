@@ -1,9 +1,9 @@
 import {
   FolderIcon,
-  HomeIcon,
-  ListBulletIcon,
   WrenchIcon,
+  BuildingOffice2Icon
 } from "@heroicons/react/24/outline";
+import { Cart } from "react-bootstrap-icons";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
@@ -12,7 +12,7 @@ import cx from "classnames";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 
 const initialNavigation = [
-  { name: "Built", to: "built", icon: HomeIcon, current: true },
+  { name: "Built", to: "built", icon: BuildingOffice2Icon, current: true },
   {
     name: "Want to Build",
     to: "want-to-build",
@@ -23,7 +23,7 @@ const initialNavigation = [
   {
     name: "Shopping List",
     to: "shopping-list",
-    icon: ListBulletIcon,
+    icon: Cart,
     current: false,
   },
 ];

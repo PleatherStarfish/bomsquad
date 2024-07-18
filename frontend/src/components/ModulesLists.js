@@ -36,7 +36,7 @@ const ModulesList = ({ type }) => {
               <p className="text-base text-center text-gray-400">
                 {result.module.manufacturer.name}
               </p>
-              <AddModuleButtons module={result} moduleId={result.module.id} type={type} />
+              <AddModuleButtons moduleId={result.module.id} type={type} />
             </div>
           </li>
         );

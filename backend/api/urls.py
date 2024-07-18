@@ -15,6 +15,7 @@ from modules.views import (
     get_module_bom_list_items,
     rate_component,
     get_average_rating,
+    get_module_status,
 )
 
 # Module and components-related views
@@ -54,6 +55,9 @@ urlpatterns = [
     path("delete-user-me/", delete_user, name="delete-user"),
     path("kofi/", kofi_payment_webhook, name="kofi_webhook"),
     path("modules/<str:type>/", UserModulesView.as_view(), name="user-modules"),
+    path(
+        "module-status/<uuid:module_pk>/", get_module_status, name="get_module_status"
+    ),
     path("inventory/", UserInventoryView.as_view(), name="user-inventory"),
     path(
         "inventory/bom-list-item/<int:modulebomlistitem_pk>/aggregate-sum/",
