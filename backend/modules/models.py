@@ -1,7 +1,6 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from components.models import Component
-from accounts.models import CustomUser
 from django.db import models
 from PIL import Image
 from core.models import BaseModel
@@ -201,7 +200,7 @@ class ModuleBomListComponentForItemRating(BaseModel):
         Component, blank=False, null=False, on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        CustomUser, blank=False, null=False, on_delete=models.CASCADE
+        "accounts.CustomUser", blank=False, null=False, on_delete=models.CASCADE
     )
     rating = models.PositiveSmallIntegerField(
         default=0, validators=[MinValueValidator(1), MaxValueValidator(5)]

@@ -1,12 +1,26 @@
 from django.db import models
-from tinymce.models import HTMLField
+from django_editorjs_fields import EditorJsJSONField
 
 
-# Create your models here.
-class Page(models.Model):
-    # id = models.BigAutoField(primary_key=True)
-    title = models.CharField(max_length=100)
-    content = HTMLField()
+class StaticPage(models.Model):
+    title = models.CharField(max_length=255)
+    content = EditorJsJSONField(
+        plugins=[
+            "@editorjs/image",
+            "@editorjs/header",
+            "editorjs-github-gist-plugin",
+            "@editorjs/code@2.6.0",
+            "@editorjs/list@latest",
+            "@editorjs/inline-code",
+            "@editorjs/table",
+        ],
+        tools={
+            "Gist": {"class": "Gist"},
+            "Image": {"config": {"endpoints": {"byFile": "/editorjs/image_upload/"}}},
+        },
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.title

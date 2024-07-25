@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.models import BaseModel
-from django.utils import timezone
+from modules.models import WantToBuildModules, BuiltModules
+from django.core.exceptions import ValidationError
+
 
 import uuid
 
@@ -112,24 +114,65 @@ class CustomUser(AbstractUser):
         """
         Returns the date when the user's premium expires in a human-readable format.
         """
-        date = None
-        if self.premium_until:
-            date = self.premium_until
-        elif self.premium_until_via_kofi:
-            date = self.premium_until_via_kofi
-        elif self.premium_until_via_patreon:
-            date = self.premium_until_via_patreon
+        # date = None
+        # if self.premium_until:
+        #     date = self.premium_until
+        # elif self.premium_until_via_kofi:
+        #     date = self.premium_until_via_kofi
+        # elif self.premium_until_via_patreon:
+        #     date = self.premium_until_via_patreon
 
-        if date:
-            return date.strftime("%B %d, %Y")
-        else:
-            return None
+        # if date:
+        #     return date.strftime("%B %d, %Y")
+        # else:
+        return None
 
 
 class UserNotes(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     note = models.TextField()
+    want_to_build_module = models.ForeignKey(
+        WantToBuildModules,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="notes",
+    )
+    built_module = models.ForeignKey(
+        BuiltModules,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="notes",
+    )
 
     def __str__(self):
-        return self.user.email
+        if self.want_to_build_module:
+            return f"Note by {self.want_to_build_module.user.email}"
+        elif self.built_module:
+            return f"Note by {self.built_module.user.email}"
+        return "Note with no associated module"
+
+    def clean(self):
+        if self.want_to_build_module and self.built_module:
+            raise ValidationError(
+                "Note can be related to either WantToBuildModule or BuiltModule, not both."
+            )
+        if not self.want_to_build_module and not self.built_module:
+            raise ValidationError(
+                "Note must be related to either WantToBuildModule or BuiltModule."
+            )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["want_to_build_module"], name="unique_want_to_build_module"
+            ),
+            models.UniqueConstraint(
+                fields=["built_module"], name="unique_built_module"
+            ),
+        ]

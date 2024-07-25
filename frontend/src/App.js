@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   Route,
   Routes,
@@ -14,6 +13,7 @@ import Settings from "./components/UserSettings";
 import ShoppingList from "./components/shopping_list/index";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
+import { useEffect } from 'react';
 
 const App = () => {
 
@@ -57,7 +57,7 @@ const App = () => {
             <Route
               path={`want-to-build`}
               element={
-                <ModulesList type="wtb" />
+                <ModulesList type="want-to-build" />
               }
             />
             <Route path={`inventory`} element={<Inventory />} />

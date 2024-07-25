@@ -23,10 +23,10 @@ const useAddToWtbMutation = (moduleId) => {
       );
       return response.data;
     },
-    mutationKey: ["wtbModules"],
+    mutationKey: ["want-to-build"],
     onSuccess: () => {
-      // Invalidate and refetch the wtbModules query after mutation
-      queryClient.invalidateQueries(["wtbModules"]);
+      // Invalidate and refetch the want-to-build query after mutation
+      queryClient.invalidateQueries(["want-to-build"]);
     },
     onError: (error) => {
       // Optionally handle error, such as logging or user notifications

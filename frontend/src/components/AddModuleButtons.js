@@ -1,14 +1,14 @@
 import React from 'react';
+import cx from "classnames";
 import useAddToBuiltMutation from '../services/useAddToBuiltMutation';
 import useAddToWtbMutation from '../services/useAddToWtbMutation';
 import useModuleStatus from '../services/useModuleStatus';
-import cx from "classnames";
 
 const AddModuleButtons = ({ moduleId, queryName }) => {
   const { data: moduleStatus, isLoading: moduleStatusIsLoading, refetch: refetchModuleStatus } = useModuleStatus(moduleId);
 
-  const hideBuilt = queryName === 'builtModules';
-  const hideWtb = queryName === 'wtbModules';
+  const hideBuilt = queryName === 'built';
+  const hideWtb = queryName === 'want-to-build';
 
   const addToBuilt = useAddToBuiltMutation(moduleId, {
     onSuccess: () => {

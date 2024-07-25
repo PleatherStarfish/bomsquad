@@ -2,6 +2,7 @@ from django.urls import path
 
 # User-related views
 from accounts.views import (
+    UserNotesView,
     delete_user,
     get_user_me,
     get_user_history,
@@ -190,4 +191,15 @@ urlpatterns = [
         get_average_rating,
         name="get-average-rating",
     ),
+    path(
+        "user-notes/<str:module_type>/<uuid:module_id>/",
+        UserNotesView.as_view(),
+        name="user-notes-list",
+    ),
+    path(
+        "user-notes/<str:module_type>/",
+        UserNotesView.as_view(),
+        name="user-notes-create",
+    ),
+    path("user-notes/<uuid:pk>/", UserNotesView.as_view(), name="user-notes-detail"),
 ]

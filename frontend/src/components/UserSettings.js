@@ -5,6 +5,7 @@ import DeleteAccountButton from "./DeleteAccountButton";
 import Dropdown from "../ui/Dropdown";
 import React from "react";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
+import { DateTime } from 'luxon';
 
 const Settings = () => {
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
@@ -20,6 +21,8 @@ const Settings = () => {
   if (userIsLoading) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   }
+
+  const formattedDateJoined = DateTime.fromISO(user.date_joined).toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' });
 
   return (
     <div className="px-4 py-8 mb-12 mt-36 md:px-24 lg:px-48">
@@ -61,19 +64,14 @@ const Settings = () => {
                 ))}
               </dd>
             </div>
-            {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                Supporter Status
+                Date Joined
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {!user?.is_premium ? <a href="https://ko-fi.com/bomsquad">
-                  <Button Image="/static/images/ko-fi-logo.png" variant="primary" size="md" classNames="!bg-[#13C3FF]">
-                    Get BOM Squad Supporter Status on Ko-fi
-                  </Button>
-                </a> : `Until ${user?.end_of_premium_display_date}`}
-                {user?.is_premium && <small className="block mt-2 text-xs text-gray-500">May renew if subscribed through crowdfunding platform</small>}
+                {formattedDateJoined}
               </dd>
-            </div> */}
+            </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 Default Currency

@@ -3,12 +3,12 @@ types-bleach==6.0.0.3
 crispy-tailwind==0.5
 drf-yasg==1.21.5
 djlint==1.25.0
+django-editorjs-fields==0.2.7
 django-comments-xtd==2.10.0
 django-money==3.0.0
 djangorestframework==3.14.0
 django-cors-headers==3.14.0
 django-import-export==3.1.0
-django-tinymce==3.6.1
 django-sendgrid-v5==0.6.8
 Pillow==9.4.0
 Django==4.1.5

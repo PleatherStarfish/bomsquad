@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django_comments_xtd",
     "django_comments",
+    "django_editorjs_fields",
     "whitenoise.runserver_nostatic",
     "core.staticfiles_config.StaticFilesConfig",
     "django.contrib.sites",
@@ -45,7 +46,6 @@ INSTALLED_APPS = [
     "crispy_tailwind",
     "rest_framework",
     "drf_yasg",  # Swagger
-    "tinymce",
     "corsheaders",
     "djmoney",
     "import_export",

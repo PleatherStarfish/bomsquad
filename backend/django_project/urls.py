@@ -116,6 +116,7 @@ urlpatterns = [
     path("", include("pages.urls")),
     path("comments/edit/<int:comment_id>/", edit_comment, name="comments-edit"),
     path("comments/delete/<int:comment_id>/", delete_comment, name="comments-delete"),
+    path("editorjs/", include("django_editorjs_fields.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

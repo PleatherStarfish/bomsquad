@@ -1,10 +1,10 @@
 from django.urls import path
-from . import views
+from contact.views import contact, subscription
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path("", views.contact, name="contact"),
-    path("subscribe/", views.subscription, name="subscription"),
+    path("", contact, name="contact"),
+    path("subscribe/", subscription, name="subscription"),
     path(
         "success/",
         TemplateView.as_view(template_name="contact/success.html"),

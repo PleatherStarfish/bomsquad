@@ -148,7 +148,7 @@ class UserModulesView(APIView):
                 "module__name"
             )
             serializer_class = BuiltModuleSerializer
-        elif type == "wtb":
+        elif type == "want-to-build":
             modules = WantToBuildModules.objects.filter(user=request.user).order_by(
                 "module__name"
             )

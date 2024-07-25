@@ -1,8 +1,8 @@
+import AddModuleButtons from '../components/AddModuleButtons';
 import BomList from "../components/bom_list";
 import ModuleLinks from '../components/ModuleLinks'
 import React from "react";
 import useModule from '../services/useModule'
-import AddModuleButtons from '../components/AddModuleButtons';
 import {
   useParams
 } from "react-router-dom";
@@ -37,8 +37,8 @@ const ModuleDetail = () => {
               <ModuleLinks module={module} />
               <div className="flex flex-col justify-center h-full">
                 <div className="flex space-x-4">
-                  <AddModuleButtons moduleId={module.id} queryName="builtModules" />
-                  <AddModuleButtons moduleId={module.id} queryName="wtbModules" />
+                  <AddModuleButtons moduleId={module.id} queryName="built" />
+                  <AddModuleButtons moduleId={module.id} queryName="want-to-build" />
                 </div>
               </div>
             </div>

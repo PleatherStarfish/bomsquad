@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from .models import Page
+from .models import StaticPage
 from django.views.generic.detail import DetailView
 from components.models import Component
 from django.shortcuts import render, get_object_or_404
@@ -11,30 +11,21 @@ class HomePageView(TemplateView):
 
 
 class AboutPageView(DetailView):
-    model = Page
-    template_name = "pages/page.html"
+    model = StaticPage
+    template_name = "pages/page.html"  # Use the new template
     context_object_name = "page"
 
     def get_object(self):
-        return Page.objects.filter(title="About").first()
+        return StaticPage.objects.filter(title="About").first()
 
 
 class DisclaimerPageView(DetailView):
-    model = Page
+    model = StaticPage
     template_name = "pages/page.html"
     context_object_name = "page"
 
     def get_object(self):
-        return Page.objects.filter(title="Disclaimer").first()
-
-
-class PremiumPageView(DetailView):
-    model = Page
-    template_name = "pages/page.html"
-    context_object_name = "page"
-
-    def get_object(self):
-        return Page.objects.filter(title="Support").first()
+        return StaticPage.objects.filter(title="Disclaimer").first()
 
 
 def component_detail(request, component_id):

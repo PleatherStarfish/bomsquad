@@ -3,10 +3,9 @@ import axios from 'axios';
 import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 import { useQuery } from "@tanstack/react-query";
 
-const useModuleStatus = (moduleId) => {
+const useModuleStatus = (moduleId, isLoggedIn) => {
   const csrftoken = Cookies.get('csrftoken');
   const moduleIdCleaned = removeAfterUnderscore(moduleId);
-  console.log(moduleIdCleaned)
 
   const fetchModuleStatus = async () => {
     try {
@@ -24,7 +23,8 @@ const useModuleStatus = (moduleId) => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['moduleStatus', moduleIdCleaned],
-    queryFn: fetchModuleStatus
+    queryFn: fetchModuleStatus,
+    enabled: isLoggedIn
   });
 
   return { data, isLoading, isError, error };

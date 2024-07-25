@@ -8,6 +8,7 @@ import Tippy from "@tippyjs/react";
 import useGetAverageRating from '../../services/useGetAverageRating';
 import useRateComponent from '../../services/useRateComponent';
 import useModuleStatus from '../../services/useModuleStatus';
+import useAuthenticatedUser from '../../services/useAuthenticatedUser';
 
 const UserRating = ({ moduleBomListItemId, componentId, initialRating, moduleName, bomItemName, moduleId, isLoggedIn }) => {
   const [rating, setRating] = useState(initialRating);
@@ -16,7 +17,8 @@ const UserRating = ({ moduleBomListItemId, componentId, initialRating, moduleNam
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { rateComponentMutate, error: rateError } = useRateComponent();
   const { data, isLoading, isError, error: fetchError } = useGetAverageRating(moduleBomListItemId, componentId);
-  const { data: moduleStatus, isLoading: moduleStatusIsLoading, isError: moduleStatusIsError } = useModuleStatus(moduleId);
+  const { user } = useAuthenticatedUser();
+  const { data: moduleStatus, isLoading: moduleStatusIsLoading, isError: moduleStatusIsError } = useModuleStatus(moduleId, !!user);
 
   const handleSubmit = async () => {
     await rateComponentMutate({

@@ -1,10 +1,10 @@
 from django import forms
-from tinymce.widgets import TinyMCE
-from .models import Page
+from .models import StaticPage
+from django_editorjs_fields import EditorJsWidget
 
 
-class PageForm(forms.ModelForm):
+class StaticPageForm(forms.ModelForm):
     class Meta:
-        model = Page
+        model = StaticPage
         fields = ["title", "content"]
-        widgets = {"content": TinyMCE(attrs={"cols": 80, "rows": 30})}
+        widgets = {"content": EditorJsWidget(config={"minHeight": 300})}

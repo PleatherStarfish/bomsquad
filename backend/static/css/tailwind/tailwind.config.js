@@ -20,6 +20,11 @@ module.exports = {
     "../../../../frontend/**/**/**/**/**/**/*.{html,js}",
     "../../../../backend/**/**/**/**/**/**/*.{html,js}",
   ],
+  safelist: [
+    'list-disc',
+    'my-8',
+    'my-10',
+  ],
   darkMode: 'class',
   theme: {
     screens: {
