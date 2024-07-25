@@ -35,6 +35,7 @@ export const ButtonVariant = {
   light:
     "bg-white border-2 border-gray-400 text-gray-500 hover:border-gray-600 hover:text-gray-700",
   link: "text-gray-500 hover:text-red-500",
+  linkBlue: "text-blue-500 hover:text-blue-700"
 };
 
 const Button = ({

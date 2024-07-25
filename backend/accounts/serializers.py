@@ -66,4 +66,4 @@ class UserHistorySerializer(serializers.ModelSerializer):
 class UserNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserNotes
-        fields = ["note"]
+        fields = ["id", "note", "want_to_build_module", "built_module"]

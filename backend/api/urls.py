@@ -7,6 +7,7 @@ from accounts.views import (
     get_user_me,
     get_user_history,
     kofi_payment_webhook,
+    get_all_notes,
 )
 
 # User modules-related views
@@ -201,5 +202,6 @@ urlpatterns = [
         UserNotesView.as_view(),
         name="user-notes-create",
     ),
+    path("user-notes/<str:module_type>/all/", get_all_notes, name="user-notes-all"),
     path("user-notes/<uuid:pk>/", UserNotesView.as_view(), name="user-notes-detail"),
 ]

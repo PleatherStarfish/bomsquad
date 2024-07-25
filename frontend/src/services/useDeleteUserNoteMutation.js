@@ -3,13 +3,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const useDeleteUserNoteMutation = (noteId, moduleType) => {
+const useDeleteUserNoteMutation = (moduleId, moduleType) => {
   const csrftoken = Cookies.get('csrftoken');
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      await axios.delete(`/api/user-notes/${moduleType}/${noteId}/`, {
+      await axios.delete(`/api/user-notes/${moduleType}/${moduleId}/`, {
         headers: {
           'X-CSRFToken': csrftoken,
         },

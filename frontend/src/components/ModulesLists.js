@@ -7,66 +7,56 @@ import Modal from "../ui/Modal";
 import NoteForm from "./user_notes/NoteForm";
 import axios from 'axios';
 import useAddUserNoteMutation from '../services/useAddUserNoteMutation';
+import useDeleteUserNoteMutation from '../services/useDeleteUserNoteMutation';
+import useGetAllNotes from '../services/useGetAllNotes';
 import useGetUserModulesLists from "../services/useGetUserModulesLists";
-import useGetUserNote from '../services/useGetUserNote';
+import { useQueryClient } from '@tanstack/react-query';
 import useUpdateUserNoteMutation from '../services/useUpdateUserNoteMutation';
 
 const ModulesList = ({ type }) => {
   const csrftoken = Cookies.get('csrftoken');
   const { userModulesList, userModulesListIsLoading, userModulesListIsError, userModulesListError } = useGetUserModulesLists(type);
+  const { notes, isLoading: notesLoading, isError: notesError } = useGetAllNotes(type);
   const [selectedModule, setSelectedModule] = useState(null);
   const [noteFormVisible, setNoteFormVisible] = useState(false);
-  const [notes, setNotes] = useState({});
   const [currentNote, setCurrentNote] = useState('');
+  const [expandedNotes, setExpandedNotes] = useState({});
 
+  const queryClient = useQueryClient();
   const addNoteMutation = useAddUserNoteMutation(type);
   const updateNoteMutation = useUpdateUserNoteMutation(selectedModule?.note_id);
-  console.log(notes)
+
+  const deleteNoteMutation = useDeleteUserNoteMutation(selectedModule?.id, type);
 
   useEffect(() => {
-    const fetchNotes = async () => {
-      if (userModulesList && userModulesList.results) {
-        const notesData = {};
-        for (const module of userModulesList.results) {
-          try {
-            const response = await axios.get(`/api/user-notes/${type}/${module.id}/`, {
-              headers: {
-                'X-CSRFToken': csrftoken,
-              },
-              withCredentials: true,
-            });
-            console.log("TEST", response.data)
-            notesData[module.id] = response.data.note;
-          } catch (error) {
-            if (error.response && error.response.status === 404) {
-              notesData[module.id] = '';
-            } else {
-              console.error(`Error fetching note for module ${module.id}:`, error);
-            }
+    if (selectedModule) {
+      const fetchCurrentNote = async () => {
+        try {
+          const response = await axios.get(`/api/user-notes/${type}/${selectedModule.id}/`, {
+            headers: {
+              'X-CSRFToken': csrftoken,
+            },
+            withCredentials: true,
+          });
+          setCurrentNote(response.data.note);
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            setCurrentNote('');
+          } else {
+            console.error(`Error fetching note for module ${selectedModule.id}:`, error);
           }
         }
-        setNotes(notesData);
-      }
-    };
-    fetchNotes();
-  }, [userModulesList, type, csrftoken]);
-
-  const { data: selectedModuleNote, error: selectedModuleNoteError, isLoading: selectedModuleNoteLoading } = useGetUserNote(selectedModule?.id, type === "want-to-build" ? "want-to-build" : "built");
-
-  useEffect(() => {
-    if (selectedModuleNote) {
-      setCurrentNote(selectedModuleNote.note);
-    } else if (selectedModuleNoteError && selectedModuleNoteError.response && selectedModuleNoteError.response.status === 404) {
-      setCurrentNote('');
+      };
+      fetchCurrentNote();
     }
-  }, [selectedModuleNote, selectedModuleNoteError]);
+  }, [selectedModule, type, csrftoken]);
 
-  if (userModulesListIsLoading) {
+  if (userModulesListIsLoading || notesLoading) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   }
 
-  if (userModulesListIsError) {
-    return <div>Error: {userModulesListError.message}</div>;
+  if (userModulesListIsError || notesError) {
+    return <div>Error: {userModulesListError?.message || "Error fetching notes"}</div>;
   }
 
   const handleEditNote = (module) => {
@@ -80,17 +70,25 @@ const ModulesList = ({ type }) => {
     setCurrentNote('');
   };
 
+  const handleDeleteNote = async () => {
+    deleteNoteMutation.mutate(null, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['userNotes', type]); // Refetch notes
+        handleCloseNoteForm();
+      },
+    });
+  };
+
   const handleSubmit = async () => {
     const noteId = selectedModule?.note_id;
     const moduleId = selectedModule?.id;
 
-    if (noteId) {
+    if (!currentNote.trim()) {
+      handleDeleteNote();
+    } else if (noteId) {
       updateNoteMutation.mutate({ note: currentNote }, {
         onSuccess: () => {
-          setNotes((prevNotes) => ({
-            ...prevNotes,
-            [moduleId]: currentNote
-          }));
+          queryClient.invalidateQueries(['userNotes', type]); // Refetch notes
           handleCloseNoteForm();
         },
         onError: (error) => console.error("Error updating note:", error)
@@ -98,10 +96,7 @@ const ModulesList = ({ type }) => {
     } else {
       addNoteMutation.mutate({ note: currentNote, module_id: moduleId }, {
         onSuccess: () => {
-          setNotes((prevNotes) => ({
-            ...prevNotes,
-            [moduleId]: currentNote
-          }));
+          queryClient.invalidateQueries(['userNotes', type]); // Refetch notes
           handleCloseNoteForm();
         },
         onError: (error) => console.error("Error adding note:", error)
@@ -112,6 +107,32 @@ const ModulesList = ({ type }) => {
   const truncateNote = (note, maxLength) => {
     if (note.length <= maxLength) return note;
     return `${note.substring(0, maxLength)}...`;
+  };
+
+  const handleToggleExpand = (moduleId) => {
+    setExpandedNotes((prev) => ({
+      ...prev,
+      [moduleId]: !prev[moduleId],
+    }));
+  };
+
+  const renderNote = (note, moduleId) => {
+    const maxLength = 100;
+    const isTruncated = note.length > maxLength;
+
+    return (
+      <div className="text-sm text-center text-gray-600">
+        <b>Notes:</b> {expandedNotes[moduleId] ? note : truncateNote(note, maxLength)}
+        {isTruncated && (
+          <button
+            onClick={() => handleToggleExpand(moduleId)}
+            className="ml-2 text-blue-500 underline hover:text-blue-700"
+          >
+            {expandedNotes[moduleId] ? 'Hide' : 'See all'}
+          </button>
+        )}
+      </div>
+    );
   };
 
   return !!userModulesList.results.length ? (
@@ -125,18 +146,22 @@ const ModulesList = ({ type }) => {
           onSubmit={handleSubmit}
           type="info"
         >
-          {selectedModuleNoteLoading ? (
-            <div>Loading...</div>
-          ) : (
-            <NoteForm
-              key={selectedModule.id} // Ensure NoteForm re-renders when selectedModule changes
-              noteId={selectedModule.note_id}
-              moduleId={selectedModule.id}
-              moduleType={type === "want-to-build" ? "want-to-build" : "built"}
-              note={currentNote}
-              setNote={setCurrentNote}
-              onClose={handleCloseNoteForm}
-            />
+          <NoteForm
+            key={selectedModule.id} // Ensure NoteForm re-renders when selectedModule changes
+            noteId={selectedModule.note_id}
+            moduleId={selectedModule.id}
+            moduleType={type === "want-to-build" ? "want-to-build" : "built"}
+            note={currentNote}
+            setNote={setCurrentNote}
+            onClose={handleCloseNoteForm}
+          />
+          {notes[selectedModule?.id] && (
+            <button
+              onClick={handleDeleteNote}
+              className="mt-2 text-red-500 underline hover:text-red-700"
+            >
+              Delete Note
+            </button>
           )}
         </Modal>
       )}
@@ -148,7 +173,7 @@ const ModulesList = ({ type }) => {
           <li key={`${type}${result.module.id}`} className="relative text-center bg-white border rounded-lg">
             <button
               onClick={() => handleEditNote(result.module)}
-              className="absolute top-2 right-2 btn btn-primary"
+              className="absolute text-xs text-blue-500 top-2 right-2 btn btn-primary hover:text-blue-700"
             >
               {notes[result.module.id] ? 'Edit note' : 'Add note'}
             </button>
@@ -166,12 +191,10 @@ const ModulesList = ({ type }) => {
               <p className="text-base text-center text-gray-400">
                 {result.module.manufacturer.name}
               </p>
-              {notes[result.module.id] && (
-                <p className="mt-2 text-sm text-center text-gray-600">
-                  {truncateNote(notes[result.module.id], 100)}
-                </p>
-              )}
               <AddModuleButtons moduleId={result.module.id} type={type} />
+              <div className="mt-6">
+                {notes?.[result.module.id] && renderNote(notes[result.module.id], result.module.id)}
+              </div>
             </div>
           </li>
         ))}

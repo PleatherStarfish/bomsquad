@@ -266,10 +266,46 @@ class UserNotesView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        try:
-            instance = UserNotes.objects.get(pk=pk, user=request.user)
-        except UserNotes.DoesNotExist:
+    def delete(self, request, module_type, module_id):
+        if module_type == "want-to-build":
+            module = WantToBuildModules.objects.filter(
+                module__id=module_id, user=request.user
+            ).first()
+        elif module_type == "built":
+            module = BuiltModules.objects.filter(
+                module__id=module_id, user=request.user
+            ).first()
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if module is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        instance.delete()
+
+        note = self.get_queryset(module, module_type)
+        if note is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        note.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_all_notes(request, module_type):
+    notes = {}
+    if module_type == "want-to-build":
+        modules = WantToBuildModules.objects.filter(user=request.user)
+        for module in modules:
+            note = UserNotes.objects.filter(want_to_build_module=module).first()
+            if note:
+                notes[str(module.module.id)] = UserNotesSerializer(note).data["note"]
+    elif module_type == "built":
+        modules = BuiltModules.objects.filter(user=request.user)
+        for module in modules:
+            note = UserNotes.objects.filter(built_module=module).first()
+            if note:
+                notes[str(module.module.id)] = UserNotesSerializer(note).data["note"]
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(notes, status=status.HTTP_200_OK)
