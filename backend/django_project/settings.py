@@ -209,6 +209,8 @@ COMMENTS_XTD_APP_MODEL_OPTIONS = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"

@@ -51,7 +51,7 @@ class ModuleBomListItem(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=False)
     components_options = models.ManyToManyField(
-        Component, blank=True, null=True, related_name="component_identity_to_component"
+        Component, blank=True, related_name="component_identity_to_component"
     )
     module = models.ForeignKey(
         "Module", blank=False, null=False, on_delete=models.PROTECT
