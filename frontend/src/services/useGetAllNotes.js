@@ -12,7 +12,6 @@ const useGetAllNotes = (moduleType) => {
         },
         withCredentials: true,
       });
-      console.log(response.data)
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.error || 'An error occurred while fetching the data.');

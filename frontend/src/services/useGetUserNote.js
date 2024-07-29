@@ -14,7 +14,6 @@ const useGetUserNote = (moduleId, moduleType) => {
         },
         withCredentials: true,
       });
-      console.log(response.data)
       return response.data;
     },
     retry: false
