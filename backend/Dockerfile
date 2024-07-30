@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y make
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt -y install nodejs
 
+RUN mkdir -p /code/media
+
 COPY . .
 COPY entrypoint.sh /entrypoint.sh
 

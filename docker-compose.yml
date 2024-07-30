@@ -19,6 +19,7 @@ services:
     volumes:
       - ./backend:/code
       - ./frontend/build/:/code/static/frontend
+      - media_volume:/code/media
     ports:
       - 8000:8000
     depends_on:
