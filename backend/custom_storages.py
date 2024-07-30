@@ -4,15 +4,10 @@ import os
 
 class StaticStorage(S3Boto3Storage):
     location = "static"
-    bucket_name = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    custom_domain = f"{bucket_name}.digitaloceanspaces.com"
-    region_name = os.environ.get("AWS_S3_REGION_NAME")
-    file_overwrite = False
+    bucket_name = os.environ.get("AWS_STORAGE_BUCKET_NAME", "nyc3")
 
 
 class MediaStorage(S3Boto3Storage):
     location = "media"
-    bucket_name = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    custom_domain = f"{bucket_name}.digitaloceanspaces.com"
-    region_name = os.environ.get("AWS_S3_REGION_NAME")
+    bucket_name = os.environ.get("AWS_STORAGE_BUCKET_NAME", "nyc3")
     file_overwrite = False
