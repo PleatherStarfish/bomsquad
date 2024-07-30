@@ -4,7 +4,6 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from storages.backends.s3boto3 import S3Boto3Storage
-from .custom_storages import StaticStorage, MediaStorage
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +31,18 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 ALLOWED_HOSTS = ["*"]
 
+
+class StaticStorage(S3Boto3Storage):
+    location = "static"
+    default_acl = "public-read"
+
+
+class MediaStorage(S3Boto3Storage):
+    location = "media"
+    default_acl = "public-read"
+    file_overwrite = False
+
+
 # Static and media files configuration
 if DEBUG:
     STATIC_URL = "/static/"
@@ -51,10 +62,10 @@ else:
     AWS_LOCATION = "media"
 
     STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/static/"
-    STATICFILES_STORAGE = "custom_storages.StaticStorage"  # As string
+    STATICFILES_STORAGE = StaticStorage  # As string
 
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/media/"
-    DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"  # As string
+    DEFAULT_FILE_STORAGE = MediaStorage  # As string
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
