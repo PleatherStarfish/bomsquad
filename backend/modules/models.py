@@ -124,15 +124,13 @@ class Module(BaseModel):
         unique_together = ("name", "manufacturer", "version")
 
     def save(self, *args, **kwargs):
-        if self.description:
-            self.description = self.description
-            super(Module, self).save(*args, **kwargs)
+        # Handle slug generation
         if not self.slug:
             self.slug = slugify(f"{self.name}-{self.manufacturer}-{self.version}")
-            super(Module, self).save(*args, **kwargs)
 
+        # Handle image processing
         if self.image:
-            img = Image.open(self.image.path)
+            img = Image.open(self.image)
 
             # Resize image, keeping the aspect ratio
             max_dimension = max(img.size)
@@ -142,26 +140,28 @@ class Module(BaseModel):
                 new_height = round(img.height / proportion)
                 img = img.resize((new_width, new_height), Image.ANTIALIAS)
 
+            # Convert to WEBP
             if img.format != "WEBP":
-                # Save as WEBP
                 output_webp = BytesIO()
                 img.save(output_webp, format="WEBP", quality=75)
                 output_webp.seek(0)
-                self.image = ContentFile(
-                    output_webp.read(), f"{os.path.splitext(self.image.name)[0]}.webp"
+                self.image.save(
+                    f"{os.path.splitext(self.image.name)[0]}.webp",
+                    ContentFile(output_webp.read()),
+                    save=False,
                 )
 
-            # Also save as JPEG for fallback
+            # Save as JPEG for fallback
             output_jpeg = BytesIO()
             img.save(output_jpeg, format="JPEG", quality=75)
             output_jpeg.seek(0)
-            self.image_jpeg = ContentFile(
-                output_jpeg.read(), f"{os.path.splitext(self.image.name)[0]}.jpg"
+            self.image_jpeg.save(
+                f"{os.path.splitext(self.image.name)[0]}.jpg",
+                ContentFile(output_jpeg.read()),
+                save=False,
             )
 
-            super(Module, self).save(
-                *args, **kwargs
-            )  # You need to specify the class here as well
+        super(Module, self).save(*args, **kwargs)  # Save the instance
 
     def __str__(self):
         return f"{self.name} - {self.manufacturer}"
