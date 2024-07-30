@@ -9,7 +9,7 @@ services:
     volumes:
       - ./frontend:/app
     env_file:
-      - ./.env.dev
+      - ./.env
     depends_on:
       - backend
 
@@ -19,13 +19,12 @@ services:
     volumes:
       - ./backend:/code
       - ./frontend/build/:/code/static/frontend
-      - media_volume:/code/media
     ports:
       - 8000:8000
     depends_on:
       - db
     env_file:
-      - ./.env.dev
+      - ./.env
 
   db:
     image: postgres:13
@@ -36,4 +35,3 @@ services:
 
 volumes:
   postgres_data:
-  media_volume:
