@@ -36,3 +36,4 @@ services:
 
 volumes:
   postgres_data:
+  media_volume:
