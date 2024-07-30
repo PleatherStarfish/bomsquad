@@ -59,13 +59,14 @@ else:
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",
     }
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "nyc3")
     AWS_LOCATION = "media"
     AWS_DEFAULT_ACL = os.environ.get("AWS_DEFAULT_ACL")
 
-    STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/static/"
+    STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/static/"
     STATICFILES_STORAGE = "custom_storages.StaticStorage"
 
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/media/"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/media/"
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
 
