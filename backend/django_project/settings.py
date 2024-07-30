@@ -41,9 +41,9 @@ if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 else:
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    AWS_ACCESS_KEY_ID = os.environ.get("DO_SPACES_KEY")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("DO_SPACES_SECRET")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("DO_SPACES_NAME")
     AWS_S3_ENDPOINT_URL = "https://{}.digitaloceanspaces.com".format(
         AWS_STORAGE_BUCKET_NAME
     )
@@ -53,10 +53,10 @@ else:
     AWS_LOCATION = "media"
 
     STATIC_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, "static")
-    STATICFILES_STORAGE = StaticStorage
+    STATICFILES_STORAGE = "custom_storages.StaticStorage"  # As string
 
     MEDIA_URL = "{}/{}/".format(AWS_S3_ENDPOINT_URL, "media")
-    DEFAULT_FILE_STORAGE = MediaStorage
+    DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"  # As string
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
