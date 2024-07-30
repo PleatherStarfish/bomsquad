@@ -55,11 +55,12 @@ else:
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_ENDPOINT_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.digitaloceanspaces.com"
+    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",
     }
     AWS_LOCATION = "media"
+    AWS_DEFAULT_ACL = os.environ.get("AWS_DEFAULT_ACL")
 
     STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/static/"
     STATICFILES_STORAGE = "custom_storages.StaticStorage"
