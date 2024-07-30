@@ -62,10 +62,10 @@ else:
     AWS_LOCATION = "media"
 
     STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/static/"
-    STATICFILES_STORAGE = StaticStorage  # As string
+    STATICFILES_STORAGE = "custom_storages.StaticStorage"
 
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/media/"
-    DEFAULT_FILE_STORAGE = MediaStorage  # As string
+    DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
