@@ -64,6 +64,10 @@ else:
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
+    # Ensure these are set for collectstatic to find files
+    STATICFILES_DIRS = [BASE_DIR / "static"]
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
