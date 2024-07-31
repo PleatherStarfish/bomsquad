@@ -1,3 +1,4 @@
+import "./instrument";
 import "./styles/styles.css";
 
 import * as Sentry from "@sentry/react";
@@ -32,23 +33,16 @@ const queryClient = new QueryClient({
   },
 });
 
-const sentryDSN = process.env.SENTRY_DSN;
-
-Sentry.init({
-  dsn: sentryDSN,
-  integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  tracesSampleRate: 1.0,
-
-  // Capture Replay for 10% of all sessions,
-  // plus for 100% of sessions with an error
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-});
-
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root"), {
+  // Callback called when an error is thrown and not caught by an ErrorBoundary.
+  onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+    console.warn('Uncaught error', error, errorInfo.componentStack);
+  }),
+  // Callback called when React catches an error in an ErrorBoundary.
+  onCaughtError: Sentry.reactErrorHandler(),
+  // Callback called when React automatically recovers from errors.
+  onRecoverableError: Sentry.reactErrorHandler(),
+}).render(
   <QueryClientProvider client={queryClient}>
     <React.StrictMode>
       <BrowserRouter>
