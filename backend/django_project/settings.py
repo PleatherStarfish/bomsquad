@@ -51,17 +51,18 @@ else:
     }
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "nyc3")
     AWS_DEFAULT_ACL = os.environ.get("AWS_DEFAULT_ACL")
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
 
     # Separate locations for static and media files
     STATIC_LOCATION = "static"
     MEDIA_LOCATION = "media"
 
     # Static files settings
-    STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/{STATIC_LOCATION}/"
+    STATIC_URL = f"{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
     STATICFILES_STORAGE = "custom_storages.StaticStorage"
 
     # Media files settings
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{MEDIA_LOCATION}/"
+    MEDIA_URL = f"{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
     # Ensure these are set for collectstatic to find files

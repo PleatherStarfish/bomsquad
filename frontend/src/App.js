@@ -13,7 +13,6 @@ import Settings from "./components/UserSettings";
 import ShoppingList from "./components/shopping_list/index";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
-import { useEffect } from 'react';
 
 const App = () => {
 
