@@ -41,6 +41,7 @@ if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 else:
+    # Production settings
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
@@ -49,13 +50,18 @@ else:
         "CacheControl": "max-age=86400",
     }
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "nyc3")
-    AWS_LOCATION = "media"
     AWS_DEFAULT_ACL = os.environ.get("AWS_DEFAULT_ACL")
 
-    STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/static/"
+    # Separate locations for static and media files
+    STATIC_LOCATION = "static"
+    MEDIA_LOCATION = "media"
+
+    # Static files settings
+    STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/{STATIC_LOCATION}/"
     STATICFILES_STORAGE = "custom_storages.StaticStorage"
 
-    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/media/"
+    # Media files settings
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
 
