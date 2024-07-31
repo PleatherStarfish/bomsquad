@@ -39,6 +39,9 @@ module.exports = {
         'display': ['Quicksand', ...defaultTheme.fontFamily.sans],
         'roboto': ['Roboto', 'sans-serif'],
       },
+      fontSize: {
+        '2xl': ['0.5rem', '0.75rem'],
+      },
       colors: {
         transparent: "transparent",
         current: "currentColor",
