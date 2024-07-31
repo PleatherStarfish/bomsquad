@@ -73,9 +73,7 @@
                             <picture>
                                 <source srcset="{{ module.image.url }}" type="image/webp">
                                 <source srcset="{{ module.image_jpeg.url }}" type="image/jpeg"> <!-- Fallback image -->
-                                <img class="w-auto h-full object-fit"
-                                    height="100px"
-                                    width="100px"
+                                <img class="object-contain w-auto h-full"
                                     src="{{ module.image_jpeg.url }}"
                                     alt="{{ module.name }}"/>
                             </picture>
