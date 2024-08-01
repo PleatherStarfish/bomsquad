@@ -3,6 +3,7 @@ from modules.views import module_list
 from .views import (
     AboutPageView,
     DisclaimerPageView,
+    TosView,
     component_detail,
 )
 from django.views.generic import TemplateView
@@ -23,5 +24,6 @@ urlpatterns = [
         component_detail,
         name="component-detail",
     ),
+    path("tos/", TosView.as_view(), name="tos"),
     path("community/", latest_comments, name="fetch_comments"),
 ]
