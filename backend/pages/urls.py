@@ -5,6 +5,7 @@ from .views import (
     DisclaimerPageView,
     TosView,
     PrivacyPolicyView,
+    FAQView,
     component_detail,
 )
 from django.views.generic import TemplateView
@@ -26,6 +27,7 @@ urlpatterns = [
         name="component-detail",
     ),
     path("tos/", TosView.as_view(), name="tos"),
+    path("faq/", FAQView.as_view(), name="faq"),
     path(
         "privacy-policy/",
         PrivacyPolicyView.as_view(),
