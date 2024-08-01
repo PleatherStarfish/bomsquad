@@ -24,6 +24,10 @@ module.exports = {
     'list-disc',
     'my-8',
     'my-10',
+    'w-24', 
+    'h-24', 
+    'md:w-48', 
+    'md:h-48'
   ],
   darkMode: 'class',
   theme: {
