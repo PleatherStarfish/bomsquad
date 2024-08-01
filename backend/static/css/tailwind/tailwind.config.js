@@ -27,7 +27,9 @@ module.exports = {
     'w-24', 
     'h-24', 
     'w-48', 
-    'h-48'
+    'h-48',
+    'md:w-48', 
+    'md:h-48',
   ],
   darkMode: 'class',
   theme: {
