@@ -1,12 +1,12 @@
 import {
+  BuildingOffice2Icon,
   FolderIcon,
-  WrenchIcon,
-  BuildingOffice2Icon
+  WrenchIcon
 } from "@heroicons/react/24/outline";
-import { Cart } from "react-bootstrap-icons";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
+import { Cart } from "react-bootstrap-icons";
 import Gravatar from "react-gravatar";
 import cx from "classnames";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
@@ -148,7 +148,7 @@ const UserPage = () => {
                     <div className="flex items-center px-6 py-3 text-sm font-semibold leading-6 text-gray-900 group/settings gap-x-4 hover:bg-gray-200">
                       <Gravatar
                         className="rounded-full"
-                        email={user.emails.filter((e) => e.primary === true)[0].email}
+                        email={(user?.emails ?? []).filter((e) => e.primary === true)[0].email}
                         rating="pg"
                         size={40}
                       />

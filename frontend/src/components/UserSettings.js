@@ -1,11 +1,11 @@
 import BackButton from "../ui/BackButton";
 import Button from "../ui/Button";
 import { CURRENCIES } from "../utils/currencies";
+import { DateTime } from 'luxon';
 import DeleteAccountButton from "./DeleteAccountButton";
 import Dropdown from "../ui/Dropdown";
 import React from "react";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
-import { DateTime } from 'luxon';
 
 const Settings = () => {
   const { user, userIsLoading, userIsError } = useAuthenticatedUser();
@@ -48,7 +48,7 @@ const Settings = () => {
                 Emails
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.emails.map((item, index) => (
+                {(user?.emails ?? []).map((item, index) => (
                   <div key={index} className="mb-1">
                     {item.email}
                     {item.primary && (
