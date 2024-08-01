@@ -37,6 +37,15 @@ class TosView(DetailView):
         return StaticPage.objects.filter(title="Terms of Service").first()
 
 
+class PrivacyPolicyView(DetailView):
+    model = StaticPage
+    template_name = "pages/page.html"
+    context_object_name = "page"
+
+    def get_object(self):
+        return StaticPage.objects.filter(title="Privacy Policy").first()
+
+
 def component_detail(request, component_id):
     component = get_object_or_404(Component, id=component_id)
     module_items = ModuleBomListItem.objects.filter(components_options=component)

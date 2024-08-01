@@ -4,6 +4,7 @@ from .views import (
     AboutPageView,
     DisclaimerPageView,
     TosView,
+    PrivacyPolicyView,
     component_detail,
 )
 from django.views.generic import TemplateView
@@ -25,5 +26,10 @@ urlpatterns = [
         name="component-detail",
     ),
     path("tos/", TosView.as_view(), name="tos"),
+    path(
+        "privacy-policy/",
+        PrivacyPolicyView.as_view(),
+        name="pp",
+    ),
     path("community/", latest_comments, name="fetch_comments"),
 ]
