@@ -26,8 +26,8 @@ module.exports = {
     'my-10',
     'w-24', 
     'h-24', 
-    'md:w-48', 
-    'md:h-48'
+    'w-48', 
+    'h-48'
   ],
   darkMode: 'class',
   theme: {
