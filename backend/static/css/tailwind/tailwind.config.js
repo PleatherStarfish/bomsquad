@@ -4,21 +4,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   relative: true,
   content: [
-    "../../../../frontend/*.{html,js}",
-    "../../../../backend/*.{html,js}",
-    "../../../../frontend/**/*.{html,js}",
-    "../../../../backend/**/*.{html,js}",
-    "../../../../frontend/**/**/*.{html,js}",
-    "../../../../backend/**/**/*.{html,js}",
-    "../../../../frontend/**/**/**/*.{html,js}",
-    "../../../../backend/**/**/**/*.{html,js}",
-    "../../../../frontend/**/**/**/**/*.{html,js}",
-    "../../../../backend/**/**/**/**/*.{html,js}",
-    "../../../../frontend/**/**/**/**/**/*.{html,js}",
-    "../../../../backend/**/**/**/**/**/*.{html,js}",
-    "../../../../backend/templates/_base.html",
-    "../../../../frontend/**/**/**/**/**/**/*.{html,js}",
-    "../../../../backend/**/**/**/**/**/**/*.{html,js}",
+    "../../../../**/*.{html,js}",
   ],
   safelist: [
     'list-disc',
@@ -30,6 +16,7 @@ module.exports = {
     'h-48',
     'md:w-48', 
     'md:h-48',
+    'text-2xl'
   ],
   darkMode: 'class',
   theme: {
@@ -46,7 +33,7 @@ module.exports = {
         'roboto': ['Roboto', 'sans-serif'],
       },
       fontSize: {
-        '2xl': ['0.5rem', '0.75rem'],
+        '2xs': ['0.5rem', '0.75rem'],
       },
       colors: {
         transparent: "transparent",

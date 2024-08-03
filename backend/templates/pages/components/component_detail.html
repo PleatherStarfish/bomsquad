@@ -1,139 +1,141 @@
-{% extends '_base.html' %}
-{% block title %}{{ component.supplier }} {{ component.supplier_item_no }}{% endblock %}
+{% extends "_base.html" %}
 {% load static %}
 {% load comments %}
 {% load comments_xtd %}
-
+{% block title %}{{ component.supplier }} {{ component.supplier_item_no }}{% endblock title %}
 {% block content %}
-<div class="container p-6 mx-auto">
-  <h1 class="pt-6 pb-10 text-4xl font-bold">{{ component.description }}</h1>
-  <table class="min-w-full bg-white border-collapse">
-    <thead>
-      <tr>
-        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Attribute</th>
-        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Manufacturer</td>
-        <td class="px-4 py-2">{{ component.manufacturer }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Manufacturer Part No</td>
-        <td class="px-4 py-2">{{ component.manufacturer_part_no }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Mounting Style</td>
-        <td class="px-4 py-2">{{ component.get_mounting_style_display }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Supplier</td>
-        <td class="px-4 py-2">{{ component.supplier }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Supplier Item No</td>
-        <td class="px-4 py-2">{{ component.supplier_item_no }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Type</td>
-        <td class="px-4 py-2">{{ component.type }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Ohms</td>
-        <td class="px-4 py-2">{{ component.ohms }} {{ component.ohms_unit }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Farads</td>
-        <td class="px-4 py-2">{{ component.farads }} {{ component.farads_unit }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Voltage Rating</td>
-        <td class="px-4 py-2">{{ component.voltage_rating }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Tolerance</td>
-        <td class="px-4 py-2">{{ component.tolerance }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Price</td>
-        <td class="px-4 py-2">{{ component.price }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Discontinued</td>
-        <td class="px-4 py-2">{{ component.discontinued }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Notes</td>
-        <td class="px-4 py-2">{{ component.notes }}</td>
-      </tr>
-      <tr class="border-b">
-        <td class="px-4 py-2 font-bold">Link</td>
-        <td class="px-4 py-2">
-          <a href="{{ component.link }}" class="text-blue-500 hover:underline">More Info</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="container py-12 mx-auto">
-  <h2 class="pt-6 pb-10 text-2xl font-bold">Projects using {{ component.description }}</h2>
-  <table class="min-w-full bg-white border-collapse">
-    <thead>
-      <tr>
-        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Module</th>
-        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Manufacturer</th>
-        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Quantity</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for module_item in modules %}
-      <tr class="border-b">
-        <td class="px-4 py-2">
-          <a href="/module/{{ module_item.slug }}/" class="text-blue-500 hover:underline">{{ module_item.module.name }}</a>
-        </td>
-        <td class="px-4 py-2">{{ module_item.module.manufacturer.name }}</td>
-        <td class="px-4 py-2">{{ module_item.quantity }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<!-- Comments Section -->
-<div class="row justify-content-center flex-fill">
-  <div class="col-8">
-    <div id="comments">
-      {% get_comment_count for component as comment_count %}
-      {% if comment_count %}
-        <h2 class="text-center">There is {{ comment_count }} comment below.</h2>
-      {% endif %}
-
-      {% if component.allow_comments %}
-      <div class="p-6 mb-5 card card-block">
-        <div class="card-body">
-          <h2 class="pt-6 pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
-          {% render_comment_form for component %}
-        </div>
+  <div class="container p-6 mx-auto">
+    <h1 class="pt-6 pb-10 text-4xl font-bold">{{ component.description }}</h1>
+    <table class="min-w-full bg-white border-collapse">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Attribute</th>
+          <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Manufacturer</td>
+          <td class="px-4 py-2">{{ component.manufacturer }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Manufacturer Part No</td>
+          <td class="px-4 py-2">{{ component.manufacturer_part_no }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Mounting Style</td>
+          <td class="px-4 py-2">{{ component.get_mounting_style_display }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Supplier</td>
+          <td class="px-4 py-2">{{ component.supplier }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Supplier Item No</td>
+          <td class="px-4 py-2">{{ component.supplier_item_no }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Type</td>
+          <td class="px-4 py-2">{{ component.type }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Ohms</td>
+          <td class="px-4 py-2">{{ component.ohms }} {{ component.ohms_unit }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Farads</td>
+          <td class="px-4 py-2">{{ component.farads }} {{ component.farads_unit }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Voltage Rating</td>
+          <td class="px-4 py-2">{{ component.voltage_rating }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Tolerance</td>
+          <td class="px-4 py-2">{{ component.tolerance }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Price</td>
+          <td class="px-4 py-2">{{ component.price }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Discontinued</td>
+          <td class="px-4 py-2">{{ component.discontinued }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Notes</td>
+          <td class="px-4 py-2">{{ component.notes }}</td>
+        </tr>
+        <tr class="border-b">
+          <td class="px-4 py-2 font-bold">Link</td>
+          <td class="px-4 py-2">
+            <a href="{{ component.link }}" class="text-blue-500 hover:underline">More Info</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="container py-12 mx-auto">
+    <h2 class="pt-6 pb-10 text-2xl font-bold">Projects using {{ component.description }}</h2>
+    <table class="min-w-full bg-white border-collapse">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Module</th>
+          <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Manufacturer</th>
+          <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for module_item in modules %}
+          <tr class="border-b">
+            <td class="px-4 py-2">
+              <a href="{% url 'module-detail' module_item.slug %}"
+                 class="text-blue-500 hover:underline">{{ module_item.module.name }}</a>
+            </td>
+            <td class="px-4 py-2">{{ module_item.module.manufacturer.name }}</td>
+            <td class="px-4 py-2">{{ module_item.quantity }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Comments Section -->
+  <div class="row justify-content-center flex-fill">
+    <div class="col-8">
+      <div id="comments">
+        {% get_comment_count for component as comment_count %}
+        {% if comment_count %}<h2 class="text-center">There is {{ comment_count }} comment below.</h2>{% endif %}
+        {% if component.allow_comments %}
+          <div class="p-6 mb-5 card card-block">
+            <div class="card-body">
+              <h2 class="pt-6 pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
+              {% render_comment_form for component %}
+            </div>
+          </div>
+        {% else %}
+          <h2 class="mt-4 mb-5 text-center text-secondary">Comments are disabled on this page.</h2>
+        {% endif %}
+        {% if comment_count %}
+          {% render_comment_list for component %}
+        {% endif %}
       </div>
-      {% else %}
-      <h2 class="mt-4 mb-5 text-center text-secondary">Comments are disabled on this page.</h2>
-      {% endif %}
-
-      {% if comment_count %}
-      {% render_comment_list for component %}
-      {% endif %}
     </div>
   </div>
-</div>
 {% endblock content %}
-
 {% block extra-js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" integrity="sha512-QVs8Lo43F9lSuBykadDb0oSXDL/BbZ588urWVCRwSIoewQv/Ewg1f84mK3U790bZ0FfhFa1YSQUmIhG+pIRKeg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" integrity="sha512-6a1107rTlA4gYpgHAqbwLAtxmWipBdJFcq8y5S/aTge3Bp+VAklABm2LO+Kg51vOWR9JMZq1Ovjl5tpluNpTeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/2.0.1/remarkable.min.js" integrity="sha512-skYYbQHAuOTpeJTthhUH3flZohep8blA+qjZOY0VqmfXMDiYcWxu29F5UbxU4LxaIpGkRBk+3Qf8qaXfd9jngg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"
+          integrity="sha512-QVs8Lo43F9lSuBykadDb0oSXDL/BbZ588urWVCRwSIoewQv/Ewg1f84mK3U790bZ0FfhFa1YSQUmIhG+pIRKeg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"
+          integrity="sha512-6a1107rTlA4gYpgHAqbwLAtxmWipBdJFcq8y5S/aTge3Bp+VAklABm2LO+Kg51vOWR9JMZq1Ovjl5tpluNpTeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/2.0.1/remarkable.min.js"
+          integrity="sha512-skYYbQHAuOTpeJTthhUH3flZohep8blA+qjZOY0VqmfXMDiYcWxu29F5UbxU4LxaIpGkRBk+3Qf8qaXfd9jngg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <script>
   window.comments_props = {% get_commentbox_props for component %};
   window.comments_props_override = {
       allow_comments: {%if component.allow_comments%}true{%else%}false{%endif%},
@@ -142,16 +144,14 @@
       allow_flagging: true,
       polling_interval: 5000  // In milliseconds.
   };
-</script>
-<script
-  type="text/javascript"
-  src="{% url 'javascript-catalog' %}"></script>
-<script src="{% static 'django_comments_xtd/js/django-comments-xtd-2.10.0.js' %}"></script>
-<script>
+  </script>
+  <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+  <script src="{% static 'django_comments_xtd/js/django-comments-xtd-2.10.0.js' %}"></script>
+  <script>
   window.addEventListener('DOMContentLoaded', (_) => {
     const tooltipQs = '[data-bs-toggle="tooltip"]';
     const tooltipList = document.querySelectorAll(tooltipQs);
     [...tooltipList].map(el => new bootstrap.Tooltip(el, {html: true}));
   });
-</script>
-{% endblock %}
+  </script>
+{% endblock extra-js %}

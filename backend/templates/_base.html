@@ -41,7 +41,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.0/dist/cookieconsent.css" />
     {% endcomment %}
 
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +49,9 @@
     <script>(function(){const{protocol:n,host:o,pathname:t,search:a,hash:h}=window.location;t.endsWith("/")||t.endsWith(".html")||window.location.replace(`${n}//${o}${t}/${a}${h}`)})()</script>
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
 
     {% block css %}{% endblock css %}
   </head>
@@ -124,6 +126,14 @@
               }, 300);  // Matches the duration of the transition
           });
       }, 5000);  // Toasts will disappear after 5 seconds
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        tippy('[data-tippy-content]', {
+          allowHTML: true,
+        });
+      });
     </script>
 
     {% block javascript %}{% endblock javascript %}

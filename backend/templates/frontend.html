@@ -11,15 +11,17 @@
 <!-- Comments Section -->
 <div class="container py-12 mx-auto transition-opacity duration-500 opacity-0" id="comments-section">
   <div id="comments">
-    {% get_comment_count for module as comment_count %}
-    {% if comment_count %}
-      <h5 class="text-center">There are {{ comment_count }} comments below.</h5>
-    {% endif %}
+    <div class="flex justify-between">
+      <h2 class="pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
+      {% get_comment_count for module as comment_count %}
+      {% if comment_count > 1 %}
+        <h5 class="text-right">{{ comment_count }} comments</h5>
+      {% endif %}
+    </div>
 
     {% if module.allow_comments %}
     <div class="p-6 mb-5 card card-block">
       <div class="card-body">
-        <h2 class="pt-6 pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
         {% render_comment_form for module %}
       </div>
     </div>

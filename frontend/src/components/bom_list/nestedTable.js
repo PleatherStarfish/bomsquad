@@ -1,15 +1,20 @@
+import 'tippy.js/dist/tippy.css';
+
 import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
 import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
+import { getFaradConversions, getOhmConversions } from '../conversions';
+
 import AddComponentModal from "./addComponentModal";
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
 import { FlagIcon } from "@heroicons/react/24/outline";
+import Tippy from '@tippyjs/react';
+import UserRating from "./UserRating";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
-import UserRating from "./UserRating";
 
 export const customStyles = {
   headCells: {
@@ -103,24 +108,37 @@ const NestedTable = ({ data }) => {
     },
     {
       name: <div>Supp. Item #</div>,
-      selector: (row) => (
-        <a href={row.link} className="text-blue-500 hover:text-blue-700">
+      selector: (row) => {
+      console.log(row)
+        return <a href={row.link} className="text-blue-500 hover:text-blue-700">
           {row.supplier_item_no}
         </a>
-      ),
+    },
       sortable: true,
       wrap: true,
     },
     {
       name: <div>Farads</div>,
-      selector: (row) => row.farads,
+      selector: (row) => (
+        <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>
+          <span>
+            {row.farads} {row.farads_unit}
+          </span>
+        </Tippy>
+      ),
       sortable: true,
       wrap: true,
       omit: type !== "Capacitor",
     },
     {
       name: <div>Ohms</div>,
-      selector: (row) => row.ohms,
+      selector: (row) => (
+        <Tippy content={<div dangerouslySetInnerHTML={{ __html: getOhmConversions(row.ohms, row.ohms_unit) }} />}>
+          <span>
+            {row.ohms} {row.ohms_unit}
+          </span>
+        </Tippy>
+      ),
       sortable: true,
       wrap: true,
       omit: type !== "Resistor",

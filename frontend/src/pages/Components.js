@@ -1,5 +1,8 @@
+import 'tippy.js/dist/tippy.css';
+
 import Quantity, { Types } from "../components/bom_list/quantity";
 import React, { useEffect, useState } from "react";
+import { getFaradConversions, getOhmConversions } from '../components/conversions';
 
 import AddComponentModal from "../components/bom_list/addComponentModal";
 import Alert from "../ui/Alert";
@@ -7,6 +10,7 @@ import Button from "../ui/Button";
 import DataTable from "react-data-table-component";
 import Pagination from "../components/components/Pagination";
 import SearchForm from "../components/components/SearchForm";
+import Tippy from '@tippyjs/react';
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 import { useForm } from "react-hook-form";
 import useGetComponents from "../services/useGetComponents";
@@ -127,13 +131,25 @@ const Components = () => {
     },
     {
       name: <div>Farads</div>,
-      selector: (row) => row.farads,
+      selector: (row) => (
+        row.farads ? (
+          <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>
+            <span>{row.farads} {row.farads_unit || 'µF'}</span>
+          </Tippy>
+        ) : ""
+      ),
       sortable: true,
       wrap: true,
     },
     {
       name: <div>Ohms</div>,
-      selector: (row) => row.ohms,
+      selector: (row) => (
+        row.ohms ? (
+          <Tippy content={<div dangerouslySetInnerHTML={{ __html: getOhmConversions(row.ohms, row.ohms_unit) }} />}>
+            <span>{row.ohms} {row.ohms_unit || 'Ω'}</span>
+          </Tippy>
+        ) : ""
+      ),
       sortable: true,
       wrap: true,
     },
