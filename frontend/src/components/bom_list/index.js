@@ -207,11 +207,12 @@ const BomList = ({ moduleId, moduleName }) => {
       }
       {filteredData &&
         <DataTable
-          // fixedHeader
+          fixedHeader={false}
           responsive
           exportHeaders
           expandableRows
           expandOnRowClicked
+          fixedHeaderScrollHeight="500vh"
           progressComponent={
             <div className="text-center text-gray-500 animate-pulse">
               Loading...
