@@ -132,6 +132,7 @@ const BomList = ({ moduleId, moduleName }) => {
       selector: (row) => row.designators,
       sortable: true,
       wrap: true,
+      maxWidth: "150px",
     },
     {
       name: <div>Notes</div>,

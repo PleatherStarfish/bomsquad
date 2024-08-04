@@ -1,0 +1,56 @@
+{% for module in page_obj %}
+    <div class="flex items-center mb-4 overflow-hidden bg-white rounded-lg module-item">
+        <div class="flex justify-center object-contain w-24 h-24 md:w-48 md:h-48">
+            {% if module.image and module.image_jpeg %}
+                <picture>
+                    <source srcset="{{ module.image.url }}" type="image/webp">
+                    <source srcset="{{ module.image_jpeg.url }}" type="image/jpeg">
+                    <img class="object-contain w-auto h-full" src="{{ module.image_jpeg.url }}" alt="{{ module.name }}"/>
+                </picture>
+            {% endif %}
+        </div>
+        <div class="flex-1">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex flex-wrap justify-between">
+                    <div>
+                        <a href="{% url 'module' module.slug %}">
+                            <h2 class="text-xl font-medium text-gray-900">{{ module.name }}</h2>
+                        </a>
+                    </div>
+                    <div class="flex py-2 space-x-2 md:py-0">
+                        <form method="post" action="{% url 'add_to_built' module.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center gap-x-1.5 rounded-md {% if module.is_built %}bg-pink-600 hover:bg-pink-400{% else %}bg-gray-500 hover:bg-gray-400{% endif %} py-2 px-2.5 text-xs md:text-sm font-semibold text-white shadow-sm hover:outline-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-400 transition-all">
+                                {% if module.is_built %}
+                                <svg class="-ml-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                </svg>
+                                Built
+                                {% else %}
+                                Add to built
+                                {% endif %}
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'add_to_wtb' module.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center gap-x-1.5 rounded-md {% if module.is_wtb %}bg-pink-600 hover:bg-pink-400{% else %}bg-gray-500 hover:bg-gray-400{% endif %} py-2 px-2.5 text-xs md:text-sm font-semibold text-white shadow-sm hover:outline-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-400 transition-all">
+                                {% if module.is_wtb %}
+                                <svg class="-ml-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                </svg>
+                                Want to build
+                                {% else %}
+                                Add to want-to-build
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">{{ module.manufacturer }}</p>
+                <p class="mt-4 text-sm text-gray-500" style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5">
+                    {{ module.description }}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endfor %}

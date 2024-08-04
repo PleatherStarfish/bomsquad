@@ -102,8 +102,37 @@ class Component(BaseModel):
         blank=True,
         help_text="If the component type involves capacitance, this value MUST be set.",
     )
-    voltage_rating = models.CharField(max_length=3, blank=True)
-    tolerance = models.CharField(max_length=3, blank=True)
+    voltage_rating = models.CharField(max_length=6, blank=True)
+    current_rating = models.CharField(max_length=6, blank=True)
+    forward_current = models.DecimalField(
+        blank=True,
+        null=True,
+        decimal_places=1,
+        max_digits=6,
+        help_text="The maximum forward current of the component.",
+    )
+    forward_voltage = models.DecimalField(
+        blank=True,
+        null=True,
+        decimal_places=1,
+        max_digits=6,
+        help_text="The forward voltage drop of the component.",
+    )
+    forward_surge_current = models.DecimalField(
+        blank=True,
+        null=True,
+        decimal_places=1,
+        max_digits=6,
+        help_text="The maximum forward surge current of the component.",
+    )
+    forward_current_avg_rectified = models.DecimalField(
+        blank=True,
+        null=True,
+        decimal_places=1,
+        max_digits=6,
+        help_text="The average forward current over a full cycle of an AC signal.",
+    )
+    tolerance = models.CharField(max_length=6, blank=True)
     price = MoneyField(
         max_digits=4,
         decimal_places=2,
@@ -159,7 +188,29 @@ class Component(BaseModel):
                 )
             if self.farads or self.farads_unit:
                 raise ValidationError(
-                    "Farad value and unit must not be set for resistors."
+                    "Farad value and unit must not be set for potentiometers."
+                )
+        elif self.type.name == "Diodes":
+            if not (
+                self.forward_current
+                or self.forward_voltage
+                or self.forward_surge_current
+                or self.forward_current_avg_rectified
+            ):
+                raise ValidationError(
+                    "If this component is a diode, you must set at least one of the forward current, forward voltage, forward surge current, or average forward current rectified."
+                )
+
+        # Validation to ensure diode-specific fields are not set for non-diodes and non-LEDs
+        if self.type.name not in ["Diodes", "Light-emitting diode (LED)"]:
+            if (
+                self.forward_current
+                or self.forward_voltage
+                or self.forward_surge_current
+                or self.forward_current_avg_rectified
+            ):
+                raise ValidationError(
+                    "Forward current, forward voltage, forward surge current, and average forward current rectified must not be set for non-diodes and non-LEDs."
                 )
 
     def get_absolute_url(self):

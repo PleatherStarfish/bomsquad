@@ -30,27 +30,28 @@
                 </div>
             {% endif %}
         </div>
+        
         <div id="dataElem" class="p-10 mb-10 bg-gray-100 rounded-lg">
             <form method="get">
                 <div class="flex flex-col gap-6 -mx-2">
                     <div class="w-full px-2 mb-6 md:w-3/5 lg:w-1/2 md:mb-0">
-                        <label htmlFor="search" class="block mb-2 font-semibold text-gray-700 text-md">Search</label>
+                        <label for="search" class="block mb-2 font-semibold text-gray-700 text-md">Search</label>
                         <input type="text"
                             name="search"
                             placeholder="Search"
                             id="search"
+                            value="{{ search }}"
                             autoComplete="off"
                             class="w-full h-10 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"/>
                     </div>
                     <div class="flex flex-wrap gap-4">
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
-                            <label htmlFor="manufacturer"
+                            <label for="manufacturer"
                                 class="block mb-2 font-semibold text-gray-700 text-md">Manufacturer</label>
-
                             {% include "components/select.html" with select_name="manufacturer" select_id="manufacturer" default_option_text="All" items=manufacturers %}
                         </div>
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
-                            <label htmlFor="componentType"
+                            <label for="component_type"
                                 class="block mb-2 font-semibold text-gray-700 text-md">Mounting Style</label>
                             {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=mounting_style %}
                         </div>
@@ -64,10 +65,11 @@
                 </div>
             </form>  
         </div>              
-        <div class="grid grid-cols-1 gap-6 md:gap-8 lg:gap-12">
+        
+        <div id="module-container" class="grid grid-cols-1 gap-6 md:gap-8 lg:gap-12">
             <h1 class="my-6 text-3xl">Projects</h1>
             {% for module in page_obj %}
-                <div class="flex items-center overflow-hidden bg-white rounded-lg">
+                <div class="flex items-center overflow-hidden bg-white rounded-lg module-item">
                     <div class="flex justify-center object-contain w-24 h-24 md:w-48 md:h-48">
                         {% if module.image and module.image_jpeg %}
                             <picture>
@@ -120,35 +122,68 @@
                             <p class="mt-4 text-sm text-gray-500" style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5">
                                 {{ module.description }}
                             </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+        <div id="loading" class="hidden py-4 text-center animate-pulse">
+            <span>Loading...</span>
+        </div>
+        <div id="pagination" class="hidden">
+            <span id="next-page" data-next-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}None{% endif %}"></span>
+        </div>
     </div>
-    <div class="mt-6">
-        {% if page_obj.has_other_pages %}
-            <nav class="flex justify-between">
-                {% if page_obj.has_previous %}
-                    <a href="?{% if manufacturer %}manufacturer={{ manufacturer }}&{% endif %}search={{ search }}&page={{ page_obj.previous_page_number }}"
-                       class="inline-block px-3 py-2 font-medium text-gray-800 rounded-lg hover:text-gray-500">
-                        &laquo; Previous
-                    </a>
-                {% endif %}
-                <div class="inline-block py-2 font-medium text-gray-800">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                </div>
-                {% if page_obj.has_next %}
-                    <a href="?{% if manufacturer %}manufacturer={{ manufacturer }}&{% endif %}search={{ search }}&page={{ page_obj.next_page_number }}"
-                       class="inline-block px-3 py-2 font-medium text-gray-800 rounded-lg hover:text-gray-500">
-                        Next &raquo;
-                    </a>
-                {% endif %}
-            </nav>
-        {% endif %}
-    </div>
-</div>
 {% endblock content %}
 
 {% block javascript %}
+    <script>
+        let loading = false;
 
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loading) {
+                loading = true;
+                loadMoreModules();
+            }
+        });
+
+        function loadMoreModules() {
+            const nextPage = document.getElementById('next-page').dataset.nextPage;
+            if (nextPage === 'None') return;
+
+            const loadingSpinner = document.getElementById('loading');
+            loadingSpinner.classList.remove('hidden');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('page', nextPage);
+
+            fetch(`?${urlParams.toString()}`, {
+                headers: {
+                    'x-requested-with': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const newModules = document.createElement('div');
+                newModules.innerHTML = data.html;
+                const moduleContainer = document.getElementById('module-container');
+                moduleContainer.append(...newModules.children);
+
+                if (data.has_next) {
+                    document.getElementById('next-page').dataset.nextPage = parseInt(nextPage) + 1;
+                } else {
+                    document.getElementById('next-page').dataset.nextPage = 'None';
+                }
+
+                loadingSpinner.classList.add('hidden');
+                loading = false;
+            })
+            .catch(error => {
+                console.error('Error loading more modules:', error);
+                loadingSpinner.classList.add('hidden');
+                loading = false;
+            });
+        }
+    </script>
 {% endblock javascript %}
+

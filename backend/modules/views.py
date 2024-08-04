@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Avg, DecimalField
-from django.db.models.functions import Cast
-from uuid import UUID
+from django.db.models import Q, Sum
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -26,8 +27,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from .models import Component
 
 
 mounting_style_options = [
@@ -52,7 +51,7 @@ def module_list(request):
         module_list = module_list.filter(
             Q(name__icontains=query)
             | Q(manufacturer__name__icontains=query)
-            | Q(description__icontains=query)  # Add this line
+            | Q(description__icontains=query)
         ).order_by("name")
 
     paginator = Paginator(module_list, 10)
@@ -66,6 +65,12 @@ def module_list(request):
             module.is_built = module.is_built_by_user(user)
             module.is_wtb = module.is_wtb_by_user(user)
 
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        html = render_to_string(
+            "modules/module_list_partial.html", {"page_obj": page_obj}
+        )
+        return JsonResponse({"html": html, "has_next": page_obj.has_next()})
+
     return render(
         request,
         "modules/index.html",
@@ -74,7 +79,7 @@ def module_list(request):
             "manufacturers": manufacturers,
             "search": query,
             "manufacturer": manufacturer,
-            "mounting_style": mounting_style_options,
+            "mounting_style": mounting_style,
             "user_logged_in": request.user.is_authenticated,
         },
     )
