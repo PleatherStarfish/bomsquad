@@ -122,7 +122,7 @@ const Components = () => {
       selector: (row) => {
         return (
           <a href={row.link} className="text-blue-500 hover:text-blue-700">
-            {row.supplier_item_no}
+            {row?.supplier_item_no ? row?.supplier_item_no : "[ none ]"}
           </a>
         );
       },
@@ -216,8 +216,8 @@ const Components = () => {
             <AddComponentModal
               open={inventoryModalOpen === row.id}
               setOpen={setInventoryModalOpen}
-              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
-              title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
+              componentName={row.supplier_item_no ? `${row.supplier?.short_name} ${row.supplier_item_no}` : row.description}
+              title={row.supplier_item_no ? `Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?` : `Add ${row.description} to Inventory?`}
               // text={`Add ${row.description} (${row.supplier?.short_name} ${row.supplier_item_no}) to your inventory?`}
               type={Types.INVENTORY}
               quantityRequired={1}

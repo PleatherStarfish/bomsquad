@@ -78,7 +78,7 @@ const SupplierItemNo = ({ componentPks }) => {
 
   return (
     <a href={component?.link} className="text-blue-500 hover:text-blue-700">
-      {component?.supplier_item_no}
+      {component?.supplier_item_no ? component?.supplier_item_no : "[ none ]"}
     </a>
   );
 };

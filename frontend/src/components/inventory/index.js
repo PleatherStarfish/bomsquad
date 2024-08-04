@@ -194,7 +194,7 @@ const Inventory = () => {
             .map((row) =>
               [
                 row.component.description.replace(/,/g, ""),
-                row.component.supplier_item_no.replace(/,/g, ""),
+                (row.component.supplier_item_no ?? "").replace(/,/g, ""),
                 row.component.farads,
                 row.component.price,
                 row.quantity,
@@ -274,7 +274,7 @@ const Inventory = () => {
             href={row.component.link}
             className="text-blue-500 hover:text-blue-700"
           >
-            {row.component.supplier_item_no}
+            {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
           </a>
         );
       },

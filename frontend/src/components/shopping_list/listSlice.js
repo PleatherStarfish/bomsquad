@@ -199,7 +199,7 @@ const ListSlice = ({
             "text-blue-500 hover:text-blue-700": index !== 0,
           })}
         >
-          {row.component.supplier_item_no}
+          {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
         </a>
       ),
       sortable: false,

@@ -62,7 +62,7 @@ const AddOneModal = ({
       onSubmit={handleAddToInventory}
     >
       <div>
-        {`Are you sure you want to add ${component?.supplier?.short_name} ${component?.supplier_item_no} to your inventory? This will remove this item from your shopping list.`}
+        {component?.supplier_item_no ? `Are you sure you want to add ${component?.supplier?.short_name} ${component?.supplier_item_no} to your inventory? This will remove this item from your shopping list.` : `Are you sure you want to add ${component?.description} to your inventory? This will remove this item from your shopping list.`}
       </div>
       <InventoryModalContent 
         isLoadingQuantity={isLoadingQuantity} 

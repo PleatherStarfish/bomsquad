@@ -58,7 +58,7 @@ const ShoppingList = () => {
     let copyString = '';
     userShoppingListData.aggregatedComponents.forEach((item) => {
       if (item?.component.supplier.name === "Mouser Electronics") {
-        copyString += `${item?.component.supplier_item_no}|${item?.quantity}\n`;
+        copyString += `${item?.component?.supplier_item_no}|${item?.quantity}\n`;
       }
     });
     
@@ -216,8 +216,8 @@ const ShoppingList = () => {
               <div className="w-full p-4 rounded bg-stone-200">
                 <ul>
                   {mouserItems.map((item) => (
-                    <li key={item?.component.supplier_item_no}>
-                      {`${item?.component.supplier_item_no}|${item?.quantity}\n`}
+                    <li key={item?.component?.supplier_item_no}>
+                      {`${item?.component?.supplier_item_no}|${item?.quantity}\n`}
                     </li>
                   ))}
                 </ul>

@@ -74,7 +74,10 @@ class Component(BaseModel):
     supplier = models.ForeignKey(
         ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
     )
-    supplier_item_no = models.CharField(max_length=100, blank=False, unique=True)
+    supplier_item_no = models.CharField(
+        max_length=100, unique=True, null=True
+    )
+    supplier_has_no_item_no = models.BooleanField(default=False)
     type = models.ForeignKey(Types, on_delete=models.PROTECT)
     ohms = models.DecimalField(
         blank=True,
@@ -163,6 +166,10 @@ class Component(BaseModel):
             return f"{self.description} -- {self.type.name} -- ({self.supplier.name} {self.supplier_item_no})"
 
     def clean(self):
+        if not self.supplier_has_no_item_no and not self.supplier_item_no:
+            raise ValidationError(
+                "Supplier item number is required if 'supplier has no item number' is False."
+            )
         if self.type.name == "Resistors":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(

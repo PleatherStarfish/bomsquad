@@ -111,7 +111,7 @@ const NestedTable = ({ data }) => {
       selector: (row) => {
       console.log(row)
         return <a href={row.link} className="text-blue-500 hover:text-blue-700">
-          {row.supplier_item_no}
+          {row?.supplier_item_no ? row?.supplier_item_no : "[ none ]"}
         </a>
     },
       sortable: true,
@@ -144,16 +144,44 @@ const NestedTable = ({ data }) => {
       omit: type !== "Resistor",
     },
     {
+      name: <div>Forward Current</div>,
+      selector: (row) => row.forward_current,
+      sortable: true,
+      wrap: true,
+      omit: row => row.type.name !== "Diodes",
+    },
+    {
+      name: <div>Forward Voltage</div>,
+      selector: (row) => row.forward_voltage,
+      sortable: true,
+      wrap: true,
+      omit: row => row.type.name !== "Diodes",
+    },
+    {
+      name: <div>Forward Surge Current</div>,
+      selector: (row) => row.forward_surge_current,
+      sortable: true,
+      wrap: true,
+      omit: row => row.type.name !== "Diodes",
+    },
+    {
+      name: <div>Forward Current Avg Rectified</div>,
+      selector: (row) => row.forward_current_avg_rectified,
+      sortable: true,
+      wrap: true,
+      omit: row => row.type.name !== "Diodes",
+    },
+    {
       name: <div>Price</div>,
       selector: (row) => {
         return (
           <span>
-            {row.component?.price_currency &&
+            {row.price_currency &&
               `${getCurrencySymbol(
-                row.component.price_currency
+                row.price_currency
               )}${roundToCurrency(
-                row.component.price,
-                row.component.price_currency
+                row.price,
+                row.price_currency
               )}`}
           </span>
         );
@@ -236,9 +264,9 @@ const NestedTable = ({ data }) => {
             <AddComponentModal
               open={inventoryModalOpen === row.id}
               setOpen={setInventoryModalOpen}
-              title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`}
+              title={row.supplier_item_no ? `Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?` : `Add ${row.description} to Inventory?`}
               type={Types.INVENTORY}
-              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
+              componentName={row.supplier_item_no ? `${row.supplier?.short_name} ${row.supplier_item_no}` : row.description}
               text={
                 <>
                   <span>
@@ -294,7 +322,7 @@ const NestedTable = ({ data }) => {
               open={shoppingModalOpen === row.id}
               setOpen={setShoppingModalOpen}
               title={`Add ${row.description} to Shopping List?`}
-              componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
+              componentName={row.supplier_item_no ? `${row.supplier?.short_name} ${row.supplier_item_no}` : row.description}
               type={Types.SHOPPING}
               hookArgs={{
                 component_pk: row.id,
