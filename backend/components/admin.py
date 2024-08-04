@@ -17,6 +17,7 @@ class ComponentAdmin(BaseAdmin):
                     "mounting_style",
                     "supplier",
                     "supplier_item_no",
+                    "supplier_has_no_item_no",
                     "type",
                     "price",
                     "pcs",

@@ -75,7 +75,11 @@ class Component(BaseModel):
         ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
     )
     supplier_item_no = models.CharField(
-        max_length=100, unique=True, null=True
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="This must be set unless 'supplier_has_no_item_no' is checked.",
     )
     supplier_has_no_item_no = models.BooleanField(default=False)
     type = models.ForeignKey(Types, on_delete=models.PROTECT)
