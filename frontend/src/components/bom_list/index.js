@@ -207,7 +207,7 @@ const BomList = ({ moduleId, moduleName }) => {
       }
       {filteredData &&
         <DataTable
-          fixedHeader
+          // fixedHeader
           responsive
           exportHeaders
           expandableRows

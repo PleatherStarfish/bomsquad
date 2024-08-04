@@ -174,7 +174,7 @@ class Component(BaseModel):
             raise ValidationError(
                 "Supplier item number is required if 'supplier has no item number' is False."
             )
-        if self.type.name == "Resistors":
+        if self.type.name == "Resistor":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(
                     "If this component is a resistor, you must set the Ohm value and unit."
@@ -183,7 +183,7 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for resistors."
                 )
-        elif self.type.name == "Capacitors":
+        elif self.type.name == "Capacitor":
             if not self.farads or not self.farads_unit:
                 raise ValidationError(
                     "If this component is a capacitor, you must set the Farad value and unit."
@@ -192,7 +192,7 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Ohm value and unit must not be set for capacitors."
                 )
-        elif self.type.name == "Potentiometers":
+        elif self.type.name == "Potentiometer":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(
                     "If this component is a potentiometer, you must set the Ohm value and unit."
@@ -201,7 +201,7 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for potentiometers."
                 )
-        elif self.type.name == "Diodes":
+        elif self.type.name == "Diode":
             if not (
                 self.forward_current
                 or self.forward_voltage
@@ -213,7 +213,7 @@ class Component(BaseModel):
                 )
 
         # Validation to ensure diode-specific fields are not set for non-diodes and non-LEDs
-        if self.type.name not in ["Diodes", "Light-emitting diode (LED)"]:
+        if self.type.name not in ["Diode", "Light-emitting diode (LED)"]:
             if (
                 self.forward_current
                 or self.forward_voltage
