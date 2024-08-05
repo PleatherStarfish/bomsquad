@@ -1,12 +1,12 @@
 import {
   BuildingOffice2Icon,
   FolderIcon,
-  WrenchIcon
+  WrenchIcon,
+  ShoppingCartIcon
 } from "@heroicons/react/24/outline";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-import { Cart } from "react-bootstrap-icons";
 import Gravatar from "react-gravatar";
 import cx from "classnames";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
@@ -23,7 +23,7 @@ const initialNavigation = [
   {
     name: "Shopping List",
     to: "shopping-list",
-    icon: Cart,
+    icon: ShoppingCartIcon,
     current: false,
   },
 ];
@@ -146,20 +146,24 @@ const UserPage = () => {
                 <li className="justify-between mt-auto -mx-6">
                   <Link to="settings">
                     <div className="flex items-center px-6 py-3 text-sm font-semibold leading-6 text-gray-900 group/settings gap-x-4 hover:bg-gray-200">
-                      <Gravatar
-                        className="rounded-full"
-                        email={(user?.emails ?? []).filter((e) => e.primary === true)[0].email}
-                        rating="pg"
-                        size={40}
-                      />
+                      {user?.emails?.length > 0 ? (
+                        <Gravatar
+                          className="rounded-full"
+                          email={user.emails.find((e) => e.primary)?.email || user.emails[0].email}
+                          rating="pg"
+                          size={40}
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                      )}
                       <span className="sr-only">Your profile</span>
                       <span
                         aria-hidden="true"
                         className="invisible transition-all opacity-0 whitespace-nowrap group-hover/slideout:visible group-hover/slideout:opacity-100"
                       >
-                        {user.first_name && user.last_name
+                        {user?.first_name && user?.last_name
                           ? `${user.first_name} ${user.last_name}`
-                          : user.username}
+                          : user?.username || "User"}
                       </span>
                     </div>
                   </Link>
