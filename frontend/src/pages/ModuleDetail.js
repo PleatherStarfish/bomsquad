@@ -20,7 +20,7 @@ const ModuleDetail = () => {
             <source srcSet={`${module.large_image_webp}`} type="image/webp" />
             <source srcSet={`${module.large_image_jpeg}`} type="image/jpeg" />
             <img
-              className="max-h-80"
+              className="max-h-[30rem]"
               src={`${module.large_image_jpeg}`}
               alt={module.name}
             />
