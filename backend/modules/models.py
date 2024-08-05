@@ -93,9 +93,10 @@ class Module(BaseModel):
     version = models.CharField(max_length=10, default="1")
     description = models.TextField()
     image = models.ImageField(upload_to="module_imgs", blank=True)
-    image_jpeg = models.ImageField(
-        upload_to="module_imgs_jpeg", blank=True
-    )  # JPEG version of the image
+    thumb_image_webp = models.ImageField(upload_to="module_imgs_thumb_webp", blank=True)
+    thumb_image_jpeg = models.ImageField(upload_to="module_imgs_thumb_jpeg", blank=True)
+    large_image_webp = models.ImageField(upload_to="module_imgs_large_webp", blank=True)
+    large_image_jpeg = models.ImageField(upload_to="module_imgs_large_jpeg", blank=True)
     manufacturer_page_link = models.URLField(blank=True)
     bom_link = models.URLField(blank=True)
     manual_link = models.URLField(blank=True)
@@ -128,40 +129,58 @@ class Module(BaseModel):
         if not self.slug:
             self.slug = slugify(f"{self.name}-{self.manufacturer}-{self.version}")
 
-        # Handle image processing
         if self.image:
-            img = Image.open(self.image)
+            self.process_image(self.image, "thumb", 300)
+            self.process_image(self.image, "large", 1200)
 
-            # Resize image, keeping the aspect ratio
-            max_dimension = max(img.size)
-            if max_dimension > 300:
-                proportion = max_dimension / 300
-                new_width = round(img.width / proportion)
-                new_height = round(img.height / proportion)
-                img = img.resize((new_width, new_height), Image.ANTIALIAS)
+        super(Module, self).save(*args, **kwargs)  # Save the instance
 
-            # Convert to WEBP
-            if img.format != "WEBP":
-                output_webp = BytesIO()
-                img.save(output_webp, format="WEBP", quality=75)
-                output_webp.seek(0)
-                self.image.save(
-                    f"{os.path.splitext(self.image.name)[0]}.webp",
-                    ContentFile(output_webp.read()),
-                    save=False,
-                )
+    def process_image(self, image_field, size_type, max_dimension):
+        img = Image.open(image_field)
 
-            # Save as JPEG for fallback
-            output_jpeg = BytesIO()
-            img.save(output_jpeg, format="JPEG", quality=75)
-            output_jpeg.seek(0)
-            self.image_jpeg.save(
-                f"{os.path.splitext(self.image.name)[0]}.jpg",
-                ContentFile(output_jpeg.read()),
+        # Resize image
+        if max(img.size) > max_dimension:
+            img.thumbnail((max_dimension, max_dimension), Image.ANTIALIAS)
+
+        # Save WEBP
+        output_webp = BytesIO()
+        img.save(output_webp, format="WEBP", quality=75)
+        output_webp.seek(0)
+        if size_type == "thumb":
+            self.thumb_image_webp.save(
+                f"{os.path.splitext(image_field.name)[0]}_thumb.webp",
+                ContentFile(output_webp.read()),
+                save=False,
+            )
+        else:
+            self.large_image_webp.save(
+                f"{os.path.splitext(image_field.name)[0]}_large.webp",
+                ContentFile(output_webp.read()),
                 save=False,
             )
 
-        super(Module, self).save(*args, **kwargs)  # Save the instance
+        # Convert image to RGB if it has an alpha channel
+        if img.mode in ("RGBA", "LA"):
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
+            img = background
+
+        # Save JPEG
+        output_jpeg = BytesIO()
+        img.save(output_jpeg, format="JPEG", quality=75)
+        output_jpeg.seek(0)
+        if size_type == "thumb":
+            self.thumb_image_jpeg.save(
+                f"{os.path.splitext(image_field.name)[0]}_thumb.jpg",
+                ContentFile(output_jpeg.read()),
+                save=False,
+            )
+        else:
+            self.large_image_jpeg.save(
+                f"{os.path.splitext(image_field.name)[0]}_large.jpg",
+                ContentFile(output_jpeg.read()),
+                save=False,
+            )
 
     def __str__(self):
         return f"{self.name} - {self.manufacturer}"

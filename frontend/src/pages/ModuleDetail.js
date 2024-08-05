@@ -1,15 +1,13 @@
 import AddModuleButtons from '../components/AddModuleButtons';
 import BomList from "../components/bom_list";
-import ModuleLinks from '../components/ModuleLinks'
+import ModuleLinks from '../components/ModuleLinks';
 import React from "react";
-import useModule from '../services/useModule'
-import {
-  useParams
-} from "react-router-dom";
+import useModule from '../services/useModule';
+import { useParams } from "react-router-dom";
 
 const ModuleDetail = () => {
   let { slug } = useParams();
-  const { module, moduleIsLoading, moduleIsError } = useModule(slug)
+  const { module, moduleIsLoading, moduleIsError } = useModule(slug);
 
   if (moduleIsLoading) return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
@@ -17,11 +15,16 @@ const ModuleDetail = () => {
   return (
     <>
       <div className="flex justify-center">
-        {module.image && (
-          <img
-          className="max-h-60"
-            src={`${module.image}`}
-          />
+        {module.large_image_webp && (
+          <picture>
+            <source srcSet={`${module.large_image_webp}`} type="image/webp" />
+            <source srcSet={`${module.large_image_jpeg}`} type="image/jpeg" />
+            <img
+              className="max-h-80"
+              src={`${module.large_image_jpeg}`}
+              alt={module.name}
+            />
+          </picture>
         )}
       </div>
       <div>
@@ -49,7 +52,7 @@ const ModuleDetail = () => {
           </div>
         </div>
       </div>
-      <h1  className="py-8 text-xl font-semibold">Components</h1>
+      <h1 className="py-8 text-xl font-semibold">Components</h1>
       <BomList moduleId={module?.id} moduleName={module?.name} />
     </>
   );

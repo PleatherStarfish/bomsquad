@@ -71,12 +71,12 @@
             {% for module in page_obj %}
                 <div class="flex items-center overflow-hidden bg-white rounded-lg module-item">
                     <div class="flex justify-center object-contain w-24 h-24 md:w-48 md:h-48">
-                        {% if module.image and module.image_jpeg %}
+                        {% if module.thumb_image_webp and module.thumb_image_jpeg %}
                             <picture>
-                                <source srcset="{{ module.image.url }}" type="image/webp">
-                                <source srcset="{{ module.image_jpeg.url }}" type="image/jpeg"> <!-- Fallback image -->
+                                <source srcset="{{ module.thumb_image_webp.url }}" type="image/webp">
+                                <source srcset="{{ module.thumb_image_jpeg.url }}" type="image/jpeg"> <!-- Fallback image -->
                                 <img class="object-contain w-auto h-full"
-                                    src="{{ module.image_jpeg.url }}"
+                                    src="{{ module.thumb_image_jpeg.url }}"
                                     alt="{{ module.name }}"/>
                             </picture>
                         {% endif %}
