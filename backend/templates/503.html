@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXVV479GJX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KXVV479GJX');
+    </script>
+    <meta charset="utf-8" />
+    <meta
+      name="keywords"
+      content="eurorack, diy, synthesizer, modular, music, hardware, analog synthesizer, modular synth, electronic music, synth building, sound design, music production, audio gear, circuit design"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta
+      name="viewport"
+      content="width=device-width,minimum-scale=1,initial-scale=1"
+    />
+    <title>{% block title %}BOM Squad{% endblock title %}</title>
+    <meta
+      name="description"
+      content="An inventory and search tool for DIY Eurorack synthesizer modules and components"
+    />
+    <meta
+      name="author"
+      content="https://github.com/PleatherStarfish/bomsquad"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="{% static 'images/logo.png' %}"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/cash-dom/dist/cash.min.js"></script>
+    <script>(function(){const{protocol:n,host:o,pathname:t,search:a,hash:h}=window.location;t.endsWith("/")||t.endsWith(".html")||window.location.replace(`${n}//${o}${t}/${a}${h}`)})()</script>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    {% block css %}{% endblock css %}
+  </head>
+
+  <body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="text-center">
+        <h1 class="mb-4 text-3xl font-bold text-gray-700">We'll be back soon!</h1>
+        <p class="mb-8 text-lg text-gray-600">
+            Sorry for the inconvenience; we're performing some maintenance at the moment. We'll be back online shortly!
+        </p>
+        <p class="text-gray-500 text-md">
+            - The BOM Squad Team
+        </p>
+    </div>
+    
+    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/cc.js' %}"></script>
+    <script src="{% static 'js/mobile_menu.js' %}"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        tippy('[data-tippy-content]', {
+          allowHTML: true,
+        });
+      });
+    </script>
+
+    {% block javascript %}{% endblock javascript %}
+  </body>
+</html>

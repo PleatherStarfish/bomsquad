@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView, TemplateView
 from django.contrib.auth.decorators import login_required
-from django.urls import path, re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -44,6 +43,7 @@ frontend_redirect_urls = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
+    re_path(r"^maintenance-mode/", include("maintenance_mode.urls")),
     path(r"comments/", include("django_comments_xtd.urls")),
     path(
         "module/<slug:slug>/",

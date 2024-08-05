@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "core.staticfiles_config.StaticFilesConfig",
     "django.contrib.sites",
     # Third-party
+    "maintenance_mode",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -123,6 +124,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "maintenance_mode.middleware.MaintenanceModeMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -397,3 +399,5 @@ LOGGING = {
         },
     },
 }
+
+MAINTENANCE_MODE_TEMPLATE = "503.html"
