@@ -149,7 +149,7 @@ const UserPage = () => {
                       {user?.emails?.length > 0 ? (
                         <Gravatar
                           className="rounded-full"
-                          email={user.emails.find((e) => e.primary)?.email || user.emails[0].email}
+                          email={user.emails.find((e) => e.primary)?.[0].email || user.emails[0].email}
                           rating="pg"
                           size={40}
                         />
