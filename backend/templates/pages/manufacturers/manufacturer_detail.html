@@ -34,13 +34,20 @@
     </table>
 </div>
 
-<div class="container py-12 mx-auto">
+<!-- Warning message for small screens -->
+<div class="container block py-12 mx-auto lg:hidden">
+    <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage</h2>
+    <p class="text-lg text-red-600">Please view on a desktop screen to see the graphs and detailed data.</p>
+</div>
+
+<!-- Graphs for larger screens -->
+<div class="container hidden py-12 mx-auto lg:block">
     <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
     <div id="buttonsContainerCount"></div>
     <canvas id="componentUsageCountChart" width="400" height="200"></canvas>
 </div>
 
-<div class="container py-12 mx-auto">
+<div class="container hidden py-12 mx-auto lg:block">
     <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity of Components Used</h2>
     <div id="buttonsContainerQuantity"></div>
     <canvas id="componentUsageQuantityChart" width="400" height="200"></canvas>
@@ -67,8 +74,8 @@
                         {{ item.count }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 ],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: '{{ main_color }}',
+                borderColor: '{{ main_border_color }}',
                 borderWidth: 1,
                 ids: [
                     {% for item in component_usage_count %}
@@ -87,8 +94,8 @@
                         {{ item.total_quantity }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 ],
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: '{{ main_color }}',
+                borderColor: '{{ main_border_color }}',
                 borderWidth: 1,
                 ids: [
                     {% for item in component_usage_quantity %}
@@ -248,9 +255,18 @@
                 button.style.backgroundColor = dataset.backgroundColor;
                 button.style.border = 'none';
                 button.style.marginRight = '10px';
+                button.style.marginTop = '20px';
+                button.style.marginBottom = '20px';
                 button.style.padding = '10px';
                 button.style.cursor = 'pointer';
-                button.classList.add('active'); // Initially, all buttons are active
+                if (dataset.label === '{{ manufacturer.name }} Modules Including Component' || dataset.label === '{{ manufacturer.name }} Total Quantity of Components Used') {
+                    button.classList.add('active'); // Main manufacturer button is active
+                    button.style.opacity = 1;
+                } else {
+                    button.classList.remove('active');
+                    button.style.opacity = 0.5;
+                    chart.getDatasetMeta(index).hidden = true; // Initially hide other manufacturers
+                }
                 
                 button.addEventListener('click', function() {
                     const meta = chart.getDatasetMeta(index);
@@ -283,7 +299,6 @@
     });
 </script>
 {% endblock content %}
-
 
 {% block extra-js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"
