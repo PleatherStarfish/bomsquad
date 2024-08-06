@@ -28,12 +28,11 @@ MOUNTING_STYLE = [
 class Types(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255, unique=True)
-    order = models.PositiveSmallIntegerField(unique=False)
     notes = models.TextField(blank=True)
 
     class Meta:
         verbose_name_plural = "Types"
-        ordering = ["order"]
+        ordering = ["name"]
 
     def __str__(self):
         return f"{self.name}"
@@ -58,6 +57,7 @@ class ComponentManufacturer(BaseModel):
 
     class Meta:
         verbose_name_plural = "Component Manufacturers"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -158,6 +158,7 @@ class Component(BaseModel):
 
     class Meta:
         verbose_name_plural = "Components"
+        ordering = ["type", "mounting_style", "description"]
 
     def __str__(self):
         if self.type.name == "Potentiometers":

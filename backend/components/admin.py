@@ -56,6 +56,13 @@ class ComponentAdmin(BaseAdmin):
             },
         ),
     )
+    list_display = (
+        "description",
+        "mounting_style",
+        "supplier",
+        "type",
+        "discontinued",
+    )
 
 
 class TypesAdmin(BaseAdmin):

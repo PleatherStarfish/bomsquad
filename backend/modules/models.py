@@ -26,6 +26,10 @@ class Manufacturer(BaseModel):
     notes = models.TextField(blank=True)
     slug = models.SlugField(blank=True)
 
+    class Meta:
+        verbose_name_plural = "Manufacturer"
+        ordering = ["name"]
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.name}")
@@ -44,7 +48,7 @@ class PcbVersion(BaseModel):
     order = models.PositiveIntegerField(default=0, blank=False)
 
     def __str__(self):
-        return f"{self.module.name} - {self.version} - {self.order}"
+        return f"{self.module.name} - version {self.version} - {self.order}"
 
 
 class ModuleBomListItem(BaseModel):
@@ -123,6 +127,7 @@ class Module(BaseModel):
     class Meta:
         verbose_name_plural = "Modules"
         unique_together = ("name", "manufacturer", "version")
+        ordering = ["name"]
 
     def save(self, *args, **kwargs):
         # Handle slug generation
