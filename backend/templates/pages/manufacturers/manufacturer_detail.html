@@ -70,6 +70,11 @@
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
+                ids: [
+                    {% for item in component_usage_count %}
+                        "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
                 xAxisID: "x"
             }
         ];
@@ -85,6 +90,11 @@
                 backgroundColor: 'rgba(153, 102, 255, 0.2)',
                 borderColor: 'rgba(153, 102, 255, 1)',
                 borderWidth: 1,
+                ids: [
+                    {% for item in component_usage_quantity %}
+                        "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
                 xAxisID: "x"
             }
         ];
@@ -100,6 +110,11 @@
             backgroundColor: '{{ other_manufacturer.color }}',
             borderColor: '{{ other_manufacturer.border_color }}',
             borderWidth: 1,
+            ids: [
+                {% for item in other_manufacturer.component_usage_count %}
+                    "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
             xAxisID: "x2"
         });
 
@@ -113,6 +128,11 @@
             backgroundColor: '{{ other_manufacturer.color }}',
             borderColor: '{{ other_manufacturer.border_color }}',
             borderWidth: 1,
+            ids: [
+                {% for item in other_manufacturer.component_usage_quantity %}
+                    "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
             xAxisID: "x2"
         });
         {% endfor %}
@@ -152,7 +172,6 @@
                 const points = componentUsageCountChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
                 if (points.length) {
                     const firstPoint = points[0];
-                    const label = componentUsageCountChart.data.labels[firstPoint.index];
                     const componentId = componentUsageCountChart.data.datasets[firstPoint.datasetIndex].ids[firstPoint.index];
                     const url = `/components/${componentId}/`;
                     window.location.href = url;
@@ -195,7 +214,6 @@
                 const points = componentUsageQuantityChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
                 if (points.length) {
                     const firstPoint = points[0];
-                    const label = componentUsageQuantityChart.data.labels[firstPoint.index];
                     const componentId = componentUsageQuantityChart.data.datasets[firstPoint.datasetIndex].ids[firstPoint.index];
                     const url = `/components/${componentId}/`;
                     window.location.href = url;
@@ -265,6 +283,7 @@
     });
 </script>
 {% endblock content %}
+
 
 {% block extra-js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"

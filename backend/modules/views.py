@@ -306,20 +306,25 @@ def get_module_status(request, module_pk):
 def manufacturer_detail(request, slug):
     manufacturer = Manufacturer.objects.get(slug=slug)
 
-    # Get the component usage data for the main manufacturer
+    # Get the component usage data for the main manufacturer and sort by count
     component_usage_count = (
         ModuleBomListItem.objects.filter(module__manufacturer=manufacturer)
         .values("components_options__description", "components_options__id")
         .annotate(count=Count("id"))
-        .order_by("components_options__description")
+        .order_by("-count")
     )
 
     component_usage_quantity = (
         ModuleBomListItem.objects.filter(module__manufacturer=manufacturer)
         .values("components_options__description", "components_options__id")
         .annotate(total_quantity=Sum("quantity"))
-        .order_by("components_options__description")
+        .order_by("-total_quantity")
     )
+
+    # Create a sorted list of component IDs based on the main manufacturer's data
+    sorted_component_ids = [
+        item["components_options__id"] for item in component_usage_count
+    ]
 
     # Define colors for other manufacturers
     colors = [
@@ -357,13 +362,31 @@ def manufacturer_detail(request, slug):
             .order_by("components_options__description")
         )
 
+        # Sort other manufacturer data by the sorted component IDs
+        sorted_other_usage_count = sorted(
+            other_usage_count,
+            key=lambda x: (
+                sorted_component_ids.index(x["components_options__id"])
+                if x["components_options__id"] in sorted_component_ids
+                else -1
+            ),
+        )
+        sorted_other_usage_quantity = sorted(
+            other_usage_quantity,
+            key=lambda x: (
+                sorted_component_ids.index(x["components_options__id"])
+                if x["components_options__id"] in sorted_component_ids
+                else -1
+            ),
+        )
+
         other_manufacturers_data.append(
             {
                 "name": other_manufacturer.name,
                 "color": colors[index % len(colors)],
                 "border_color": border_colors[index % len(border_colors)],
-                "component_usage_count": other_usage_count,
-                "component_usage_quantity": other_usage_quantity,
+                "component_usage_count": sorted_other_usage_count,
+                "component_usage_quantity": sorted_other_usage_quantity,
             }
         )
 

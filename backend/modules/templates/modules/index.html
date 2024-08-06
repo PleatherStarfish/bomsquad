@@ -118,7 +118,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-500">{{ module.manufacturer }}</p>
+                            <a href="{% url 'manufacturer_detail' module.manufacturer.slug %}" class="text-gray-500 hover:text-gray-400">{{ module.manufacturer.name }}</a>
                             <p class="mt-4 text-sm text-gray-500" style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5">
                                 {{ module.description }}
                             </p>
