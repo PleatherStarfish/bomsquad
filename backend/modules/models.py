@@ -21,7 +21,7 @@ MOUNTING_STYLE = [
 
 class Manufacturer(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     link = models.URLField(blank=True)
     notes = models.TextField(blank=True)
     slug = models.SlugField(blank=True)

@@ -8,6 +8,7 @@ from .views import (
     FAQView,
     component_detail,
 )
+from modules.views import manufacturer_detail
 from django.views.generic import TemplateView
 from comments.views import latest_comments
 
@@ -34,4 +35,9 @@ urlpatterns = [
         name="pp",
     ),
     path("community/", latest_comments, name="fetch_comments"),
+    path(
+        "manufacturer/<slug:slug>/",
+        manufacturer_detail,
+        name="manufacturer_detail",
+    ),
 ]

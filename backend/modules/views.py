@@ -1,10 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -302,3 +301,76 @@ def get_module_status(request, module_pk):
     is_wtb = WantToBuildModules.objects.filter(user=user, module=module).exists()
 
     return Response({"is_built": is_built, "is_wtb": is_wtb}, status=status.HTTP_200_OK)
+
+
+def manufacturer_detail(request, slug):
+    manufacturer = Manufacturer.objects.get(slug=slug)
+
+    # Get the component usage data for the main manufacturer
+    component_usage_count = (
+        ModuleBomListItem.objects.filter(module__manufacturer=manufacturer)
+        .values("components_options__description", "components_options__id")
+        .annotate(count=Count("id"))
+        .order_by("components_options__description")
+    )
+
+    component_usage_quantity = (
+        ModuleBomListItem.objects.filter(module__manufacturer=manufacturer)
+        .values("components_options__description", "components_options__id")
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("components_options__description")
+    )
+
+    # Define colors for other manufacturers
+    colors = [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(255, 206, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+    ]
+    border_colors = [
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(153, 102, 255, 1)",
+        "rgba(255, 159, 64, 1)",
+    ]
+
+    # Get data for other manufacturers
+    other_manufacturers = Manufacturer.objects.exclude(id=manufacturer.id)
+    other_manufacturers_data = []
+    for index, other_manufacturer in enumerate(other_manufacturers):
+        other_usage_count = (
+            ModuleBomListItem.objects.filter(module__manufacturer=other_manufacturer)
+            .values("components_options__description", "components_options__id")
+            .annotate(count=Count("id"))
+            .order_by("components_options__description")
+        )
+
+        other_usage_quantity = (
+            ModuleBomListItem.objects.filter(module__manufacturer=other_manufacturer)
+            .values("components_options__description", "components_options__id")
+            .annotate(total_quantity=Sum("quantity"))
+            .order_by("components_options__description")
+        )
+
+        other_manufacturers_data.append(
+            {
+                "name": other_manufacturer.name,
+                "color": colors[index % len(colors)],
+                "border_color": border_colors[index % len(border_colors)],
+                "component_usage_count": other_usage_count,
+                "component_usage_quantity": other_usage_quantity,
+            }
+        )
+
+    context = {
+        "manufacturer": manufacturer,
+        "component_usage_count": list(component_usage_count),
+        "component_usage_quantity": list(component_usage_quantity),
+        "other_manufacturers": other_manufacturers_data,
+    }
+    return render(request, "pages/manufacturers/manufacturer_detail.html", context)
