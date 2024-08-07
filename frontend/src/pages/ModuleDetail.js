@@ -12,6 +12,8 @@ const ModuleDetail = () => {
   if (moduleIsLoading) return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
   if (moduleIsError) return <div>Error!</div>;
 
+  const manufacturerDetailUrl = `/manufacturer/${module.manufacturer_slug}/`;
+
   return (
     <>
       <div className="flex justify-center">
@@ -32,9 +34,9 @@ const ModuleDetail = () => {
           <div className="mt-12">
             <div>
               <h1 className="py-8 text-3xl font-semibold">{module.name}</h1>
-              {module.manufacturer.link ? <a href={module.manufacturer.link}>
+              <a href={manufacturerDetailUrl} className="text-gray-500 hover:text-gray-400">
                 {module.manufacturer.name}
-              </a> : <p>{module.manufacturer.name}</p>}
+              </a>
             </div>
             <div className="flex justify-between h-full mt-6">
               <ModuleLinks module={module} />
