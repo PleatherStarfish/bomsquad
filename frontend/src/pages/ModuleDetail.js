@@ -34,7 +34,7 @@ const ModuleDetail = () => {
           <div className="mt-12">
             <div>
               <h1 className="py-8 text-3xl font-semibold">{module.name}</h1>
-              <a href={manufacturerDetailUrl} className="text-gray-500 hover:text-gray-400">
+              <a href={manufacturerDetailUrl} className="text-gray-500 hover:text-gray-300">
                 {module.manufacturer.name}
               </a>
             </div>
