@@ -196,15 +196,17 @@ const BomList = ({ moduleId, moduleName }) => {
           </Alert>
         </div>
       )}
-      {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab && <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>}
-      {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab &&
-        <Tabs
-          onClick={setSelectedTab}
-          tabs={uniquePCBVersions?.map((name) => {
-            return { name: name, current: name === selectedTab };
-          })}
-        />
-      }
+      {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab && (
+        <div className="p-4 mb-4 rounded-lg bg-blue-50">
+          <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>
+          <Tabs
+            onClick={setSelectedTab}
+            tabs={uniquePCBVersions?.map((name) => {
+              return { name: name, current: name === selectedTab };
+            })}
+          />
+        </div>
+      )}
       {filteredData &&
         <DataTable
           fixedHeader={false}
