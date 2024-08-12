@@ -18,7 +18,7 @@ const Tabs = ({
         <select
           id="tabs"
           name="tabs"
-          className="block w-full border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
+          className="block w-full rounded-md"
           defaultValue={tabs.find((tab) => tab.current)?.name}
         >
           {tabs?.map((tab, index) => (
@@ -33,7 +33,7 @@ const Tabs = ({
               key={index}
               className={cx(
                 tab?.current
-                  ? `${activeTabColor} ${activeBorder ? "border-b-2 border-indigo-500" : ""}`
+                  ? `${activeTabColor} ${activeBorder ? "border border-black" : ""}`
                   : inactiveTabColor,
                 "cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-gray-800"
               )}
