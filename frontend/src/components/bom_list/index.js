@@ -197,7 +197,7 @@ const BomList = ({ moduleId, moduleName }) => {
         </div>
       )}
       {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab && (
-        <div className="p-4 mb-4 rounded-lg bg-blue-50">
+        <div className="p-4 mb-4 rounded-lg bg-[#ddeae2]">
           <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>
           <Tabs
             onClick={setSelectedTab}
