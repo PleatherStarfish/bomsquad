@@ -2,7 +2,13 @@ import React from "react";
 import _ from 'lodash';
 import cx from "classnames";
 
-const Tabs = ({ tabs, onClick }) => {
+const Tabs = ({
+  tabs,
+  onClick,
+  activeTabColor = "bg-gray-200",
+  inactiveTabColor = "bg-gray-50 hover:bg-slate-100",
+  activeBorder = false
+}) => {
   return (
     <div className="sm:my-4">
       <div className="sm:hidden">
@@ -27,8 +33,8 @@ const Tabs = ({ tabs, onClick }) => {
               key={index}
               className={cx(
                 tab?.current
-                  ? "bg-gray-200"
-                  : "bg-gray-50 hover:bg-slate-100",
+                  ? `${activeTabColor} ${activeBorder ? "border-b-2 border-indigo-500" : ""}`
+                  : inactiveTabColor,
                 "cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-gray-800"
               )}
               aria-current={tab?.current ? "page" : undefined}
