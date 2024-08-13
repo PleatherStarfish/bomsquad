@@ -5,8 +5,8 @@ import cx from "classnames";
 const Tabs = ({
   tabs,
   onClick,
-  activeTabColor = "bg-gray-200 hover:bg-slate-300",
-  inactiveTabColor = "bg-gray-50 hover:bg-slate-100",
+  activeTabColor = "bg-gray-200 text-gray-800 hover:bg-slate-300",
+  inactiveTabColor = "bg-gray-50 text-gray-800 hover:bg-slate-100",
   activeBorder = false
 }) => {
   return (
@@ -35,7 +35,7 @@ const Tabs = ({
                 tab?.current
                   ? `${activeTabColor} ${activeBorder ? "border border-black" : ""}`
                   : inactiveTabColor,
-                "cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-gray-800"
+                "cursor-pointer rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={tab?.current ? "page" : undefined}
               onClick={() => onClick(tab?.name)}
