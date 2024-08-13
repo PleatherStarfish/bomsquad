@@ -48,7 +48,8 @@ class PcbVersion(BaseModel):
     order = models.PositiveIntegerField(default=0, blank=False)
 
     def __str__(self):
-        return f"{self.module.name} - version {self.version} - {self.order}"
+        version_str = f" - version {self.version}" if self.version.isdigit() else ""
+        return f"{self.module.name}{version_str} - {self.order}"
 
 
 class ModuleBomListItem(BaseModel):
