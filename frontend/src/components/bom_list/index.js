@@ -200,7 +200,7 @@ const BomList = ({ moduleId, moduleName }) => {
         <div className="p-4 mb-4 bg-gray-100 rounded-lg">
           <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>
           <Tabs
-            activeTabColor="bg-[#568b6d] hover:text-white hover:bg-[#4f7f63]"
+            activeTabColor="bg-[#568b6d] text-white hover:text-white hover:bg-[#4f7f63]"
             inactiveTabColor="bg-[#c9e2d3] text-gray-800 hover:bg-[#afd4be]"
             onClick={setSelectedTab}
             tabs={uniquePCBVersions?.map((name) => {
