@@ -48,7 +48,9 @@ class PcbVersion(BaseModel):
     order = models.PositiveIntegerField(default=0, blank=False)
 
     def __str__(self):
-        version_str = f" - version {self.version}" if self.version.isdigit() else ""
+        version_str = (
+            f" - version {self.version}" if self.version.isdigit() else self.version
+        )
         return f"{self.module.name}{version_str} - {self.order}"
 
 
