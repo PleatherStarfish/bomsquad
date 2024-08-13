@@ -53,7 +53,7 @@ class PcbVersion(BaseModel):
             if self.version.isdigit()
             else f" {self.version}"
         )
-        return f"{self.module.name}{version_str} - {self.order}"
+        return f"{self.module.name}{version_str}"
 
 
 class ModuleBomListItem(BaseModel):

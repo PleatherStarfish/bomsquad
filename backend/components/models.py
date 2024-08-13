@@ -111,35 +111,35 @@ class Component(BaseModel):
     )
     voltage_rating = models.CharField(max_length=6, blank=True)
     current_rating = models.CharField(max_length=6, blank=True)
-    forward_current = models.DecimalField(
+    forward_current = models.CharField(
+        max_length=6,
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="The maximum forward current of the component.",
     )
-    forward_voltage = models.DecimalField(
+    forward_voltage = models.CharField(
+        max_length=6,
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="The forward voltage drop of the component.",
     )
-    forward_surge_current = models.DecimalField(
+    forward_surge_current = models.CharField(
+        max_length=6,
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="The maximum forward surge current of the component.",
     )
-    forward_current_avg_rectified = models.DecimalField(
+    forward_current_avg_rectified = models.CharField(
+        max_length=6,
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="The average forward current over a full cycle of an AC signal.",
     )
-    tolerance = models.CharField(max_length=6, blank=True)
+    tolerance = models.CharField(
+        max_length=6,
+        blank=True,
+        null=True,
+    )
     price = MoneyField(
         max_digits=4,
         decimal_places=2,
