@@ -197,11 +197,11 @@ const BomList = ({ moduleId, moduleName }) => {
         </div>
       )}
       {uniquePCBVersions && uniquePCBVersions.length > 1 && selectedTab && (
-        <div className="p-4 mb-4 rounded-lg bg-gray-50">
+        <div className="p-4 mb-4 bg-gray-100 rounded-lg">
           <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>
           <Tabs
-            activeTabColor="bg-brandgreen-300 text-white hover:bg-brandgreen-400"
-            inactiveTabColor="bg-brandgreen-200 text-gray-800 hover:bg-brandgreen-300"
+            activeTabColor="bg-[#568b6d] hover:text-white hover:bg-[#4f7f63]"
+            inactiveTabColor="bg-[#c9e2d3] text-gray-800 hover:bg-[#afd4be]"
             onClick={setSelectedTab}
             tabs={uniquePCBVersions?.map((name) => {
               return { name: name, current: name === selectedTab };
