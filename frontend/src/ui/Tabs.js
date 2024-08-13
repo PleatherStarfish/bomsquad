@@ -5,8 +5,8 @@ import cx from "classnames";
 const Tabs = ({
   tabs,
   onClick,
-  activeTabColor = "bg-gray-200 text-gray-800 hover:bg-slate-300",
-  inactiveTabColor = "bg-gray-50 text-gray-800 hover:bg-slate-100",
+  activeTabColor = "bg-gray-200 text-gray-800 hover:bg-gray-300",
+  inactiveTabColor = "bg-gray-50 text-gray-800 hover:bg-gray-100",
   activeBorder = false
 }) => {
   return (
