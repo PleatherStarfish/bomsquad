@@ -49,7 +49,9 @@ class PcbVersion(BaseModel):
 
     def __str__(self):
         version_str = (
-            f" - version {self.version}" if self.version.isdigit() else self.version
+            f" - version {self.version}"
+            if self.version.isdigit()
+            else f" {self.version}"
         )
         return f"{self.module.name}{version_str} - {self.order}"
 
