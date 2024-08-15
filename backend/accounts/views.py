@@ -13,7 +13,6 @@ from django.db.transaction import non_atomic_requests
 from django.http import HttpResponse
 from .models import CustomUser, KofiPayment, UserNotes, WantToBuildModules, BuiltModules
 from datetime import datetime, timedelta
-from django.core.exceptions import ValidationError
 from decimal import Decimal
 from uuid import UUID
 import logging

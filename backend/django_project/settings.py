@@ -341,7 +341,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_MAX_EMAIL_ADDRESSES = 3
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
-ACCOUNT_FORMS = {"signup": "accounts.forms.CustomUserCreationForm"}
+ACCOUNT_FORMS = {
+    "signup": "accounts.forms.CustomUserCreationForm",
+    "reset_password": "accounts.forms.CaptchaPasswordResetForm",
+}
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
 

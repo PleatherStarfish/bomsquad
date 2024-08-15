@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from accounts.models import CustomUser
-from allauth.account.forms import SignupForm
+from allauth.account.forms import SignupForm, ResetPasswordForm
 from captcha.fields import ReCaptchaField
 
 
@@ -51,3 +51,20 @@ class CustomUserChangeForm(UserChangeForm):
             "email",
             "username",
         )
+
+
+class CaptchaPasswordResetForm(ResetPasswordForm):
+    captcha = ReCaptchaField()
+
+    def __init__(self, *args, **kwargs):
+        super(CaptchaPasswordResetForm, self).__init__(*args, **kwargs)
+        # No need to explicitly add the captcha field here; it's already part of the form fields
+
+    def save(self, request, **kwargs):
+        # Call the parent class's save method
+        email_address = super(CaptchaPasswordResetForm, self).save(request, **kwargs)
+
+        # Add any additional processing here if needed
+
+        # Return the original result
+        return email_address
