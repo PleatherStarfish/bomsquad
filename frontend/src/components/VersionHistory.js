@@ -106,6 +106,14 @@ const VersionHistory = () => {
 
   if (userHistoryIsError || userIsError) return <div>Error!</div>;
 
+  const filteredHistory = _.filter(userHistory.history, item => {
+      const isLocationEqual = _.isEqual(item.location_before, item.location_after);
+      const isQuantityEqual = item.quantity_before === item.quantity_after;
+      return !(isLocationEqual && isQuantityEqual);
+  });
+
+  userHistory.history = filteredHistory;
+
   const columns = [
     {
       name: <div className="text-bold">Timestamp</div>,
