@@ -32,29 +32,27 @@ def update_user_inventory_history(sender, instance, created, **kwargs):
     # Get the related CustomUser object
     user = instance.user
 
-    # Create a new entry for the change history
     history_entry = {
-        "component_id": str(instance.component_id),  # Convert UUID to string
+        "component_id": str(instance.component_id),
         "quantity_before": instance.old_quantity,
         "quantity_after": instance.quantity,
-        "location_before": instance.old_location,
-        "location_after": instance.location,
         "timestamp": str(now()),
     }
 
-    # Update the history field on the CustomUser object
+    if instance.old_location is not None or instance.location is not None:
+        history_entry["location_before"] = instance.old_location
+        history_entry["location_after"] = instance.location
+
     user.history = (
         json.loads(user.history) if isinstance(user.history, str) else user.history
     )
     user.history = user.history or []
 
-    # If the history array has more than 1000 items, remove the oldest one
     if len(user.history) >= 1000:
         user.history.pop(0)
 
     user.history.append(history_entry)
     user.save()
 
-    # Serialize the history field using the custom JSON encoder
     user.history = json.dumps(user.history, cls=CustomJSONEncoder)
     user.save()

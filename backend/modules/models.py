@@ -24,7 +24,7 @@ class Manufacturer(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     link = models.URLField(blank=True)
     notes = models.TextField(blank=True)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, unique=True)
 
     class Meta:
         verbose_name_plural = "Manufacturer"
@@ -112,7 +112,7 @@ class Module(BaseModel):
     modulargrid_link = models.URLField(blank=True)
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     discontinued = models.BooleanField(default=False)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, unique=True)
     allow_comments = models.BooleanField("allow comments", default=True)
 
     def is_built_by_user(self, user):
@@ -135,9 +135,8 @@ class Module(BaseModel):
         ordering = ["name"]
 
     def save(self, *args, **kwargs):
-        # Handle slug generation
         if not self.slug:
-            self.slug = slugify(f"{self.name}-{self.manufacturer}-{self.version}")
+            self.slug = slugify(f"{self.name}-{self.version}")
 
         if self.image:
             self.process_image(self.image, "thumb", 300)
