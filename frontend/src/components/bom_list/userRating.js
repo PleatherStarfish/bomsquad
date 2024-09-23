@@ -5,12 +5,12 @@ import React, { useEffect, useState } from 'react';
 import Modal from '../../ui/Modal';
 import { Rating } from 'react-simple-star-rating';
 import Tippy from "@tippyjs/react";
-import useGetAverageRating from '../../services/useGetAverageRating';
-import useRateComponent from '../../services/useRateComponent';
-import useModuleStatus from '../../services/useModuleStatus';
 import useAuthenticatedUser from '../../services/useAuthenticatedUser';
+import useGetAverageRating from '../../services/useGetAverageRating';
+import useModuleStatus from '../../services/useModuleStatus';
+import useRateComponent from '../../services/useRateComponent';
 
-const UserRating = ({ moduleBomListItemId, componentId, initialRating, moduleName, bomItemName, moduleId, isLoggedIn }) => {
+const UserRating = ({ moduleBomListItemId, componentId, initialRating, moduleName, bomItemName, moduleId }) => {
   const [rating, setRating] = useState(initialRating);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -43,7 +43,7 @@ const UserRating = ({ moduleBomListItemId, componentId, initialRating, moduleNam
   const tooltipText = isError ? errorMessage : `${numberOfRatings} rating${numberOfRatings !== 1 ? 's' : ''}`;
 
   const handleOpenModal = () => {
-    if (!isLoggedIn) {
+    if (!user) {
       setShowLoginModal(true);
     } else if (moduleStatus?.is_built) {
       setShowError(false);
