@@ -27,9 +27,6 @@ const AddOneModal = ({
     isError: isErrorLocation,
   } = useGetInventoryLocations(component?.id);
 
-  console.log("component?.id", component?.id)
-  console.log("locations", locations)
-
   const locationsData = locations ?? locations?.data ?? [];
   const savedLocationsData = Array.isArray(locationsData)
     ? locationsData.map((item) => ({

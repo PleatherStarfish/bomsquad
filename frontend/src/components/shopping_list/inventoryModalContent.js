@@ -16,7 +16,6 @@ const InventoryModalContent = ({
 }) => {
   const selectedComponent = Array.isArray(component) ? component[0] : component;
 
-  console.log(savedLocationsData)
   return isLoadingQuantity || isLoadingLocation ? (
     <div className="text-center text-gray-500 animate-pulse">
       Loading...

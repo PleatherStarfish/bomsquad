@@ -181,7 +181,6 @@ def get_component_locations(request, component_pk):
         .values("location", "quantity")
         .distinct()
     )
-    print(locations_and_quantities)
 
     if not locations_and_quantities:
         # Return an empty JSON object
@@ -192,7 +191,6 @@ def get_component_locations(request, component_pk):
         {"location": item["location"], "quantity": item["quantity"]}
         for item in locations_and_quantities
     ]
-    print(locations_with_quantity)
 
     return Response(locations_with_quantity, status=status.HTTP_200_OK)
 
