@@ -68,8 +68,8 @@
 
 @media (min-width: 1024px) {
     @layer components {
-        .table-of-contents {
-            @apply float-right w-1/4 ml-5;
-        }
+      .table-of-contents {
+        @apply float-right w-1/4 ml-5;
+      }
     }
-}
+  }
