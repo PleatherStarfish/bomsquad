@@ -16,7 +16,22 @@ module.exports = {
     'h-48',
     'md:w-48', 
     'md:h-48',
-    'text-2xl'
+    'text-2xl',
+    'bg-gray-100', 
+    'p-5', 
+    'rounded-lg', 
+    'mb-5', 
+    'lg:float-right', 
+    'lg:w-1/4', 
+    'lg:ml-5', 
+    'text-xl', 
+    'font-semibold', 
+    'list-none', 
+    'pl-5', 
+    'block', 
+    'text-blue-500', 
+    'hover:text-blue-700', 
+    'font-bold'
   ],
   darkMode: 'class',
   theme: {
