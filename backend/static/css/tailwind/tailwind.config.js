@@ -21,6 +21,7 @@ module.exports = {
     'p-5', 
     'rounded-lg', 
     'mb-5', 
+    'lg:inline-block', 
     'lg:float-right', 
     'lg:w-1/4', 
     'lg:ml-5', 
@@ -28,11 +29,21 @@ module.exports = {
     'font-semibold', 
     'list-none', 
     'pl-5', 
+    'p-0', 
+    'p-2', 
+    'mb-1', 
     'block', 
     'text-blue-500', 
     'hover:text-blue-700', 
-    'font-bold'
-  ],
+    'font-bold', 
+    'container', 
+    'mx-auto', 
+    'flex', 
+    'flex-wrap', 
+    'lg:flex-nowrap', 
+    'flex-grow', 
+    'lg:w-3/4'
+],
   darkMode: 'class',
   theme: {
     screens: {
