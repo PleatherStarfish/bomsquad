@@ -25,7 +25,7 @@ Access the latest live version of BOM Squad, complete with ongoing updates, at [
 -   **Continuous Integration**: GitHub Actions for CI/CD
 
 ## TypeScript Integration 
-Plans BOM Squad is transitioning to TypeScript to enhance code reliability, improve developer experience, and add static type-checking to the frontend codebase. The migration will be gradual: 
+BOM Squad is transitioning to TypeScript to enhance code reliability, improve developer experience, and add static type-checking to the frontend codebase. The migration will be gradual: 
 1. **Initial Refactor**: Key components and utility functions will be refactored to TypeScript over the next year. 
 2. **Component-Based Migration**: Each React component will be updated to TypeScript as modifications are made.
 3. **Documentation and Types**: Custom types and interfaces will be documented to facilitate future contributions. As TypeScript is introduced, contributors are encouraged to use TypeScript for any new components or features.
