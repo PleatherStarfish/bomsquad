@@ -2,11 +2,9 @@ from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.db.models import Q
 from core.models import BaseModel
-from accounts.models import UserNotes
 
 from modules.models import Module, ModuleBomListItem
 from components.models import Component
-from accounts.models import CustomUser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import uuid
@@ -20,7 +18,7 @@ class UserShoppingList(BaseModel):
     )
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(
-        CustomUser, blank=False, null=False, on_delete=models.CASCADE
+        "accounts.CustomUser", blank=False, null=False, on_delete=models.CASCADE
     )
     quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
 
@@ -63,12 +61,16 @@ class UserShoppingListSaved(BaseModel):
     )
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
     user = models.ForeignKey(
-        CustomUser, blank=False, null=False, on_delete=models.CASCADE
+        "accounts.CustomUser", blank=False, null=False, on_delete=models.CASCADE
     )
     quantity = models.PositiveIntegerField(default=1, blank=False, null=False)
     name = models.CharField(max_length=255, blank=True)
     notes = models.ForeignKey(
-        UserNotes, on_delete=models.CASCADE, null=True, blank=True
+        "accounts.UserNotes",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="saved_shopping_list_notes",
     )
 
     class Meta:

@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.models import BaseModel
 from modules.models import WantToBuildModules, BuiltModules
+from shopping_list.models import UserShoppingListSaved
 from django.core.exceptions import ValidationError
 
 
@@ -136,14 +137,21 @@ class UserNotes(BaseModel):
         null=True,
         blank=True,
         on_delete=models.CASCADE,
-        related_name="notes",
+        related_name="notes_want_to_build",
     )
     built_module = models.ForeignKey(
         BuiltModules,
         null=True,
         blank=True,
         on_delete=models.CASCADE,
-        related_name="notes",
+        related_name="notes_built",
+    )
+    user_shopping_list_saved = models.ForeignKey(
+        "shopping_list.UserShoppingListSaved",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="notes_user_shopping_list_saved",
     )
 
     def __str__(self):
@@ -151,16 +159,23 @@ class UserNotes(BaseModel):
             return f"Note by {self.want_to_build_module.user.email}"
         elif self.built_module:
             return f"Note by {self.built_module.user.email}"
+        elif self.user_shopping_list_saved:
+            return f"Note by {self.user_shopping_list_saved.user.email}"
         return "Note with no associated module"
 
     def clean(self):
-        if self.want_to_build_module and self.built_module:
+        associations = [
+            self.want_to_build_module,
+            self.built_module,
+            self.user_shopping_list_saved,
+        ]
+        if sum(bool(assoc) for assoc in associations) > 1:
             raise ValidationError(
-                "Note can be related to either WantToBuildModule or BuiltModule, not both."
+                "Note can be related to only one of WantToBuildModule, BuiltModule, or UserShoppingListSaved."
             )
-        if not self.want_to_build_module and not self.built_module:
+        if not any(associations):
             raise ValidationError(
-                "Note must be related to either WantToBuildModule or BuiltModule."
+                "Note must be related to either WantToBuildModule, BuiltModule, or UserShoppingListSaved."
             )
 
     def save(self, *args, **kwargs):
@@ -174,5 +189,9 @@ class UserNotes(BaseModel):
             ),
             models.UniqueConstraint(
                 fields=["built_module"], name="unique_built_module"
+            ),
+            models.UniqueConstraint(
+                fields=["user_shopping_list_saved"],
+                name="unique_user_shopping_list_saved",
             ),
         ]

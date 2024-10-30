@@ -274,16 +274,21 @@ class ArchivedShoppingListsView(APIView):
         try:
             user = request.user
 
-            # Check if there are saved lists for the user
-            saved_lists = UserShoppingListSaved.objects.filter(user=user).order_by(
-                "-time_saved"
+            # Use prefetch_related to handle optional related notes
+            saved_lists = (
+                UserShoppingListSaved.objects.filter(user=user)
+                .prefetch_related("notes")
+                .order_by("-time_saved")
             )
+            print(saved_lists)
+
             # If no saved lists are available, return an empty list
             if not saved_lists.exists():
                 return Response([], status=status.HTTP_200_OK)
 
             # Serialize the data
             serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
+            print(serializer.data)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -678,52 +683,77 @@ def add_all_user_shopping_list_to_inventory(request):
 @permission_classes([IsAuthenticated])
 def archive_shopping_list(request):
     user = request.user
+    print("User:", user)
 
-    # check if there's something in the shopping list
+    # Check if there's something in the shopping list
     if not UserShoppingList.objects.filter(user=user).exists():
+        print("No items in shopping list.")
         return Response(
             {"error": "No items in shopping list."}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    shopping_list = UserShoppingList.objects.filter(user=user)
+    shopping_list = UserShoppingList.objects.filter(user=user).select_related(
+        "module", "bom_item", "component"
+    )
+    print("Shopping List:", shopping_list)
     time_now = timezone.now()
+    print("Current Time:", time_now)
 
     # Get the notes from the request body
     notes_content = request.data.get("notes", "")
+    print("Notes from Request:", notes_content)
 
     # Sanitize the input with bleach
     notes_content = bleach.clean(notes_content)
+    print("Sanitized Notes:", notes_content)
 
     # Validate the length of the notes
     if len(notes_content) > 1000:
+        print("Notes exceed 1000 characters.")
         return Response(
             {"error": "Notes must be no longer than 1000 characters."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Create a UserNotes instance only if notes_content has length
-    notes = None
-    if len(notes_content) > 0:
+    # Save each item in the shopping list as a UserShoppingListSaved instance
+    for item in shopping_list:
         try:
-            notes = UserNotes.objects.create(user=user, note=notes_content)
-        except IntegrityError:
+            with transaction.atomic():  # Ensuring atomic transaction for each item
+                print("Processing item:", item)
+
+                saved_item = UserShoppingListSaved(
+                    time_saved=time_now,
+                    module=item.module,
+                    bom_item=item.bom_item,
+                    component=item.component,
+                    user=item.user,
+                    quantity=item.quantity,
+                    name=item.component.description,
+                )
+                saved_item.save()  # Save to commit the instance
+
+                # Refresh to ensure the saved_item is committed to the DB
+                saved_item.refresh_from_db()
+
+                # Create a UserNotes instance if notes_content is provided
+                if notes_content:
+                    notes = UserNotes.objects.create(
+                        note=notes_content,
+                        user_shopping_list_saved=saved_item,  # Link to saved item
+                    )
+                    print("UserNotes created:", notes)
+                    saved_item.notes = notes  # Associate the note with the saved item
+
+                print("Saved item:", saved_item)
+
+        except Exception as e:
+            print("Error saving item:", e)
             return Response(
-                {"error": "Failed to create UserNotes."},
+                {"error": "An error occurred while saving an item."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    # Save each item in the shopping list as a UserShoppingListSaved instance
-    for item in shopping_list:
-        saved_item = UserShoppingListSaved()
-        saved_item.time_saved = time_now
-        saved_item.module = item.module
-        saved_item.bom_item = item.bom_item
-        saved_item.component = item.component
-        saved_item.user = item.user
-        saved_item.quantity = item.quantity
-        saved_item.notes = notes  # Associate with the UserNotes instance
-        saved_item.save()
-
+    print("Shopping List saved successfully.")
     return Response(
         {"message": "Shopping List saved successfully"}, status=status.HTTP_200_OK
     )

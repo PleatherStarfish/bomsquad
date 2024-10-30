@@ -19,7 +19,7 @@ class UserShoppingListSavedSerializer(serializers.ModelSerializer):
     module = ModuleSerializer(allow_null=True)
     module_name = serializers.CharField(source="module.name", allow_null=True)
     component = ComponentSerializer(allow_null=False)
-    notes = UserNotesSerializer(many=False, allow_null=True)
+    notes = UserNotesSerializer(allow_null=True)
 
     class Meta:
         model = UserShoppingListSaved
