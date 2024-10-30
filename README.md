@@ -4,6 +4,10 @@
 
 Welcome to **BOM Squad**, a tool designed to simplify the DIY Eurorack synthesizer module-building experience. BOM Squad helps users explore modules, manage their inventory, and streamline the sourcing and assembly process for components.
 
+## Live Site
+
+Access the latest live version of BOM Squad, complete with ongoing updates, at [https://bom-squad.com/](https://bom-squad.com/). This version includes the newest features, bug fixes, and improvements. Explore modules, track your inventory, and connect with the DIY audio community through the live site.
+
 ## Features
 
 -   **Module Management**: Explore DIY modules, add them to your list of completed or "to build" projects, and catalog required components.
