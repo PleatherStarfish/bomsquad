@@ -8,6 +8,9 @@ const useGetArchivedShoppingLists = () => {
       withCredentials: true,
     });
 
+    // Log the response to inspect structure
+    console.log("API response:", data);
+
     // Group by time_saved
     const groupedByTimeSaved = _(data)
       .groupBy("time_saved")
@@ -32,8 +35,8 @@ const useGetArchivedShoppingLists = () => {
       // Aggregate components within each time_saved group
       const aggregatedComponents = _(shoppingList).uniqBy("component.id").sortBy("component.supplier.name").value();
 
-      // Extract notes from the first item if available
-      const notes = shoppingList.length > 0 ? shoppingList[0]?.notes?.note : null;
+      // Extract notes (check if notes exist and access note property)
+      const notes = shoppingList.length > 0 && shoppingList[0].notes ? shoppingList[0].notes.note : null;
 
       // Return time_saved along with groupedByModule, aggregatedComponents, and notes
       return {

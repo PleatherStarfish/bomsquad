@@ -66,4 +66,15 @@ class UserHistorySerializer(serializers.ModelSerializer):
 class UserNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserNotes
-        fields = ["id", "note", "want_to_build_module", "built_module"]
+        fields = [
+            "id",
+            "note",
+            "want_to_build_module",
+            "built_module",
+            "user_shopping_list_saved",
+        ]
+        extra_kwargs = {
+            "want_to_build_module": {"required": False},
+            "built_module": {"required": False},
+            "user_shopping_list_saved": {"required": False},
+        }

@@ -79,7 +79,7 @@ const NestedTable = ({ data }) => {
 
   const columns = [
     {
-      name: <div>Name</div>,
+      name: <small>Name</small>,
       selector: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
       sortable: true,
       grow: 1,
@@ -87,27 +87,27 @@ const NestedTable = ({ data }) => {
       minWidth: "200px",
     },
     {
-      name: <div>Type</div>,
+      name: <small>Type</small>,
       selector: (row) => row.type?.name,
       sortable: true,
       wrap: true,
       hide: 1700,
     },
     {
-      name: <div>Manufacturer</div>,
+      name: <small>Manufacturer</small>,
       selector: (row) => row.manufacturer?.name,
       sortable: true,
       wrap: true,
       hide: 1700,
     },
     {
-      name: <div>Supplier</div>,
+      name: <small>Supplier</small>,
       selector: (row) => row.supplier?.name,
       sortable: true,
       wrap: true,
     },
     {
-      name: <div>Supp. Item #</div>,
+      name: <small>Supp. Item #</small>,
       selector: (row) => {
       console.log(row)
         return <a href={row.link} className="text-blue-500 hover:text-blue-700">
@@ -118,7 +118,7 @@ const NestedTable = ({ data }) => {
       wrap: true,
     },
     {
-      name: <div>Farads</div>,
+      name: <small>Farads</small>,
       selector: (row) => (
         <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>
           <span>
@@ -131,7 +131,7 @@ const NestedTable = ({ data }) => {
       omit: type !== "Capacitor",
     },
     {
-      name: <div>Ohms</div>,
+      name: <small>Ohms</small>,
       selector: (row) => (
         <Tippy content={<div dangerouslySetInnerHTML={{ __html: getOhmConversions(row.ohms, row.ohms_unit) }} />}>
           <span>
@@ -144,35 +144,35 @@ const NestedTable = ({ data }) => {
       omit: type !== "Resistor",
     },
     {
-      name: <div>Forward Current</div>,
+      name: <small>Forward Current</small>,
       selector: (row) => row.forward_current,
       sortable: true,
       wrap: true,
       omit: row => row.type.name !== "Diodes",
     },
     {
-      name: <div>Forward Voltage</div>,
+      name: <small>Forward Voltage</small>,
       selector: (row) => row.forward_voltage,
       sortable: true,
       wrap: true,
       omit: row => row.type.name !== "Diodes",
     },
     {
-      name: <div>Forward Surge Current</div>,
+      name: <small>Forward Surge Current</small>,
       selector: (row) => row.forward_surge_current,
       sortable: true,
       wrap: true,
       omit: row => row.type.name !== "Diodes",
     },
     {
-      name: <div>Forward Current Avg Rectified</div>,
+      name: <small>Forward Current Avg Rectified</small>,
       selector: (row) => row.forward_current_avg_rectified,
       sortable: true,
       wrap: true,
       omit: row => row.type.name !== "Diodes",
     },
     {
-      name: <div>Price</div>,
+      name: <small>Price</small>,
       selector: (row) => {
         return (
           <span>
@@ -191,21 +191,21 @@ const NestedTable = ({ data }) => {
       hide: 1700,
     },
     {
-      name: <div>Tolerance</div>,
+      name: <small>Tolerance</small>,
       selector: (row) => row.tolerance,
       sortable: true,
       wrap: true,
       hide: 1700,
     },
     {
-      name: <div>V. Rating</div>,
+      name: <small>V. Rating</small>,
       selector: (row) => row.voltage_rating,
       sortable: true,
       wrap: true,
       hide: 1700,
     },
     {
-      name: <div>Qty in User Inv.</div>,
+      name: <small>Qty in User Inv.</small>,
       cell: (row) => (
         <Quantity
           useHook={useUserInventoryQuantity}
@@ -214,10 +214,10 @@ const NestedTable = ({ data }) => {
       ),
       sortable: false,
       omit: !user,
-      width: "80px",
+      width: "85px",
     },
     {
-      name: <div>Qty in Shopping List</div>,
+      name: <small>Qty for project in Shopping List</small>,
       selector: (row) => (
         <Quantity
           useHook={useGetUserShoppingListQuantity}
@@ -230,7 +230,7 @@ const NestedTable = ({ data }) => {
       ),
       sortable: false,
       omit: !user,
-      width: "80px",
+      width: "85px",
     },
     {
       name: "",
