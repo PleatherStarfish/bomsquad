@@ -6,7 +6,11 @@
 {% endblock %}
 
 {% block content %}
+
+{% if page.title !== 'About' %}
 <h1 class="mb-6 text-4xl font-bold sm:my-10 lg:my-14 font-display">{{ page.title }}</h1>
+{% endif %}
+
 <div class="page-content">
     {{ page.content | editorjs }}
 </div>
