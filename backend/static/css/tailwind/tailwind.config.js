@@ -45,7 +45,9 @@ module.exports = {
     'lg:w-3/4',
     'w-full', 
     'max-w-full', 
-    'aspect-video'
+    'aspect-video',
+    'aspect-w-16', 
+    'aspect-h-9'
 ],
   darkMode: 'class',
   theme: {
@@ -93,5 +95,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require('@tailwindcss/aspect-ratio'),
+  ],
 };
