@@ -683,11 +683,8 @@ def add_all_user_shopping_list_to_inventory(request):
 @permission_classes([IsAuthenticated])
 def archive_shopping_list(request):
     user = request.user
-    print("User:", user)
 
-    # Check if there's something in the shopping list
     if not UserShoppingList.objects.filter(user=user).exists():
-        print("No items in shopping list.")
         return Response(
             {"error": "No items in shopping list."}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -695,32 +692,22 @@ def archive_shopping_list(request):
     shopping_list = UserShoppingList.objects.filter(user=user).select_related(
         "module", "bom_item", "component"
     )
-    print("Shopping List:", shopping_list)
     time_now = timezone.now()
-    print("Current Time:", time_now)
 
-    # Get the notes from the request body
-    notes_content = request.data.get("notes", "")
-    print("Notes from Request:", notes_content)
+    notes_content = bleach.clean(request.data.get("notes", ""))
 
-    # Sanitize the input with bleach
-    notes_content = bleach.clean(notes_content)
-    print("Sanitized Notes:", notes_content)
-
-    # Validate the length of the notes
     if len(notes_content) > 1000:
-        print("Notes exceed 1000 characters.")
         return Response(
             {"error": "Notes must be no longer than 1000 characters."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Save each item in the shopping list as a UserShoppingListSaved instance
-    for item in shopping_list:
-        try:
-            with transaction.atomic():  # Ensuring atomic transaction for each item
-                print("Processing item:", item)
+    # Initialize variable to hold a single UserNotes instance
+    notes = None
 
+    for index, item in enumerate(shopping_list):
+        try:
+            with transaction.atomic():
                 saved_item = UserShoppingListSaved(
                     time_saved=time_now,
                     module=item.module,
@@ -730,32 +717,27 @@ def archive_shopping_list(request):
                     quantity=item.quantity,
                     name=item.component.description,
                 )
-                saved_item.save()  # Save to commit the instance
+                saved_item.save()
 
-                # Refresh to ensure the saved_item is committed to the DB
-                saved_item.refresh_from_db()
-
-                # Create a UserNotes instance if notes_content is provided
-                if notes_content:
+                # Create a single UserNotes instance if needed and link it
+                if notes_content and notes is None:
                     notes = UserNotes.objects.create(
                         note=notes_content,
-                        user_shopping_list_saved=saved_item,  # Link to saved item
+                        user_shopping_list_saved=saved_item,  # Link to satisfy constraints
                     )
-                    print("UserNotes created:", notes)
-                    saved_item.notes = notes  # Associate the note with the saved item
 
-                print("Saved item:", saved_item)
+                saved_item.notes = notes
+                saved_item.save(update_fields=["notes"])
 
         except Exception as e:
-            print("Error saving item:", e)
             return Response(
-                {"error": "An error occurred while saving an item."},
+                {"error": "An error occurred while saving items or notes."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    print("Shopping List saved successfully.")
     return Response(
-        {"message": "Shopping List saved successfully"}, status=status.HTTP_200_OK
+        {"message": "Shopping List saved successfully with one note"},
+        status=status.HTTP_200_OK,
     )
 
 
