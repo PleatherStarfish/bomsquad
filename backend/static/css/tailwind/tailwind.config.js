@@ -42,7 +42,11 @@ module.exports = {
     'flex-wrap', 
     'lg:flex-nowrap', 
     'flex-grow', 
-    'lg:w-3/4'
+    'lg:w-3/4',
+    'w-full', 
+    'max-w-full', 
+    'aspect-w-16', 
+    'aspect-h-9'
 ],
   darkMode: 'class',
   theme: {
