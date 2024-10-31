@@ -45,8 +45,7 @@ module.exports = {
     'lg:w-3/4',
     'w-full', 
     'max-w-full', 
-    'aspect-w-16', 
-    'aspect-h-9'
+    'aspect-video'
 ],
   darkMode: 'class',
   theme: {
