@@ -1,0 +1,35 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Sign up{% endblock title %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-900">Verify Your E-mail Address</h1>
+<div class="p-6 mt-10 border rounded-lg bg-gray-50">
+    <p class="text-gray-700" id="email-paragraph">
+        We have sent a confirmation e-mail. Follow the link provided in the e-mail to complete your registration.
+    </p>
+    <p class="mt-4 text-gray-700">
+        If you do not see the e-mail in your inbox, please check your spam or junk folder. Contact us if you do not receive the e-mail within a few minutes.
+    </p>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Retrieve and display the email if it exists
+      const storedEmail = localStorage.getItem('verificationEmail');
+      if (storedEmail) {
+          const emailParagraph = document.getElementById('email-paragraph');
+          if (emailParagraph) {
+              emailParagraph.innerHTML = `We have sent a confirmation e-mail to <strong>${storedEmail}</strong>. Follow the link provided in the e-mail to complete your registration.`;
+          }
+      }
+
+      // Clean up the email when navigating away from the page
+      window.addEventListener('beforeunload', function() {
+          localStorage.removeItem('verificationEmail');
+      });
+  });
+</script>
+{% endblock javascript %}

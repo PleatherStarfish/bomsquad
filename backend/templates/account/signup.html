@@ -27,3 +27,20 @@
   </div>
 </div>
 {% endblock content %}
+
+{% block javascript %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const emailInput = document.querySelector('input[name="email"]');
+            if (emailInput) {
+                // Store the email in localStorage
+                localStorage.setItem('verificationEmail', emailInput.value);
+            }
+        });
+    }
+});
+</script>
+{% endblock javascript %}
