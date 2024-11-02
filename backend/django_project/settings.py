@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     "django_comments_xtd",
     "django_comments",
     "django_editorjs_fields",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     "whitenoise.runserver_nostatic",
     "core.staticfiles_config.StaticFilesConfig",
     "django.contrib.sites",
@@ -95,6 +97,7 @@ INSTALLED_APPS = [
     "crispy_tailwind",
     "rest_framework",
     "drf_yasg",  # Swagger
+    "admin_honeypot",
     "corsheaders",
     "djmoney",
     "import_export",
@@ -125,6 +128,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "maintenance_mode.middleware.MaintenanceModeMiddleware",
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -162,6 +166,9 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {"anon": "1000/hour", "user": "10000/hour"},
 }
+
+LOGIN_REDIRECT_URL = "/patchbay/"
+ADMIN_HONEYPOT_EMAIL_ADMINS = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"

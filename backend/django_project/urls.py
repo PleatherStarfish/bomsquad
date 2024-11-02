@@ -10,6 +10,12 @@ from drf_yasg import openapi
 from modules import views as ModuleView
 from comments.views import edit_comment, delete_comment
 from pages.views import module_detail
+from django_otp.admin import OTPAdminSite
+import admin_honeypot
+
+
+# Custom OTP-enabled admin site
+admin.site.__class__ = OTPAdminSite
 
 
 schema_view = get_schema_view(
@@ -98,6 +104,7 @@ frontend_redirect_urls = [
 
 
 urlpatterns = [
+    path("admin/", include("admin_honeypot.urls", namespace="admin_honeypot")),
     path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("user/", RedirectView.as_view(pattern_name="frontend")),

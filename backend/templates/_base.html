@@ -135,6 +135,25 @@
       });
     </script>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const logo = document.getElementById("the_logo");
+        const initialScale = 1;
+        const shrinkScale = 0.7; // 20% shrink
+        const maxScroll = 50; // The scroll amount to reach full shrink
+    
+        // Set the transform origin to the top
+        logo.style.transformOrigin = "top";
+    
+        window.addEventListener("scroll", () => {
+            const scrollY = window.scrollY;
+            const scale = Math.max(shrinkScale, initialScale - (scrollY / maxScroll) * (initialScale - shrinkScale));
+            logo.style.transform = `scale(${scale})`;
+            logo.style.transition = "transform 0.2s ease-out";
+        });
+    });    
+    </script>
+
     {% block javascript %}{% endblock javascript %}
   </body>
 </html>
