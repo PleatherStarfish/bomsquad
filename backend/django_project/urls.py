@@ -15,7 +15,7 @@ import admin_honeypot
 
 
 # Custom OTP-enabled admin site
-# admin.site.__class__ = OTPAdminSite
+admin.site.__class__ = OTPAdminSite
 
 
 schema_view = get_schema_view(
