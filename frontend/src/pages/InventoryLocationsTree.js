@@ -2,6 +2,7 @@ import 'vis-network/styles/vis-network.css';
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import BackButton from "../ui/BackButton";
 import { Network } from 'vis-network/standalone';
 import chroma from 'chroma-js'; // Importing chroma-js for color interpolation
 import useGetUserInventoryTree from '../services/useGetUserInventoryTree';
@@ -128,7 +129,12 @@ const UserInventoryTree = () => {
   if (isLoading) return <p>Loading inventory tree...</p>;
   if (isError) return <p>Error loading inventory tree.</p>;
 
-  return <div ref={networkContainerRef} id="network-container" style={{ width: '100%', height: '100vh' }}></div>;
+  return (
+    <>
+      <BackButton prevPageName="Account" />
+      <div ref={networkContainerRef} id="network-container" style={{ width: '100%', height: '100vh' }}></div>
+    </>
+  );
 };
 
 export default UserInventoryTree;
