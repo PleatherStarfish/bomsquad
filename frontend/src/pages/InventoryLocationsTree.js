@@ -15,15 +15,20 @@ const UserInventoryTree = () => {
     if (data) {
       const nodes = [];
       const edges = [];
+      const edgeCountMap = new Map();
+      const nodeMap = new Map(); // Map to track unique nodes per path
+      const nodeLinkCountMap = new Map();
 
       // Define color scale from hot pink to cool blue
       const colorScale = chroma.scale(['#ff69b4', '#1e90ff']).mode('lab'); // Hot pink to cool blue
       const maxLevel = 4; // Number of distinct levels
 
-      const traverseTree = (node, parentId = null, level = 0) => {
+      const traverseTree = (node, parentId = null, level = 0, path = '') => {
         Object.keys(node).forEach((key) => {
           if (key !== 'component' && key !== 'quantity') {
-            const nodeId = `${parentId ? parentId + '-' : ''}${key}`;
+            // Create a unique node ID based on the top-level node and current path
+            const topNode = path.split('/')[1] || key;
+            const nodeId = `${topNode.trim()}/${path.trim()}/${key.trim()}`; // Ensure uniqueness by including the full path
             const componentsList = Object.keys(node[key])
               .filter(subKey => subKey === 'component' || subKey === 'quantity')
               .map(subKey => node[key][subKey])
@@ -37,22 +42,39 @@ const UserInventoryTree = () => {
 
             // Calculate font size based on inverted level (larger at higher levels)
             const fontSize = 8 + (maxLevel - adjustedLevel) * 6; // Base size 14, decreasing by 4 units per level
+            const currentNodeCount = (nodeLinkCountMap.get(nodeId) || 0) + 1;
+            nodeLinkCountMap.set(nodeId, currentNodeCount);
+            const nodeSize = 10 + currentNodeCount * 20; // <-- Adjust this number to control the scaling
+            console.log(nodeSize)
 
-            nodes.push({
-              id: nodeId,
-              label: key,
-              title: componentsList ? componentsList : key,
-              color: color,
-              font: {
-                size: fontSize
+            if (nodeMap.has(nodeId)) {
+              const existingNodeIndex = nodes.findIndex(n => n.id === nodeId);
+              if (existingNodeIndex !== -1) {
+                nodes[existingNodeIndex].value = nodeSize;
               }
-            });
-
-            if (parentId) {
-              edges.push({ from: parentId, to: nodeId });
+            } else {
+              nodes.push({
+                id: nodeId,
+                label: key,
+                title: componentsList ? componentsList : key,
+                color: color,
+                value: nodeSize, // Adjust node size based on linkage count
+                font: {
+                  size: fontSize
+                }
+              });
+              nodeMap.set(nodeId, true);
             }
 
-            traverseTree(node[key], nodeId, level + 1);
+            if (parentId) {
+              const edgeId = `${parentId}->${nodeId}`;
+              const currentCount = edgeCountMap.get(edgeId) || 0;
+              edgeCountMap.set(edgeId, currentCount + 1);
+
+              edges.push({ from: parentId, to: nodeId, value: currentCount });
+            }
+            
+            traverseTree(node[key], nodeId, level + 1, `${path.trim()}/${key.trim()}`);
           }
         });
       };
@@ -66,15 +88,22 @@ const UserInventoryTree = () => {
     if (networkContainerRef.current && graphData.nodes.length > 0) {
       const network = new Network(networkContainerRef.current, graphData, {
         nodes: {
-          shape: 'circle',
-          font: {
-            size: 14,
-            color: '#000'
+          shape: 'dot', // Set shape to dot
+          scaling: {
+            customScalingFunction: function (min, max, total, value) {
+              return value / total;
+            },
+            min: 5,
+            max: 150,
           },
         },
         edges: {
           color: '#848484',
           width: 2,
+          scaling: {
+            min: 1,
+            max: 10,
+          },
         },
         layout: {
           improvedLayout: true,
