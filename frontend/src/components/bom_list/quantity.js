@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 
 import cx from 'classnames';
 
@@ -8,7 +8,7 @@ export const Types = Object.freeze({
   INVENTORY: "inventory",
 });
 
-const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames }) => {
+const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames, hideLoadingTag = false }) => {
   const [quantity, setQuantity] = React.useState();
   const { data, isLoading, error } = useHook(...Object.values(hookArgs));
 
@@ -16,8 +16,12 @@ const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames }) => {
     setQuantity(data);
   }, [data]);
 
-  if (isLoading) {
+  if (isLoading && !hideLoadingTag) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+  }
+
+  if (isLoading && hideLoadingTag) {
+    return <div className="text-center text-gray-500 animate-pulse">{'-'}</div>;
   }
 
   if (error) {
@@ -25,7 +29,7 @@ const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames }) => {
   }
 
   return (
-    <span className={cx("font-bold", classNames, {'text-[#548a6a]': quantity !== 0, 'text-gray-500': quantity === 0})}>
+    <span className={cx("font-bold", classNames, { 'text-[#548a6a]': quantity !== 0, 'text-gray-500': quantity === 0 })}>
       {quantity === 0 && replaceZero ? '-' : quantity}
     </span>
   );

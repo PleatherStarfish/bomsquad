@@ -36,7 +36,7 @@ const customStyles = {
 };
 
 const Components = () => {
-  const { register, handleSubmit, control, watch } = useForm();
+  const { register, handleSubmit, control } = useForm();
   const [currentPage, setCurrentPage] = useState(1); // state for the current page, initially 1
   const [formData, setFormData] = useState({});
   
@@ -183,6 +183,7 @@ const Components = () => {
         <Quantity
           useHook={useUserInventoryQuantity}
           hookArgs={{ componentId: row.id }}
+          hideLoadingTag={true}
         />
       ),
       sortable: false,
@@ -195,6 +196,7 @@ const Components = () => {
         <Quantity
           useHook={useGetUserAnonymousShoppingListQuantity}
           hookArgs={{ componentId: row.id }}
+          hideLoadingTag={true}
         />
       ),
       sortable: false,
