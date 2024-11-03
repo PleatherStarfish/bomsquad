@@ -1,10 +1,12 @@
 import {
   Route,
   Routes,
+  useLocation
 } from 'react-router-dom';
 
 import Components from "./pages/Components";
 import Inventory from "./components/inventory/index";
+import InventoryLocationsTree from "./pages/InventoryLocationsTree";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
 import React from "react";
@@ -13,7 +15,6 @@ import Settings from "./components/UserSettings";
 import ShoppingList from "./components/shopping_list/index";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
-import InventoryLocationsTree from "./pages/InventoryLocationsTree";
 
 const App = () => {
 
