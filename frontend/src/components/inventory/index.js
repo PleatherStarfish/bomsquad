@@ -10,6 +10,7 @@ import Fuse from "fuse.js";
 import { Link } from "react-router-dom";
 import Modal from "../../ui/Modal";
 import SearchInput from "./SearchInput";
+import { SignpostSplit } from "react-bootstrap-icons";
 import SolderingMode from "../SolderingMode";
 import _ from "lodash";
 import { find } from "lodash/find";
@@ -406,6 +407,9 @@ const Inventory = () => {
                   >
                     Soldering Mode
                   </Button>
+                  <Link to="tree/">
+                    <Button Icon={SignpostSplit} version="primary">Locations Diagram</Button>
+                  </Link>
                   <Link to="version-history/">
                     <Button version="primary">Version History</Button>
                   </Link>

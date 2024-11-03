@@ -1,10 +1,8 @@
-import 'tippy.js/dist/tippy.css';
 import 'vis-network/styles/vis-network.css';
 
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Network } from 'vis-network/standalone';
-import Tippy from '@tippyjs/react';
 import useGetUserInventoryTree from '../services/useGetUserInventoryTree';
 
 const UserInventoryTree = () => {
@@ -23,7 +21,7 @@ const UserInventoryTree = () => {
             const nodeId = `${parentId ? parentId + '-' : ''}${key}`;
             const componentsList = Object.keys(node[key])
               .filter(subKey => subKey === 'component' || subKey === 'quantity')
-              .map(subKey => `${subKey}: ${node[key][subKey]}`)
+              .map(subKey => node[key][subKey]) // Only display the value, not "key: value"
               .join(', ');
 
             const maxLevel = 4; // Number of distinct levels
@@ -45,7 +43,7 @@ const UserInventoryTree = () => {
             nodes.push({
               id: nodeId,
               label: key,
-              title: componentsList ? `<b>${key}</b><br>${componentsList}` : key,
+              title: componentsList ? componentsList : key,
               color: color,
               font: {
                 size: fontSize
@@ -70,7 +68,7 @@ const UserInventoryTree = () => {
     if (networkContainerRef.current && graphData.nodes.length > 0) {
       const network = new Network(networkContainerRef.current, graphData, {
         nodes: {
-          shape: 'box',
+          shape: 'circle',
           font: {
             size: 14,
             color: '#000'
@@ -82,7 +80,7 @@ const UserInventoryTree = () => {
         },
         layout: {
           improvedLayout: true,
-          hierarchical: true // Allow free movement
+          hierarchical: false
         },
         physics: {
           enabled: true,
