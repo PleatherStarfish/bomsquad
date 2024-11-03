@@ -13,6 +13,7 @@ import Settings from "./components/UserSettings";
 import ShoppingList from "./components/shopping_list/index";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
+import InventoryLocationsTree from "./pages/InventoryLocationsTree";
 
 const App = () => {
 
@@ -59,6 +60,7 @@ const App = () => {
                 <ModulesList type="want-to-build" />
               }
             />
+            <Route path={`inventory/tree`} element={<InventoryLocationsTree />} />
             <Route path={`inventory`} element={<Inventory />} />
             <Route path={`shopping-list`} element={<ShoppingList />} />
             <Route path="*" element={<RedirectToBackend />} />

@@ -72,6 +72,11 @@ frontend_redirect_urls = [
         name="user-want-to-build",
     ),
     path(
+        "user/<str:username>/inventory/tree/",
+        login_required(TemplateView.as_view(template_name="frontend.html")),
+        name="user-inventory-tree",
+    ),
+    path(
         "user/<str:username>/inventory/",
         login_required(TemplateView.as_view(template_name="frontend.html")),
         name="user-inventory",

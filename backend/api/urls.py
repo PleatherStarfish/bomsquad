@@ -33,6 +33,7 @@ from inventory.views import (
     get_user_inventory_quantities_for_bom_list_item,
     get_component_locations,
     get_components_locations,
+    UserInventoryTreeView,
 )
 
 # User shopping list-related views
@@ -95,6 +96,9 @@ urlpatterns = [
         "inventory/locations/",
         get_components_locations,
         name="user_inventory_locations_multiple",
+    ),
+    path(
+        "inventory/tree/", UserInventoryTreeView.as_view(), name="user-inventory-tree"
     ),
     path("shopping-list/", UserShoppingListView.as_view(), name="user-shopping-list"),
     path(

@@ -15,6 +15,7 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 import json
 from django.db.models import Q
+from django.http import JsonResponse
 
 
 class UserInventoryView(APIView):
@@ -236,3 +237,26 @@ def get_components_locations(request):
         components_locations[component_pk] = locations_with_quantity
 
     return Response(components_locations, status=status.HTTP_200_OK)
+
+
+class UserInventoryTreeView(APIView):
+    def get(self, request):
+        user = request.user
+        inventory_items = UserInventory.objects.filter(user=user)
+
+        # Create a nested tree structure
+        inventory_tree = {}
+
+        for item in inventory_items:
+            location_path = item.location if item.location else []
+            current_level = inventory_tree
+
+            for loc in location_path:
+                if loc not in current_level:
+                    current_level[loc] = {}
+                current_level = current_level[loc]
+
+            current_level["component"] = str(item.component.description)
+            current_level["quantity"] = item.quantity
+
+        return JsonResponse({"inventory_tree": inventory_tree}, safe=False)
