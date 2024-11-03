@@ -8,9 +8,6 @@ const useGetArchivedShoppingLists = () => {
       withCredentials: true,
     });
 
-    // Log the response to inspect structure
-    console.log("API response:", data);
-
     // Group by time_saved
     const groupedByTimeSaved = _(data)
       .groupBy("time_saved")

@@ -6,11 +6,9 @@ import axios from "axios";
 const useArchiveShoppingListMutation = () => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
-  console.log("called")
 
   return useMutation({
     mutationFn: async ({ notes }) => {
-      console.log(notes)
       const response = await axios.post(
         "/api/shopping-list/archive/",
         { notes },

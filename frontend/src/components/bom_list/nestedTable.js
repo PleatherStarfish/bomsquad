@@ -109,7 +109,6 @@ const NestedTable = ({ data }) => {
     {
       name: <small>Supp. Item #</small>,
       selector: (row) => {
-      console.log(row)
         return <a href={row.link} className="text-blue-500 hover:text-blue-700">
           {row?.supplier_item_no ? row?.supplier_item_no : "[ none ]"}
         </a>
