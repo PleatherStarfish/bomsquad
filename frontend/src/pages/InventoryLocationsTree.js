@@ -23,13 +23,14 @@ const UserInventoryTree = () => {
       // Define color scale from hot pink to cool blue
       const colorScale = chroma.scale(['#ff69b4', '#1e90ff']).mode('lab'); // Hot pink to cool blue
       const maxLevel = 4; // Number of distinct levels
-
+      const normalizePath = (path) => path.replace(/\/+$/, '').trim();
+      
       const traverseTree = (node, parentId = null, level = 0, path = '') => {
         Object.keys(node).forEach((key) => {
           if (key !== 'component' && key !== 'quantity') {
             if (node[key] && typeof node[key] === 'object') {
               // Use only the current key to extend the path, without duplicating topNode
-              const newPath = path ? `${path}/${key.trim()}` : key.trim();
+              const newPath = normalizePath(path ? `${path}/${key.trim()}` : key.trim());
               
               // Construct the nodeId without including the topNode twice
               const nodeId = newPath.replace(/\/{2,}/g, '/').trim();
@@ -76,8 +77,10 @@ const UserInventoryTree = () => {
                 const currentCount = (edgeCountMap.get(edgeId) || 0) + 1;
                 edgeCountMap.set(edgeId, currentCount);
                 
-                if (currentCount === 1) { // This should be 1 to push the edge on the first occurrence
-                  edges.push({ from: parentId, to: nodeId, value: currentCount });
+                if (currentCount === 1) { // Push the edge on the first occurrence, ensuring no self-linkage
+                  if (parentId !== nodeId) { // Prevent self-linkage
+                    edges.push({ from: parentId, to: nodeId, value: currentCount });
+                  }
                 } else {
                   const existingEdgeIndex = edges.findIndex(edge => edge.from === parentId && edge.to === nodeId);
                   if (existingEdgeIndex !== -1) {
