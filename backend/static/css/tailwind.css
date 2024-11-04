@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+    #sentry-feedback {
+        --background: #1f2327;
+        --submit-background: #518467;
+        --submit-border: #518467;
+    }
+
     .rdt_Table {
         z-index: 0 !important;
         max-height: none !important;

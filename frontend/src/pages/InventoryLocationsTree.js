@@ -27,58 +27,72 @@ const UserInventoryTree = () => {
       const traverseTree = (node, parentId = null, level = 0, path = '') => {
         Object.keys(node).forEach((key) => {
           if (key !== 'component' && key !== 'quantity') {
-            // Create a unique node ID based on the top-level node and current path
-            const topNode = path.split('/')[1] || key;
-            const nodeId = `${topNode.trim()}/${path.trim()}/${key.trim()}`; // Ensure uniqueness by including the full path
-            const componentsList = Object.keys(node[key])
-              .filter(subKey => subKey === 'component' || subKey === 'quantity')
-              .map(subKey => node[key][subKey])
-              .join(', ');
-
-            // Ensure level is capped between 0 and maxLevel to prevent overflow
-            const adjustedLevel = Math.min(level, maxLevel);
-
-            // Use chroma-js to interpolate colors based on the level
-            const color = colorScale(adjustedLevel / maxLevel).hex();
-
-            // Calculate font size based on inverted level (larger at higher levels)
-            const fontSize = 8 + (maxLevel - adjustedLevel) * 6; // Base size 14, decreasing by 4 units per level
-            const currentNodeCount = (nodeLinkCountMap.get(nodeId) || 0) + 1;
-            nodeLinkCountMap.set(nodeId, currentNodeCount);
-            const nodeSize = 10 + currentNodeCount * 20; // <-- Adjust this number to control the scaling
-            console.log(nodeSize)
-
-            if (nodeMap.has(nodeId)) {
-              const existingNodeIndex = nodes.findIndex(n => n.id === nodeId);
-              if (existingNodeIndex !== -1) {
-                nodes[existingNodeIndex].value = nodeSize;
-              }
-            } else {
-              nodes.push({
-                id: nodeId,
-                label: key,
-                title: componentsList ? componentsList : key,
-                color: color,
-                value: nodeSize, // Adjust node size based on linkage count
-                font: {
-                  size: fontSize
+            if (node[key] && typeof node[key] === 'object') {
+              // Use only the current key to extend the path, without duplicating topNode
+              const newPath = path ? `${path}/${key.trim()}` : key.trim();
+              
+              // Construct the nodeId without including the topNode twice
+              const nodeId = newPath.replace(/\/{2,}/g, '/').trim();
+      
+              const componentsList = Object.keys(node[key])
+                .filter(subKey => subKey === 'component' || subKey === 'quantity')
+                .map(subKey => node[key][subKey])
+                .join(', ');
+      
+              // Ensure level is capped between 0 and maxLevel to prevent overflow
+              const adjustedLevel = Math.min(level, maxLevel);
+      
+              // Use chroma-js to interpolate colors based on the level
+              const color = colorScale(adjustedLevel / maxLevel).hex();
+      
+              // Calculate font size and node size based on linkage count
+              const fontSize = 8 + (maxLevel - adjustedLevel) * 6; // Base size 14, decreasing by 4 units per level
+              const currentNodeCount = (nodeLinkCountMap.get(nodeId) || 0) + 1;
+              nodeLinkCountMap.set(nodeId, currentNodeCount);
+              const nodeSize = 10 + currentNodeCount * 20;
+      
+              if (nodeMap.has(nodeId)) {
+                // Update existing node size if it already exists
+                const existingNodeIndex = nodes.findIndex(n => n.id === nodeId);
+                if (existingNodeIndex !== -1) {
+                  nodes[existingNodeIndex].value = nodeSize;
                 }
-              });
-              nodeMap.set(nodeId, true);
+              } else {
+                nodes.push({
+                  id: nodeId,
+                  label: key,
+                  title: componentsList ? componentsList : key,
+                  color: color,
+                  value: nodeSize, // Adjust node size based on linkage count
+                  font: {
+                    size: fontSize
+                  }
+                });
+                nodeMap.set(nodeId, true);
+              }
+      
+              if (parentId) {
+                const edgeId = `${parentId}->${nodeId}`;
+                const currentCount = (edgeCountMap.get(edgeId) || 0) + 1;
+                edgeCountMap.set(edgeId, currentCount);
+                
+                if (currentCount === 1) { // This should be 1 to push the edge on the first occurrence
+                  edges.push({ from: parentId, to: nodeId, value: currentCount });
+                } else {
+                  const existingEdgeIndex = edges.findIndex(edge => edge.from === parentId && edge.to === nodeId);
+                  if (existingEdgeIndex !== -1) {
+                    edges[existingEdgeIndex].value = currentCount;
+                  }
+                }
+              }
+              
+              console.log(edges)
+              traverseTree(node[key], nodeId, level + 1, newPath);
             }
-
-            if (parentId) {
-              const edgeId = `${parentId}->${nodeId}`;
-              const currentCount = edgeCountMap.get(edgeId) || 0;
-              edgeCountMap.set(edgeId, currentCount + 1);
-
-              edges.push({ from: parentId, to: nodeId, value: currentCount });
-            }
-            
-            traverseTree(node[key], nodeId, level + 1, `${path.trim()}/${key.trim()}`);
           }
         });
       };
+      
 
       traverseTree(data);
       setGraphData({ nodes, edges });

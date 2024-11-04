@@ -19,6 +19,11 @@ Sentry.init({
           createRoutesFromChildren,
           matchRoutes,
         }),
+        Sentry.feedbackIntegration({
+          colorScheme: "system",
+          isNameRequired: true,
+          isEmailRequired: true,
+        }),
         Sentry.replayIntegration(),
       ],
   tracesSampleRate: 1.0,
