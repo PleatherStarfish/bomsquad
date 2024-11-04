@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.db.transaction import non_atomic_requests
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
 from .models import CustomUser, KofiPayment, UserNotes, WantToBuildModules, BuiltModules
 from datetime import datetime, timedelta
@@ -47,6 +48,14 @@ def convert_to_usd(amount, currency):
 @api_view(["GET"])
 def get_user_me(request):
     user = request.user
+
+    # Check if the user is authenticated
+    if isinstance(user, AnonymousUser) or not user.is_authenticated:
+        return Response(
+            {"detail": "Authentication credentials were not provided or are invalid."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     serializer = UserSerializer(user)
     return Response(serializer.data)
 

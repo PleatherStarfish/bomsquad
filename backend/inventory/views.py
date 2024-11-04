@@ -38,6 +38,10 @@ class UserInventoryView(APIView):
         edit_mode = request.data.get("editMode", True)
         location = request.data.get("location", "")
 
+        # Handle location if it is a list
+        if isinstance(location, list):
+            location = ", ".join(location).strip()
+
         location_list = location.split(",") if location else None
 
         # Filter the user inventory items by user, component_id, and location
@@ -97,6 +101,11 @@ class UserInventoryView(APIView):
 
         # Process the location data from the request
         location = request.data.get("location", "")
+
+        # Handle location if it is a list
+        if isinstance(location, list):
+            location = ", ".join(location).strip()
+
         location_list = location.split(",") if location else None
 
         # Retrieve the user inventory item by inventory_pk

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Exists, OuterRef
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
@@ -54,6 +54,9 @@ def module_list(request):
     query = request.GET.get("search", "")
     manufacturer = request.GET.get("manufacturer", None)
     mounting_style = request.GET.get("mounting_style", None)
+    user = request.user if request.user.is_authenticated else None
+
+    # Optimize base query with select_related or prefetch_related if needed
     module_list = Module.objects.order_by("name")
 
     if manufacturer:
@@ -69,16 +72,21 @@ def module_list(request):
             | Q(description__icontains=query)
         ).order_by("name")
 
+    # Annotate to prevent N+1 query issue
+    if user:
+        module_list = module_list.annotate(
+            is_built=Exists(
+                BuiltModules.objects.filter(module=OuterRef("pk"), user=user)
+            ),
+            is_wtb=Exists(
+                WantToBuildModules.objects.filter(module=OuterRef("pk"), user=user)
+            ),
+        )
+
     paginator = Paginator(module_list, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     manufacturers = Manufacturer.objects.values("name").distinct()
-
-    user = request.user if request.user.is_authenticated else None
-    if user:
-        for module in page_obj:
-            module.is_built = module.is_built_by_user(user)
-            module.is_wtb = module.is_wtb_by_user(user)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         html = render_to_string(
