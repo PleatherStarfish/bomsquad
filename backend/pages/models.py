@@ -16,7 +16,10 @@ class StaticPage(models.Model):
         ],
         tools={
             "Gist": {"class": "Gist"},
-            "Image": {"config": {"endpoints": {"byFile": "/editorjs/image_upload/"}}},
+            "Image": {
+                "config": {"endpoints": {"byFile": "/editorjs/image_upload/"}},
+                "inlineToolbar": True,
+            },
         },
         null=True,
         blank=True,
