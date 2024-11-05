@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from core.models import BaseModel
 from django.urls import reverse
-import logging
+from django.db.models import F
 import uuid
 
 OHMS_UNITS = (
@@ -152,6 +152,11 @@ class Component(BaseModel):
         default=1,
         help_text="The number of component that are purchased per price (if they are sold in a set). Defaults to 1.",
     )
+    unit_price = models.GeneratedField(
+        expression=F("price") / F("pcs"),
+        output_field=models.DecimalField(max_digits=8, decimal_places=2),
+        db_persist=True,  # Persisting in the database for querying and indexing
+    )
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     link = models.URLField(blank=False)
@@ -233,13 +238,6 @@ class Component(BaseModel):
                 "component_id": self.pk,
             },
         )
-
-    def get_unit_price(self, obj):
-        try:
-            return self.price / self.pcs if self.pcs else self.price
-        except Exception as e:
-            logging.error(f"Error calculating unit price for component {obj.id}: {e}")
-            return None  # Or raise a validation error as appropriate
 
     @classmethod
     def get_mounting_styles(cls):
