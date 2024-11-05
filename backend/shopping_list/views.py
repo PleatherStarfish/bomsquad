@@ -487,10 +487,10 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
 def get_user_shopping_list_total_price(request):
     """
     This GET endpoint calculates the total cost of all components
-    in the authenticated user's shopping list.
+    in the authenticated user's shopping list using the unit price.
 
     It retrieves the user's shopping list items, checks if any exist,
-    calculates the total cost by multiplying quantity and price directly in the database,
+    calculates the total cost by multiplying quantity and unit price,
     and returns this total in a JSON response.
     """
 
@@ -504,9 +504,9 @@ def get_user_shopping_list_total_price(request):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    # Calculate total price of all components for the user
+    # Calculate total price of all components for the user using unit price
     total_price = shopping_list_items.aggregate(
-        total_price=Sum(F("quantity") * F("component__price"))
+        total_price=Sum(F("quantity") * (F("component__price") / F("component__pcs")))
     )["total_price"]
 
     return Response({"total_price": total_price}, status=status.HTTP_200_OK)
