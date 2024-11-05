@@ -156,9 +156,9 @@ const Components = () => {
     {
       name: <div>Price</div>,
       selector: (row) =>
-        row.price && row.price_currency
-          ? `${row.price} ${row.price_currency}`
-          : row.price,
+        row.unit_price && row.price_currency
+          ? `${row.unit_price} ${row.price_currency}`
+          : row.unit_price,
       sortable: true,
       wrap: true,
       hide: 1700,

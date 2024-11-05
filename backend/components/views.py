@@ -142,13 +142,12 @@ class ComponentView(APIView):
 
 @api_view(["GET"])
 def get_components_by_ids(request, pks):
-    # Validate input
+    print(pks)
     if not pks:
         return Response(
             {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Split the pks string into a list of UUIDs using the extract_uuids function
     try:
         component_pks = extract_uuids(pks)
     except ValueError:
@@ -157,15 +156,12 @@ def get_components_by_ids(request, pks):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Retrieve the Component instances based on the provided component_pks
     components = Component.objects.filter(pk__in=component_pks)
 
-    # Check if components are found
     if not components.exists():
         return Response(
             {"error": "Components do not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
-    # Serialize and return the components
     serializer = ComponentSerializer(components, many=True)
     return Response(serializer.data)

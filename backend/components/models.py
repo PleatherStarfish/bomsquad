@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from core.models import BaseModel
 from django.urls import reverse
+import logging
 import uuid
 
 OHMS_UNITS = (
@@ -232,6 +233,13 @@ class Component(BaseModel):
                 "component_id": self.pk,
             },
         )
+
+    def get_unit_price(self, obj):
+        try:
+            return self.price / self.pcs if self.pcs else self.price
+        except Exception as e:
+            logging.error(f"Error calculating unit price for component {obj.id}: {e}")
+            return None  # Or raise a validation error as appropriate
 
     @classmethod
     def get_mounting_styles(cls):

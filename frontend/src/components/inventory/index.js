@@ -197,7 +197,7 @@ const Inventory = () => {
                 row.component.description.replace(/,/g, ""),
                 (row.component.supplier_item_no ?? "").replace(/,/g, ""),
                 row.component.farads,
-                row.component.price,
+                row.component.unit_price,
                 row.quantity,
                 row.location
                   ? row.location
@@ -299,9 +299,9 @@ const Inventory = () => {
     {
       name: <div>Price</div>,
       selector: (row) =>
-        row.component.price && row.component.price_currency
-          ? `${row.component.price} ${row.component.price_currency}`
-          : row.component.price,
+        row.component.unit_price && row.component.price_currency
+          ? `${row.component.unit_price} ${row.component.price_currency}`
+          : row.component.unit_price,
       sortable: true,
       wrap: true,
       hide: 1700,

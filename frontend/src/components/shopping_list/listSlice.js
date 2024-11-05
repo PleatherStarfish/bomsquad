@@ -212,7 +212,7 @@ const ListSlice = ({
           <span className="text-gray-300">{`${getCurrencySymbol(
             row.component.price_currency
           )}${roundToCurrency(
-            row.component.price,
+            row.component.unit_price,
             row.component.price_currency
           )}`}</span>
         );

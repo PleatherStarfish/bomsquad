@@ -179,7 +179,7 @@ const NestedTable = ({ data }) => {
               `${getCurrencySymbol(
                 row.price_currency
               )}${roundToCurrency(
-                row.price,
+                row.unit_price,
                 row.price_currency
               )}`}
           </span>
