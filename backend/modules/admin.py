@@ -55,6 +55,9 @@ class ModuleAdmin(admin.ModelAdmin):
                     "bom_link",
                     "manual_link",
                     "modulargrid_link",
+                    "rack_unit",
+                    "hp",
+                    "category",
                 )
             },
         ),

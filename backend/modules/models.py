@@ -96,6 +96,21 @@ class ModuleBomListItem(BaseModel):
 
 
 class Module(BaseModel):
+
+    CATEGORY_CHOICES = [
+        ("Eurorack", "Eurorack"),
+        ("Pedals", "Pedals"),
+        ("Serge", "Serge"),
+        # Add other categories as needed
+    ]
+
+    RACK_UNIT_CHOICES = [
+        ("3U", "3U"),
+        ("4U", "4U"),
+        ("5U", "5U"),
+        # Add other rack units as needed
+    ]
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.PROTECT)
@@ -112,6 +127,26 @@ class Module(BaseModel):
     modulargrid_link = models.URLField(blank=True)
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     discontinued = models.BooleanField(default=False)
+    rack_unit = models.CharField(
+        max_length=2,
+        choices=RACK_UNIT_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Choose the rack unit (e.g., 3U, 4U, 5U).",
+    )
+    hp = models.IntegerField(
+        validators=[MinValueValidator(1)],
+        blank=True,
+        null=True,
+        help_text="Specify the width in HP (optional).",
+    )
+    category = models.CharField(
+        max_length=10,
+        choices=CATEGORY_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Select the module category (e.g., Eurorack, Pedals, Serge).",
+    )
     slug = models.SlugField(blank=True, unique=True)
     allow_comments = models.BooleanField("allow comments", default=True)
 
