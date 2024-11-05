@@ -504,9 +504,9 @@ def get_user_shopping_list_total_price(request):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    # Calculate total price of all components for the user using unit price
+    # Calculate total price of all components for the user using unit_price field
     total_price = shopping_list_items.aggregate(
-        total_price=Sum(F("quantity") * (F("component__price") / F("component__pcs")))
+        total_price=Sum(F("quantity") * F("component__unit_price"))
     )["total_price"]
 
     return Response({"total_price": total_price}, status=status.HTTP_200_OK)
@@ -517,13 +517,10 @@ def get_user_shopping_list_total_price(request):
 def get_user_shopping_list_total_component_price(request, component_pk):
     """
     This GET endpoint calculates the total cost of a specific component ('component_pk')
-    in the authenticated user's shopping list.
-
-    It retrieves the component, filters UserShoppingList items for the user and the component,
-    calculates the total cost by multiplying the quantity and price directly in the database,
-    and returns this total in a JSON response.
+    in the authenticated user's shopping list using a database field for unit price.
     """
 
+    # Fetch the component by primary key
     try:
         component = Component.objects.get(pk=component_pk)
     except Component.DoesNotExist:
@@ -531,17 +528,19 @@ def get_user_shopping_list_total_component_price(request, component_pk):
             {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
         )
 
+    # Filter shopping list items for the specific user and component
     shopping_list_items = UserShoppingList.objects.filter(
         user=request.user, component=component
     )
 
-    total_price = shopping_list_items.annotate(
-        total_price=Cast(F("quantity") * F("component__price"), FloatField())
-    ).values_list("total_price", flat=True)
+    # Calculate total price directly in the database using the unit_price field
+    total_price = shopping_list_items.aggregate(
+        total_price=Sum(
+            F("quantity") * F("component__unit_price"), output_field=FloatField()
+        )
+    )["total_price"]
 
-    total = sum(total_price)
-
-    return Response({"total_price": total}, status=status.HTTP_200_OK)
+    return Response({"total_price": total_price}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])
