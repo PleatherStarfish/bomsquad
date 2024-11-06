@@ -1,3 +1,5 @@
+import { BuildingOffice2Icon, WrenchIcon } from "@heroicons/react/24/outline";
+
 import React from 'react';
 import cx from "classnames";
 import useAddToBuiltMutation from '../services/useAddToBuiltMutation';
@@ -31,33 +33,17 @@ const AddModuleButtons = ({ moduleId, queryName }) => {
           type="button"
           onClick={addToBuilt.mutate}
           disabled={addToBuilt.isLoading}
+          data-tippy-content="Add to your built projects list"
           className={cx(
-            "inline-flex items-center gap-x-1.5 rounded-md p-1.5 text-xs font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
+            "inline-flex items-center gap-x-2 rounded-md py-2 px-2 text-sm md:text-base font-semibold text-white shadow-sm transition-all",
             {
               "bg-pink-600 hover:bg-pink-400": moduleStatus?.is_built,
               "bg-gray-500 hover:bg-gray-400": !moduleStatus?.is_built,
             }
           )}
         >
-          {moduleStatus?.is_built ? (
-            <>
-              <svg
-                className="-ml-0.5 h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Built
-            </>
-          ) : (
-            <>Add to built</>
-          )}
+          <BuildingOffice2Icon className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only">{moduleStatus?.is_built ? 'Built' : 'Add to built'}</span>
         </button>
       )}
       {!hideWtb && (
@@ -65,33 +51,17 @@ const AddModuleButtons = ({ moduleId, queryName }) => {
           type="button"
           onClick={addToWtb.mutate}
           disabled={addToWtb.isLoading}
+          data-tippy-content="Add to your want-to-build projects list"
           className={cx(
-            "inline-flex items-center gap-x-1.5 rounded-md p-1.5 text-xs font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
+            "inline-flex items-center gap-x-2 rounded-md py-2 px-2 text-sm md:text-base font-semibold text-white shadow-sm transition-all",
             {
               "bg-pink-600 hover:bg-pink-400": moduleStatus?.is_wtb,
               "bg-gray-500 hover:bg-gray-400": !moduleStatus?.is_wtb,
             }
           )}
         >
-          {moduleStatus?.is_wtb ? (
-            <>
-              <svg
-                className="-ml-0.5 h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Want to build
-            </>
-          ) : (
-            <>Add to want-to-build</>
-          )}
+          <WrenchIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only">{moduleStatus?.is_wtb ? 'Want to build' : 'Add to want-to-build'}</span>
         </button>
       )}
     </div>
