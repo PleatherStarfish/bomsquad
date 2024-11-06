@@ -190,6 +190,8 @@
 
                 loadingSpinner.classList.add('hidden');
                 loading = false;
+
+                applyColorToHpPills(); // Apply colors to newly loaded modules
             })
             .catch(error => {
                 console.error('Error loading more modules:', error);
@@ -197,18 +199,16 @@
                 loading = false;
             });
         }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Define the color scale for HP using Chroma.js, based on #558a6b
+
+        // Function to apply colors based on HP
+        function applyColorToHpPills() {
             const colorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
-    
-            // Select all elements with the data-hp attribute and apply the gradient color
             document.querySelectorAll('[data-hp]').forEach(function(element) {
                 const hpValue = parseInt(element.getAttribute('data-hp'), 10);
-                element.style.backgroundColor = colorScale(hpValue).hex();
+                const color = colorScale(hpValue).hex() || "#558a6b"; // Fallback color
+                element.style.backgroundColor = color;
             });
-        });
+        }
     </script>
 {% endblock javascript %}
 
