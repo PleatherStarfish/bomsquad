@@ -22,7 +22,11 @@ export const customStyles = {
 };
 
 const filterByUniquePCBVersion = (data) => {
-  const sortedUniqueVersions = _(data)
+  // Filter items by unique ID to remove duplicates
+  const uniqueItems = _.uniqBy(data, 'id');
+
+  // Extract and sort PCB versions for each unique item
+  const sortedUniqueVersions = _(uniqueItems)
     .flatMap((item) =>
       _(item.pcb_version)
         .sortBy((version) => version.order)
