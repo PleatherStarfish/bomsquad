@@ -70,7 +70,6 @@ class UserInventoryView(APIView):
 
         # If the user inventory item does not exist, create a new one
         quantity = int(request.data.get("quantity", 0))
-        print("quantity", quantity)
 
         component = Component.objects.get(id=component_pk)
 
@@ -119,8 +118,6 @@ class UserInventoryView(APIView):
                 component=user_inventory_item.component,
                 location__exact=location_list,
             ).exclude(pk=inventory_pk)
-
-            print(existing_inventory_items)
 
             if existing_inventory_items.exists():
                 return Response(

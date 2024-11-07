@@ -142,7 +142,6 @@ class ComponentView(APIView):
 
 @api_view(["GET"])
 def get_components_by_ids(request, pks):
-    print(pks)
     if not pks:
         return Response(
             {"error": "No component pks provided"}, status=status.HTTP_400_BAD_REQUEST

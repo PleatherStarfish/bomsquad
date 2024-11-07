@@ -280,7 +280,6 @@ class ArchivedShoppingListsView(APIView):
                 .prefetch_related("notes")
                 .order_by("-time_saved")
             )
-            print(saved_lists)
 
             # If no saved lists are available, return an empty list
             if not saved_lists.exists():
@@ -288,7 +287,6 @@ class ArchivedShoppingListsView(APIView):
 
             # Serialize the data
             serializer = UserShoppingListSavedSerializer(saved_lists, many=True)
-            print(serializer.data)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
