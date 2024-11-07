@@ -54,6 +54,7 @@ const BomList = ({ moduleId, moduleName }) => {
     moduleId,
   }));
 
+  console.log("selectedTab", selectedTab)
   console.log("uniquePCBVersions", uniquePCBVersions)
 
   useEffect(() => {
@@ -72,10 +73,12 @@ const BomList = ({ moduleId, moduleName }) => {
       )
       .map((item) => ({
         ...item,
-        // Create a unique ID that combines item.id with the selectedTab to avoid duplication
+        // Use the selectedTab as part of the ID to make it unique without relying on pcb_version.id directly
         id: `${item.id}_${selectedTab}`,
       }));
   }, [selectedTab, moduleBomData]);
+
+  console.log("filteredData", filteredData)
 
   const handleRowHover = (componentsOptions) => {
     prefetchComponentsData(queryClient, componentsOptions);
