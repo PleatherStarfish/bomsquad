@@ -8,7 +8,7 @@ import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
 import Tabs from "../../ui/Tabs";
 import Tippy from "@tippyjs/react";
-import { preloadComponentsData } from '../../services/usePreloadComponentsData';
+import { prefetchComponentsData } from '../../services/usePreloadComponentsData';
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
 import { useQueryClient } from '@tanstack/react-query';
@@ -71,7 +71,7 @@ const BomList = ({ moduleId, moduleName }) => {
   }, [selectedTab, moduleBomData]);
 
   const handleRowHover = (componentsOptions) => {
-    preloadComponentsData(queryClient, componentsOptions);
+    prefetchComponentsData(queryClient, componentsOptions);
   };
 
   if (moduleBomIsLoading)

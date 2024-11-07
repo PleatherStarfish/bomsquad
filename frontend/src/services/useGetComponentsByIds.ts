@@ -3,7 +3,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 // Define the function to fetch components by IDs
-export const getComponentsByIds = async (componentPks: string): Promise<Component[]> => {
+export const getComponentsByIds = async (componentPks: string[]): Promise<Component[]> => {
   try {
     const response = await axios.get(`/api/components/${componentPks}/`);
     return response.data as Component[];
@@ -13,7 +13,7 @@ export const getComponentsByIds = async (componentPks: string): Promise<Componen
 };
 
 // Define the custom hook to use this data
-const useGetComponentsByIds = (componentPks: string) => {
+const useGetComponentsByIds = (componentPks: string[]) => {
   const { 
     data: componentsData, 
     isLoading: componentsAreLoading, 
