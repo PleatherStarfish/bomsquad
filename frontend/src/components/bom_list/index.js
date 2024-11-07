@@ -22,11 +22,8 @@ export const customStyles = {
 };
 
 const filterByUniquePCBVersion = (data) => {
-  // Filter items by unique ID to remove duplicates
-  const uniqueItems = _.uniqBy(data, 'id');
-
   // Extract and sort PCB versions for each unique item
-  const sortedUniqueVersions = _(uniqueItems)
+  const sortedUniqueVersions = _(data)
     .flatMap((item) =>
       _(item.pcb_version)
         .sortBy((version) => version.order)
@@ -57,6 +54,8 @@ const BomList = ({ moduleId, moduleName }) => {
     moduleId,
   }));
 
+  console.log("uniquePCBVersions", uniquePCBVersions)
+
   useEffect(() => {
     setUniquePCBVersions(filterByUniquePCBVersion(moduleBomData));
   }, [moduleBomData?.length]);
@@ -66,12 +65,16 @@ const BomList = ({ moduleId, moduleName }) => {
   }, [uniquePCBVersions])
 
   const filteredData = useMemo(() => {
-    return moduleBomData.filter((item) => {
-      return item.pcb_version.some((x) => x.version === selectedTab);
-    }).map((item) => ({
-      ...item,
-      id: `${item.id}_${item.pcb_version.id}`, // Modify the id value with selectedTab
-    }));
+    return moduleBomData
+      .filter((item) =>
+        // Check if the item has the selected PCB version
+        item.pcb_version.some((version) => version.version === selectedTab)
+      )
+      .map((item) => ({
+        ...item,
+        // Create a unique ID that combines item.id with the selectedTab to avoid duplication
+        id: `${item.id}_${selectedTab}`,
+      }));
   }, [selectedTab, moduleBomData]);
 
   const handleRowHover = (componentsOptions) => {
@@ -93,6 +96,7 @@ const BomList = ({ moduleId, moduleName }) => {
       cell: (row) => {
         return (
           <div className="flex items-center space-x-2">
+            <>
             {row.quantity <= row.sum_of_user_options_from_inventory && row.quantity > 0 && (
               <Tippy
                 content={
@@ -111,6 +115,7 @@ const BomList = ({ moduleId, moduleName }) => {
                 <Cart className="fill-[#548a6a] w-4 h-4" />
               </Tippy>
             )}
+            </>
           </div>
         );
       },
