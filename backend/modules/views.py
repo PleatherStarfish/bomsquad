@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Exists, OuterRef
+from django.db.models import Q, Sum, Count, Exists, OuterRef, Avg
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
@@ -292,22 +292,34 @@ def rate_component(request):
 @api_view(["GET"])
 def get_average_rating(request, module_bom_list_item_id, component_id):
     try:
-        ratings = ModuleBomListComponentForItemRating.objects.filter(
+        # Check if there are any ratings for this item and component
+        ratings_exist = ModuleBomListComponentForItemRating.objects.filter(
             module_bom_list_item_id=module_bom_list_item_id, component_id=component_id
-        )
-        if ratings.exists():
-            total_rating = sum(rating.rating for rating in ratings)
-            count = ratings.count()
-            average_rating = total_rating / count if count > 0 else 0
-            average_rating = round(average_rating, 2)  # rounding to 2 decimal places
+        ).exists()
+
+        # If ratings exist, proceed with aggregation
+        if ratings_exist:
+            result = ModuleBomListComponentForItemRating.objects.filter(
+                module_bom_list_item_id=module_bom_list_item_id,
+                component_id=component_id,
+            ).aggregate(average_rating=Avg("rating"), number_of_ratings=Count("rating"))
+
+            # Round average rating to 2 decimal places
+            average_rating = (
+                round(result["average_rating"], 2) if result["average_rating"] else 0
+            )
             return Response(
-                {"average_rating": average_rating, "number_of_ratings": count},
+                {
+                    "average_rating": average_rating,
+                    "number_of_ratings": result["number_of_ratings"],
+                },
                 status=status.HTTP_200_OK,
             )
         else:
+            # If no ratings exist, return a 204 No Content response
             return Response(
                 {"detail": "Not rated"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=status.HTTP_204_NO_CONTENT,
             )
     except Exception as e:
         return Response(
