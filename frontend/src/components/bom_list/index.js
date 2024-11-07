@@ -8,8 +8,10 @@ import DataTable from "react-data-table-component";
 import NestedTable from "./nestedTable";
 import Tabs from "../../ui/Tabs";
 import Tippy from "@tippyjs/react";
+import { preloadComponentsData } from '../../services/usePreloadComponentsData';
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
+import { useQueryClient } from '@tanstack/react-query';
 
 export const customStyles = {
   headCells: {
@@ -38,6 +40,7 @@ const BomList = ({ moduleId, moduleName }) => {
   const [selectedTab, setSelectedTab] = React.useState();
   const [uniquePCBVersions, setUniquePCBVersions] = React.useState();
   const { user } = useAuthenticatedUser();
+  const queryClient = useQueryClient()
 
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
     useModuleBomListItems(moduleId);
@@ -49,7 +52,6 @@ const BomList = ({ moduleId, moduleName }) => {
     moduleName,
     moduleId,
   }));
-
 
   useEffect(() => {
     setUniquePCBVersions(filterByUniquePCBVersion(moduleBomData));
@@ -67,6 +69,10 @@ const BomList = ({ moduleId, moduleName }) => {
       id: `${item.id}_${item.pcb_version.id}`, // Modify the id value with selectedTab
     }));
   }, [selectedTab, moduleBomData]);
+
+  const handleRowHover = (componentsOptions) => {
+    preloadComponentsData(queryClient, componentsOptions);
+  };
 
   if (moduleBomIsLoading)
     return (
@@ -178,6 +184,8 @@ const BomList = ({ moduleId, moduleName }) => {
     },
   ];
 
+  console.log(filteredData)
+
   return (
     <div className="mb-8">
       {!user && (
@@ -228,6 +236,9 @@ const BomList = ({ moduleId, moduleName }) => {
           data={filteredData}
           progressPending={moduleBomIsLoading}
           customStyles={customStyles}
+          onRowMouseEnter={(row) => {
+            handleRowHover(row.components_options)
+          }}
           keyField="id"
         />
       }

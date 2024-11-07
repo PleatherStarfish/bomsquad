@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "whitenoise.runserver_nostatic",
     "core.staticfiles_config.StaticFilesConfig",
+    "django.contrib.sitemaps",
     "django.contrib.sites",
     # Third-party
     "maintenance_mode",

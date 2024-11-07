@@ -11,11 +11,28 @@ from modules import views as ModuleView
 from comments.views import edit_comment, delete_comment
 from pages.views import module_detail
 from django_otp.admin import OTPAdminSite
+from core.views import robots_txt
+from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps import views as sitemap_views
+from core.sitemaps import (
+    ModuleSitemap,
+    ManufacturerSitemap,
+    ComponentSitemap,
+    StaticViewSitemap,
+)
+from django.views.decorators.cache import cache_page
 import admin_honeypot
 
 
 # Custom OTP-enabled admin site
 admin.site.__class__ = OTPAdminSite
+
+sitemaps = {
+    "modules": ModuleSitemap,
+    "manufacturers": ManufacturerSitemap,
+    "components": ComponentSitemap,
+    "static": StaticViewSitemap,
+}
 
 
 schema_view = get_schema_view(
@@ -112,6 +129,19 @@ urlpatterns = [
     path("admin/", include("admin_honeypot.urls", namespace="admin_honeypot")),
     path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path(
+        "sitemap.xml",
+        cache_page(86400)(sitemap_views.index),
+        {"sitemaps": sitemaps},
+        name="sitemap-index",
+    ),
+    path(
+        "sitemap-<section>.xml",
+        cache_page(86400)(sitemap_views.sitemap),
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
+    path("robots.txt/", robots_txt, name="robots-txt"),
     path("user/", RedirectView.as_view(pattern_name="frontend")),
     path("api/", include("api.urls")),
     path("contact/", include("contact.urls")),
