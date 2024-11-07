@@ -130,7 +130,7 @@ urlpatterns = [
     path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path(
-        "sitemap.xml",
+        "sitemap.xml/",
         cache_page(86400)(sitemap_views.index),
         {"sitemaps": sitemaps},
         name="sitemap-index",

@@ -151,25 +151,29 @@
 
 {% block javascript %}
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            applyColorToHpPills(); // Initial call for modules loaded on page load
+        });
+        
         let loading = false;
-
+        
         window.addEventListener('scroll', () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loading) {
                 loading = true;
                 loadMoreModules();
             }
         });
-
+        
         function loadMoreModules() {
             const nextPage = document.getElementById('next-page').dataset.nextPage;
             if (nextPage === 'None') return;
-
+        
             const loadingSpinner = document.getElementById('loading');
             loadingSpinner.classList.remove('hidden');
-
+        
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('page', nextPage);
-
+        
             fetch(`?${urlParams.toString()}`, {
                 headers: {
                     'x-requested-with': 'XMLHttpRequest'
@@ -181,16 +185,16 @@
                 newModules.innerHTML = data.html;
                 const moduleContainer = document.getElementById('module-container');
                 moduleContainer.append(...newModules.children);
-
+        
                 if (data.has_next) {
                     document.getElementById('next-page').dataset.nextPage = parseInt(nextPage) + 1;
                 } else {
                     document.getElementById('next-page').dataset.nextPage = 'None';
                 }
-
+        
                 loadingSpinner.classList.add('hidden');
                 loading = false;
-
+        
                 applyColorToHpPills(); // Apply colors to newly loaded modules
             })
             .catch(error => {
@@ -199,7 +203,7 @@
                 loading = false;
             });
         }
-
+        
         // Function to apply colors based on HP
         function applyColorToHpPills() {
             const colorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
@@ -208,7 +212,7 @@
                 const color = colorScale(hpValue).hex() || "#558a6b"; // Fallback color
                 element.style.backgroundColor = color;
             });
-        }
+        }        
     </script>
 {% endblock javascript %}
 
