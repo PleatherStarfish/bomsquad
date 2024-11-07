@@ -71,11 +71,17 @@ const BomList = ({ moduleId, moduleName }) => {
         // Check if the item has the selected PCB version
         item.pcb_version.some((version) => version.version === selectedTab)
       )
-      .map((item) => ({
-        ...item,
-        // Use the selectedTab as part of the ID to make it unique without relying on pcb_version.id directly
-        id: `${item.id}_${selectedTab}`,
-      }));
+      .reduce((uniqueItems, item) => {
+        // Use the item id as a key to ensure uniqueness
+        const uniqueKey = `${item.id}_${selectedTab}`;
+        if (!uniqueItems.some((uniqueItem) => uniqueItem.id === uniqueKey)) {
+          uniqueItems.push({
+            ...item,
+            id: uniqueKey, // Assign a unique ID for the React component
+          });
+        }
+        return uniqueItems;
+      }, []);
   }, [selectedTab, moduleBomData]);
 
   console.log("filteredData", filteredData)
