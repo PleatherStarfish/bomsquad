@@ -7,10 +7,6 @@ export const usePreloadData = (componentPks) => {
   return useQuery(
     ['components', componentPks],
     () => useGetComponentsByIds(componentPks),
-    {
-      enabled: false, // Disabled by default, will be triggered manually
-      staleTime: 10000, // Cached data remains fresh for 10 seconds
-    }
   );
 };
 
