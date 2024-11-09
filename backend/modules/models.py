@@ -131,6 +131,10 @@ class Module(BaseModel):
     modulargrid_link = models.URLField(blank=True)
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     discontinued = models.BooleanField(default=False)
+    bom_under_construction = models.BooleanField(
+        default=False,
+        help_text="Indicates if the module's BOM is currently under construction and hidden from view",
+    )
     rack_unit = models.CharField(
         max_length=2,
         choices=RACK_UNIT_CHOICES,

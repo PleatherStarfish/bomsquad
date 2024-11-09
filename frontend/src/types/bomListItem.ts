@@ -1,7 +1,7 @@
 export interface Manufacturer {
   id: string;
-  name: string;
   link?: string;
+  name: string;
   notes?: string;
   slug: string;
 }
@@ -9,81 +9,83 @@ export interface Manufacturer {
 export interface PcbVersion {
   id: string;
   module: string; // Assume this is the Module's ID
-  version: string;
   order: number;
+  version: string;
 }
 
 export interface Component {
   id: string;
   name: string;
-  type: string; // Assuming type is a string here; adjust as needed
+  type: string; // Assuming type is a string here; adjust as needed // Assuming type is a string here; adjust as needed
 }
 
 export interface Module {
-  id: string;
-  name: string;
-  manufacturer: Manufacturer;
-  version: string;
-  description: string;
-  image?: string;
-  thumb_image_webp?: string;
-  thumb_image_jpeg?: string;
-  large_image_webp?: string;
-  large_image_jpeg?: string;
-  manufacturer_page_link?: string;
+  allow_comments: boolean;
   bom_link?: string;
+  bom_under_construction: boolean;
+  category?: "Eurorack" | "Pedals" | "Serge"; // Categories
+  description: string;
+  discontinued: boolean;
+  hp?: number; // Width in HP
+  id: string;
+  image?: string;
+  large_image_jpeg?: string;
+  large_image_webp?: string;
   manual_link?: string;
+  manufacturer: Manufacturer;
+  manufacturer_page_link?: string;
   modulargrid_link?: string;
   mounting_style?: "smt" | "th"; // "Surface Mount (SMT)" or "Through Hole"
-  discontinued: boolean;
+  name: string;
   rack_unit?: "3U" | "4U" | "5U"; // Rack unit choices
-  hp?: number; // Width in HP
-  category?: "Eurorack" | "Pedals" | "Serge"; // Categories
   slug: string;
-  allow_comments: boolean;
+  thumb_image_jpeg?: string;
+  thumb_image_webp?: string;
+  version: string;
 }
 
 export interface BomItem {
-  id: string;
-  description: string;
   components_options: string[];
-  module: Module;
-  pcb_version: PcbVersion[];
-  type: Types;
+  description: string;
   designators: string;
-  quantity: number;
+  id: string;
+  module: Module;
   notes: string;
+  pcb_version: PcbVersion[];
+  quantity: number;
   sum_of_user_options_from_inventory?: number | null;
   sum_of_user_options_from_shopping_list?: number | null;
+  type: Types;
 }
 
 export interface Types {
+  description?: string;
   id: string;
   name: string;
-  description?: string;
 }
 
 export interface BomListProps {
+  bomUnderConstruction: boolean;
   moduleId: string;
   moduleName: string;
 }
 
 export interface WantToBuildModules {
   id: string;
-  user: string; // User ID
   module: Module;
+  user: string; // User ID
 }
 
 export interface BuiltModules {
   id: string;
-  user: string; // User ID
   module: Module;
+  user: string; // User ID
 }
 
 export interface ModuleBomListComponentForItemRating {
+  component: Component;
   id: string;
   module_bom_list_item: BomItem;
-  component: Component;
-  user: string; // User ID
   rating: number; // Between 1 and 5
+  user: string; // User ID // Between 1 and 5
 }

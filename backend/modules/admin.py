@@ -16,6 +16,26 @@ class ModuleBomListItemAdmin(BaseAdmin):
     model = ModuleBomListItem
     filter_horizontal = ("components_options", "pcb_version")
 
+    # Display important fields in the list view
+    list_display = (
+        "description",
+        "module",
+        "quantity",
+        "type",
+    )
+
+    # Add filters for relevant fields
+    list_filter = ("module", "type", "module__manufacturer__name")
+
+    # Add search fields for easy lookup
+    search_fields = (
+        "description",
+        "module__name",
+        "type__name",
+        "components_options__name",
+        "pcb_version__version",
+    )
+
 
 class ManufacturerAdmin(BaseAdmin):
     model = Manufacturer
@@ -44,6 +64,7 @@ class ModuleAdmin(admin.ModelAdmin):
                     "slug",
                     "description",
                     "image",
+                    "bom_under_construction",
                 )
             },
         ),

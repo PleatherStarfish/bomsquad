@@ -36,7 +36,7 @@ module.exports = {
     'text-blue-500', 
     'hover:text-blue-700',
     'gap-y-10', 
-    'lg:gap-y-12', 
+    'lg:gap-y-14', 
     'font-bold', 
     'container', 
     'mx-auto', 

@@ -4,12 +4,12 @@ import { BomItem, BomListProps, PcbVersion } from "../../types/bomListItem";
 import { Cart, Folder2 } from "react-bootstrap-icons";
 import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useMemo, useState } from "react";
+import { flatMap, sortBy, uniq } from 'lodash-es';
 
 import Alert from "../../ui/Alert";
 import NestedTable from "./nestedTable";
 import Tabs from "../../ui/Tabs";
 import Tippy from "@tippyjs/react";
-import _ from "lodash";
 import { prefetchComponentsData } from "../../services/usePreloadComponentsData";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
@@ -25,21 +25,18 @@ export const customStyles = {
 
 // Helper function to extract unique PCB version names sorted by order
 const getUniqueSortedPCBVersionNames = (data: BomItem[]): string[] => {
-  return _(data)
-    .flatMap((item: BomItem) =>
-      _(item.pcb_version)
-        .sortBy((version: PcbVersion) => version.order)
-        .map((version: PcbVersion) => version.version) // Accessing the PCB version name
-        .value()
+  return uniq(
+    flatMap(data, (item: BomItem) =>
+      sortBy(item.pcb_version, (version: PcbVersion) => version.order)
+        .map((version: PcbVersion) => version.version)
     )
-    .uniq()
-    .value();
+  );
 };
 
 // Helper function to generate a unique key for each item and selected tab
 const generateUniqueKey = (itemId: string, tabName: string) => `${itemId}_${tabName}`;
 
-const BomList: React.FC<BomListProps> = ({ moduleId, moduleName }) => {
+const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstruction }) => {
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
   const [uniquePCBVersions, setUniquePCBVersions] = useState<string[]>([]);
   const { user } = useAuthenticatedUser();
@@ -91,6 +88,19 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName }) => {
   const handleRowHover = (componentsOptions: string[]) => {
     prefetchComponentsData(queryClient, componentsOptions);
   };
+
+  // Short-circuit and display an alert if BOM is under construction
+  if (bomUnderConstruction) {
+    return (
+      <div className="w-full mb-8">
+        <Alert variant="underConstruction" align="center" expand={false} icon>
+          <div className="text-center">
+            This BOM is currently under construction. Please check back later.
+          </div>
+        </Alert>
+      </div>
+    );
+  }
 
   if (moduleBomIsLoading) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;

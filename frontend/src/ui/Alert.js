@@ -1,6 +1,7 @@
+import { ConeStriped, Shuffle } from "react-bootstrap-icons"; // Import ConeStriped icon
+
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import React from "react";
-import { Shuffle } from "react-bootstrap-icons";
 import cx from "classnames";
 
 export const AlertVariant = {
@@ -9,6 +10,7 @@ export const AlertVariant = {
   sky: "bg-sky-200 text-blue-900",
   muted: "bg-gray-100 text-gray-500",
   transparent: "bg-transparent text-gray-500",
+  underConstruction: "bg-yellow-100 text-yellow-800", // New underConstruction variant
 };
 
 export const AlertVariantPadding = {
@@ -23,8 +25,13 @@ export const AlertVariantIcon = {
     </div>
   ),
   sky: (
-    <div className="flex-shrink-0" style={{paddingTop: "2px"}}>
+    <div className="flex-shrink-0" style={{ paddingTop: "2px" }}>
       <Shuffle className="w-5 h-5 text-blue-900" aria-hidden="true" />
+    </div>
+  ),
+  underConstruction: (
+    <div className="flex-shrink-0">
+      <ConeStriped className="w-6 h-6 text-yellow-800" aria-hidden="true" />
     </div>
   ),
 };
