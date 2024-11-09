@@ -72,6 +72,7 @@ class ModuleBomListItemSerializer(serializers.ModelSerializer):
     sum_of_user_options_from_shopping_list = serializers.IntegerField(required=False)
     pcb_version = PCBVersionSerializer(many=True)
     type = serializers.CharField(source="type.name")
+    bom_link = serializers.URLField(source="module.bom_link", read_only=True)
 
     class Meta:
         model = ModuleBomListItem

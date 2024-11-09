@@ -194,7 +194,7 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName }) => {
   return (
     <div className="mb-8">
       {!user && (
-        <Alert variant="warning">
+        <Alert variant="warning" padding="compact">
           <div className="alert alert-warning" role="alert">
             <a href="/accounts/login/" className="text-blue-500 hover:text-blue-700">
               <b>Login</b>

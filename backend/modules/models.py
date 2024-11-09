@@ -73,6 +73,10 @@ class ModuleBomListItem(BaseModel):
         help_text="A list of locations on the circuit board.",
     )
     quantity = models.PositiveIntegerField(default=0, blank=False)
+    bom_specifies_a_choice_of_values = models.BooleanField(
+        default=False,
+        help_text="Check the BOM to select a value based on user preference.",
+    )
     notes = models.TextField(blank=True)
 
     class Meta:

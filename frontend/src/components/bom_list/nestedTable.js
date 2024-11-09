@@ -6,6 +6,7 @@ import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 import { getFaradConversions, getOhmConversions } from '../conversions';
 
 import AddComponentModal from "./addComponentModal";
+import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
 import DataTable from "react-data-table-component";
 import { FlagIcon } from "@heroicons/react/24/outline";
@@ -45,7 +46,9 @@ const getBaseUrl = () => {
 
 const NestedTable = ({ data }) => {
   const {
+    bom_specifies_a_choice_of_values,
     components_options,
+    bom_link,
     type,
     id: modulebomlistitem_pk,
     moduleId: module_pk,
@@ -396,7 +399,14 @@ const NestedTable = ({ data }) => {
   ];
 
   return (
-    <div className="py-1 px-3 ml-[47px] bg-sky-50">
+    <div className="py-1 px-4 ml-[47px] bg-sky-50">
+      {bom_specifies_a_choice_of_values && (
+        <Alert variant="sky" role="alert" icon={true} padding="compact" align="center" expand={false}>
+          <p>
+          This BOM item specifies a choice of several different component value options. Please check <a href={bom_link} target="_blank" className="underline hover:text-sky-800">the BOM</a> for details.
+          </p>
+        </Alert>
+      )}
       <DataTable
         compact
         columns={columns}

@@ -66,76 +66,71 @@
             </form>  
         </div>              
         
-        <div id="module-container" class="grid grid-cols-1 gap-6 md:gap-8 lg:gap-12">
+        <div id="module-container" class="grid grid-cols-1 gap-y-10 lg:gap-y-12">
             <h1 class="my-6 text-3xl">Projects</h1>
             {% for module in page_obj %}
-                <div class="flex items-center overflow-hidden bg-white rounded-lg module-item">
-                    <div class="flex justify-center object-contain w-24 h-24 md:w-48 md:h-48">
+                <div class="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row module-item">
+                    <!-- Image section with responsive full width on mobile -->
+                    <div class="flex justify-center w-full h-64 md:w-48 md:h-48">
                         {% if module.thumb_image_webp and module.thumb_image_jpeg %}
                             <picture>
                                 <source srcset="{{ module.thumb_image_webp.url }}" type="image/webp">
-                                <source srcset="{{ module.thumb_image_jpeg.url }}" type="image/jpeg"> <!-- Fallback image -->
-                                <img class="object-contain w-auto h-full"
+                                <source srcset="{{ module.thumb_image_jpeg.url }}" type="image/jpeg">
+                                <img class="object-cover w-full h-full md:object-contain"
                                     src="{{ module.thumb_image_jpeg.url }}"
                                     alt="{{ module.name }}"/>
                             </picture>
                         {% endif %}
                     </div>
-                    <div class="flex-1">
-                        <div class="px-4 py-5 sm:p-6">
-                            <div class="flex flex-wrap justify-between">
-                                <div>
-                                    <a href="{% url 'module' module.slug %}">
-                                        <h2 class="text-xl font-medium text-gray-900">{{ module.name }}</h2>
-                                    </a>
-                                </div>
-                                <div class="flex py-2 space-x-2 md:py-0">
-                                    {% include "modules/_module_button.html" with action_url="add_to_built" icon_type="built" btn_class=module.is_built|yesno:"inline-flex items-center gap-x-1.5 rounded-md bg-pink-600 hover:bg-pink-400,inline-flex items-center gap-x-1.5 rounded-md bg-gray-500 hover:bg-gray-400" label_text="Built" %}
-                                    {% include "modules/_module_button.html" with action_url="add_to_wtb" icon_type="wtb" btn_class=module.is_wtb|yesno:"inline-flex items-center gap-x-1.5 rounded-md bg-pink-600 hover:bg-pink-400,inline-flex items-center gap-x-1.5 rounded-md bg-gray-500 hover:bg-gray-400" label_text="Want to build" %}
-                                </div>
+
+                    <!-- Content section below the image on mobile, side-by-side on desktop -->
+                    <div class="flex-1 p-4 md:px-4 md:py-5 sm:p-6">
+                        <div class="flex flex-wrap justify-between">
+                            <div>
+                                <a href="{% url 'module' module.slug %}">
+                                    <h2 class="text-xl font-medium text-gray-900">{{ module.name }}</h2>
+                                </a>
                             </div>
-                            <a href="{% url 'manufacturer_detail' module.manufacturer.slug %}" class="text-gray-500 hover:text-gray-400">{{ module.manufacturer.name }}</a>
-                            <div class="flex flex-wrap gap-2 mt-2">
-                                <!-- Rack Unit Pill with Static Color -->
-                                {% if module.rack_unit %}
-                                    <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full" style="background-color: #1f77b4;">
-                                        {{ module.rack_unit }}
-                                    </span>
-                                {% endif %}
-                            
-                                <!-- HP Pill with Color Gradient -->
-                                {% if module.hp %}
-                                <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full" 
-                                        data-hp="{{ module.hp }}">
+                            <div class="flex py-2 space-x-2 md:py-0">
+                                {% include "modules/_module_button.html" with action_url="add_to_built" icon_type="built" btn_class=module.is_built|yesno:"inline-flex items-center gap-x-1.5 rounded-md bg-pink-600 hover:bg-pink-400,inline-flex items-center gap-x-1.5 rounded-md bg-gray-500 hover:bg-gray-400" label_text="Built" %}
+                                {% include "modules/_module_button.html" with action_url="add_to_wtb" icon_type="wtb" btn_class=module.is_wtb|yesno:"inline-flex items-center gap-x-1.5 rounded-md bg-pink-600 hover:bg-pink-400,inline-flex items-center gap-x-1.5 rounded-md bg-gray-500 hover:bg-gray-400" label_text="Want to build" %}
+                            </div>
+                        </div>
+                        <a href="{% url 'manufacturer_detail' module.manufacturer.slug %}" class="text-gray-500 hover:text-gray-400">{{ module.manufacturer.name }}</a>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            {% if module.rack_unit %}
+                                <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full" style="background-color: #1f77b4;">
+                                    {{ module.rack_unit }}
+                                </span>
+                            {% endif %}
+                            {% if module.hp %}
+                                <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full" data-hp="{{ module.hp }}">
                                     {{ module.hp }} HP
                                 </span>
+                            {% endif %}
+                            {% if module.category %}
+                                {% if module.category.lower == 'eurorack' %}
+                                    <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-slate-500">
+                                        {{ module.category }}
+                                    </span>
+                                {% elif module.category.lower == 'pedals' %}
+                                    <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-purple-500">
+                                        {{ module.category }}
+                                    </span>
+                                {% elif module.category.lower == 'serge' %}
+                                    <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-yellow-800">
+                                        {{ module.category }}
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 text-xs font-semibold text-white bg-gray-500 rounded-full">
+                                        {{ module.category }}
+                                    </span>
                                 {% endif %}
-                            
-                                <!-- Category Pill with Static Colors Based on Value -->
-                                {% if module.category %}
-                                    {% if module.category.lower == 'eurorack' %}
-                                        <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-slate-500">
-                                            {{ module.category }}
-                                        </span>
-                                    {% elif module.category.lower == 'pedals' %}
-                                        <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-purple-500">
-                                            {{ module.category }}
-                                        </span>
-                                    {% elif module.category.lower == 'serge' %}
-                                        <span class="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-yellow-800">
-                                            {{ module.category }}
-                                        </span>
-                                    {% else %}
-                                        <span class="px-2 py-0.5 text-xs font-semibold text-white bg-gray-500 rounded-full">
-                                            {{ module.category }}
-                                        </span>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            <p class="mt-4 text-sm text-gray-500" style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5">
-                                {{ module.description }}
-                            </p>
+                            {% endif %}
                         </div>
+                        <p class="mt-4 text-sm text-gray-500" style="overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5">
+                            {{ module.description }}
+                        </p>
                     </div>
                 </div>
             {% endfor %}
