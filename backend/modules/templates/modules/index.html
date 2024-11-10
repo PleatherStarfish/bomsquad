@@ -4,33 +4,74 @@
 
 {% block content %}
     <div class="py-12 mx-auto">
-        <div class="flex flex-col mb-4 space-x-4 md:flex-row">
-            {% if request.GET.search %}
-                <div>
-                    <span>Search:</span>
-                    <a href="?{% query_transform request excluding='search' %}" class="m-0 py-0.5 px-1.5 no-underline rounded-full font-sans font-semibold bg-slate-500 text-white">
-                        {{ request.GET.search }} ×
+        <div class="flex justify-between mb-4">
+            <div class="flex flex-wrap gap-2 text-xs">
+                {% if request.GET.search %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Search:</span>
+                        <a href="?{% query_transform request excluding='search' %}" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.search }} ×
+                        </a>
+                    </div>
+                {% endif %}
+                {% if request.GET.manufacturer %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Manufacturer:</span>
+                        <a href="?{% query_transform request excluding='manufacturer' %}" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.manufacturer }} ×
+                        </a>
+                    </div>
+                {% endif %}
+                {% if request.GET.component or request.GET.quantity_min or request.GET.quantity_max %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Component & Quantity:</span>
+                        <a href="javascript:void(0);" onclick="clearMultipleParams(['component', 'component_id', 'quantity_min', 'quantity_max'])" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.component|truncatechars:20 }}
+                            {% if request.GET.component %}
+                                {% if request.GET.quantity_min or request.GET.quantity_max %}&#8212;{% endif %}
+                            {% endif %}
+                            {% if request.GET.quantity_min %}{{ request.GET.quantity_min }}{% else %}0{% endif %}
+                            to
+                            {% if request.GET.quantity_max %}{{ request.GET.quantity_max }}{% else %}∞{% endif %}
+                        </a>
+                    </div>
+                {% endif %}
+                {% if request.GET.component_type %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Mounting Style:</span>
+                        <a href="?{% query_transform request excluding='component_type' %}" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.component_type|get_display_name:mounting_style_options }} ×
+                        </a>
+                    </div>
+                {% endif %}
+                {% if request.GET.category %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Category:</span>
+                        <a href="?{% query_transform request excluding='category' %}" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.category }} ×
+                        </a>
+                    </div>
+                {% endif %}
+                {% if request.GET.rack_unit %}
+                    <div class="flex items-center">
+                        <span class="font-bold">Rack Unit:</span>
+                        <a href="?{% query_transform request excluding='rack_unit' %}" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                            {{ request.GET.rack_unit }} ×
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Clear All Filters button aligned right -->
+            {% if request.GET.search or request.GET.manufacturer or request.GET.component_type or request.GET.category or request.GET.rack_unit or request.GET.component or request.GET.quantity_min or request.GET.quantity_max %}
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="px-3 py-1 font-sans font-semibold text-white bg-[#fed703] rounded-full whitespace-nowrap">
+                        Clear All Filters
                     </a>
                 </div>
             {% endif %}
-            {% if request.GET.manufacturer %}
-                <div>
-                    <span>Manufacturer:</span>
-                    <a href="?{% query_transform request excluding='manufacturer' %}" class="m-0 py-0.5 px-1.5 no-underline rounded-full font-sans font-semibold bg-slate-500 text-white">
-                        {{ request.GET.manufacturer }} ×
-                    </a>
-                </div>
-            {% endif %}
-            {% if request.GET.component_type %}
-                <div>
-                    <span>Mounting Style:</span>
-                    <a href="?{% query_transform request excluding='component_type' %}" class="m-0 py-0.5 px-1.5 no-underline rounded-full font-sans font-semibold bg-slate-500 text-white">
-                        {% if request.GET.component_type == 'th' %}Through Hole{% elif request.GET.component_type == 'smt' %}Surface Mount (SMT){% else %}{{ request.GET.component_type }}{% endif %} ×
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-        
+        </div>                          
+
         <div id="dataElem" class="p-10 mb-10 bg-gray-100 rounded-lg">
             <form method="get">
                 <div class="flex flex-col gap-6 -mx-2">
@@ -45,17 +86,59 @@
                             class="w-full h-10 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"/>
                     </div>
                     <div class="flex flex-wrap gap-4">
+                        <!-- Manufacturer Filter -->
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
-                            <label for="manufacturer"
-                                class="block mb-2 font-semibold text-gray-700 text-md">Manufacturer</label>
+                            <label for="manufacturer" class="block mb-2 font-semibold text-gray-700 text-md">Manufacturer</label>
                             {% include "components/select.html" with select_name="manufacturer" select_id="manufacturer" default_option_text="All" items=manufacturers %}
                         </div>
+                    
+                        <!-- Mounting Style Filter -->
                         <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
-                            <label for="component_type"
-                                class="block mb-2 font-semibold text-gray-700 text-md">Mounting Style</label>
-                            {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=mounting_style %}
+                            <label for="component_type" class="block mb-2 font-semibold text-gray-700 text-md">Mounting Style</label>
+                            {% include "components/select.html" with select_name="component_type" select_id="component_type" default_option_text="All" items=mounting_style_options %}
+                        </div>
+                    
+                        <!-- Category Filter -->
+                        <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
+                            <label for="category" class="block mb-2 font-semibold text-gray-700 text-md">Category</label>
+                            {% include "components/select.html" with select_name="category" select_id="category" default_option_text="All" items=category_options %}
+                        </div>
+                    
+                        <!-- Rack Unit Filter -->
+                        <div class="w-48 px-2 mb-4 md:mb-0 min-w-[200px]">
+                            <label for="rack_unit" class="block mb-2 font-semibold text-gray-700 text-md">Rack Unit</label>
+                            {% include "components/select.html" with select_name="rack_unit" select_id="rack_unit" default_option_text="All" items=rack_unit_options %}
                         </div>
                     </div>
+                    <div id="components-container" class="w-full px-2 mb-4 md:w-3/5 lg:w-1/2 min-w-[200px]">
+                        <div class="relative">
+                            <label for="component" class="block mb-2 font-semibold text-gray-700 text-md">Component</label>
+                    
+                            <!-- Input field for component search -->
+                            <input type="text" name="component" id="component" placeholder="Search component"
+                                   class="w-full h-10 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"
+                                   oninput="fetchComponents()" autocomplete="off"/>
+                    
+                            <!-- Hidden field for component ID -->
+                            <input type="hidden" name="component_id" id="component-id">
+                            
+                            <!-- Dropdown for suggestions -->
+                            <div id="component-dropdown" class="absolute z-10 hidden w-full bg-white border border-gray-300 rounded-md shadow-lg"></div>
+                        </div>
+                    
+                        <!-- Quantity Range Inputs -->
+                        <div class="flex items-center gap-4 mt-2">
+                            <label for="quantity_min" class="text-sm font-semibold text-gray-700">Quantity:</label>
+                            <input type="number" name="quantity_min" id="quantity_min" placeholder="Min"
+                                   class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
+                            <span class="text-sm font-semibold text-gray-700">to</span>
+                            <input type="number" name="quantity_max" id="quantity_max" placeholder="Max"
+                                   class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
+                        </div>
+                    </div>
+                    <div class="flex w-full">
+                        <button type="button" onclick="addComponentGroup()">+</button>  
+                    </div>                  
                     <div class="w-full px-2 md:w-1/2 lg:w-1/3">
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 text-base font-medium text-white border border-transparent rounded-md bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500">
@@ -64,7 +147,7 @@
                     </div>
                 </div>
             </form>  
-        </div>              
+        </div>                
         
         <div id="module-container" class="grid grid-cols-1 gap-y-10 lg:gap-y-14">
             <h1 class="my-6 text-3xl">Projects</h1>
@@ -208,6 +291,81 @@
                 element.style.backgroundColor = color;
             });
         }        
+    </script>
+    <script>
+        async function fetchComponents() {
+            const query = document.getElementById("component").value;
+            const dropdown = document.getElementById("component-dropdown");
+        
+            if (query.length < 2) {
+                dropdown.classList.add("hidden");
+                return;
+            }
+        
+            // Fetching component suggestions from the server
+            const response = await fetch(`/component-autocomplete/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            dropdown.innerHTML = ""; // Clear previous suggestions
+        
+            // Populate dropdown with results
+            data.results.forEach(item => {
+                const option = document.createElement("div");
+                option.className = "py-2 px-4 cursor-pointer hover:bg-gray-100";
+                option.textContent = item.text;
+                option.onclick = () => selectComponent(item);
+                dropdown.appendChild(option);
+            });
+        
+            // Display the dropdown
+            dropdown.classList.remove("hidden");
+        }
+        
+        // Selects component from dropdown
+        function selectComponent(item) {
+            document.getElementById("component").value = item.text; // Display selected text
+            document.getElementById("component-id").value = item.id; // Store ID in hidden input
+            document.getElementById("component-dropdown").classList.add("hidden"); // Hide dropdown
+        }
+        
+        // Close dropdown if clicking outside the input field and dropdown
+        document.addEventListener("click", function(event) {
+            const dropdown = document.getElementById("component-dropdown");
+            const componentInput = document.getElementById("component");
+        
+            if (!dropdown.contains(event.target) && event.target !== componentInput) {
+                dropdown.classList.add("hidden");
+            }
+        });        
+    </script>
+    <script>
+        function clearMultipleParams(params) {
+            const url = new URL(window.location.href);
+            params.forEach(param => url.searchParams.delete(param));
+            window.location.href = url.toString();
+        }
+        function addComponentGroup() {
+            const container = document.getElementById("components-container");
+            const newComponentGroup = document.querySelector(".component-group").cloneNode(true);
+            
+            // Reset input values in the cloned group
+            newComponentGroup.querySelectorAll("input").forEach(input => input.value = "");
+            
+            // Append remove button if it doesn't exist
+            if (!newComponentGroup.querySelector(".remove-button")) {
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "remove-button px-2 py-1 bg-red-500 text-white rounded";
+                removeButton.textContent = "-";
+                removeButton.onclick = function() { removeComponentGroup(removeButton); };
+                newComponentGroup.appendChild(removeButton);
+            }
+        
+            container.appendChild(newComponentGroup);
+        }
+        
+        function removeComponentGroup(button) {
+            button.closest(".component-group").remove();
+        }
     </script>
 {% endblock javascript %}
 

@@ -21,15 +21,18 @@ def dropdown_items(user, preset=None):
 
 
 @register.simple_tag
-def query_transform(request, excluding=None):
-    query = request.GET.copy()
-    if excluding:
-        query.pop(excluding, None)
-    return query.urlencode()
+def query_transform(request, excluding=[]):
+    query_dict = request.GET.copy()
+    if isinstance(excluding, list):
+        for exclude in excluding:
+            query_dict.pop(exclude, None)
+    elif excluding:  # Single value exclusion
+        query_dict.pop(excluding, None)
+    return query_dict.urlencode()
 
 
 @register.filter
-def get_mounting_style_name(value, mounting_style_options):
+def get_display_name(value, mounting_style_options):
     for option in mounting_style_options:
         if option["value"] == value:
             return option["name"]

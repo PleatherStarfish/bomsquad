@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Exists, OuterRef, Avg
+from django.db.models import Q, Sum, Count, Exists, OuterRef, Avg, F
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
+from components.models import Component
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -53,26 +54,51 @@ mounting_style_options = [
 def module_list(request):
     query = request.GET.get("search", "")
     manufacturer = request.GET.get("manufacturer", None)
-    mounting_style = request.GET.get("mounting_style", None)
+    component_type = request.GET.get("component_type", None)
+    category = request.GET.get("category", None)
+    rack_unit = request.GET.get("rack_unit", None)
     user = request.user if request.user.is_authenticated else None
+    component_id = request.GET.get("component_id")
+    quantity_min = request.GET.get("quantity_min")
+    quantity_max = request.GET.get("quantity_max")
 
-    # Optimize base query with select_related or prefetch_related if needed
     module_list = Module.objects.order_by("name")
+
+    # Efficient filtering for BOM items
+    bom_filter = Q()
+    if component_id:
+        bom_filter &= Q(components_options__id=component_id)
+    if quantity_min:
+        bom_filter &= Q(quantity__gte=quantity_min)
+    if quantity_max:
+        bom_filter &= Q(quantity__lte=quantity_max)
+
+    # Apply BOM filters only if any BOM criteria are specified
+    if bom_filter:
+        # Get module IDs from BOM items matching the filter criteria
+        filtered_module_ids = (
+            ModuleBomListItem.objects.filter(bom_filter)
+            .values_list("module_id", flat=True)
+            .distinct()
+        )
+        # Filter module_list to only include modules that match the BOM item criteria
+        module_list = module_list.filter(id__in=filtered_module_ids)
 
     if manufacturer:
         module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
-
-    if mounting_style:
-        module_list = module_list.filter(mounting_style=mounting_style)
-
+    if component_type:
+        module_list = module_list.filter(mounting_style=component_type)
+    if category:
+        module_list = module_list.filter(category=category)
+    if rack_unit:
+        module_list = module_list.filter(rack_unit=rack_unit)
     if query:
         module_list = module_list.filter(
             Q(name__icontains=query)
             | Q(manufacturer__name__icontains=query)
             | Q(description__icontains=query)
-        ).order_by("name")
+        )
 
-    # Annotate to prevent N+1 query issue
     if user:
         module_list = module_list.annotate(
             is_built=Exists(
@@ -86,7 +112,18 @@ def module_list(request):
     paginator = Paginator(module_list, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
     manufacturers = Manufacturer.objects.values("name").distinct()
+    mounting_style_options = [
+        {"name": "Surface Mount (SMT)", "value": "smt"},
+        {"name": "Through Hole", "value": "th"},
+    ]
+    category_options = [
+        {"name": choice[1], "value": choice[0]} for choice in Module.CATEGORY_CHOICES
+    ]
+    rack_unit_options = [
+        {"name": choice[1], "value": choice[0]} for choice in Module.RACK_UNIT_CHOICES
+    ]
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         html = render_to_string(
@@ -102,8 +139,13 @@ def module_list(request):
             "manufacturers": manufacturers,
             "search": query,
             "manufacturer": manufacturer,
-            "mounting_style": mounting_style,
+            "component_type": component_type,
+            "category": category,
+            "rack_unit": rack_unit,
             "user_logged_in": request.user.is_authenticated,
+            "mounting_style_options": mounting_style_options,
+            "category_options": category_options,
+            "rack_unit_options": rack_unit_options,
         },
     )
 
@@ -436,3 +478,28 @@ def manufacturer_detail(request, slug):
         cache.set(cache_key, context, timeout=3600)  # Cache for 1 hour (3600 seconds)
 
     return render(request, "pages/manufacturers/manufacturer_detail.html", context)
+
+
+def component_autocomplete(request):
+    query = request.GET.get("q", "")
+    if query:
+        # Filter components by description or other relevant fields
+        components = Component.objects.filter(description__icontains=query)[:10]
+        results = [{"id": comp.id, "text": comp.description} for comp in components]
+    else:
+        results = []
+
+    return JsonResponse({"results": results})
+
+
+def get_url_with_exclusions(request, exclusions):
+    # Create a copy of request.GET to avoid modifying the original
+    querydict = request.GET.copy()
+
+    # Delete each parameter specified in the exclusions list
+    for param in exclusions:
+        if param in querydict:
+            del querydict[param]
+
+    # Return the modified query parameters as a URL-encoded string
+    return querydict.urlencode()
