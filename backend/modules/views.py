@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
 from components.models import Component
+from itertools import zip_longest
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -58,32 +59,35 @@ def module_list(request):
     category = request.GET.get("category", None)
     rack_unit = request.GET.get("rack_unit", None)
     user = request.user if request.user.is_authenticated else None
-    component_id = request.GET.get("component_id")
-    quantity_min = request.GET.get("quantity_min")
-    quantity_max = request.GET.get("quantity_max")
 
+    # Retrieve lists of component filter criteria
+    components = request.GET.getlist("component[]")
+    component_ids = request.GET.getlist("component_id[]")
+    quantity_mins = request.GET.getlist("quantity_min[]")
+    quantity_maxs = request.GET.getlist("quantity_max[]")
+
+    # Initialize module list with a base queryset
     module_list = Module.objects.order_by("name")
 
-    # Efficient filtering for BOM items
-    bom_filter = Q()
-    if component_id:
-        bom_filter &= Q(components_options__id=component_id)
-    if quantity_min:
-        bom_filter &= Q(quantity__gte=quantity_min)
-    if quantity_max:
-        bom_filter &= Q(quantity__lte=quantity_max)
+    # Apply individual component group filters with AND relationship
+    for i in range(len(component_ids)):
+        component_id = component_ids[i] if i < len(component_ids) else None
+        quantity_min = quantity_mins[i] if i < len(quantity_mins) else None
+        quantity_max = quantity_maxs[i] if i < len(quantity_maxs) else None
 
-    # Apply BOM filters only if any BOM criteria are specified
-    if bom_filter:
-        # Get module IDs from BOM items matching the filter criteria
-        filtered_module_ids = (
-            ModuleBomListItem.objects.filter(bom_filter)
-            .values_list("module_id", flat=True)
-            .distinct()
-        )
-        # Filter module_list to only include modules that match the BOM item criteria
-        module_list = module_list.filter(id__in=filtered_module_ids)
+        # Build a filter for each component group
+        bom_filter = Q()
+        if component_id:
+            bom_filter &= Q(modulebomlistitem__components_options__id=component_id)
+        if quantity_min:
+            bom_filter &= Q(modulebomlistitem__quantity__gte=quantity_min)
+        if quantity_max:
+            bom_filter &= Q(modulebomlistitem__quantity__lte=quantity_max)
 
+        # Apply the filter to module_list
+        module_list = module_list.filter(bom_filter)
+
+    # Apply other filters
     if manufacturer:
         module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
     if component_type:
@@ -99,6 +103,7 @@ def module_list(request):
             | Q(description__icontains=query)
         )
 
+    # Annotate for user-specific data if the user is authenticated
     if user:
         module_list = module_list.annotate(
             is_built=Exists(
@@ -109,10 +114,12 @@ def module_list(request):
             ),
         )
 
+    # Paginate the result
     paginator = Paginator(module_list, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # Prepare options for the filter dropdowns
     manufacturers = Manufacturer.objects.values("name").distinct()
     mounting_style_options = [
         {"name": "Surface Mount (SMT)", "value": "smt"},
@@ -125,12 +132,19 @@ def module_list(request):
         {"name": choice[1], "value": choice[0]} for choice in Module.RACK_UNIT_CHOICES
     ]
 
+    # Handle AJAX requests for infinite scroll
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         html = render_to_string(
             "modules/module_list_partial.html", {"page_obj": page_obj}
         )
         return JsonResponse({"html": html, "has_next": page_obj.has_next()})
 
+    # Zip components with component criteria for displaying pills
+    zipped_components = list(
+        zip_longest(components, component_ids, quantity_mins, quantity_maxs)
+    )
+
+    # Render the main template
     return render(
         request,
         "modules/index.html",
@@ -146,6 +160,7 @@ def module_list(request):
             "mounting_style_options": mounting_style_options,
             "category_options": category_options,
             "rack_unit_options": rack_unit_options,
+            "zipped_components": zipped_components,
         },
     )
 
@@ -490,16 +505,3 @@ def component_autocomplete(request):
         results = []
 
     return JsonResponse({"results": results})
-
-
-def get_url_with_exclusions(request, exclusions):
-    # Create a copy of request.GET to avoid modifying the original
-    querydict = request.GET.copy()
-
-    # Delete each parameter specified in the exclusions list
-    for param in exclusions:
-        if param in querydict:
-            del querydict[param]
-
-    # Return the modified query parameters as a URL-encoded string
-    return querydict.urlencode()

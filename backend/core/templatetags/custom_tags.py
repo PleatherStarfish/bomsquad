@@ -31,6 +31,12 @@ def query_transform(request, excluding=[]):
     return query_dict.urlencode()
 
 
+@register.simple_tag
+def zip_lists(*args):
+    """Custom template tag to zip multiple lists together."""
+    return list(zip(*args))
+
+
 @register.filter
 def get_display_name(value, mounting_style_options):
     for option in mounting_style_options:

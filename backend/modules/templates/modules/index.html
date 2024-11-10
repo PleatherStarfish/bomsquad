@@ -22,19 +22,17 @@
                         </a>
                     </div>
                 {% endif %}
-                {% if request.GET.component or request.GET.quantity_min or request.GET.quantity_max %}
-                    <div class="flex items-center">
-                        <span class="font-bold">Component & Quantity:</span>
-                        <a href="javascript:void(0);" onclick="clearMultipleParams(['component', 'component_id', 'quantity_min', 'quantity_max'])" class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
-                            {{ request.GET.component|truncatechars:20 }}
-                            {% if request.GET.component %}
-                                {% if request.GET.quantity_min or request.GET.quantity_max %}&#8212;{% endif %}
-                            {% endif %}
-                            {% if request.GET.quantity_min %}{{ request.GET.quantity_min }}{% else %}0{% endif %}
-                            to
-                            {% if request.GET.quantity_max %}{{ request.GET.quantity_max }}{% else %}∞{% endif %}
-                        </a>
-                    </div>
+                {% if zipped_components %}
+                    {% for component, component_id, quantity_min, quantity_max in zipped_components %}
+                        <div class="flex items-center">
+                            <span class="font-bold">Component:</span>
+                            <a href="javascript:void(0);" onclick="clearComponentGroup({{ forloop.counter0 }})"
+                            class="ml-2 py-0.5 px-3 rounded-full font-sans font-semibold bg-slate-500 text-white whitespace-nowrap">
+                                {{ component|truncatechars:20 }}
+                                {% if quantity_min or quantity_max %} &#8212; {{ quantity_min|default:"0" }} to {{ quantity_max|default:"∞" }}{% endif %}x
+                            </a>
+                        </div>
+                    {% endfor %}
                 {% endif %}
                 {% if request.GET.component_type %}
                     <div class="flex items-center">
@@ -63,7 +61,7 @@
             </div>
 
             <!-- Clear All Filters button aligned right -->
-            {% if request.GET.search or request.GET.manufacturer or request.GET.component_type or request.GET.category or request.GET.rack_unit or request.GET.component or request.GET.quantity_min or request.GET.quantity_max %}
+            {% if request.GET.search or request.GET.manufacturer or request.GET.component_type or request.GET.category or request.GET.rack_unit or request.GET.component or request.GET.quantity_min or request.GET.quantity_max or zipped_components %}
                 <div class="flex items-center">
                     <a href="{% url 'home' %}" class="px-3 py-1 font-sans font-semibold text-white bg-[#fed703] rounded-full whitespace-nowrap">
                         Clear All Filters
@@ -110,35 +108,31 @@
                             {% include "components/select.html" with select_name="rack_unit" select_id="rack_unit" default_option_text="All" items=rack_unit_options %}
                         </div>
                     </div>
-                    <div id="components-container" class="w-full px-2 mb-4 md:w-3/5 lg:w-1/2 min-w-[200px]">
-                        <div class="relative">
+                    {% comment %}
+                    <div id="components-container" class="flex flex-col w-full space-y-6">
+                        <div class="relative component-group">
                             <label for="component" class="block mb-2 font-semibold text-gray-700 text-md">Component</label>
-                    
-                            <!-- Input field for component search -->
-                            <input type="text" name="component" id="component" placeholder="Search component"
-                                   class="w-full h-10 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"
-                                   oninput="fetchComponents()" autocomplete="off"/>
-                    
-                            <!-- Hidden field for component ID -->
-                            <input type="hidden" name="component_id" id="component-id">
                             
-                            <!-- Dropdown for suggestions -->
-                            <div id="component-dropdown" class="absolute z-10 hidden w-full bg-white border border-gray-300 rounded-md shadow-lg"></div>
-                        </div>
+                            <!-- Choices.js-enhanced select field for component search -->
+                            <select name="component[]" class="w-full h-10 pl-2 border border-gray-300 rounded-md choices-component-select focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500" data-placeholder="Search component">
+                                <!-- Options will be dynamically added via JavaScript -->
+                            </select>
                     
-                        <!-- Quantity Range Inputs -->
-                        <div class="flex items-center gap-4 mt-2">
-                            <label for="quantity_min" class="text-sm font-semibold text-gray-700">Quantity:</label>
-                            <input type="number" name="quantity_min" id="quantity_min" placeholder="Min"
-                                   class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
-                            <span class="text-sm font-semibold text-gray-700">to</span>
-                            <input type="number" name="quantity_max" id="quantity_max" placeholder="Max"
-                                   class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
+                            <!-- Quantity Range Inputs -->
+                            <div class="flex items-center gap-4 mt-2">
+                                <label class="text-sm font-semibold text-gray-700">Quantity:</label>
+                                <input type="number" name="quantity_min[]" placeholder="Min"
+                                       class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
+                                <span class="text-sm font-semibold text-gray-700">to</span>
+                                <input type="number" name="quantity_max[]" placeholder="Max"
+                                       class="w-20 h-8 px-2 border border-gray-300 rounded-md" />
+                            </div>
                         </div>
                     </div>
                     <div class="flex w-full">
-                        <button type="button" onclick="addComponentGroup()">+</button>  
-                    </div>                  
+                        <button type="button" onclick="addComponentGroup()" class="w-8 h-8 text-gray-700 transition duration-150 ease-in-out bg-gray-300 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"> + </button>
+                    </div> 
+                    {% endcomment %}                 
                     <div class="w-full px-2 md:w-1/2 lg:w-1/3">
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 text-base font-medium text-white border border-transparent rounded-md bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500">
@@ -228,10 +222,10 @@
 {% endblock content %}
 
 {% block javascript %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            applyColorToHpPills(); // Initial call for modules loaded on page load
-        });
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        applyColorToHpPills();
+        initializeChoicesForComponents();
         
         let loading = false;
         
@@ -241,131 +235,150 @@
                 loadMoreModules();
             }
         });
-        
-        function loadMoreModules() {
-            const nextPage = document.getElementById('next-page').dataset.nextPage;
-            if (nextPage === 'None') return;
-        
-            const loadingSpinner = document.getElementById('loading');
-            loadingSpinner.classList.remove('hidden');
-        
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('page', nextPage);
-        
-            fetch(`?${urlParams.toString()}`, {
-                headers: {
-                    'x-requested-with': 'XMLHttpRequest'
+    
+        document.querySelector("form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            serializeComponentGroupsToURL();
+        });
+    });
+    
+    // Load more modules for infinite scroll
+    function loadMoreModules() {
+        const nextPage = document.getElementById('next-page').dataset.nextPage;
+        if (nextPage === 'None') return;
+    
+        const loadingSpinner = document.getElementById('loading');
+        loadingSpinner.classList.remove('hidden');
+    
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', nextPage);
+    
+        fetch(`?${urlParams.toString()}`, {
+            headers: { 'x-requested-with': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const newModules = document.createElement('div');
+            newModules.innerHTML = data.html;
+            document.getElementById('module-container').append(...newModules.children);
+    
+            document.getElementById('next-page').dataset.nextPage = data.has_next ? parseInt(nextPage) + 1 : 'None';
+            loadingSpinner.classList.add('hidden');
+            loading = false;
+            applyColorToHpPills();
+        })
+        .catch(error => {
+            console.error('Error loading more modules:', error);
+            loadingSpinner.classList.add('hidden');
+            loading = false;
+        });
+    }
+    
+    // Apply colors to HP pills based on values
+    function applyColorToHpPills() {
+        const colorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
+        document.querySelectorAll('[data-hp]').forEach(element => {
+            const hpValue = parseInt(element.getAttribute('data-hp'), 10);
+            element.style.backgroundColor = colorScale(hpValue).hex() || "#558a6b";
+        });
+    }
+    
+    // Object to store Choices instances
+    const choicesInstances = {};
+    
+    // Initialize Choices.js for each select field
+    function initializeChoicesForComponents() {
+        document.querySelectorAll(".choices-component-select").forEach(select => {
+            if (select.choicesInstance) {
+                select.choicesInstance.destroy();
+            }
+    
+            const choices = new Choices(select, {
+                searchEnabled: true,
+                placeholder: true,
+                itemSelectText: "",
+                noResultsText: "No components found",
+                shouldSort: false
+            });
+    
+            // Store Choices instance by unique ID
+            const uniqueId = select.id;
+            choicesInstances[uniqueId] = choices;
+    
+            select.addEventListener("search", async function (event) {
+                if (event.detail.value.length < 2) return;
+    
+                try {
+                    const response = await fetch(`/component-autocomplete/?q=${encodeURIComponent(event.detail.value)}`);
+                    const data = await response.json();
+    
+                    choices.clearChoices();
+                    choices.setChoices(
+                        data.results.map(component => ({
+                            value: component.id,
+                            label: component.text,
+                            selected: false
+                        }))
+                    );
+                } catch (error) {
+                    console.error("Error fetching components:", error);
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const newModules = document.createElement('div');
-                newModules.innerHTML = data.html;
-                const moduleContainer = document.getElementById('module-container');
-                moduleContainer.append(...newModules.children);
-        
-                if (data.has_next) {
-                    document.getElementById('next-page').dataset.nextPage = parseInt(nextPage) + 1;
-                } else {
-                    document.getElementById('next-page').dataset.nextPage = 'None';
-                }
-        
-                loadingSpinner.classList.add('hidden');
-                loading = false;
-        
-                applyColorToHpPills(); // Apply colors to newly loaded modules
-            })
-            .catch(error => {
-                console.error('Error loading more modules:', error);
-                loadingSpinner.classList.add('hidden');
-                loading = false;
             });
-        }
-        
-        // Function to apply colors based on HP
-        function applyColorToHpPills() {
-            const colorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
-            document.querySelectorAll('[data-hp]').forEach(function(element) {
-                const hpValue = parseInt(element.getAttribute('data-hp'), 10);
-                const color = colorScale(hpValue).hex() || "#558a6b"; // Fallback color
-                element.style.backgroundColor = color;
-            });
-        }        
-    </script>
-    <script>
-        async function fetchComponents() {
-            const query = document.getElementById("component").value;
-            const dropdown = document.getElementById("component-dropdown");
-        
-            if (query.length < 2) {
-                dropdown.classList.add("hidden");
-                return;
-            }
-        
-            // Fetching component suggestions from the server
-            const response = await fetch(`/component-autocomplete/?q=${encodeURIComponent(query)}`);
-            const data = await response.json();
-            dropdown.innerHTML = ""; // Clear previous suggestions
-        
-            // Populate dropdown with results
-            data.results.forEach(item => {
-                const option = document.createElement("div");
-                option.className = "py-2 px-4 cursor-pointer hover:bg-gray-100";
-                option.textContent = item.text;
-                option.onclick = () => selectComponent(item);
-                dropdown.appendChild(option);
-            });
-        
-            // Display the dropdown
-            dropdown.classList.remove("hidden");
-        }
-        
-        // Selects component from dropdown
-        function selectComponent(item) {
-            document.getElementById("component").value = item.text; // Display selected text
-            document.getElementById("component-id").value = item.id; // Store ID in hidden input
-            document.getElementById("component-dropdown").classList.add("hidden"); // Hide dropdown
-        }
-        
-        // Close dropdown if clicking outside the input field and dropdown
-        document.addEventListener("click", function(event) {
-            const dropdown = document.getElementById("component-dropdown");
-            const componentInput = document.getElementById("component");
-        
-            if (!dropdown.contains(event.target) && event.target !== componentInput) {
-                dropdown.classList.add("hidden");
-            }
-        });        
-    </script>
-    <script>
-        function clearMultipleParams(params) {
-            const url = new URL(window.location.href);
-            params.forEach(param => url.searchParams.delete(param));
-            window.location.href = url.toString();
-        }
-        function addComponentGroup() {
-            const container = document.getElementById("components-container");
-            const newComponentGroup = document.querySelector(".component-group").cloneNode(true);
-            
-            // Reset input values in the cloned group
-            newComponentGroup.querySelectorAll("input").forEach(input => input.value = "");
-            
-            // Append remove button if it doesn't exist
-            if (!newComponentGroup.querySelector(".remove-button")) {
-                const removeButton = document.createElement("button");
-                removeButton.type = "button";
-                removeButton.className = "remove-button px-2 py-1 bg-red-500 text-white rounded";
-                removeButton.textContent = "-";
-                removeButton.onclick = function() { removeComponentGroup(removeButton); };
-                newComponentGroup.appendChild(removeButton);
-            }
-        
-            container.appendChild(newComponentGroup);
-        }
-        
-        function removeComponentGroup(button) {
-            button.closest(".component-group").remove();
-        }
-    </script>
+        });
+    }
+    
+    // Serialize component groups to URL for filtering
+    function serializeComponentGroupsToURL() {
+        const urlParams = new URLSearchParams();
+    
+        // General filters
+        ["search", "manufacturer", "component_type", "category", "rack_unit"].forEach(param => {
+            const value = document.querySelector(`[name='${param}']`)?.value;
+            if (value) urlParams.append(param, value);
+        });
+    
+        // Component groups
+        document.querySelectorAll(".component-group").forEach(group => {
+            const componentId = group.querySelector(".choices-component-select").value;
+            const quantityMin = group.querySelector("input[name='quantity_min[]']").value;
+            const quantityMax = group.querySelector("input[name='quantity_max[]']").value;
+    
+            if (componentId) urlParams.append("component_id[]", componentId);
+            if (quantityMin) urlParams.append("quantity_min[]", quantityMin);
+            if (quantityMax) urlParams.append("quantity_max[]", quantityMax);
+        });
+    
+        window.location.href = `?${urlParams.toString()}`;
+    }
+    
+    // Add a new component group and initialize Choices.js
+    function addComponentGroup() {
+        const container = document.getElementById("components-container");
+        const newComponentGroup = document.querySelector(".component-group").cloneNode(true);
+    
+        // Generate a unique ID for the new select
+        const uniqueId = `choices-component-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const select = newComponentGroup.querySelector(".choices-component-select");
+    
+        // Set the unique ID and remove previous Choices instance if any
+        select.id = uniqueId;
+        select.choicesInstance?.destroy();
+        select.innerHTML = ""; // Clear previous options
+    
+        container.appendChild(newComponentGroup);
+        initializeChoicesForComponents(); // Reinitialize with the new group added
+    }
+    
+    // Clear specific parameters in the URL for given indices
+    function clearComponentGroup(index) {
+        const url = new URL(window.location.href);
+        ["component_id", "quantity_min", "quantity_max"].forEach(param => {
+            url.searchParams.delete(`${param}[${index}]`);
+        });
+        window.location.href = url.toString();
+    }           
+
+</script>
+
 {% endblock javascript %}
 

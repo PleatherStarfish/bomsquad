@@ -56,7 +56,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1549230942850511"
      crossorigin="anonymous"></script>
-
+     <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+      />
+      <!-- Include Choices.js JavaScript from CDN -->
+      <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     {% block css %}{% endblock css %}
   </head>
 
@@ -88,9 +93,9 @@
         {% endif %}
         {% block content %}{% endblock content %}
       </div>
-      {% if path == '/user' %} {% else %}
+      {% if path != '/' and path != '/user' %}
       <footer>{% include "footer.html" %}</footer>
-      {% endif %} 
+      {% endif %}
       {% endwith %}
     </div>
 

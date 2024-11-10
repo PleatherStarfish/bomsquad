@@ -1,23 +1,8 @@
-<div class="custom-dropdown relative inline-block w-[200px]">
-  <input name="{{ select_name }}" id="{{ select_id }}" class="hidden selected-value" type="hidden">
-  <button type="button" class="dropdown-button w-[200px] p-2 bg-gray-50 text-left rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-10 border border-gray-300">
-      <span class="pointer-events-none selected-text">
-          {% if default_option_text %}{{ default_option_text }}{% else %}Select...{% endif %}
-      </span>
-      <span class="pointer-events-none">
-          <svg class="absolute w-4 h-4 transition duration-150 ease-in delay-200 transform -translate-y-1/2 chevron top-1/2 right-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 7.293a1 1 0 011.414 0L10 11.586l4.293-4.293a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-      </span>
-  </button>
-  <ul class="absolute left-0 hidden w-full mt-1 bg-white rounded-md shadow-md dropdown-list">
-    <li data-value="" class="block px-4 py-2 cursor-pointer default-option hover:bg-gray-100">
-      {{ default_option_text }}
-    </li>
-    {% for item in items %}
-      <li data-value="{{ item.value|default:item.name }}" class="block px-4 py-2 cursor-pointer option-item hover:bg-gray-100">
-        {{ item.name }}
-      </li>
-    {% endfor %}
-  </ul>
-</div>
+<select name="{{ select_name }}" id="{{ select_id }}" class="choices-select w-[200px] p-2 bg-gray-50 text-left rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500 h-10 border border-gray-300">
+  {% if default_option_text %}
+      <option value="">{{ default_option_text }}</option>
+  {% endif %}
+  {% for item in items %}
+      <option value="{{ item.value|default:item.name }}">{{ item.name }}</option>
+  {% endfor %}
+</select>
