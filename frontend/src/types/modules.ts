@@ -111,8 +111,8 @@ export interface ModuleFilterParams {
   component_groups?: {
     component: string;
     component_description?: string;
-    min: number;
-    max: number;
+    min: number | undefined;
+    max: number | undefined;
   }[];
   page?: number;
 }

@@ -17,8 +17,8 @@ export type FormValues = {
   component_groups: {
     component: string;
     component_description: string;
-    min: string;
-    max: string;
+    min: string | undefined;
+    max: string | undefined;
   }[];
 };
 
@@ -33,8 +33,11 @@ export const MOUNTING_STYLES = [
   { label: 'Through Hole', value: 'th' },
 ]
 
-const getMountingStyleLabel = (value: string) => {
-  const style = MOUNTING_STYLES.find(style => style.value === value);
+const getMountingStyleLabel = (value?: string) => {
+  if (!value) {
+    return ""; // or an empty string ""
+  }
+  const style = MOUNTING_STYLES.find((style) => style.value === value);
   return style ? style.label : value;
 };
 
@@ -73,8 +76,8 @@ const InfiniteModulesList: React.FC = () => {
       component_groups: data.component_groups.map((group) => ({
         component: group.component,
         component_description: group.component_description,
-        min: parseInt(group.min, 10) || 0,
-        max: parseInt(group.max, 10) || 0,
+        min: group.min ? parseInt(group.min, 10) : undefined,
+        max: group.max ? parseInt(group.max, 10) : undefined,
       })),
     };
 
@@ -105,23 +108,31 @@ const InfiniteModulesList: React.FC = () => {
       return value
         .map((group, index) => {
           const groupText = [
-            group.component_description && `Component: ${group.component_description}`,
+            group.component_description && `${truncate(group.component_description, 20)}`,
             group.min && `Min: ${group.min}`,
             group.max && `Max: ${group.max}`,
           ]
             .filter(Boolean)
             .join(", ");
           return groupText
-            ? { key: `${key}-${index}`, label: `Component Group ${index + 1}`, text: groupText }
+            ? { key: `${key}-${index}`, label: `Component [${index + 1}]`, text: groupText }
             : null;
         })
         .filter((pill): pill is FilterPill => pill !== null); // Filter out nulls and assert type
+    } else if (key === "mounting_style" && value) {
+      return [
+        {
+          key,
+          label: "Mounting Style",
+          text: getMountingStyleLabel(value as string),
+        },
+      ];
     } else if (value) {
       return [
         {
           key,
           label: key.replace("_", " "),
-          text: Array.isArray(value) ? value.join(", ") : value,
+          text: truncate(Array.isArray(value) ? value.join(", ") : value, 15),
         },
       ];
     }

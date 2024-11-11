@@ -36,22 +36,6 @@ from rest_framework.views import APIView
 import hashlib
 
 
-def is_valid_group(group):
-    """
-    Checks if the component group has all required meaningful fields for filtering.
-    Returns True only if component, min, and max values are provided.
-    """
-    component = group.get("component")
-    min_quantity = group.get("min")
-    max_quantity = group.get("max")
-    # All fields must have meaningful values to be considered valid
-    return bool(
-        component
-        and min_quantity not in [None, "", 0]
-        and max_quantity not in [None, "", 0]
-    )
-
-
 def generate_color_from_name(name):
     # Generate a SHA256 hash of the name
     hash_object = hashlib.sha256(name.encode())
@@ -552,9 +536,13 @@ def module_list_v2(request):
     category = data.get("category", None)
     rack_unit = data.get("rack_unit", None)
 
+    # Inline filter to include only component groups with a defined component
     component_groups = [
-        group for group in data.get("component_groups", []) if is_valid_group(group)
+        {**group, "min": group.get("min", ""), "max": group.get("max", "")}
+        for group in data.get("component_groups", [])
+        if group.get("component")
     ]
+    print(component_groups)
     user = request.user if request.user.is_authenticated else None
 
     # Fetch component names based on IDs
@@ -565,7 +553,7 @@ def module_list_v2(request):
                 component_uuid = UUID(component_id)
                 component = Component.objects.get(id=component_uuid)
                 group["component_description"] = component.description
-            except Component.DoesNotExist:
+            except (Component.DoesNotExist, ValueError):
                 group["component_description"] = "Unknown Component"
 
     # Initial filtering by basic fields
@@ -585,64 +573,46 @@ def module_list_v2(request):
             | Q(description__icontains=query)
         )
 
-    print("Filtered by basic fields:", module_list)
-
     # Apply component group filters if they contain valid data
-    if component_groups:
-        for i, group in enumerate(component_groups):
-            component = group.get("component")
-            min_quantity = group.get("min")
-            max_quantity = group.get("max")
+    for i, group in enumerate(component_groups):
+        component = group.get("component")
+        min_quantity = int(group.get("min", 0)) if group.get("min") else None
+        max_quantity = int(group.get("max", 0)) if group.get("max") else None
 
-            # Set up the component filter
-            component_filter = (
-                Q(modulebomlistitem__components_options__id=component)
-                if component
-                else Q()
-            )
+        # Set up the component filter
+        component_filter = (
+            Q(modulebomlistitem__components_options__id=component) if component else Q()
+        )
 
-            # Determine min and max filters based on their availability
-            if min_quantity not in [None, "", 0] and max_quantity in [None, ""]:
-                # Min quantity set, max quantity unset -> min_quantity to infinity
-                min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
-                max_filter = Q()
-            elif max_quantity not in [None, "", 0] and min_quantity in [None, ""]:
-                # Max quantity set, min quantity unset -> 0 to max_quantity
-                min_filter = Q(modulebomlistitem__quantity__gte=0)
-                max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
-            elif min_quantity not in [None, "", 0] and max_quantity not in [
-                None,
-                "",
-                0,
-            ]:
-                # Both min and max quantities are set
-                min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
-                max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
-            else:
-                # Neither min nor max is set; treat as "contains any"
-                min_filter = Q()
-                max_filter = Q()
+        # Determine min and max filters based on their availability
+        if min_quantity not in [None, "", 0] and max_quantity in [None, ""]:
+            # Min quantity set, max quantity unset -> min_quantity to infinity
+            min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
+            max_filter = Q()
+        elif max_quantity not in [None, "", 0] and min_quantity in [None, ""]:
+            # Max quantity set, min quantity unset -> 0 to max_quantity
+            min_filter = Q(modulebomlistitem__quantity__gte=0)
+            max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
+        elif min_quantity not in [None, "", 0] and max_quantity not in [None, "", 0]:
+            # Both min and max quantities are set
+            min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
+            max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
+        else:
+            # Neither min nor max is set; treat as "contains any"
+            min_filter = Q()
+            max_filter = Q()
 
-            # Combine filters: If only component is set, use it alone. Otherwise, combine with min and max filters.
-            combined_filter = (
-                component_filter
-                if component and min_filter == Q() and max_filter == Q()
-                else (component_filter & min_filter & max_filter)
-            )
+        # Combine filters
+        combined_filter = (
+            component_filter
+            if component and min_filter == Q() and max_filter == Q()
+            else (component_filter & min_filter & max_filter)
+        )
 
-            print(f"Applying filters for component group {i + 1}:")
-            print(" - component:", component_filter)
-            print(" - min_quantity:", min_filter)
-            print(" - max_quantity:", max_filter)
-            print(" - combined filter:", combined_filter)
+        # Apply each filter
+        module_list = module_list.filter(combined_filter).distinct()
 
-            # Apply each filter
-            module_list = module_list.filter(combined_filter).distinct()
-            print("Module list after applying component group filters:", module_list)
-
-    print("Final filtered module list:", module_list)
-
-    # Pagination and response as before
+    # Pagination and response
     paginator = Paginator(module_list, 10)
     page_number = data.get("page", 1)
     page_obj = paginator.get_page(page_number)

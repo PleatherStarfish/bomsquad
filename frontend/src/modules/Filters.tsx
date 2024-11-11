@@ -1,7 +1,15 @@
-import { Control, UseFormRegister, UseFormSetValue, UseFormWatch, useFieldArray } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+  useFieldArray,
+} from "react-hook-form";
 
 import Accordion from "../ui/Accordion";
 import AsyncSelect from "react-select/async";
+import ClearableNumberInput from "./ClearableNumberInput";
 import FilterFields from "./FilterFields";
 import { FormValues } from "./InfiniteModulesList";
 import React from "react";
@@ -16,32 +24,56 @@ type FiltersProps = {
   onSubmit: (data: FormValues) => void;
 };
 
-// Define the option type for AsyncSelect
 interface ComponentOption {
-  value: string; // UUID of the component
-  label: string; // Description of the component
+  value: string;
+  label: string;
 }
 
-const Filters: React.FC<FiltersProps> = ({ control, register, setValue, watch, onSubmit }) => {
+const Filters: React.FC<FiltersProps> = ({
+  control,
+  register,
+  setValue,
+  watch,
+  onSubmit,
+}) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "component_groups",
   });
 
-  const loadOptions = async (inputValue: string): Promise<ComponentOption[]> => {
+  const loadOptions = async (
+    inputValue: string
+  ): Promise<ComponentOption[]> => {
     try {
-      const response = await axios.get('/api/components-autocomplete/', {
+      const response = await axios.get("/api/components-autocomplete/", {
         params: { q: inputValue },
-        xsrfCookieName: 'csrftoken',
-        xsrfHeaderName: 'X-CSRFToken',
+        xsrfCookieName: "csrftoken",
+        xsrfHeaderName: "X-CSRFToken",
       });
-      return response.data.results.map((item: { id: string; text: string }) => ({
-        value: item.id,
-        label: item.text,
-      }));
+      return response.data.results.map(
+        (item: { id: string; text: string }) => ({
+          value: item.id,
+          label: item.text,
+        })
+      );
     } catch (error) {
       console.error("Error fetching autocomplete options:", error);
       return [];
+    }
+  };
+
+  // Custom onChange handlers
+  const handleMinChange = (index: number, value: string) => {
+    const max = watch(`component_groups.${index}.max`) || "";
+    if (value !== "" && parseInt(value) > parseInt(max || "Infinity")) {
+      setValue(`component_groups.${index}.max`, value);
+    }
+  };
+
+  const handleMaxChange = (index: number, value: string) => {
+    const min = watch(`component_groups.${index}.min`) || "";
+    if (value !== "" && parseInt(value) < parseInt(min || "0")) {
+      setValue(`component_groups.${index}.min`, value);
     }
   };
 
@@ -55,7 +87,9 @@ const Filters: React.FC<FiltersProps> = ({ control, register, setValue, watch, o
       >
         <div className="flex flex-col gap-6 -mx-2">
           <div className="w-full px-2 mb-6">
-            <label className="block mb-2 font-semibold text-gray-700 text-md">Search</label>
+            <label className="block mb-2 font-semibold text-gray-700 text-md">
+              Search
+            </label>
             <input
               {...register("search")}
               type="text"
@@ -74,65 +108,113 @@ const Filters: React.FC<FiltersProps> = ({ control, register, setValue, watch, o
               bgColor="bg-gray-50"
               rounded={false}
             >
-              <div id="components-container" className="flex flex-col w-full space-y-8">
-                {fields.map((field, index) => (
-                  <React.Fragment key={field.id}>
-                    <div className="component-group">
-                      <label className="block mb-2 font-semibold text-gray-700 text-md">{`Component [${index + 1}]`}</label>
-                      <AsyncSelect<ComponentOption>
-                        cacheOptions
-                        loadOptions={loadOptions}
-                        onChange={(selected: ComponentOption | null) =>
-                          setValue(`component_groups.${index}`, {
-                            component: selected?.value || "",
-                            component_description: selected?.label || "",
-                            min: watch(`component_groups.${index}.min`),
-                            max: watch(`component_groups.${index}.max`),
-                          })
-                        }
-                        placeholder="Search components..."
-                        className="w-full h-10"
-                        menuPortalTarget={document.body}
-                        menuPosition="fixed"
-                        styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                          menu: (provided) => ({ ...provided, maxHeight: 200, overflowY: "auto" }),
-                        }}
-                      />
-                      <div className="flex items-center w-full gap-4 mt-2">
-                        <label className="text-sm font-semibold text-gray-700">Quantity:</label>
-                        <input
-                          {...register(`component_groups.${index}.min` as const)}
-                          type="number"
-                          min={0}
-                          placeholder="Min"
-                          className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+              <div
+                id="components-container"
+                className="flex flex-col w-full space-y-8"
+              >
+                {fields.map((field, index) => {
+                  const minValue = watch(`component_groups.${index}.min`);
+                  const maxValue = watch(`component_groups.${index}.max`);
+
+                  return (
+                    <React.Fragment key={field.id}>
+                      <div className="component-group">
+                        <label className="block mb-2 font-semibold text-gray-700 text-md">{`Component [${
+                          index + 1
+                        }]`}</label>
+                        <AsyncSelect<ComponentOption>
+                          cacheOptions
+                          loadOptions={loadOptions}
+                          onChange={(selected: ComponentOption | null) =>
+                            setValue(`component_groups.${index}`, {
+                              component: selected?.value || "",
+                              component_description: selected?.label || "",
+                              min: minValue || "",
+                              max: maxValue || "",
+                            })
+                          }
+                          placeholder="Search components..."
+                          className="w-full h-10"
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (provided) => ({
+                              ...provided,
+                              maxHeight: 200,
+                              overflowY: "auto",
+                            }),
+                          }}
                         />
-                        <span className="text-sm font-semibold text-gray-700">to</span>
-                        <input
-                          {...register(`component_groups.${index}.max` as const)}
-                          type="number"
-                          min={0}
-                          placeholder="Max"
-                          className="w-20 h-8 px-2 border border-gray-300 rounded-md"
-                        />
-                        <div className="flex justify-end w-full pr-2 grow-1">
-                          <button
-                            type="button"
-                            onClick={() => remove(index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <TrashIcon className="w-5 h-5" />
-                          </button>
+                        <div className="flex items-center w-full gap-4 mt-2">
+                          <label className="text-sm font-semibold text-gray-700">
+                            Quantity:
+                          </label>
+                          <Controller
+                            control={control}
+                            name={`component_groups.${index}.min`}
+                            defaultValue=""
+                            render={({ field: { onChange, value } }) => (
+                              <ClearableNumberInput
+                                value={value || ""}
+                                onChange={(newValue) => {
+                                  onChange(newValue);
+                                  handleMinChange(index, newValue);
+                                }}
+                                placeholder="Min"
+                                min={0}
+                                max={maxValue ? parseInt(maxValue) : undefined}
+                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                              />
+                            )}
+                          />
+
+                          <span className="text-sm font-semibold text-gray-700">
+                            to
+                          </span>
+
+                          <Controller
+                            control={control}
+                            name={`component_groups.${index}.max`}
+                            defaultValue=""
+                            render={({ field: { onChange, value } }) => (
+                              <ClearableNumberInput
+                                value={value || ""}
+                                onChange={(newValue) => {
+                                  onChange(newValue);
+                                  handleMaxChange(index, newValue);
+                                }}
+                                placeholder="Max"
+                                min={minValue ? parseInt(minValue) : 0}
+                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                              />
+                            )}
+                          />
+                          <div className="flex justify-end w-full pr-2 grow-1">
+                            <button
+                              type="button"
+                              onClick={() => remove(index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <TrashIcon className="w-5 h-5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <hr />
-                  </React.Fragment>
-                ))}
+                      <hr />
+                    </React.Fragment>
+                  );
+                })}
                 <button
                   type="button"
-                  onClick={() => append({ component: "", component_description: "", min: "", max: "" })}
+                  onClick={() =>
+                    append({
+                      component: "",
+                      component_description: "",
+                      min: "",
+                      max: "",
+                    })
+                  }
                   className="w-8 h-8 text-gray-700 transition duration-150 ease-in-out bg-gray-300 rounded hover:bg-gray-400"
                 >
                   +
