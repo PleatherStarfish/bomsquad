@@ -18,6 +18,9 @@ from modules.views import (
     rate_component,
     get_average_rating,
     get_module_status,
+    module_list_v2,
+    get_filter_options,
+    components_autocomplete,
 )
 
 # Module and components-related views
@@ -58,6 +61,13 @@ urlpatterns = [
     path("delete-user-me/", delete_user, name="delete-user"),
     path("kofi/", kofi_payment_webhook, name="kofi_webhook"),
     path("modules/<str:type>/", UserModulesView.as_view(), name="user-modules"),
+    path("modules-infinite/", module_list_v2, name="module-list-v2"),
+    path("filter-options/", get_filter_options, name="filter-options"),
+    path(
+        "components-autocomplete/",
+        components_autocomplete,
+        name="component-autocomplete",
+    ),
     path(
         "module-status/<uuid:module_pk>/", get_module_status, name="get_module_status"
     ),

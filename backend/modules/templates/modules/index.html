@@ -3,6 +3,8 @@
 {% load static %}
 
 {% block content %}
+    <div id="modules-root"></div>
+    {% comment %}
     <div class="py-12 mx-auto">
         <div class="flex justify-between mb-4">
             <div class="flex flex-wrap gap-2 text-xs">
@@ -108,7 +110,6 @@
                             {% include "components/select.html" with select_name="rack_unit" select_id="rack_unit" default_option_text="All" items=rack_unit_options %}
                         </div>
                     </div>
-                    {% comment %}
                     <div id="components-container" class="flex flex-col w-full space-y-6">
                         <div class="relative component-group">
                             <label for="component" class="block mb-2 font-semibold text-gray-700 text-md">Component</label>
@@ -132,7 +133,6 @@
                     <div class="flex w-full">
                         <button type="button" onclick="addComponentGroup()" class="w-8 h-8 text-gray-700 transition duration-150 ease-in-out bg-gray-300 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"> + </button>
                     </div> 
-                    {% endcomment %}                 
                     <div class="w-full px-2 md:w-1/2 lg:w-1/3">
                         <button type="submit"
                                 class="inline-flex items-center px-4 py-2 text-base font-medium text-white border border-transparent rounded-md bg-brandgreen-500 hover:bg-brandgreen-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandgreen-500">
@@ -219,9 +219,11 @@
             <span id="next-page" data-next-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}None{% endif %}"></span>
         </div>
     </div>
+    {% endcomment %}
 {% endblock content %}
 
 {% block javascript %}
+{% comment %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         applyColorToHpPills();
@@ -379,6 +381,8 @@
     }           
 
 </script>
+{% endcomment %}
+<script src="{% static 'js/modules.bundle.js' %}"></script>
 
 {% endblock javascript %}
 

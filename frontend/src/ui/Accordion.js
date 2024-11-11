@@ -3,13 +3,28 @@ import React, { useState } from 'react';
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import cx from 'classnames';
 
-const Accordion = ({ backgroundColor="", title, headerClasses="", children }) => {
+const Accordion = ({
+  backgroundColor = "", 
+  title, 
+  headerClasses = "", 
+  borderColor = "",
+  bgColor = "bg-white",
+  rounded = true,
+  innerPadding = "",
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <button
-        className={cx(`rounded flex items-center w-full py-2 space-x-1 font-medium text-left text-gray-900 px-4 focus:outline-none ${isOpen ? 'justify-between' : 'justify-start'}`, backgroundColor)}
+        className={cx(
+          `flex items-center w-full py-2 space-x-1 font-medium text-left text-gray-900 px-4 focus:outline-none ${isOpen ? 'justify-between' : 'justify-start'}`,
+          rounded && "rounded", 
+          borderColor && "border-b",
+          backgroundColor,
+          borderColor
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         <h4 className={cx("grow", headerClasses)}>{title}</h4>
@@ -19,8 +34,15 @@ const Accordion = ({ backgroundColor="", title, headerClasses="", children }) =>
           />
         </div>
       </button>
-      <div className={`transition-all duration-300 ${isOpen ? 'max-h-48' : 'max-h-0'} overflow-y-auto`}>
-          {children}
+      <div 
+        className={cx(
+          "transition-all duration-300 overflow-y-auto rounded",
+          {"max-h-48": isOpen, "max-h-0": !isOpen},
+          bgColor,
+          isOpen && innerPadding
+        )}
+      >
+        {children}
       </div>
     </>
   );

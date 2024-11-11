@@ -9,7 +9,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from modules import views as ModuleView
 from comments.views import edit_comment, delete_comment
-from modules.views import component_autocomplete
+from modules.views import components_autocomplete
 from pages.views import module_detail
 from django_otp.admin import OTPAdminSite
 from core.views import robots_txt
@@ -160,9 +160,6 @@ urlpatterns = [
     path("comments/edit/<int:comment_id>/", edit_comment, name="comments-edit"),
     path("comments/delete/<int:comment_id>/", delete_comment, name="comments-delete"),
     path("editorjs/", include("django_editorjs_fields.urls")),
-    path(
-        "component-autocomplete/", component_autocomplete, name="component-autocomplete"
-    ),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

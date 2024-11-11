@@ -7,6 +7,8 @@ from django.http import JsonResponse
 from django.core.cache import cache
 from components.models import Component
 from itertools import zip_longest
+from django.views.decorators.csrf import csrf_exempt
+from uuid import UUID
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
@@ -23,14 +25,31 @@ from modules.serializers import (
     WantTooBuildModuleSerializer,
     ModuleBomListItemSerializer,
     ModuleBomListComponentForItemRatingSerializer,
+    ModuleManufacturerSerializer,
 )
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import hashlib
+
+
+def is_valid_group(group):
+    """
+    Checks if the component group has all required meaningful fields for filtering.
+    Returns True only if component, min, and max values are provided.
+    """
+    component = group.get("component")
+    min_quantity = group.get("min")
+    max_quantity = group.get("max")
+    # All fields must have meaningful values to be considered valid
+    return bool(
+        component
+        and min_quantity not in [None, "", 0]
+        and max_quantity not in [None, "", 0]
+    )
 
 
 def generate_color_from_name(name):
@@ -495,13 +514,189 @@ def manufacturer_detail(request, slug):
     return render(request, "pages/manufacturers/manufacturer_detail.html", context)
 
 
-def component_autocomplete(request):
+@csrf_exempt
+@api_view(["GET"])
+def components_autocomplete(request):
     query = request.GET.get("q", "")
+    results = []
+
     if query:
-        # Filter components by description or other relevant fields
-        components = Component.objects.filter(description__icontains=query)[:10]
+        # Use Q objects to create an OR condition across multiple fields
+        components = Component.objects.filter(
+            Q(description__icontains=query)
+            | Q(manufacturer__name__icontains=query)
+            | Q(manufacturer_part_no__icontains=query)
+            | Q(supplier__name__icontains=query)
+            | Q(supplier_item_no__icontains=query)
+            | Q(voltage_rating__icontains=query)
+            | Q(current_rating__icontains=query)
+            | Q(forward_current__icontains=query)
+            | Q(forward_voltage__icontains=query)
+            | Q(tolerance__icontains=query)
+        ).order_by("-datetime_updated")[
+            :20
+        ]  # Adjust ordering and limit as needed
+
         results = [{"id": comp.id, "text": comp.description} for comp in components]
-    else:
-        results = []
 
     return JsonResponse({"results": results})
+
+
+@csrf_exempt
+@api_view(["POST"])
+def module_list_v2(request):
+    data = request.data
+    query = data.get("search", "")
+    manufacturer = data.get("manufacturer", None)
+    mounting_style = data.get("mounting_style", None)
+    category = data.get("category", None)
+    rack_unit = data.get("rack_unit", None)
+
+    component_groups = [
+        group for group in data.get("component_groups", []) if is_valid_group(group)
+    ]
+    user = request.user if request.user.is_authenticated else None
+
+    # Fetch component names based on IDs
+    for group in component_groups:
+        component_id = group.get("component")
+        if component_id:
+            try:
+                component_uuid = UUID(component_id)
+                component = Component.objects.get(id=component_uuid)
+                group["component_description"] = component.description
+            except Component.DoesNotExist:
+                group["component_description"] = "Unknown Component"
+
+    # Initial filtering by basic fields
+    module_list = Module.objects.order_by("name")
+    if manufacturer:
+        module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
+    if mounting_style in ["th", "smt"]:
+        module_list = module_list.filter(mounting_style=mounting_style)
+    if category:
+        module_list = module_list.filter(category=category)
+    if rack_unit:
+        module_list = module_list.filter(rack_unit=rack_unit)
+    if query:
+        module_list = module_list.filter(
+            Q(name__icontains=query)
+            | Q(manufacturer__name__icontains=query)
+            | Q(description__icontains=query)
+        )
+
+    print("Filtered by basic fields:", module_list)
+
+    # Apply component group filters if they contain valid data
+    if component_groups:
+        for i, group in enumerate(component_groups):
+            component = group.get("component")
+            min_quantity = group.get("min")
+            max_quantity = group.get("max")
+
+            # Set up the component filter
+            component_filter = (
+                Q(modulebomlistitem__components_options__id=component)
+                if component
+                else Q()
+            )
+
+            # Determine min and max filters based on their availability
+            if min_quantity not in [None, "", 0] and max_quantity in [None, ""]:
+                # Min quantity set, max quantity unset -> min_quantity to infinity
+                min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
+                max_filter = Q()
+            elif max_quantity not in [None, "", 0] and min_quantity in [None, ""]:
+                # Max quantity set, min quantity unset -> 0 to max_quantity
+                min_filter = Q(modulebomlistitem__quantity__gte=0)
+                max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
+            elif min_quantity not in [None, "", 0] and max_quantity not in [
+                None,
+                "",
+                0,
+            ]:
+                # Both min and max quantities are set
+                min_filter = Q(modulebomlistitem__quantity__gte=min_quantity)
+                max_filter = Q(modulebomlistitem__quantity__lte=max_quantity)
+            else:
+                # Neither min nor max is set; treat as "contains any"
+                min_filter = Q()
+                max_filter = Q()
+
+            # Combine filters: If only component is set, use it alone. Otherwise, combine with min and max filters.
+            combined_filter = (
+                component_filter
+                if component and min_filter == Q() and max_filter == Q()
+                else (component_filter & min_filter & max_filter)
+            )
+
+            print(f"Applying filters for component group {i + 1}:")
+            print(" - component:", component_filter)
+            print(" - min_quantity:", min_filter)
+            print(" - max_quantity:", max_filter)
+            print(" - combined filter:", combined_filter)
+
+            # Apply each filter
+            module_list = module_list.filter(combined_filter).distinct()
+            print("Module list after applying component group filters:", module_list)
+
+    print("Final filtered module list:", module_list)
+
+    # Pagination and response as before
+    paginator = Paginator(module_list, 10)
+    page_number = data.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+    module_serializer = ModuleSerializer(page_obj.object_list, many=True)
+
+    return Response(
+        {
+            "modules": module_serializer.data,
+            "pagination": {
+                "currentPage": page_number,
+                "nextPage": page_number + 1 if page_obj.has_next() else None,
+                "hasNextPage": page_obj.has_next(),
+                "totalPages": paginator.num_pages,
+                "totalItems": paginator.count,
+            },
+            "filters": {
+                "search": query,
+                "manufacturer": manufacturer,
+                "mounting_style": mounting_style,
+                "category": category,
+                "rack_unit": rack_unit,
+                "component_groups": component_groups,
+            },
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@csrf_exempt
+@api_view(["GET"])
+def get_filter_options(request):
+    """
+    Endpoint for fetching filter options (manufacturers, mounting styles, categories, rack units).
+    """
+    manufacturers = Manufacturer.objects.values("name").distinct()
+    manufacturers_serializer = ModuleManufacturerSerializer(manufacturers, many=True)
+
+    mounting_style_options = [
+        {"name": "Surface Mount (SMT)", "value": "smt"},
+        {"name": "Through Hole", "value": "th"},
+    ]
+    category_options = [
+        {"name": choice[1], "value": choice[0]} for choice in Module.CATEGORY_CHOICES
+    ]
+    rack_unit_options = [
+        {"name": choice[1], "value": choice[0]} for choice in Module.RACK_UNIT_CHOICES
+    ]
+
+    return Response(
+        {
+            "manufacturers": manufacturers_serializer.data,
+            "mountingStyleOptions": mounting_style_options,
+            "categoryOptions": category_options,
+            "rackUnitOptions": rack_unit_options,
+        },
+        status=status.HTTP_200_OK,
+    )
