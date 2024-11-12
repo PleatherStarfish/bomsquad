@@ -78,7 +78,7 @@ const Filters: React.FC<FiltersProps> = ({
   };
 
   return (
-    <div className="p-10 mb-10 bg-gray-100 rounded-lg">
+    <div className="p-10 mb-5 bg-gray-100 rounded-lg">
       <form
         onSubmit={(e) => {
           e.preventDefault();

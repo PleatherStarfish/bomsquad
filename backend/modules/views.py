@@ -542,7 +542,6 @@ def module_list_v2(request):
         for group in data.get("component_groups", [])
         if group.get("component")
     ]
-    print(component_groups)
     user = request.user if request.user.is_authenticated else None
 
     # Fetch component names based on IDs

@@ -6,11 +6,24 @@ import useAuthenticatedUser from "../services/useAuthenticatedUser";
 
 interface ModulesListProps {
   modules: Module[];
+  filtersApplied?: boolean;
 }
 
-const ModulesList: React.FC<ModulesListProps> = ({ modules }) => {
+const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = false }) => {
   const hpColorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
   const { user } = useAuthenticatedUser();
+
+  if (modules.length === 0) {
+    return (
+      <div className="text-center text-gray-600">
+        {filtersApplied ? (
+          <p>No modules found matching your filter settings.</p>
+        ) : (
+          <p>No modules available. Please check back later.</p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">

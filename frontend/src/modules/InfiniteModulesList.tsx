@@ -2,9 +2,11 @@ import { Module, ModuleFilterParams } from "../types/modules";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import Button from "../ui/Button";
 import Filters from "./Filters";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ModulesList from "./ModulesList";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useModules } from "../services/useModules";
 
 export type FormValues = {
@@ -60,6 +62,7 @@ const InfiniteModulesList: React.FC = () => {
 
   const [filters, setFilters] = useState<ModuleFilterParams>({});
   const { data, fetchNextPage, hasNextPage, refetch } = useModules(filters);
+  const filtersApplied = Object.keys(filters).length > 0;
 
   useEffect(() => {
     console.log(watch()); // Logs the form data
@@ -87,11 +90,31 @@ const InfiniteModulesList: React.FC = () => {
 
   const modules = data?.pages?.flatMap((page) => (page as { modules: Module[] }).modules) || [];
 
-  const clearFilter = (key: keyof FormValues) => {
+  const clearFilter = (key: string) => {
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters };
-      delete newFilters[key];
-      setValue(key, ""); 
+  
+      // Check if key is a component group key with an index, like "component_groups-0"
+      const match = key.match(/^component_groups-(\d+)$/);
+      if (match) {
+        const index = parseInt(match[1], 10);
+        
+        // Remove the specified component group by index
+        const updatedGroups = [...(newFilters.component_groups || [])];
+        updatedGroups.splice(index, 1);
+        newFilters.component_groups = updatedGroups.length ? updatedGroups : undefined;
+  
+        // Clear the specific group fields in the form state
+        setValue(`component_groups.${index}.component`, "");
+        setValue(`component_groups.${index}.component_description`, "");
+        setValue(`component_groups.${index}.min`, "");
+        setValue(`component_groups.${index}.max`, "");
+      } else {
+        // Otherwise, clear as a regular filter field
+        delete newFilters[key];
+        setValue(key as keyof FormValues, ""); 
+      }
+  
       return newFilters;
     });
   };
@@ -166,12 +189,13 @@ const InfiniteModulesList: React.FC = () => {
         </div>
 
         {filterPills.length > 0 && (
-          <button
+          <Button
+            classNames="bg-gray-300"
             onClick={clearAllFilters}
-            className="px-3 py-1 font-sans font-semibold text-white bg-[#fed703] rounded-full whitespace-nowrap"
-          >
-            Clear All Filters
-          </button>
+            variant="none"
+            size="sm"
+            tooltipText="Clear all filters"
+          >Clear</Button>
         )}
       </div>
 
@@ -181,8 +205,8 @@ const InfiniteModulesList: React.FC = () => {
         hasMore={hasNextPage || false}
         loader={<p className="text-center">Loading...</p>}
       >
-        <h1 className="my-6 text-3xl">Projects</h1>
-        <ModulesList modules={modules} />
+        <h1 className="my-6 mb-16 text-4xl font-display">Projects</h1>
+        <ModulesList modules={modules} filtersApplied={filtersApplied} />
       </InfiniteScroll>
     </div>
   );
