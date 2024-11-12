@@ -38,6 +38,7 @@ type FiltersProps = {
   setValue: UseFormSetValue<FormValues>;
   watch: UseFormWatch<FormValues>;
   onSubmit: (data: FormValues) => void;
+  onAnimationComplete: () => void;
 };
 
 interface ComponentOption {
@@ -61,7 +62,7 @@ const fetchComponentOptions = async (inputValue: string): Promise<ComponentOptio
 // Custom hook to use React Query for fetching options
 export const useComponentAutocomplete = (inputValue: string) => {
   return useQuery({
-    enabled: inputValue.length >= 2,
+    enabled: Boolean(inputValue && inputValue.length >= 2),
     queryFn: () => fetchComponentOptions(inputValue),
     queryKey: ["components-autocomplete", inputValue], // Only fetch when there is input
   });
@@ -73,6 +74,7 @@ const Filters: React.FC<FiltersProps> = ({
   setValue,
   watch,
   onSubmit,
+  onAnimationComplete
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -84,14 +86,10 @@ const Filters: React.FC<FiltersProps> = ({
   // Fetch component options with React Query using the current search term
   const { data: componentOptions = [], isLoading } = useComponentAutocomplete(searchTerm);
 
-  // Watch min and max fields separately in a map
-  const minValues = fields.map((_, index) =>
-    useWatch({ control, name: `component_groups.${index}.min` as const })
-  );
-
-  const maxValues = fields.map((_, index) =>
-    useWatch({ control, name: `component_groups.${index}.max` as const })
-  );
+  const componentGroups = useWatch({
+    control,
+    name: "component_groups",
+  }) || [];
 
   // Debounced function for loading options
   const debouncedLoadOptions = useCallback(
@@ -104,14 +102,14 @@ const Filters: React.FC<FiltersProps> = ({
 
   // Custom onChange handlers for min and max inputs
   const handleMinChange = (index: number, value: string) => {
-    const max = maxValues[index] || "";
+    const max = componentGroups[index]?.max || "";
     if (value !== "" && parseInt(value) > parseInt(max || "Infinity")) {
       setValue(`component_groups.${index}.max`, value);
     }
   };
-
+  
   const handleMaxChange = (index: number, value: string) => {
-    const min = minValues[index] || "";
+    const min = componentGroups[index]?.min || "";
     if (value !== "" && parseInt(value) < parseInt(min || "0")) {
       setValue(`component_groups.${index}.min`, value);
     }
@@ -122,6 +120,7 @@ const Filters: React.FC<FiltersProps> = ({
       animate="visible"
       className="p-10 mb-5 bg-gray-100 rounded-lg"
       initial="hidden"
+      onAnimationComplete={onAnimationComplete}
       variants={scaleInWithDelay}
     >
       <form

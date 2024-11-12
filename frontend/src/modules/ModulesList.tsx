@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-
 import AddModuleButtons from "../components/AddModuleButtons";
 import { Module } from "../types/modules";
+import React from "react";
 import chroma from "chroma-js";
 import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 
 interface ModulesListProps {
   modules: Module[];
+  shouldAnimate?: boolean;
   filtersApplied?: boolean;
   isLoading?: boolean;
 }
@@ -15,7 +15,7 @@ interface ModulesListProps {
 const containerVariants = {
   visible: {
     transition: {
-      staggerChildren: 0.2, // Stagger each child by 0.2 seconds
+      staggerChildren: 0.1, // Stagger each child by 0.2 seconds
     },
   },
 };
@@ -25,7 +25,7 @@ const slideInFromRight = {
   visible: (index: number) => ({
     opacity: 1,
     transition: {
-      delay: index * 0.2, // Additional delay per item based on index
+      delay: index * 0.1, // Additional delay per item based on index
       duration: 0.4,
       ease: "easeIn",
     },
@@ -33,20 +33,19 @@ const slideInFromRight = {
   }),
 };
 
-const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = false, isLoading = true }) => {
-  const [shouldAnimate, setShouldAnimate] = useState(false);
+const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filtersApplied = false, isLoading = true }) => {
   const hpColorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
   const { user } = useAuthenticatedUser();
 
-  useEffect(() => {
-    // Delay animation by 0.5 seconds
-    const timeout = setTimeout(() => setShouldAnimate(true), 500);
-    return () => clearTimeout(timeout);
-  }, []);
+  if (isLoading) {
+    <div className="py-12 text-center text-gray-600 animate-pulse">
+      <p className="text-center animate-pulse">Loading...</p>
+    </div>
+  }
 
-  if (modules.length === 0 && !isLoading) {
+  if (modules.length === 0) {
     return (
-      <div className="text-center text-gray-600">
+      <div className="py-12 text-center text-gray-600">
         {filtersApplied ? (
           <p>No modules found matching your filter settings.</p>
         ) : (

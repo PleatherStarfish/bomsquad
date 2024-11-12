@@ -59,6 +59,7 @@ const InfiniteModulesList: React.FC = () => {
     },
   });
 
+  const [filtersAnimationComplete, setFiltersAnimationComplete] = useState(false);
   const [filters, setFilters] = useState<ModuleFilterParams>({});
   const { data, fetchNextPage, hasNextPage, refetch, isLoading } = useModules(filters);
   const filtersApplied = Object.keys(filters).length > 0;
@@ -165,6 +166,7 @@ const InfiniteModulesList: React.FC = () => {
     <div className="py-12 mx-auto">
       <Filters
         control={control}
+        onAnimationComplete={() => setFiltersAnimationComplete(true)}
         onSubmit={onSubmit}
         register={register}
         setValue={setValue}
@@ -201,19 +203,18 @@ const InfiniteModulesList: React.FC = () => {
       <InfiniteScroll
         dataLength={modules.length}
         endMessage={
-
-          <div className="flex justify-center w-full pt-24 pb-12">
+          !filtersApplied ? <div className="flex justify-center w-full pt-24 pb-12">
             <div className="w-[500px]">
-              <p className="text-center text-gray-300">That&apos;s all the projects for now! Subscribe on <a className="text-blue-400 hover:text-blue-600" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and help us pick the next module!</p>
+              <p className="text-center text-gray-300">That&apos;s all the projects for now! Subscribe on <a className="text-blue-400 hover:text-blue-600" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and help us pick the next BOM to add!</p>
             </div>
-          </div>
+          </div> : undefined
         }
         hasMore={hasNextPage || false}
         loader={<p className="text-center animate-pulse">Loading...</p>}
         next={fetchNextPage}
       >
         {/* <h1 className="my-6 mb-16 text-4xl font-display">Projects</h1> */}
-        <ModulesList filtersApplied={filtersApplied} isLoading={isLoading} modules={modules} />
+        <ModulesList filtersApplied={filtersApplied} isLoading={isLoading} modules={modules} shouldAnimate={filtersAnimationComplete} />
       </InfiniteScroll>
     </div>
   );
