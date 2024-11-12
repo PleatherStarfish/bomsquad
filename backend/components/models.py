@@ -161,6 +161,7 @@ class Component(BaseModel):
     notes = models.TextField(blank=True)
     link = models.URLField(blank=False)
     allow_comments = models.BooleanField("allow comments", default=True)
+    user_submission_hold = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Components"

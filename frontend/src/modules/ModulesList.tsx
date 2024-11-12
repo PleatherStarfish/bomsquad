@@ -26,8 +26,8 @@ const slideInFromRight = {
     opacity: 1,
     transition: {
       delay: index * 0.1, // Additional delay per item based on index
-      duration: 0.4,
-      ease: "easeIn",
+      duration: 0.3,
+      ease: "easeInOut",
     },
     x: 0,
   }),

@@ -1,6 +1,9 @@
 import "../instrument";
 
-import App from "./App"; // Ensure this path points to your App component
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as Sentry from "@sentry/react";
+
+import App from "./App";
 import React from "react";
 import ReactDOM from "react-dom/client";
 

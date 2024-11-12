@@ -77,6 +77,7 @@ class ModuleBomListItem(BaseModel):
         default=False,
         help_text="Check the BOM to select a value based on user preference.",
     )
+    optional = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
 
     class Meta:
