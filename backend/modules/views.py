@@ -8,6 +8,13 @@ from django.core.cache import cache
 from components.models import Component
 from itertools import zip_longest
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
+from django.contrib.postgres.search import (
+    SearchVector,
+    SearchQuery,
+    SearchRank,
+    TrigramSimilarity,
+)
 from uuid import UUID
 
 from django.shortcuts import get_object_or_404, redirect, render
@@ -34,6 +41,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import hashlib
+
+CACHE_TIMEOUT = 60 * 60
 
 
 def generate_color_from_name(name):
@@ -501,26 +510,43 @@ def manufacturer_detail(request, slug):
 @csrf_exempt
 @api_view(["GET"])
 def components_autocomplete(request):
-    query = request.GET.get("q", "")
+    query = request.GET.get("q", "").strip()
     results = []
 
     if query:
-        # Use Q objects to create an OR condition across multiple fields
-        components = Component.objects.filter(
-            Q(description__icontains=query)
-            | Q(manufacturer__name__icontains=query)
-            | Q(manufacturer_part_no__icontains=query)
-            | Q(supplier__name__icontains=query)
-            | Q(supplier_item_no__icontains=query)
-            | Q(voltage_rating__icontains=query)
-            | Q(current_rating__icontains=query)
-            | Q(forward_current__icontains=query)
-            | Q(forward_voltage__icontains=query)
-            | Q(tolerance__icontains=query)
-        ).order_by("-datetime_updated")[
-            :20
-        ]  # Adjust ordering and limit as needed
+        # Define the SearchVector across multiple fields
+        search_vector = (
+            SearchVector("description", weight="A")
+            + SearchVector("supplier__name", weight="B")
+            + SearchVector("supplier_item_no", weight="B")
+            + SearchVector("manufacturer__name", weight="C")
+            + SearchVector("manufacturer_part_no", weight="C")
+        )
 
+        # Define the SearchQuery with websearch for natural language processing
+        search_query = SearchQuery(query, search_type="websearch")
+
+        # Apply full-text search and trigram similarity
+        components = (
+            Component.objects.annotate(
+                search=search_vector,
+                rank=SearchRank(search_vector, search_query),
+                similarity=(
+                    TrigramSimilarity("description", query)
+                    + TrigramSimilarity("manufacturer__name", query)
+                    + TrigramSimilarity("manufacturer_part_no", query)
+                    + TrigramSimilarity("supplier__name", query)
+                    + TrigramSimilarity("supplier_item_no", query)
+                ),
+            )
+            .filter(
+                Q(search=search_query) | Q(similarity__gt=0.3)
+            )  # Filter with full-text or trigram similarity
+            .order_by("-rank", "-similarity")  # Order by relevance and similarity
+            .distinct()[:50]  # Ensure unique results and limit the results
+        )
+
+        # Prepare the results for the response
         results = [{"id": comp.id, "text": comp.description} for comp in components]
 
     return JsonResponse({"results": results})
@@ -642,6 +668,7 @@ def module_list_v2(request):
 
 @csrf_exempt
 @api_view(["GET"])
+@cache_page(CACHE_TIMEOUT)
 def get_filter_options(request):
     """
     Endpoint for fetching filter options (manufacturers, mounting styles, categories, rack units).

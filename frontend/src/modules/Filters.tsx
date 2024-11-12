@@ -6,15 +6,31 @@ import {
   UseFormWatch,
   useFieldArray,
 } from "react-hook-form";
+import React, { useCallback, useState } from "react";
 
 import Accordion from "../ui/Accordion";
 import AsyncSelect from "react-select/async";
 import ClearableNumberInput from "./ClearableNumberInput";
 import FilterFields from "./FilterFields";
 import { FormValues } from "./InfiniteModulesList";
-import React from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import debounce from "lodash/debounce";
+import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useWatch } from "react-hook-form";
+
+const scaleInWithDelay = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: "easeIn",
+    },
+  },
+};
 
 type FiltersProps = {
   control: Control<FormValues>;
@@ -29,6 +45,28 @@ interface ComponentOption {
   label: string;
 }
 
+// API call to fetch component options
+const fetchComponentOptions = async (inputValue: string): Promise<ComponentOption[]> => {
+  const response = await axios.get("/api/components-autocomplete/", {
+    params: { q: inputValue },
+    xsrfCookieName: "csrftoken",
+    xsrfHeaderName: "X-CSRFToken",
+  });
+  return response.data.results.map((item: { id: string; text: string }) => ({
+    value: item.id,
+    label: item.text,
+  }));
+};
+
+// Custom hook to use React Query for fetching options
+export const useComponentAutocomplete = (inputValue: string) => {
+  return useQuery({
+    queryKey: ["components-autocomplete", inputValue],
+    queryFn: () => fetchComponentOptions(inputValue),
+    enabled: inputValue.length >= 2, // Only fetch when there is input
+  });
+};
+
 const Filters: React.FC<FiltersProps> = ({
   control,
   register,
@@ -41,44 +79,51 @@ const Filters: React.FC<FiltersProps> = ({
     name: "component_groups",
   });
 
-  const loadOptions = async (
-    inputValue: string
-  ): Promise<ComponentOption[]> => {
-    try {
-      const response = await axios.get("/api/components-autocomplete/", {
-        params: { q: inputValue },
-        xsrfCookieName: "csrftoken",
-        xsrfHeaderName: "X-CSRFToken",
-      });
-      return response.data.results.map(
-        (item: { id: string; text: string }) => ({
-          value: item.id,
-          label: item.text,
-        })
-      );
-    } catch (error) {
-      console.error("Error fetching autocomplete options:", error);
-      return [];
-    }
-  };
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Custom onChange handlers
+  // Fetch component options with React Query using the current search term
+  const { data: componentOptions = [], isLoading } = useComponentAutocomplete(searchTerm);
+
+  // Watch min and max fields separately in a map
+  const minValues = fields.map((_, index) =>
+    useWatch({ control, name: `component_groups.${index}.min` as const })
+  );
+
+  const maxValues = fields.map((_, index) =>
+    useWatch({ control, name: `component_groups.${index}.max` as const })
+  );
+
+  // Debounced function for loading options
+  const debouncedLoadOptions = useCallback(
+    debounce((inputValue: string, callback: (options: ComponentOption[]) => void) => {
+      setSearchTerm(inputValue);
+      callback(componentOptions);
+    }, 200), // 200ms delay
+    [componentOptions]
+  );
+
+  // Custom onChange handlers for min and max inputs
   const handleMinChange = (index: number, value: string) => {
-    const max = watch(`component_groups.${index}.max`) || "";
+    const max = maxValues[index] || "";
     if (value !== "" && parseInt(value) > parseInt(max || "Infinity")) {
       setValue(`component_groups.${index}.max`, value);
     }
   };
 
   const handleMaxChange = (index: number, value: string) => {
-    const min = watch(`component_groups.${index}.min`) || "";
+    const min = minValues[index] || "";
     if (value !== "" && parseInt(value) < parseInt(min || "0")) {
       setValue(`component_groups.${index}.min`, value);
     }
   };
 
   return (
-    <div className="p-10 mb-5 bg-gray-100 rounded-lg">
+    <motion.div
+      className="p-10 mb-5 bg-gray-100 rounded-lg"
+      variants={scaleInWithDelay}
+      initial="hidden"
+      animate="visible"
+    >
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -108,10 +153,7 @@ const Filters: React.FC<FiltersProps> = ({
               bgColor="bg-gray-50"
               rounded={false}
             >
-              <div
-                id="components-container"
-                className="flex flex-col w-full space-y-8"
-              >
+              <div id="components-container" className="flex flex-col w-full space-y-8">
                 {fields.map((field, index) => {
                   const minValue = watch(`component_groups.${index}.min`);
                   const maxValue = watch(`component_groups.${index}.max`);
@@ -122,10 +164,11 @@ const Filters: React.FC<FiltersProps> = ({
                         <label className="block mb-2 font-semibold text-gray-700 text-md">{`Component [${
                           index + 1
                         }]`}</label>
-                        <AsyncSelect<ComponentOption>
+                        <AsyncSelect
                           cacheOptions
-                          loadOptions={loadOptions}
-                          onChange={(selected: ComponentOption | null) =>
+                          loadOptions={debouncedLoadOptions}
+                          isLoading={isLoading}
+                          onChange={(selected) =>
                             setValue(`component_groups.${index}`, {
                               component: selected?.value || "",
                               component_description: selected?.label || "",
@@ -233,7 +276,7 @@ const Filters: React.FC<FiltersProps> = ({
           </div>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

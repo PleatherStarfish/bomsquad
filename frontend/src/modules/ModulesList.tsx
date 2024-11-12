@@ -1,19 +1,50 @@
+import React, { useEffect, useState } from "react";
+
 import AddModuleButtons from "../components/AddModuleButtons";
 import { Module } from "../types/modules";
-import React from "react";
 import chroma from "chroma-js";
+import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 
 interface ModulesListProps {
   modules: Module[];
   filtersApplied?: boolean;
+  isLoading?: boolean;
 }
 
-const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = false }) => {
+const containerVariants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.2, // Stagger each child by 0.2 seconds
+    },
+  },
+};
+
+const slideInFromRight = {
+  hidden: { opacity: 0, x: 200 },
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: index * 0.2, // Additional delay per item based on index
+      duration: 0.4,
+      ease: "easeIn",
+    },
+  }),
+};
+
+const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = false, isLoading = true }) => {
+  const [shouldAnimate, setShouldAnimate] = useState(false);
   const hpColorScale = chroma.scale(["#a4d3b5", "#558a6b", "#2d5d46"]).domain([1, 34]);
   const { user } = useAuthenticatedUser();
 
-  if (modules.length === 0) {
+  useEffect(() => {
+    // Delay animation by 0.5 seconds
+    const timeout = setTimeout(() => setShouldAnimate(true), 500);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (modules.length === 0 && !isLoading) {
     return (
       <div className="text-center text-gray-600">
         {filtersApplied ? (
@@ -26,9 +57,19 @@ const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = fal
   }
 
   return (
-    <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">
-      {modules.map((module) => (
-        <div key={module.id} className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row">
+    <motion.div
+      className="grid grid-cols-1 gap-y-10 lg:gap-y-14"
+      initial="hidden"
+      animate={shouldAnimate ? "visible" : "hidden"}
+      variants={containerVariants}
+    >
+      {modules.map((module, index) => (
+        <motion.div
+          key={module.id}
+          className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row"
+          custom={index}
+          variants={slideInFromRight}
+        >
           <div className="flex justify-center w-full h-64 md:w-48 md:h-48">
             {module.thumb_image_webp && module.thumb_image_jpeg ? (
               <picture>
@@ -91,9 +132,9 @@ const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = fal
               {module.description}
             </p>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,7 +1,7 @@
 import { ModuleFilterParams, ModuleResponse } from '../types/modules'; // Import your types
-import { UseInfiniteQueryResult, useInfiniteQuery } from '@tanstack/react-query';
 
 import axios from 'axios';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 // Fetch modules function
 export const fetchModules = async ({
@@ -24,11 +24,15 @@ export const fetchModules = async ({
 };
 
 export const useModules = (filters: ModuleFilterParams) => {
-  return useInfiniteQuery<ModuleResponse, Error>({
+  const queryResult = useInfiniteQuery<ModuleResponse, Error>({
     queryKey: ['modules', filters],
     // @ts-ignore
-    queryFn: ({ pageParam = 1 }: {pageParam: number}) => fetchModules({ pageParam, filters }),
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => fetchModules({ pageParam, filters }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.pagination.nextPage,
   });
+
+  const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = queryResult;
+
+  return { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch };
 };

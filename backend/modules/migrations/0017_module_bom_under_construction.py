@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('modules', '0016_modulebomlistitem_bom_specifies_a_choice_of_values'),
+        ("modules", "0016_modulebomlistitem_bom_specifies_a_choice_of_values"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='module',
-            name='bom_under_construction',
-            field=models.BooleanField(default=False, help_text="Indicates if the module's BOM is currently under construction and hidden from view"),
+            model_name="module",
+            name="bom_under_construction",
+            field=models.BooleanField(
+                default=False,
+                help_text="Indicates if the module's BOM is currently under construction and hidden from view",
+            ),
         ),
     ]

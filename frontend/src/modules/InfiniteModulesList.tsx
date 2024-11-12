@@ -6,7 +6,6 @@ import Button from "../ui/Button";
 import Filters from "./Filters";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ModulesList from "./ModulesList";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useModules } from "../services/useModules";
 
 export type FormValues = {
@@ -48,7 +47,7 @@ const truncate = (text: string, maxLength: number) => {
 };
 
 const InfiniteModulesList: React.FC = () => {
-  const { control, register, handleSubmit, reset, setValue, watch } = useForm<FormValues>({
+  const { control, register, reset, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       search: "",
       manufacturer: "",
@@ -61,7 +60,7 @@ const InfiniteModulesList: React.FC = () => {
   });
 
   const [filters, setFilters] = useState<ModuleFilterParams>({});
-  const { data, fetchNextPage, hasNextPage, refetch } = useModules(filters);
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch, isLoading } = useModules(filters);
   const filtersApplied = Object.keys(filters).length > 0;
 
   useEffect(() => {
@@ -203,10 +202,18 @@ const InfiniteModulesList: React.FC = () => {
         dataLength={modules.length}
         next={fetchNextPage}
         hasMore={hasNextPage || false}
-        loader={<p className="text-center">Loading...</p>}
+        loader={<p className="text-center animate-pulse">Loading...</p>}
+        endMessage={
+
+          <div className="flex justify-center w-full pt-24 pb-12">
+            <div className="w-[500px]">
+              <p className="text-center text-gray-300">That's all the projects for now! Subscribe on <a className="text-blue-400 hover:text-blue-600" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and help us pick the next module!</p>
+            </div>
+          </div>
+        }
       >
-        <h1 className="my-6 mb-16 text-4xl font-display">Projects</h1>
-        <ModulesList modules={modules} filtersApplied={filtersApplied} />
+        {/* <h1 className="my-6 mb-16 text-4xl font-display">Projects</h1> */}
+        <ModulesList modules={modules} filtersApplied={filtersApplied} isLoading={isLoading} />
       </InfiniteScroll>
     </div>
   );

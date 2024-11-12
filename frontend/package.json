@@ -18,6 +18,7 @@
     "choices.js": "^11.0.2",
     "chroma-js": "^3.1.2",
     "classnames": "^2.3.2",
+    "framer-motion": "^11.11.11",
     "fuse.js": "^6.6.2",
     "heroicons": "^2.0.16",
     "js-cookie": "^3.0.1",
