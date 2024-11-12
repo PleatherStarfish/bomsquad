@@ -53,17 +53,17 @@ const fetchComponentOptions = async (inputValue: string): Promise<ComponentOptio
     xsrfHeaderName: "X-CSRFToken",
   });
   return response.data.results.map((item: { id: string; text: string }) => ({
-    value: item.id,
     label: item.text,
+    value: item.id,
   }));
 };
 
 // Custom hook to use React Query for fetching options
 export const useComponentAutocomplete = (inputValue: string) => {
   return useQuery({
-    queryKey: ["components-autocomplete", inputValue],
+    enabled: inputValue.length >= 2,
     queryFn: () => fetchComponentOptions(inputValue),
-    enabled: inputValue.length >= 2, // Only fetch when there is input
+    queryKey: ["components-autocomplete", inputValue], // Only fetch when there is input
   });
 };
 
@@ -119,10 +119,10 @@ const Filters: React.FC<FiltersProps> = ({
 
   return (
     <motion.div
-      className="p-10 mb-5 bg-gray-100 rounded-lg"
-      variants={scaleInWithDelay}
-      initial="hidden"
       animate="visible"
+      className="p-10 mb-5 bg-gray-100 rounded-lg"
+      initial="hidden"
+      variants={scaleInWithDelay}
     >
       <form
         onSubmit={(e) => {
@@ -137,9 +137,9 @@ const Filters: React.FC<FiltersProps> = ({
             </label>
             <input
               {...register("search")}
-              type="text"
-              placeholder="Search"
               className="w-full h-10 pl-2 border border-gray-300 rounded-md"
+              placeholder="Search"
+              type="text"
             />
           </div>
 
@@ -147,13 +147,13 @@ const Filters: React.FC<FiltersProps> = ({
 
           <div className="px-2">
             <Accordion
-              borderColor="border-gray-300"
-              title="Advanced"
-              innerPadding="p-4"
               bgColor="bg-gray-50"
+              borderColor="border-gray-300"
+              innerPadding="p-4"
               rounded={false}
+              title="Advanced"
             >
-              <div id="components-container" className="flex flex-col w-full space-y-8">
+              <div className="flex flex-col w-full space-y-8" id="components-container">
                 {fields.map((field, index) => {
                   const minValue = watch(`component_groups.${index}.min`);
                   const maxValue = watch(`component_groups.${index}.max`);
@@ -166,27 +166,27 @@ const Filters: React.FC<FiltersProps> = ({
                         }]`}</label>
                         <AsyncSelect
                           cacheOptions
-                          loadOptions={debouncedLoadOptions}
+                          className="w-full h-10"
                           isLoading={isLoading}
+                          loadOptions={debouncedLoadOptions}
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
                           onChange={(selected) =>
                             setValue(`component_groups.${index}`, {
                               component: selected?.value || "",
                               component_description: selected?.label || "",
-                              min: minValue || "",
                               max: maxValue || "",
+                              min: minValue || "",
                             })
                           }
                           placeholder="Search components..."
-                          className="w-full h-10"
-                          menuPortalTarget={document.body}
-                          menuPosition="fixed"
                           styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                             menu: (provided) => ({
                               ...provided,
                               maxHeight: 200,
                               overflowY: "auto",
                             }),
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                           }}
                         />
                         <div className="flex items-center w-full gap-4 mt-2">
@@ -195,19 +195,19 @@ const Filters: React.FC<FiltersProps> = ({
                           </label>
                           <Controller
                             control={control}
-                            name={`component_groups.${index}.min`}
                             defaultValue=""
+                            name={`component_groups.${index}.min`}
                             render={({ field: { onChange, value } }) => (
                               <ClearableNumberInput
-                                value={value || ""}
+                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                                max={maxValue ? parseInt(maxValue) : undefined}
+                                min={0}
                                 onChange={(newValue) => {
                                   onChange(newValue);
                                   handleMinChange(index, newValue);
                                 }}
                                 placeholder="Min"
-                                min={0}
-                                max={maxValue ? parseInt(maxValue) : undefined}
-                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                                value={value || ""}
                               />
                             )}
                           />
@@ -218,26 +218,26 @@ const Filters: React.FC<FiltersProps> = ({
 
                           <Controller
                             control={control}
-                            name={`component_groups.${index}.max`}
                             defaultValue=""
+                            name={`component_groups.${index}.max`}
                             render={({ field: { onChange, value } }) => (
                               <ClearableNumberInput
-                                value={value || ""}
+                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                                min={minValue ? parseInt(minValue) : 0}
                                 onChange={(newValue) => {
                                   onChange(newValue);
                                   handleMaxChange(index, newValue);
                                 }}
                                 placeholder="Max"
-                                min={minValue ? parseInt(minValue) : 0}
-                                className="w-20 h-8 px-2 border border-gray-300 rounded-md"
+                                value={value || ""}
                               />
                             )}
                           />
                           <div className="flex justify-end w-full pr-2 grow-1">
                             <button
-                              type="button"
-                              onClick={() => remove(index)}
                               className="text-red-500 hover:text-red-700"
+                              onClick={() => remove(index)}
+                              type="button"
                             >
                               <TrashIcon className="w-5 h-5" />
                             </button>
@@ -249,16 +249,16 @@ const Filters: React.FC<FiltersProps> = ({
                   );
                 })}
                 <button
-                  type="button"
+                  className="w-8 h-8 text-gray-700 transition duration-150 ease-in-out bg-gray-300 rounded hover:bg-gray-400"
                   onClick={() =>
                     append({
                       component: "",
                       component_description: "",
-                      min: "",
                       max: "",
+                      min: "",
                     })
                   }
-                  className="w-8 h-8 text-gray-700 transition duration-150 ease-in-out bg-gray-300 rounded hover:bg-gray-400"
+                  type="button"
                 >
                   +
                 </button>
@@ -268,8 +268,8 @@ const Filters: React.FC<FiltersProps> = ({
 
           <div className="flex flex-wrap items-center gap-4 mt-4">
             <button
+              className="inline-flex items-center px-4 py-2 ml-2 text-base font-medium text-white rounded-md bg-brandgreen-500 hover:bg-brandgreen-600"
               type="submit"
-              className="inline-flex items-center px-4 py-2 text-base font-medium text-white rounded-md bg-brandgreen-500 hover:bg-brandgreen-600"
             >
               Search
             </button>

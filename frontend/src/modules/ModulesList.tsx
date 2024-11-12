@@ -24,12 +24,12 @@ const slideInFromRight = {
   hidden: { opacity: 0, x: 200 },
   visible: (index: number) => ({
     opacity: 1,
-    x: 0,
     transition: {
       delay: index * 0.2, // Additional delay per item based on index
       duration: 0.4,
       ease: "easeIn",
     },
+    x: 0,
   }),
 };
 
@@ -58,16 +58,16 @@ const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = fal
 
   return (
     <motion.div
+      animate={shouldAnimate ? "visible" : "hidden"}
       className="grid grid-cols-1 gap-y-10 lg:gap-y-14"
       initial="hidden"
-      animate={shouldAnimate ? "visible" : "hidden"}
       variants={containerVariants}
     >
       {modules.map((module, index) => (
         <motion.div
-          key={module.id}
           className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row"
           custom={index}
+          key={module.id}
           variants={slideInFromRight}
         >
           <div className="flex justify-center w-full h-64 md:w-48 md:h-48">
@@ -76,9 +76,9 @@ const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = fal
                 <source srcSet={module.thumb_image_webp} type="image/webp" />
                 <source srcSet={module.thumb_image_jpeg} type="image/jpeg" />
                 <img
+                  alt={module.name}
                   className="object-cover w-full h-full md:object-contain"
                   src={module.thumb_image_jpeg}
-                  alt={module.name}
                 />
               </picture>
             ) : null}
@@ -95,7 +95,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ modules, filtersApplied = fal
                 </div>
               )}
             </div>
-            <a href={`/manufacturer/${module.manufacturer_slug}`} className="text-gray-500 hover:text-gray-400">
+            <a className="text-gray-500 hover:text-gray-400" href={`/manufacturer/${module.manufacturer_slug}`}>
               {module.manufacturer.name}
             </a>
             <div className="flex flex-wrap gap-2 mt-2">

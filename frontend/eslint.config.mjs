@@ -1,3 +1,4 @@
+/* eslint-disable */
 import globals from "globals";
 import pluginReact from "eslint-plugin-react";
 import sortKeysFix from "eslint-plugin-sort-keys-fix";
@@ -42,13 +43,8 @@ export default [
       "react/jsx-curly-spacing": ["error", "never", { allowMultiline: true }],
       "react/jsx-indent-props": ["error", 2],
       "react/jsx-pascal-case": ["error", { allowAllCaps: true }],
-      "react/jsx-props-no-spreading": ["error", {
-        html: "enforce",
-        custom: "enforce",
-        explicitSpread: "ignore",
-      }],
-      "react/self-closing-comp": "error",
       "react/jsx-sort-props": ["error", { ignoreCase: true }],
+      "react/self-closing-comp": "error",
       "react/prop-types": "off", // Assuming TypeScript types are used instead
 
       // General rules

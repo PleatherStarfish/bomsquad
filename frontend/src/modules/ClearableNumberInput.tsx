@@ -43,20 +43,20 @@ const ClearableNumberInput: React.FC<ClearableNumberInputProps> = ({
   return (
     <div className="flex items-center space-x-2">
       <input
-        type="number"
-        value={value}
+        className={`${className} w-20 h-8 px-2 border border-gray-300 rounded-md`}
+        max={max}
+        min={min}
         onChange={handleChange}
         placeholder={placeholder}
-        min={min}
-        max={max}
-        className={`${className} w-20 h-8 px-2 border border-gray-300 rounded-md`}
+        type="number"
+        value={value}
       />
       {value && (
         <button
-          type="button"
-          onClick={handleClear}
-          className="text-gray-500 hover:text-red-500"
           aria-label="Clear number input"
+          className="text-gray-500 hover:text-red-500"
+          onClick={handleClear}
+          type="button"
         >
           ×
         </button>

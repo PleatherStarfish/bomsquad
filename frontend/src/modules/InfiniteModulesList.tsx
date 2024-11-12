@@ -49,18 +49,18 @@ const truncate = (text: string, maxLength: number) => {
 const InfiniteModulesList: React.FC = () => {
   const { control, register, reset, setValue, watch } = useForm<FormValues>({
     defaultValues: {
-      search: "",
-      manufacturer: "",
-      component_type: "",
       category: "",
-      rack_unit: "",
+      component_groups: [{ component: "", component_description: "", max: "", min: "" }],
+      component_type: "",
+      manufacturer: "",
       mounting_style: "",
-      component_groups: [{ component: "", component_description: "", min: "", max: "" }],
+      rack_unit: "",
+      search: "",
     },
   });
 
   const [filters, setFilters] = useState<ModuleFilterParams>({});
-  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch, isLoading } = useModules(filters);
+  const { data, fetchNextPage, hasNextPage, refetch, isLoading } = useModules(filters);
   const filtersApplied = Object.keys(filters).length > 0;
 
   useEffect(() => {
@@ -69,18 +69,18 @@ const InfiniteModulesList: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const newFilters: ModuleFilterParams = {
-      search: data.search,
-      manufacturer: data.manufacturer,
-      component_type: data.component_type,
       category: data.category,
-      rack_unit: data.rack_unit,
-      mounting_style: data.mounting_style,
       component_groups: data.component_groups.map((group) => ({
         component: group.component,
         component_description: group.component_description,
-        min: group.min ? parseInt(group.min, 10) : undefined,
         max: group.max ? parseInt(group.max, 10) : undefined,
+        min: group.min ? parseInt(group.min, 10) : undefined,
       })),
+      component_type: data.component_type,
+      manufacturer: data.manufacturer,
+      mounting_style: data.mounting_style,
+      rack_unit: data.rack_unit,
+      search: data.search,
     };
 
     setFilters(newFilters);
@@ -165,20 +165,20 @@ const InfiniteModulesList: React.FC = () => {
     <div className="py-12 mx-auto">
       <Filters
         control={control}
+        onSubmit={onSubmit}
         register={register}
         setValue={setValue}
         watch={watch}
-        onSubmit={onSubmit}
       />
 
       <div className="flex justify-between mb-4">
         <div className="flex flex-wrap gap-2 text-xs grow">
           {filterPills.map(({ key, label, text }) => (
-            <div key={key} className="flex items-center">
+            <div className="flex items-center" key={key}>
               <span className="mr-2 font-semibold text-gray-700">{label}:</span>
               <button
-                onClick={() => clearFilter(key as keyof FormValues)}
                 className="flex items-center bg-slate-500 text-white rounded-full px-3 py-0.5 font-sans font-semibold hover:bg-slate-600"
+                onClick={() => clearFilter(key as keyof FormValues)}
               >
                 <span>{text}</span>
                 <span className="ml-1 text-white hover:text-red-200">×</span>
@@ -191,29 +191,29 @@ const InfiniteModulesList: React.FC = () => {
           <Button
             classNames="bg-gray-300"
             onClick={clearAllFilters}
-            variant="none"
             size="sm"
             tooltipText="Clear all filters"
+            variant="none"
           >Clear</Button>
         )}
       </div>
 
       <InfiniteScroll
         dataLength={modules.length}
-        next={fetchNextPage}
-        hasMore={hasNextPage || false}
-        loader={<p className="text-center animate-pulse">Loading...</p>}
         endMessage={
 
           <div className="flex justify-center w-full pt-24 pb-12">
             <div className="w-[500px]">
-              <p className="text-center text-gray-300">That's all the projects for now! Subscribe on <a className="text-blue-400 hover:text-blue-600" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and help us pick the next module!</p>
+              <p className="text-center text-gray-300">That&apos;s all the projects for now! Subscribe on <a className="text-blue-400 hover:text-blue-600" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and help us pick the next module!</p>
             </div>
           </div>
         }
+        hasMore={hasNextPage || false}
+        loader={<p className="text-center animate-pulse">Loading...</p>}
+        next={fetchNextPage}
       >
         {/* <h1 className="my-6 mb-16 text-4xl font-display">Projects</h1> */}
-        <ModulesList modules={modules} filtersApplied={filtersApplied} isLoading={isLoading} />
+        <ModulesList filtersApplied={filtersApplied} isLoading={isLoading} modules={modules} />
       </InfiniteScroll>
     </div>
   );

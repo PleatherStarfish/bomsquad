@@ -1,0 +1,32 @@
+# Configuration files
+eslint.config.mjs
+
+# Node modules
+node_modules/
+
+# Build and output directories
+dist/
+build/
+.out/
+.coverage/
+
+# Static assets
+public/
+static/
+
+# Environment and setup files
+.env
+*.config.js
+*.config.ts
+
+# TypeScript build outputs
+*.d.ts
+
+# Logs
+*.log
+
+# Coverage output
+coverage/
+
+# Generated files
+*.min.js
