@@ -1,3 +1,5 @@
+import "../instrument";
+
 import App from "./App"; // Ensure this path points to your App component
 import React from "react";
 import ReactDOM from "react-dom/client";
