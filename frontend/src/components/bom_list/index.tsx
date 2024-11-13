@@ -1,7 +1,7 @@
 import "tippy.js/dist/tippy.css";
 
 import { BomItem, BomListProps, PcbVersion } from "../../types/bomListItem";
-import { Cart, Folder2 } from "react-bootstrap-icons";
+import { Cart, CheckLg, Folder2 } from "react-bootstrap-icons";
 import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useMemo, useState } from "react";
 import { flatMap, sortBy, uniq } from 'lodash-es';
@@ -49,9 +49,11 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   // Annotate each item with moduleName and moduleId for easier usage
   const moduleBomData: BomItem[] = moduleBomList.map((item) => ({
     ...item,
-    moduleName,
     moduleId,
+    moduleName,
   }));
+
+  const hasOptionalColumn = useMemo(() => moduleBomData.some((item) => item.optional), [moduleBomData]);
 
   useEffect(() => {
     setUniquePCBVersions(getUniqueSortedPCBVersionNames(moduleBomData));
@@ -93,7 +95,7 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   if (bomUnderConstruction) {
     return (
       <div className="w-full mb-8">
-        <Alert variant="underConstruction" align="center" expand={false} icon>
+        <Alert align="center" expand={false} icon variant="underConstruction">
           <div className="text-center">
             This BOM is currently under construction. Please check back later.
           </div>
@@ -113,7 +115,6 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   // Define columns for the DataTable component
   const columns: TableColumn<BomItem>[] = [
     {
-      name: <div className="sr-only">Alerts</div>,
       cell: (row) => (
         <div className="flex items-center space-x-2">
           {row.quantity <= (row.sum_of_user_options_from_inventory ?? 0) &&
@@ -130,22 +131,23 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
             )}
         </div>
       ),
+      name: <div className="sr-only">Alerts</div>,
       sortable: false,
       width: "60px",
     },
     {
+      grow: 1,
       name: <div>Name</div>,
       selector: (row) => row.description,
       sortable: true,
       wrap: true,
-      grow: 1,
     },
     {
+      maxWidth: "50px",
       name: <div>Qty</div>,
       selector: (row) => row.quantity,
       sortable: true,
       wrap: true,
-      maxWidth: "50px",
     },
     {
       name: <div>Type</div>,
@@ -154,59 +156,67 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
       wrap: true,
     },
     {
+      maxWidth: "150px",
       name: <div>Designators</div>,
       selector: (row) => row.designators,
       sortable: true,
       wrap: true,
-      maxWidth: "150px",
     },
     {
-      name: <div>Notes</div>,
-      selector: (row) => row.notes,
-      format: (row) => <div className="truncate">{row.notes}</div>, // Truncated display
-      sortable: true,
-      wrap: true,
+      cell: (row) => row.optional && <CheckLg className="w-5 h-5"/>,
+      maxWidth: "50px",
+      name: <div>Optional</div>,
+      omit: !hasOptionalColumn,
+      sortable: false,
+    },
+    {
+      format: (row) => <div className="truncate">{row.notes}</div>,
       grow: 2,
+      name: <div>Notes</div>, 
+      selector: (row) => row.notes,
+      // Truncated display
+sortable: true,
+      wrap: true,
     },
   ];
 
   const conditionalRowStyles = [
     {
-      when: (row: BomItem) =>
-        row.quantity <= (row.sum_of_user_options_from_inventory ?? 0) &&
-        row.quantity > 0,
       style: {
         backgroundColor: "#fefad9",
         color: "black",
       },
+      when: (row: BomItem) =>
+        row.quantity <= (row.sum_of_user_options_from_inventory ?? 0) &&
+        row.quantity > 0,
     },
     {
-      when: (row: BomItem) =>
-        row.quantity <= (row.sum_of_user_options_from_shopping_list ?? 0) &&
-        row.quantity > 0,
       style: {
         backgroundColor: "#fefad9",
         color: "black",
       },
-    },
-    {
       when: (row: BomItem) =>
-        row.quantity <= (row.sum_of_user_options_from_inventory ?? 0) &&
         row.quantity <= (row.sum_of_user_options_from_shopping_list ?? 0) &&
         row.quantity > 0,
+    },
+    {
       style: {
         backgroundColor: "#fdf4b3",
         color: "black",
       },
+      when: (row: BomItem) =>
+        row.quantity <= (row.sum_of_user_options_from_inventory ?? 0) &&
+        row.quantity <= (row.sum_of_user_options_from_shopping_list ?? 0) &&
+        row.quantity > 0,
     },
   ];
 
   return (
     <div className="mb-8">
       {!user && (
-        <Alert variant="warning" padding="compact">
+        <Alert padding="compact" variant="warning">
           <div className="alert alert-warning" role="alert">
-            <a href="/accounts/login/" className="text-blue-500 hover:text-blue-700">
+            <a className="text-blue-500 hover:text-blue-700" href="/accounts/login/">
               <b>Login</b>
             </a>{" "}
             to compare the BOM against your personal inventory.
@@ -221,30 +231,30 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
             inactiveTabColor="bg-[#c9e2d3] text-gray-800 hover:bg-[#afd4be]"
             onClick={setSelectedTab}
             tabs={uniquePCBVersions.map((name) => ({
-              name,
               current: name === selectedTab,
+              name,
             }))}
           />
         </div>
       )}
       {filteredData && (
         <DataTable
-          fixedHeader={false}
-          responsive
+          columns={columns}
+          conditionalRowStyles={conditionalRowStyles}
+          customStyles={customStyles}
+          data={filteredData}
           expandableRows
+          expandableRowsComponent={NestedTable}
           expandOnRowClicked
+          fixedHeader={false}
           fixedHeaderScrollHeight="500vh"
+          keyField="id"
+          onRowMouseEnter={(row: BomItem) => handleRowHover(row.components_options)}
           progressComponent={
             <div className="text-center text-gray-500 animate-pulse">Loading...</div>
           }
-          expandableRowsComponent={NestedTable}
-          conditionalRowStyles={conditionalRowStyles}
-          columns={columns}
-          data={filteredData}
           progressPending={moduleBomIsLoading}
-          customStyles={customStyles}
-          onRowMouseEnter={(row: BomItem) => handleRowHover(row.components_options)}
-          keyField="id"
+          responsive
         />
       )}
     </div>

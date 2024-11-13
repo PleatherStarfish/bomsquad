@@ -42,7 +42,7 @@ from rest_framework.views import APIView
 
 import hashlib
 
-CACHE_TIMEOUT = 60 * 60
+CACHE_TIMEOUT = 60 * 60  # 1 hour (60 seconds * 60 minutes)
 
 
 def generate_color_from_name(name):
@@ -304,6 +304,7 @@ class ModuleDetailView(generics.RetrieveAPIView):
 
 
 @api_view(["GET"])
+@cache_page(CACHE_TIMEOUT)
 def get_module_bom_list_items(request, module_pk):
     try:
         # Retrieve the Module instance based on the provided module_pk
@@ -344,6 +345,9 @@ def get_module_bom_list_items(request, module_pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def rate_component(request):
+    print(request.data["module_bom_list_item"])
+    print(request.data["component"])
+    print(request.data["rating"])
     serializer = ModuleBomListComponentForItemRatingSerializer(data=request.data)
     if serializer.is_valid():
         rating_instance, created = (
@@ -360,6 +364,13 @@ def rate_component(request):
 
 @api_view(["GET"])
 def get_average_rating(request, module_bom_list_item_id, component_id):
+    cache_key = f"average_rating_{module_bom_list_item_id}_{component_id}"
+
+    # Try to retrieve the cached result first
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return Response(cached_data, status=status.HTTP_200_OK)
+
     try:
         # Check if there are any ratings for this item and component
         ratings_exist = ModuleBomListComponentForItemRating.objects.filter(
@@ -377,13 +388,14 @@ def get_average_rating(request, module_bom_list_item_id, component_id):
             average_rating = (
                 round(result["average_rating"], 2) if result["average_rating"] else 0
             )
-            return Response(
-                {
-                    "average_rating": average_rating,
-                    "number_of_ratings": result["number_of_ratings"],
-                },
-                status=status.HTTP_200_OK,
-            )
+            response_data = {
+                "average_rating": average_rating,
+                "number_of_ratings": result["number_of_ratings"],
+            }
+
+            # Cache the response data
+            cache.set(cache_key, response_data, timeout=CACHE_TIMEOUT)
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             # If no ratings exist, return a 204 No Content response
             return Response(
@@ -561,6 +573,7 @@ def module_list_v2(request):
     mounting_style = data.get("mounting_style", None)
     category = data.get("category", None)
     rack_unit = data.get("rack_unit", None)
+    user = request.user if request.user.is_authenticated else None
 
     # Inline filter to include only component groups with a defined component
     component_groups = [
@@ -568,7 +581,6 @@ def module_list_v2(request):
         for group in data.get("component_groups", [])
         if group.get("component")
     ]
-    user = request.user if request.user.is_authenticated else None
 
     # Fetch component names based on IDs
     for group in component_groups:
@@ -636,6 +648,17 @@ def module_list_v2(request):
 
         # Apply each filter
         module_list = module_list.filter(combined_filter).distinct()
+
+    # Annotate for user-specific data if the user is authenticated
+    if user:
+        module_list = module_list.annotate(
+            is_built=Exists(
+                BuiltModules.objects.filter(module=OuterRef("pk"), user=user)
+            ),
+            is_wtb=Exists(
+                WantToBuildModules.objects.filter(module=OuterRef("pk"), user=user)
+            ),
+        )
 
     # Pagination and response
     paginator = Paginator(module_list, 10)

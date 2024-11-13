@@ -51,6 +51,7 @@ export interface BomItem {
   id: string;
   module: Module;
   notes: string;
+  optional: boolean;
   pcb_version: PcbVersion[];
   quantity: number;
   sum_of_user_options_from_inventory?: number | null;
