@@ -1,0 +1,25 @@
+{% load i18n %}
+{% load account %}
+{% user_display user as user_display %}
+
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <p>Welcome to BOM Squad!</p><br>
+    
+    <p>Hi there! We’re excited to have you join the BOM Squad community. You’re receiving this email because {{ user_display }} used this address to sign up on <a href="https://bom-squad.com/" target="_blank">bom-squad.com</a>.</p><br>
+    
+    <p><strong>To complete your registration, please confirm your email by clicking the link below:</strong></p><br>
+    
+    <p><a href="{{ activate_url }}" target="_blank">{{ activate_url }}</a></p><br>
+
+    <p>If you didn’t sign up, feel free to ignore this message.</p><br>
+
+    <p>Thanks, and happy building!<br>The BOM Squad Team</p>
+</body>
+</html>
+{% endautoescape %}
