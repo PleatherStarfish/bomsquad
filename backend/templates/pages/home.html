@@ -9,8 +9,8 @@
   <!-- Header Section with Circuit Board Image Background -->
     <div id="parallax-container" class="relative w-full h-[295px] lg:h-[408px] header-section overflow-hidden border border-gray-300">
       <picture>
-        <source srcset="/static/images/circuit-board.webp" type="image/webp">
-        <img id="parallax-image" src="/static/images/circuit-board.jpg" alt="Circuit board background" class="object-cover w-full h-full">
+        <source srcset="{% static 'images/circuit-board.webp' %}" type="image/webp">
+        <img id="parallax-image" src="{% static 'images/circuit-board.jpg' %}" alt="Circuit board background" class="object-cover w-full h-full">
       </picture>
       <div style="opacity: 0.85" class="absolute inset-0 flex items-center justify-center h-screen bg-white"></div>
       <div class="absolute inset-0 flex items-center justify-center">
