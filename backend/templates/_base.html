@@ -45,7 +45,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/cash-dom/dist/cash.min.js"></script>
     <script>(function(){const{protocol:n,host:o,pathname:t,search:a,hash:h}=window.location;t.endsWith("/")||t.endsWith(".html")||window.location.replace(`${n}//${o}${t}/${a}${h}`)})()</script>
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
@@ -62,6 +63,7 @@
       />
       <!-- Include Choices.js JavaScript from CDN -->
       <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
     {% block css %}{% endblock css %}
   </head>
 
@@ -73,7 +75,7 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
-      {% if path == '/' or path == '/comp' %}
+      {% if path == '/projects' or path == '/comp' %}
         <div id="banner" class="hidden">
           <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-lg bg-[#d4e4ea]" role="alert">
             <div class="flex flex-col w-full">
@@ -93,7 +95,7 @@
         {% endif %}
         {% block content %}{% endblock content %}
       </div>
-      {% if path != '/' and path != '/user' %}
+      {% if path != '/projects' and path != '/user' %}
       <footer>{% include "footer.html" %}</footer>
       {% endif %}
       {% endwith %}

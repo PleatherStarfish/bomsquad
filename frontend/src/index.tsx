@@ -1,6 +1,7 @@
 import "./instrument";
 import "./styles/styles.css";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as Sentry from "@sentry/react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -16,17 +17,17 @@ axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      retry: 3,
-      staleTime: 30 * 1000, // 30 seconds
-      refetchOnMount: "always",
-      refetchOnWindowFocus: "always",
-      refetchOnReconnect: "always",
-      refetchInterval: 30 * 1000, // 30 seconds
-      refetchIntervalInBackground: false,
-    },
     mutations: {
       retry: 3,
+    },
+    queries: {
+      refetchInterval: 30 * 1000, // 30 seconds
+      refetchIntervalInBackground: false,
+      refetchOnMount: "always",
+      refetchOnReconnect: "always", 
+      refetchOnWindowFocus: "always", 
+      retry: 3,
+      staleTime: 30 * 1000, // 30 seconds
     },
   },
 });

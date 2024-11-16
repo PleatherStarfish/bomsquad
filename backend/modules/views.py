@@ -65,6 +65,7 @@ mounting_style_options = [
 
 
 def module_list(request):
+    print("test")
     query = request.GET.get("search", "")
     manufacturer = request.GET.get("manufacturer", None)
     component_type = request.GET.get("component_type", None)
@@ -155,6 +156,7 @@ def module_list(request):
     zipped_components = list(
         zip_longest(components, component_ids, quantity_mins, quantity_maxs)
     )
+    print("123")
 
     # Render the main template
     return render(

@@ -3,8 +3,9 @@ const colors = require("tailwindcss/colors");
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   relative: true,
+  mode: 'jit',
   content: [
-    "../../../../**/*.{html,js}",
+    "../../../**/*.{html,js,ts,tsx}",
   ],
   safelist: [
     'list-disc',
@@ -50,8 +51,8 @@ module.exports = {
     'aspect-video',
     'aspect-w-16', 
     'aspect-h-9',
-    'mt-6'
-],
+    'mt-6',
+  ],
   darkMode: 'class',
   theme: {
     screens: {
@@ -62,6 +63,16 @@ module.exports = {
       "2xl": "1536px",
     },
     extend: {
+      animation: {
+        'gradient-hover': 'gradient-hover 3s ease infinite',
+      },
+      keyframes: {
+        'gradient-hover': {
+          '0%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+          '100%': { 'background-position': '0% 50%' },
+        },
+      },
       fontFamily: {
         'display': ['Quicksand', ...defaultTheme.fontFamily.sans],
         'roboto': ['Roboto', 'sans-serif'],

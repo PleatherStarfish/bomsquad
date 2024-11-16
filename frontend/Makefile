@@ -5,4 +5,3 @@ build-styles:
 
 cp-bundle:
 	cd .. && cp frontend/build/main.bundle.js backend/static/js/main.bundle.js
-	cd .. && cp frontend/build/modules.bundle.js backend/static/js/modules.bundle.js

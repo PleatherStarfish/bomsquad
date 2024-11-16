@@ -11,10 +11,11 @@ from .views import (
 from modules.views import manufacturer_detail
 from django.views.generic import TemplateView
 from comments.views import latest_comments
+from core.views import homepage
 
 
 urlpatterns = [
-    path("", module_list, name="home"),
+    path("", homepage, name="home"),
     path("about/", AboutPageView.as_view(), name="about"),
     path("disclaimer/", DisclaimerPageView.as_view(), name="disclaimer"),
     path(

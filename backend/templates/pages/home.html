@@ -4,7 +4,298 @@
   Homepage
 {% endblock title %}
 {% block content %}
-  <div class="px-3 py-3 mx-auto text-center pricing-header pt-md-5 pb-md-4">
-    <h1 class="text-4xl">Homepage</h1>
+<div class="p-0 homepage-grid">
+
+  <!-- Header Section with Circuit Board Image Background -->
+    <div id="parallax-container" class="relative w-full h-[295px] lg:h-[408px] header-section overflow-hidden border border-gray-300">
+      <picture>
+        <source srcset="/static/images/circuit-board.webp" type="image/webp">
+        <img id="parallax-image" src="/static/images/circuit-board.jpg" alt="Circuit board background" class="object-cover w-full h-full">
+      </picture>
+      <div style="opacity: 0.85" class="absolute inset-0 flex items-center justify-center h-screen bg-white"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="max-w-[290px] sm:max-w-[400px] md:max-w-[600px]">
+          <h1 class="text-xl font-semibold text-center text-gray-900 md:text-5xl bold font-display"><span>The only BOM tool built by and for DIY </span><span id="audio-jiggle" style="display: inline-block; transform-origin: center; will-change: transform">audio</span><span> hardware geeks</span></h1>
+          <div class="mt-6">
+            <p class="font-normal text-center text-gray-600 md:text-lg font-display">An interactive bill of materials (BOMs) that intelligently cross-reference with your inventory and shopping list</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Projects Section -->
+  <div class="flex flex-col space-y-12 border-gray-300 md:space-y-0 border-x projects-section">
+    <div class="flex flex-col justify-between" style="height: 160px">
+      <div class="w-full p-6 min-h-80 md:h-full">
+        <h2 class="mb-4 text-2xl font-semibold text-left font-display">Recently Added</h2>
+        <div class="w-full my-3">
+          <p style="font-size: 16px" class="font-medium text-left text-gray-600 font-display">Projects recently added to the BOM Squad database. Support the project on <a class="text-blue-500" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and choose what we add next!</p>
+        </div>
+      </div>
+      <div class="relative py-2 overflow-hidden">
+        <svg width="100%" height="1" style="position: absolute; top: 0; left: 0;">
+          <line x1="0" y1="0.5" x2="100%" y2="0.5" stroke="#9ca3af" stroke-width="1" stroke-dasharray="8, 16" />
+        </svg>
+      </div>
+    </div>
+    <ul class="flex flex-col justify-around h-full md:flex-row">
+      {% for project in projects %}
+        <li class="flex flex-wrap items-center py-2 h-[160px] border-b md:border-0">
+          <div class="w-20 h-20 mr-4 overflow-hidden rounded lg:w-20 lg:h-20">
+            <div class="flex justify-center h-full">
+              <a href="{{ project.module_url }}">
+                <picture>
+                  <source srcset="{{ project.thumbnail }}" type="image/webp">
+                  <img src="{{ project.thumbnail }}" alt="{{ project.title }} thumbnail" class="object-cover w-auto h-full">
+                </picture>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold"><a href="{{ project.module_url }}">{{ project.title }}</a></h3>
+            <p class="text-sm text-gray-600">by <a href="{{ project.manufacturer_url }}" class="text-blue-600 hover:underline">{{ project.manufacturer }}</a></p>
+          </div>
+        </li>
+      {% empty %}
+        <li class="py-2 text-gray-500">No projects found.</li>
+      {% endfor %}
+    </ul>   
   </div>
+
+  <div class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border left-info-box lg:min-h-36">
+    <div class="flex justify-center">
+      <div class="flex flex-col justify-center align-middle lg:min-h-36">
+        <h4 class="text-4xl font-semibold text-center font-display">{{ project_count }}</h4>
+        <p>projects</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border-t middle-info-box lg:min-h-36">
+    <div class="flex justify-center">
+      <div class="flex flex-col justify-center align-middle lg:min-h-36">
+        <h4 class="text-4xl font-semibold text-center font-display">{{ component_count }}</h4>
+        <p>components</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border right-info-box lg:min-h-36">
+    <div class="flex justify-center">
+      <div class="flex flex-col justify-center align-middle lg:min-h-36">
+        <h4 class="text-4xl font-semibold text-center font-display">{{ manufacturer_count }}</h4>
+        <p>manufacturers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Row 1 -->
+  <div class="flex flex-col justify-between w-full h-full space-y-12 border-gray-200 border-x info1-section">
+    <div class="flex flex-col items-center justify-between w-full h-full p-6 border-gray-200 lg:flex-row info1-section">
+      <!-- Text Section -->
+      <div class="w-full mb-6 text-center lg:mb-0 lg:mr-6 lg:w-1/2 md:text-left">
+        <h3 class="mb-2 text-2xl font-semibold text-center text-gray-800 font-display md:text-left">Subscribe for updates</h3>
+        <p class="mb-4 text-sm text-center text-gray-600 font-display md:text-left">
+          Stay updated with the latest BOM Squad projects and community news!
+        </p>
+        {% if messages %}
+          <div class="mt-4 text-sm text-gray-600">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Form Section -->
+      <form method="post" action="{% url 'subscription' %}" class="flex flex-col items-center w-full space-y-3 lg:w-1/2">
+        {% csrf_token %}
+        <div class="flex w-full mb-3 space-x-2">
+          <input type="email" name="email" placeholder="Enter your email" 
+                class="w-5/6 p-2 rounded md:border md:border-gray-300 focus:outline-none focus:md:border-gray-400 grow-1">
+          <button type="submit" 
+                  class="w-auto px-4 py-2 text-white rounded bg-brandgreen-500 hover:bg-brandgreen-700 font-display">
+            Subscribe
+          </button>
+        </div>
+      </form>
+    </div>
+    <div style="margin: 0;" class="relative py-2">
+        <svg width="100%" height="1" style="position: absolute; top: 0; left: 0;">
+            <line x1="0" y1="0.5" x2="100%" y2="0.5" stroke="#9ca3af" stroke-width="1" stroke-dasharray="8, 16" />
+        </svg>
+    </div>
+  </div>
+
+  <!-- Info Row 2 - Spanning all columns with Product Image and Text -->
+  <div class="relative flex flex-col items-center justify-center w-full p-8 border-gray-200 border-x md:border-b md:border-l md:-space-y-4 info2-section md:flex-row md:justify-between md:space-x-6">
+    <a href="https://bom-squad.printify.me/" class="absolute inset-0 z-10"></a>
+    <!-- Product Image -->
+    <div class="flex justify-center w-full mb-4 align-middle md:w-1/2 lg:w-1/3 md:mb-0">
+      <picture>
+        <img src="{% static 'images/folded.jpg' %}" alt="BOM Squad Merch" class="object-cover w-48 h-auto md:w-full">
+      </picture>
+    </div>
+  
+    <!-- Text Section -->
+    <div class="flex flex-col items-start w-full space-y-2 grow-1">
+      <h3 style="font-size: 18px" class="w-full text-2xl font-bold text-center text-gray-800 font-display md:text-left">BOM Squad merch now available!</h3>
+      <p style="font-size: 14px" class="font-normal text-center text-gray-600 text-md md:text-left">Support BOM Squad by grabbing exclusive merch to show your passion for the DIY community!</p>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <div class="relative flex flex-col items-center justify-center w-full p-3 border border-gray-200 md:border-b md:border-l-0 md:border-r md:border-t-0 footer-section">
+    <a href="https://github.com/PleatherStarfish/bomsquad" class="absolute inset-0 z-10"></a>
+    <!-- Content Section -->
+    <div class="flex flex-col items-center w-full h-full p-4 space-y-3 text-center bg-gradient-to-r from-[#dacfc0] to-[#c4b39c] hover:animate-gradient-hover rounded">
+      <img src="{% static 'images/github.svg' %}" alt="GitHub logo" class="w-9 h-9 lg:w-11 lg:h-11">
+      <p class="text-white">BOM Squad is free and open source! Contribute to the project on GitHub!</p>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
+
+{% block javascript %}
+<script>
+  window.addEventListener('scroll', function() {
+    const parallaxImage = document.getElementById('parallax-image');
+    const scrollPosition = window.scrollY;
+    
+    // Adjust the image's transform for the parallax effect
+    parallaxImage.style.transform = `translateY(${scrollPosition * 0.3}px)`;
+  });
+</script>
+<script>
+  const audioElement = document.getElementById('audio-jiggle');
+  const parallaxImage = document.getElementById('parallax-container');
+  let lastMouseMoveTime = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+
+  // Calculate mouse speed and movement angle
+  function calculateMouseSpeedAndAngle(event) {
+    const now = performance.now();
+    const elapsedTime = now - (lastMouseMoveTime || now);
+
+    const deltaX = event.clientX - (lastMouseX || event.clientX);
+    const deltaY = event.clientY - (lastMouseY || event.clientY);
+    const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+    const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI); // Convert to degrees
+
+    lastMouseMoveTime = now;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+
+    // Calculate speed and map it using the range formula
+    const speed = elapsedTime > 0 ? distance / elapsedTime : 0;
+
+    const xMax = 10; // Maximum perturbation
+    const xMin = 1;  // Minimum perturbation
+    const yMax = 559.22; // Maximum speed
+    const yMin = 300.77; // Minimum speed
+
+    const clampedSpeed = Math.max(yMin, Math.min(speed, yMax));
+    const percent = (clampedSpeed - yMin) / (yMax - yMin);
+    const perturbationIntensity = percent * (xMax - xMin) + xMin;
+
+    return {
+      speed: perturbationIntensity,
+      angle: isNaN(angle) ? 0 : angle,
+    };
+  }
+
+  function generateKeyframes(scale, rotateX, rotateY, skewX, skewY) {
+    // Function to clamp values between a minimum and maximum range
+    const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+  
+    // Define ranges for the multipliers
+    const scaleMin = 1, scaleMax = 2;  // Scale should vary between 1 (no change) and max scale
+    const rotateMin = -45, rotateMax = 45; // Rotation should stay within -45 to 45 degrees
+    const skewMin = -10, skewMax = 10;  // Skew should stay within -10 to 10 degrees
+  
+    return `
+      @keyframes dynamicSpringBounce {
+        0% {
+          transform: scale(1) rotateX(0deg) rotateY(0deg) skew(0deg, 0deg) translate(0px, 0px);
+        }
+        35% {
+          transform: scale(${clamp(scale * 2, scaleMin, scaleMax)}) 
+                    rotateX(${clamp(rotateX, rotateMin, rotateMax)}deg) 
+                    rotateY(${clamp(rotateY, rotateMin, rotateMax)}deg) 
+                    skew(${clamp(skewX, skewMin, skewMax)}deg, ${clamp(skewY, skewMin, skewMax)}deg) 
+                    translate(2px, -2px);
+        }
+        60% {
+          transform: scale(${clamp(scale * 0.7, scaleMin, scaleMax)}) 
+                    rotateX(${clamp(rotateX * -0.8, rotateMin, rotateMax)}deg) 
+                    rotateY(${clamp(rotateY * -0.8, rotateMin, rotateMax)}deg) 
+                    skew(${clamp(skewX * -0.7, skewMin, skewMax)}deg, ${clamp(skewY * 0.7, skewMin, skewMax)}deg) 
+                    translate(-3px, 3px);
+        }
+        80% {
+          transform: scale(${clamp(scale * 1.3, scaleMin, scaleMax)}) 
+                    rotateX(${clamp(rotateX * 0.6, rotateMin, rotateMax)}deg) 
+                    rotateY(${clamp(rotateY * 0.6, rotateMin, rotateMax)}deg) 
+                    skew(${clamp(skewX * 0.5, skewMin, skewMax)}deg, ${clamp(skewY * -0.5, skewMin, skewMax)}deg) 
+                    translate(1px, -1px);
+        }
+        95% {
+          transform: scale(${clamp(scale * 0.95, scaleMin, scaleMax)}) 
+                    rotateX(${clamp(rotateX * -0.4, rotateMin, rotateMax)}deg) 
+                    rotateY(${clamp(rotateY * -0.4, rotateMin, rotateMax)}deg) 
+                    skew(${clamp(skewX * -0.3, skewMin, skewMax)}deg, ${clamp(skewY * 0.3, skewMin, skewMax)}deg) 
+                    translate(-1px, 1px);
+        }
+        100% {
+          transform: scale(1) rotateX(0deg) rotateY(0deg) skew(0deg, 0deg) translate(0px, 0px);
+        }
+      }
+    `;
+  }
+
+  function triggerAnimation(event) {
+    const { speed, angle } = calculateMouseSpeedAndAngle(event);
+
+    // Adjust the range and sensitivity for scaleIntensity
+    const scaleBase = 1; // Base scale
+    const maxScaleFactor = 3; // Increase max scale for greater variability
+    const scaleSensitivity = 0.2; // Increase sensitivity for more noticeable differences
+
+    // Calculate scaleIntensity with more dynamic variability
+    const scaleIntensity = Math.min(scaleBase + Math.pow(speed * scaleSensitivity, 1), maxScaleFactor);
+
+    // Rotation: Enhance variability by scaling based on speed and angle
+    const rotationScalingFactor = 75; // Increase factor for more rotation variability
+    const rotateXIntensity = Math.sin((angle * Math.PI) / 180) * Math.min(speed * rotationScalingFactor, 45);
+    const rotateYIntensity = Math.cos((angle * Math.PI) / 180) * Math.min(speed * rotationScalingFactor, 45);
+
+    // Skew: Adjust intensities to reflect higher variability
+    const skewXIntensity = Math.min(speed * 1.5, 15); // Increase cap to 15 for more noticeable skew
+    const skewYIntensity = Math.min(speed * 1.2, 12); // Increase cap to 12 for more variability
+
+    // Generate keyframes dynamically
+    const keyframes = generateKeyframes(scaleIntensity, rotateXIntensity, rotateYIntensity, skewXIntensity, skewYIntensity);
+
+    // Inject or update the keyframes in the stylesheet
+    const styleSheet = document.head.querySelector('style') || document.createElement('style');
+    if (!styleSheet.parentElement) document.head.appendChild(styleSheet);
+
+    [...styleSheet.sheet.rules].forEach((rule, i) => {
+      if (rule.name === 'dynamicSpringBounce') {
+        styleSheet.sheet.deleteRule(i);
+      }
+    });
+
+    styleSheet.sheet.insertRule(keyframes, styleSheet.sheet.cssRules.length);
+
+    // Restart animation
+    audioElement.style.animation = 'none';
+    void audioElement.offsetWidth; // Trigger reflow
+    audioElement.style.animation = 'dynamicSpringBounce 0.8s ease-in'; // Reapply animation
+}
+
+  parallaxImage.addEventListener('mouseenter', triggerAnimation);
+</script>
+{% endblock javascript %}

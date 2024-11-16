@@ -3,11 +3,29 @@
 @tailwind utilities;
 
 @layer base {
+    
     #sentry-feedback {
         --background: #1f2327;
         --submit-background: #518467;
         --submit-border: #518467;
     }
+
+    @keyframes gradient-hover {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      
+      .group-hover:animate-gradient-hover {
+        background-size: 200% 200%;
+        animation: gradient-hover 3s ease infinite;
+      }
 
     .rdt_Table {
         z-index: 0 !important;
@@ -43,6 +61,68 @@
 }
 
 @layer components {
+    /* Homepage Grid Layout */
+    .homepage-grid {
+        @apply grid p-6;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto 1fr 1fr auto;
+        grid-template-areas:
+            "header header header"
+            "projects projects projects"
+            "left middle right"
+            "info1 info1 info1"
+            "info2 info2 footer";
+    }
+
+    .header-section {
+        grid-area: header;
+    }
+
+    .projects-section {
+        grid-area: projects;
+    }
+
+    .left-info-box {
+        grid-area: left;
+    }
+
+    .middle-info-box {
+        grid-area: middle;
+    }
+
+    .right-info-box {
+        grid-area: right;
+    }
+
+    .info1-section {
+        grid-area: info1;
+    }
+    
+    .info2-section {
+        grid-area: info2;
+    }
+    
+    .footer-section {
+        grid-area: footer;
+    }
+
+    /* Responsive Adjustments for Small Screens */
+    @media (max-width: 640px) {
+        .homepage-grid {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto auto auto auto auto auto;
+            grid-template-areas:
+                "header header"
+                "projects projects"
+                "left left"
+                "middle middle"
+                "right right"
+                "info1 info1"
+                "info2 info2"
+                "footer footer";
+        }
+    }
+
     .chevron-open {
         transform: translateY(-50%) rotate(180deg) !important;
     }
@@ -70,7 +150,6 @@
     .table-of-contents a:hover {
         @apply text-blue-700;
     }
-}
 
 @media (min-width: 1024px) {
     @layer components {
@@ -78,4 +157,5 @@
             @apply float-right w-1/4 ml-5;
         }
     }
+}
 }

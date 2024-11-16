@@ -120,7 +120,7 @@ frontend_redirect_urls = [
         name="user-settings",
     ),
     re_path(
-        r"^(?!media|admin|accounts|api|static|module|user).*",
+        r"^(?!media|admin|accounts|api|static|user).*",
         TemplateView.as_view(template_name="frontend.html"),
     ),
 ]

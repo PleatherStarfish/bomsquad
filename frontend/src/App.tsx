@@ -9,6 +9,7 @@ import Inventory from "./components/inventory/index";
 import InventoryLocationsTree from "./pages/InventoryLocationsTree";
 import ModuleDetail from "./pages/ModuleDetail";
 import ModulesList from "./components/ModulesLists";
+import Projects from "./pages/Projects"
 import React from "react";
 import SavedLists from "./components/saved_lists/index";
 import Settings from "./components/UserSettings";
@@ -27,46 +28,47 @@ const App: React.FC = () => {
   return (
     <div className="h-fit">
         <Routes>
-          <Route path="/components" element={<Components />} />
-          <Route path="/module/:slug" element={<ModuleDetail />} />
-          <Route path={`/user/:username/settings`} element={<Settings />} />
+          <Route element={<Projects />} path="/projects" />
+          <Route element={<Components />} path="/components" />
+          <Route element={<ModuleDetail />} path="/module/:slug" />
+          <Route element={<Settings />} path={`/user/:username/settings`} />
           <Route
-            path={`/user/:username/inventory/version-history`}
             element={<VersionHistory />}
+            path={`/user/:username/inventory/version-history`}
           />
           <Route
-              path={`/user/:username/shopping-list/saved-lists`}
-              element={<SavedLists />}
+            element={<SavedLists />}
+            path={`/user/:username/shopping-list/saved-lists`}
           />
-          <Route path="/user/:username" element={<UserPage />}>
+          <Route element={<UserPage />} path="/user/:username">
             <Route
+              element={
+                <ModulesList
+                  type="built"
+                />
+              }
               index
+            />
+            <Route
               element={
                 <ModulesList
                   type="built"
                 />
               }
-            />
-            <Route
               path={`built`}
-              element={
-                <ModulesList
-                  type="built"
-                />
-              }
             />
             <Route
-              path={`want-to-build`}
               element={
                 <ModulesList type="want-to-build" />
               }
+              path={`want-to-build`}
             />
-            <Route path={`inventory/tree`} element={<InventoryLocationsTree />} />
-            <Route path={`inventory`} element={<Inventory />} />
-            <Route path={`shopping-list`} element={<ShoppingList />} />
-            <Route path="*" element={<RedirectToBackend />} />
+            <Route element={<InventoryLocationsTree />} path={`inventory/tree`} />
+            <Route element={<Inventory />} path={`inventory`} />
+            <Route element={<ShoppingList />} path={`shopping-list`} />
+            <Route element={<RedirectToBackend />} path="*" />
           </Route>
-          <Route path="*" element={<RedirectToBackend />} />
+          <Route element={<RedirectToBackend />} path="*" />
         </Routes>
     </div>
   );

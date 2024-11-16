@@ -25,14 +25,15 @@ export const fetchModules = async ({
 
 export const useModules = (filters: ModuleFilterParams) => {
   const queryResult = useInfiniteQuery<ModuleResponse, Error>({
-    queryKey: ['modules', filters],
-    // @ts-ignore
-    queryFn: ({ pageParam = 1 }: { pageParam: number }) => fetchModules({ pageParam, filters }),
-    initialPageParam: 1,
+    
     getNextPageParam: (lastPage) => lastPage.pagination.nextPage,
+    initialPageParam: 1,
+    // @ts-expect-error: expected
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => fetchModules({ filters, pageParam }),
+    queryKey: ['modules', filters],
   });
 
   const { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = queryResult;
 
-  return { data, isLoading, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch };
+  return { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, refetch };
 };

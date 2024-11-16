@@ -48,6 +48,7 @@ export default [
       "react/prop-types": "off", // Assuming TypeScript types are used instead
 
       // General rules
+      "@typescript-eslint/ban-ts-comment": "off",
       "no-underscore-dangle": ["error", { allow: ["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] }],
       "jsx-quotes": ["error", "prefer-double"],
       "class-methods-use-this": [

@@ -64,6 +64,23 @@ class ComponentAdmin(BaseAdmin):
         "discontinued",
     )
 
+    # Add filters for relevant fields
+    list_filter = ("mounting_style", "supplier", "type", "discontinued")
+
+    # Add search fields for easy lookup
+    search_fields = (
+        "description",
+        "manufacturer__name",
+        "supplier__name",
+        "type__name",
+        "manufacturer_part_no",
+        "supplier_item_no",
+    )
+
+    # Option 1: Override lookup_allowed to allow all lookups (use with caution)
+    def lookup_allowed(self, key, value=None):
+        return True
+
 
 class TypesAdmin(BaseAdmin):
     model = Types

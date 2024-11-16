@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% load custom_tags %}
+{% load static %}
+
+{% block content %}
+    <div id="modules-root"></div>
+{% endblock content %}
+
+{% block javascript %}
+<script src="{% static 'js/modules.bundle.js' %}"></script>
+{% endblock javascript %}
+

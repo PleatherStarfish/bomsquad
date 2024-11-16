@@ -60,5 +60,6 @@ def component_detail(request, component_id):
 
 
 def module_detail(request, slug):
+    print(slug)
     module = get_object_or_404(Module, slug=slug)
     return render(request, "frontend.html", {"module": module})

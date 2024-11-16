@@ -36,6 +36,9 @@ class ModuleBomListItemAdmin(BaseAdmin):
         "pcb_version__version",
     )
 
+    def lookup_allowed(self, key, value=None):
+        return True
+
 
 class ManufacturerAdmin(BaseAdmin):
     model = Manufacturer
@@ -84,7 +87,13 @@ class ModuleAdmin(admin.ModelAdmin):
         ),
         (
             "Other Info",
-            {"fields": ("mounting_style", "discontinued", "allow_comments")},
+            {
+                "fields": (
+                    "mounting_style",
+                    "discontinued",
+                    "allow_comments",
+                )
+            },
         ),
     )
 
