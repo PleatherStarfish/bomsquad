@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Exists, OuterRef, Avg, F
+from django.db.models import Prefetch, Q, Sum, Count, Exists, OuterRef, Avg, F
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
@@ -306,41 +306,44 @@ class ModuleDetailView(generics.RetrieveAPIView):
 
 
 @api_view(["GET"])
-@cache_page(CACHE_TIMEOUT)
+# @cache_page(CACHE_TIMEOUT)
 def get_module_bom_list_items(request, module_pk):
     try:
-        # Retrieve the Module instance based on the provided module_pk
-        module = Module.objects.get(pk=module_pk)
+        # Use select_related to reduce queries for related fields on Module
+        module = Module.objects.select_related("manufacturer").get(pk=module_pk)
+        print(module)
     except Module.DoesNotExist:
-        # Return a response indicating that the module does not exist
         return Response(
             {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
-    # Filter ModuleBomListItem instances based on the retrieved module
-    module_bom_list_items = ModuleBomListItem.objects.filter(module=module).order_by(
-        "-pcb_version__order"
+    # Prefetch related data for ModuleBomListItem and associated components and PCB versions
+    module_bom_list_items = ModuleBomListItem.objects.filter(
+        module=module
+    ).prefetch_related(
+        Prefetch(
+            "components_options",
+            queryset=Component.objects.select_related("type", "manufacturer"),
+        ),
+        "pcb_version",
     )
 
+    # Annotate user-specific aggregations only if user is authenticated
     if request.user.is_authenticated:
-        # Use aggregation to sum quantities of UserInventory instances for each component in the queryset
         module_bom_list_items = module_bom_list_items.annotate(
             sum_of_user_options_from_inventory=Sum(
                 "components_options__userinventory__quantity",
                 filter=Q(components_options__userinventory__user=request.user),
-                distinct=True,
             ),
             sum_of_user_options_from_shopping_list=Sum(
                 "components_options__usershoppinglist__quantity",
                 filter=Q(components_options__usershoppinglist__user=request.user),
-                distinct=True,
             ),
         )
 
-    # Serialize the retrieved ModuleBomListItem instances
+    # Serialize the data
     serializer = ModuleBomListItemSerializer(module_bom_list_items, many=True)
 
-    # Return the serialized data as a response
     return Response(serializer.data)
 
 

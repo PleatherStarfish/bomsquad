@@ -7,8 +7,7 @@ class BaseModel(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Ensure `date_created` is only set on creation if not manually provided
-        if not self.date_created:
+        if not self.datetime_created:
             self.datetime_created = timezone.now()
         super().save(*args, **kwargs)
 

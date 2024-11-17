@@ -71,6 +71,7 @@ class Component(BaseModel):
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
     )
     manufacturer_part_no = models.CharField(max_length=100, blank=True)
+    manufacturer_link = models.URLField(blank=True, null=False)
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     supplier = models.ForeignKey(
         ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
@@ -275,3 +276,32 @@ class Component(BaseModel):
             ]
             cache.set(f"unique_{field1}_{field2}_values", values, timeout=60 * 60)
         return values
+
+
+class ComponentSupplierItem(BaseModel):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    component = models.ForeignKey(
+        Component, related_name="supplier_items", on_delete=models.CASCADE
+    )
+    supplier = models.ForeignKey(
+        ComponentSupplier, related_name="component_items", on_delete=models.PROTECT
+    )
+    supplier_item_no = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        unique=True,
+        help_text="Supplier's item number for this component.",
+    )
+    price = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    pcs = models.IntegerField(
+        default=1, help_text="Number of items purchased per price (if sold in a set)."
+    )
+    link = models.URLField(
+        blank=True, null=True, help_text="URL to the supplier's page for the component."
+    )
+
+    class Meta:
+        unique_together = ("component", "supplier")

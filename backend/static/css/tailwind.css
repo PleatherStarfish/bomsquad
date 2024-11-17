@@ -10,6 +10,25 @@
         --submit-border: #518467;
     }
 
+    #parallax-image {
+        position: absolute;
+        top: -50px;
+        left: 0;
+        width: 100%; /* Ensure it overflows the container on smaller screens */
+        height: auto; /* Maintain aspect ratio */
+        object-fit: cover; /* Ensure it covers the container properly */
+      }
+      
+      @media (min-width: 1024px) {
+        #parallax-image {
+          top: -50px; /* Larger offset for large screens */
+          left: 0;
+          width: 100%; /* Standard width on larger screens */
+          height: auto; /* Maintain aspect ratio */
+        }
+      }
+      
+
     @keyframes gradient-hover {
         0% {
           background-position: 0% 50%;

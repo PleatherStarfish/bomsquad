@@ -1,6 +1,27 @@
 from django.contrib import admin
-from components.models import Component, ComponentSupplier, ComponentManufacturer, Types
+from components.models import (
+    Component,
+    ComponentSupplier,
+    ComponentManufacturer,
+    Types,
+    ComponentSupplierItem,
+)
 from core.admin import BaseAdmin
+
+
+class ComponentSupplierItemInline(admin.TabularInline):
+    model = ComponentSupplierItem
+    extra = 1  # Number of blank rows for adding new items
+    fields = (
+        "supplier",
+        "supplier_item_no",
+        "price",
+        "pcs",
+        "link",
+    )
+    readonly_fields = ()  # Specify any read-only fields here if needed
+    verbose_name = "Supplier Item"
+    verbose_name_plural = "Supplier Items"
 
 
 class ComponentAdmin(BaseAdmin):
@@ -76,6 +97,8 @@ class ComponentAdmin(BaseAdmin):
         "manufacturer_part_no",
         "supplier_item_no",
     )
+
+    inlines = [ComponentSupplierItemInline]
 
     # Option 1: Override lookup_allowed to allow all lookups (use with caution)
     def lookup_allowed(self, key, value=None):

@@ -63,6 +63,9 @@ module.exports = {
       "2xl": "1536px",
     },
     extend: {
+      objectPosition: {
+        'custom-center': '30% 70%', // Align 30% horizontally and 70% vertically
+      },
       animation: {
         'gradient-hover': 'gradient-hover 3s ease infinite',
       },
