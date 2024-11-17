@@ -9,6 +9,7 @@ from components.models import (
     SizeStandard,
 )
 from core.admin import BaseAdmin
+from import_export.admin import ImportExportModelAdmin
 from django_mptt_admin.admin import DjangoMpttAdmin
 
 
@@ -123,11 +124,11 @@ class ComponentManufacturerAdmin(BaseAdmin):
     model = ComponentManufacturer
 
 
-class CategoryAdmin(DjangoMpttAdmin):
+class CategoryAdmin(ImportExportModelAdmin, DjangoMpttAdmin):
     model = Category
 
 
-class SizeStandardAdmin(DjangoMpttAdmin):
+class SizeStandardAdmin(ImportExportModelAdmin, DjangoMpttAdmin):
     model = SizeStandard
 
 
