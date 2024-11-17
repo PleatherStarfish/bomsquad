@@ -101,6 +101,8 @@ INSTALLED_APPS = [
     "admin_honeypot",
     "corsheaders",
     "djmoney",
+    "django_mptt_admin",
+    "mptt",
     "import_export",
     "storages",
     # Local

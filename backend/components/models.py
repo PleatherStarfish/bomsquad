@@ -5,6 +5,8 @@ from django.core.cache import cache
 from core.models import BaseModel
 from django.urls import reverse
 from django.db.models import F
+from mptt.models import MPTTModel, TreeForeignKey
+from django.core.validators import MinValueValidator
 import uuid
 
 OHMS_UNITS = (
@@ -85,6 +87,22 @@ class Component(BaseModel):
     )
     supplier_has_no_item_no = models.BooleanField(default=False)
     type = models.ForeignKey(Types, on_delete=models.PROTECT)
+    category = TreeForeignKey(
+        "Category",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="components",
+        help_text="Category to which this component belongs.",
+    )
+    size = models.ForeignKey(
+        "SizeStandard",
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name="components",
+        help_text="Size standard for the component.",
+    )
     ohms = models.DecimalField(
         blank=True,
         null=True,
@@ -305,3 +323,88 @@ class ComponentSupplierItem(BaseModel):
 
     class Meta:
         unique_together = ("component", "supplier")
+
+
+class SizeStandard(MPTTModel):
+    """
+    Represents a size standard for electronic components.
+    """
+
+    SMD = "SMD"
+    THROUGH_HOLE = "TH"
+    IC_PACKAGE = "IC"
+
+    TYPE_CHOICES = [
+        (SMD, "Surface-mount"),
+        (THROUGH_HOLE, "Through-hole"),
+        (IC_PACKAGE, "IC Package"),
+    ]
+
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        help_text="Unique name of the size standard (e.g., 0805, SOIC14).",
+    )
+    description = models.TextField(
+        blank=True,
+        help_text="Detailed description of the size standard.",
+    )
+    type = models.CharField(
+        max_length=20,
+        choices=TYPE_CHOICES,
+        blank=True,
+        help_text="Type of the component size standard (e.g., Surface-mount, Through-hole, IC Package).",
+    )
+    lead_spacing = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0.01)],
+        help_text="Lead spacing in mm for through-hole components. Must be greater than 0.",
+    )
+
+    class MPTTMeta:
+        order_insertion_by = ["name"]
+
+    class Meta:
+        verbose_name = "Size Standard"
+        verbose_name_plural = "Size Standards"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    def is_through_hole(self):
+        """Returns True if the size standard is for through-hole components."""
+        return self.type == self.THROUGH_HOLE
+
+    def is_surface_mount(self):
+        """Returns True if the size standard is for surface-mount components."""
+        return self.type == self.SMD
+
+    def is_ic_package(self):
+        """Returns True if the size standard is for IC packages."""
+        return self.type == self.IC_PACKAGE
+
+
+class Category(MPTTModel):
+    """
+    Represents a hierarchical structure for categorizing components.
+    """
+
+    name = models.CharField(max_length=255)
+    parent = TreeForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children",
+        help_text="Parent category for this category.",
+    )
+
+    class MPTTMeta:
+        order_insertion_by = ["name"]
+
+    def __str__(self):
+        return self.name

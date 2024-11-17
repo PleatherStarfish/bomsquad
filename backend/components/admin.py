@@ -5,8 +5,11 @@ from components.models import (
     ComponentManufacturer,
     Types,
     ComponentSupplierItem,
+    Category,
+    SizeStandard,
 )
 from core.admin import BaseAdmin
+from django_mptt_admin.admin import DjangoMpttAdmin
 
 
 class ComponentSupplierItemInline(admin.TabularInline):
@@ -40,6 +43,8 @@ class ComponentAdmin(BaseAdmin):
                     "supplier_item_no",
                     "supplier_has_no_item_no",
                     "type",
+                    "size",
+                    "category",
                     "price",
                     "pcs",
                     "discontinued",
@@ -82,6 +87,8 @@ class ComponentAdmin(BaseAdmin):
         "mounting_style",
         "supplier",
         "supplier_item_no",
+        "size",
+        "category",
     )
 
     # Add filters for relevant fields
@@ -116,8 +123,18 @@ class ComponentManufacturerAdmin(BaseAdmin):
     model = ComponentManufacturer
 
 
+class CategoryAdmin(DjangoMpttAdmin):
+    model = Category
+
+
+class SizeStandardAdmin(DjangoMpttAdmin):
+    model = SizeStandard
+
+
 # Register your models here.
 admin.site.register(Component, ComponentAdmin)
 admin.site.register(Types, TypesAdmin)
 admin.site.register(ComponentSupplier, ComponentSupplierAdmin)
 admin.site.register(ComponentManufacturer, ComponentManufacturerAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(SizeStandard, SizeStandardAdmin)
