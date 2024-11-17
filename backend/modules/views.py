@@ -65,7 +65,6 @@ mounting_style_options = [
 
 
 def module_list(request):
-    print("test")
     query = request.GET.get("search", "")
     manufacturer = request.GET.get("manufacturer", None)
     component_type = request.GET.get("component_type", None)
@@ -156,7 +155,6 @@ def module_list(request):
     zipped_components = list(
         zip_longest(components, component_ids, quantity_mins, quantity_maxs)
     )
-    print("123")
 
     # Render the main template
     return render(
@@ -311,7 +309,6 @@ def get_module_bom_list_items(request, module_pk):
     try:
         # Use select_related to reduce queries for related fields on Module
         module = Module.objects.select_related("manufacturer").get(pk=module_pk)
-        print(module)
     except Module.DoesNotExist:
         return Response(
             {"error": "Module does not exist"}, status=status.HTTP_404_NOT_FOUND
@@ -350,9 +347,6 @@ def get_module_bom_list_items(request, module_pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def rate_component(request):
-    print(request.data["module_bom_list_item"])
-    print(request.data["component"])
-    print(request.data["rating"])
     serializer = ModuleBomListComponentForItemRatingSerializer(data=request.data)
     if serializer.is_valid():
         rating_instance, created = (

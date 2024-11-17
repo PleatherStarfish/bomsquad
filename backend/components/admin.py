@@ -81,8 +81,7 @@ class ComponentAdmin(BaseAdmin):
         "description",
         "mounting_style",
         "supplier",
-        "type",
-        "discontinued",
+        "supplier_item_no",
     )
 
     # Add filters for relevant fields
