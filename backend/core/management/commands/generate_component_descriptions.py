@@ -1,24 +1,17 @@
 from django.core.management.base import BaseCommand
-from components.models import Component, ComponentSupplier
+from components.models import Component
 from django.db import models
 
 
 class Command(BaseCommand):
-    help = "Update descriptions only for Components with ohms, farads, or from Mouser Electronics."
+    help = "Update descriptions only for Components with ohms, farads, or a supplier."
 
     def handle(self, *args, **kwargs):
-        # Fetch the Mouser Electronics supplier instance
-        try:
-            mouser_supplier = ComponentSupplier.objects.get(name="Mouser Electronics")
-        except ComponentSupplier.DoesNotExist:
-            self.stderr.write("Mouser Electronics supplier not found.")
-            return
-
-        # Filter components with ohms, farads, or Mouser Electronics as the supplier
+        # Filter components with ohms, farads, or any supplier
         components = Component.objects.filter(
             models.Q(ohms__isnull=False)
             | models.Q(farads__isnull=False)
-            | models.Q(supplier=mouser_supplier)
+            | models.Q(supplier__isnull=False)
         )
         updated_count = 0
 
