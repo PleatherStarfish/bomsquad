@@ -10,7 +10,7 @@
     <div id="parallax-container" class="relative w-full h-[295px] lg:h-[408px] header-section overflow-hidden border border-gray-300">
       <picture>
         <source srcset="{% static 'images/circuit-board.webp' %}" type="image/webp">
-        <img id="parallax-image" src="{% static 'images/circuit-board.jpg' %}" alt="Circuit board background" class="object-cover w-full h-full object-custom-center">
+        <img style="max-width:none;" id="parallax-image" src="{% static 'images/circuit-board.jpg' %}" alt="Circuit board background" class="object-custom-center">
       </picture>
       <div style="opacity: 0.85" class="absolute inset-0 flex items-center justify-center h-screen bg-white"></div>
       <div class="absolute inset-0 flex items-center justify-center">
@@ -148,7 +148,7 @@
   <div class="relative flex flex-col items-center justify-center w-full p-3 border border-gray-200 md:border-b md:border-l-0 md:border-r md:border-t-0 footer-section">
     <a href="https://github.com/PleatherStarfish/bomsquad" class="absolute inset-0 z-10"></a>
     <!-- Content Section -->
-    <div class="flex flex-col items-center w-full h-full p-4 space-y-3 text-center bg-gradient-to-r from-[#dacfc0] to-[#c4b39c] hover:animate-gradient-hover rounded">
+    <div class="flex flex-col items-center w-full h-full p-4 space-y-3 text-center bg-[#dacfc0] rounded">
       <img src="{% static 'images/github.svg' %}" alt="GitHub logo" class="w-9 h-9 lg:w-11 lg:h-11">
       <p class="text-white">BOM Squad is free and open source! Contribute to the project on GitHub!</p>
     </div>

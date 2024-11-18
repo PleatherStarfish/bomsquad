@@ -52,10 +52,37 @@ def component_detail(request, component_id):
         ],
         key=lambda x: x["module"].name,
     )
+
+    # Serialize category and size information with full path
+    category_data = (
+        {
+            "id": component.category.id,
+            "name": component.category.name,
+            "full_path": component.category.get_full_path(),
+        }
+        if component.category
+        else None
+    )
+    size_data = (
+        {
+            "id": component.size.id,
+            "name": component.size.name,
+            "full_path": component.size.get_full_path(),
+        }
+        if component.size
+        else None
+    )
+
     return render(
         request,
         "pages/components/component_detail.html",
-        {"component": component, "modules": modules, "back_url": "/components/"},
+        {
+            "component": component,
+            "modules": modules,
+            "category": category_data,
+            "size": size_data,
+            "back_url": "/components/",
+        },
     )
 
 

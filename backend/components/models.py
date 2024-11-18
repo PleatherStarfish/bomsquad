@@ -359,6 +359,23 @@ class SizeStandard(MPTTModel):
     def __str__(self):
         return self.name
 
+    def get_full_path(self):
+        """
+        Returns the full nested path of the size standard as a string.
+        """
+        ancestors = self.get_ancestors(include_self=True)
+        return " > ".join(ancestor.name for ancestor in ancestors)
+
+    def to_nested_dict(self):
+        """
+        Converts the size standard and its descendants to a nested dictionary structure.
+        """
+        return {
+            "label": self.name,
+            "value": self.id,
+            "options": [child.to_nested_dict() for child in self.get_children()],
+        }
+
 
 class Category(MPTTModel):
     """
@@ -380,3 +397,20 @@ class Category(MPTTModel):
 
     def __str__(self):
         return self.name
+
+    def get_full_path(self):
+        """
+        Returns the full nested path of the category as a string.
+        """
+        ancestors = self.get_ancestors(include_self=True)
+        return " > ".join(ancestor.name for ancestor in ancestors)
+
+    def to_nested_dict(self):
+        """
+        Converts the category and its descendants to a nested dictionary structure.
+        """
+        return {
+            "label": self.name,
+            "value": self.id,
+            "options": [child.to_nested_dict() for child in self.get_children()],
+        }

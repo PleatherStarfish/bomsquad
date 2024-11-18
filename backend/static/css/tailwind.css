@@ -11,20 +11,22 @@
     }
 
     #parallax-image {
-        position: absolute;
-        top: -50px;
+        height: auto;
         left: 0;
-        width: 100%; /* Ensure it overflows the container on smaller screens */
-        height: auto; /* Maintain aspect ratio */
-        object-fit: cover; /* Ensure it covers the container properly */
+        object-fit: cover;
+        position: absolute;
+        top: -30px;
+        width: 200%;
       }
       
-      @media (min-width: 1024px) {
+      @media (min-width: 1000px) {
         #parallax-image {
+          position: absolute;
           top: -50px; /* Larger offset for large screens */
           left: 0;
           width: 100%; /* Standard width on larger screens */
           height: auto; /* Maintain aspect ratio */
+          object-fit: cover;
         }
       }
       
