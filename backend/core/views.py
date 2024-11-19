@@ -4,6 +4,7 @@ from modules.models import Module, Manufacturer
 from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from components.models import Component
+from django.db import connection
 
 
 def robots_txt(request):
@@ -18,12 +19,10 @@ def robots_txt(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-# @cache_page(60 * 60)  # Cache this view for 60 minutes
+# connection.queriesconnection.queries@cache_page(60 * 60)  # Cache this view for 60 minutes
 def homepage(request):
     # Fetch the most recent modules that are not under construction
-    modules = Module.objects.filter(bom_under_construction=False).order_by(
-        "-datetime_created", "-datetime_updated"
-    )[:3]
+    modules = Module.objects.order_by("-datetime_created", "-datetime_updated")[:3]
 
     # Prepare data to include thumbnail, title, manufacturer name, and URLs
     project_data = [
