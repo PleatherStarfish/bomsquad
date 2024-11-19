@@ -1,15 +1,17 @@
-import csv
-from decimal import Decimal
-from django.core.management.base import BaseCommand
-from django.db import transaction
 from components.models import (
     Component,
     ComponentSupplier,
     ComponentSupplierItem,
     ComponentManufacturer,
     Types,
+    SizeStandard,
+    Category,
 )
 from djmoney.money import Money
+import csv
+from decimal import Decimal
+from django.core.management.base import BaseCommand
+from django.db import transaction
 
 OHMS_UNITS_MAP = {
     "": "Ω",  # Default to Ω if no unit is specified
@@ -17,7 +19,7 @@ OHMS_UNITS_MAP = {
     "M": "MΩ",
 }
 
-MOUNTING_STYLE = "th"  # Default mounting style for resistors (Through Hole)
+MOUNTING_STYLE = "smt"  # Default mounting style for resistors (Surface Mount)
 
 
 class Command(BaseCommand):
@@ -33,6 +35,18 @@ class Command(BaseCommand):
         csv_file = kwargs["csv_file"]
 
         try:
+            # Fetch the SizeStandard for "0805"
+            try:
+                size_0805 = SizeStandard.objects.get(name="0805")
+            except SizeStandard.DoesNotExist:
+                raise ValueError("SizeStandard '0805' does not exist in the database.")
+
+            # Fetch the Category for "Resistors"
+            try:
+                resistors_category = Category.objects.get(id=102)
+            except Category.DoesNotExist:
+                raise ValueError("Category 'Resistors' does not exist in the database.")
+
             with open(csv_file, "r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
 
@@ -82,6 +96,9 @@ class Command(BaseCommand):
                             name=component_type_name
                         )
 
+                        # Determine if the size is 0805
+                        size_standard = size_0805 if row.get("Size") == "0805" else None
+
                         # Retrieve or update the Component
                         try:
                             component = Component.objects.get(
@@ -108,6 +125,9 @@ class Command(BaseCommand):
                             if component.mounting_style != MOUNTING_STYLE:
                                 component.mounting_style = MOUNTING_STYLE
                                 updated = True
+                            if component.size != size_standard:
+                                component.size = size_standard
+                                updated = True
                             if component.link != link:
                                 component.link = link
                                 updated = True
@@ -120,14 +140,6 @@ class Command(BaseCommand):
                                         f"Updated Component: {component.description}"
                                     )
                                 )
-                            else:
-                                component.description = ""
-                                component.save()
-                                self.stdout.write(
-                                    self.style.WARNING(
-                                        f"Updated description: {component.description}"
-                                    )
-                                )
 
                         except Component.DoesNotExist:
                             # Create a new Component if it doesn't exist
@@ -136,12 +148,15 @@ class Command(BaseCommand):
                                 supplier_item_no=sku,
                                 type=component_type,
                                 manufacturer=manufacturer,
+                                category=resistors_category,
                                 ohms=ohms,
                                 ohms_unit=ohms_unit,
                                 wattage=wattage,
                                 tolerance=tolerance,
                                 mounting_style=MOUNTING_STYLE,
+                                size=size_standard,
                                 link=link,
+                                description="",
                             )
                             self.stdout.write(
                                 self.style.SUCCESS(
