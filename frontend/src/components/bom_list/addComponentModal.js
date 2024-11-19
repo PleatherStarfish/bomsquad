@@ -25,7 +25,6 @@ const AddComponentModal = ({
   text,
   type,
   componentId,
-  moduleId,
   hookArgs = undefined,
   quantityRequired,
   componentName,

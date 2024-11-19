@@ -57,7 +57,7 @@ class ComponentAdmin(BaseAdmin):
         ),
         (
             "Resistor Specific Fields",
-            {"classes": ("collapse",), "fields": ("ohms", "ohms_unit")},
+            {"classes": ("collapse",), "fields": ("ohms", "ohms_unit", "wattage")},
         ),
         (
             "Capacitor Specific Fields",

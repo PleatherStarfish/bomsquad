@@ -22,7 +22,7 @@ def robots_txt(request):
 def homepage(request):
     # Fetch the most recent modules that are not under construction
     modules = Module.objects.filter(bom_under_construction=False).order_by(
-        "-datetime_updated"
+        "-datetime_created", "-datetime_updated"
     )[:3]
 
     # Prepare data to include thumbnail, title, manufacturer name, and URLs

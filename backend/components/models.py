@@ -68,7 +68,7 @@ class ComponentManufacturer(BaseModel):
 
 class Component(BaseModel):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
     )
@@ -129,34 +129,35 @@ class Component(BaseModel):
         blank=True,
         help_text="If the component type involves capacitance, this value MUST be set.",
     )
-    voltage_rating = models.CharField(max_length=6, blank=True)
-    current_rating = models.CharField(max_length=6, blank=True)
+    voltage_rating = models.CharField(max_length=24, blank=True)
+    current_rating = models.CharField(max_length=24, blank=True)
+    wattage = models.CharField(max_length=24, blank=True)
     forward_current = models.CharField(
-        max_length=6,
+        max_length=24,
         blank=True,
         null=True,
         help_text="The maximum forward current of the component.",
     )
     forward_voltage = models.CharField(
-        max_length=6,
+        max_length=24,
         blank=True,
         null=True,
         help_text="The forward voltage drop of the component.",
     )
     forward_surge_current = models.CharField(
-        max_length=6,
+        max_length=24,
         blank=True,
         null=True,
         help_text="The maximum forward surge current of the component.",
     )
     forward_current_avg_rectified = models.CharField(
-        max_length=6,
+        max_length=24,
         blank=True,
         null=True,
         help_text="The average forward current over a full cycle of an AC signal.",
     )
     tolerance = models.CharField(
-        max_length=6,
+        max_length=24,
         blank=True,
         null=True,
     )
@@ -181,6 +182,65 @@ class Component(BaseModel):
     link = models.URLField(blank=False)
     allow_comments = models.BooleanField("allow comments", default=True)
     user_submission_hold = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        """
+        Override the save method to automatically generate the description
+        field before saving the model.
+        """
+        if not self.description:
+            self.description = self.generate_description()
+            super().save(*args, **kwargs)
+
+    def generate_description(self):
+        """
+        Generate a short and logical description for the Component,
+        including wattage, tolerance, and mounting style if set.
+        """
+        description = ""
+
+        # Prioritize value fields
+        if self.ohms and self.ohms_unit:
+            description = f"{self.ohms}{self.ohms_unit} Resistor"
+
+        elif self.farads and self.farads_unit:
+            description = f"{self.farads}{self.farads_unit} Capacitor"
+
+        # Include mounting style
+        if self.mounting_style:
+            description += (
+                f" {'(through hole)' if self.mounting_style == 'th' else '(SMT)'}"
+            )
+
+        elif self.type:
+            description = f"{self.type.name}"
+
+        # Include wattage if available
+        if self.wattage:
+            if not self.wattage.endswith("W"):
+                description += f", {self.wattage}W"
+            else:
+                description += f", {self.wattage}"
+
+        # Include tolerance if available
+        if self.tolerance:
+            description += f", {self.tolerance} tolerance"
+
+        # Add manufacturer and part number if available
+        if self.manufacturer and self.manufacturer_part_no:
+            description += (
+                f" by {self.manufacturer.name} (Part No: {self.manufacturer_part_no})"
+            )
+
+        # Add manufacturer if part number is unavailable
+        elif self.manufacturer:
+            description += f" by {self.manufacturer.name}"
+
+        # Fallback to part number only if no other info is available
+        elif self.manufacturer_part_no:
+            description += f" (Part No: {self.manufacturer_part_no})"
+
+        return description.strip()
 
     class Meta:
         verbose_name_plural = "Components"
@@ -210,7 +270,7 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for resistors."
                 )
-        elif self.type.name == "Capacitor":
+        if self.type.name == "Capacitor":
             if not self.farads or not self.farads_unit:
                 raise ValidationError(
                     "If this component is a capacitor, you must set the Farad value and unit."
@@ -219,7 +279,7 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Ohm value and unit must not be set for capacitors."
                 )
-        elif self.type.name == "Potentiometer":
+        if self.type.name == "Potentiometer":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(
                     "If this component is a potentiometer, you must set the Ohm value and unit."
@@ -228,28 +288,28 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for potentiometers."
                 )
-        elif self.type.name == "Diode":
-            if not (
-                self.forward_current
-                or self.forward_voltage
-                or self.forward_surge_current
-                or self.forward_current_avg_rectified
-            ):
-                raise ValidationError(
-                    "If this component is a diode, you must set at least one of the forward current, forward voltage, forward surge current, or average forward current rectified."
-                )
+        # elif self.type.name == "Diode":
+        #     if not (
+        #         self.forward_current
+        #         or self.forward_voltage
+        #         or self.forward_surge_current
+        #         or self.forward_current_avg_rectified
+        #     ):
+        #         raise ValidationError(
+        #             "If this component is a diode, you must set at least one of the forward current, forward voltage, forward surge current, or average forward current rectified."
+        #         )
 
         # Validation to ensure diode-specific fields are not set for non-diodes and non-LEDs
-        if self.type.name not in ["Diode", "Light-emitting diode (LED)"]:
-            if (
-                self.forward_current
-                or self.forward_voltage
-                or self.forward_surge_current
-                or self.forward_current_avg_rectified
-            ):
-                raise ValidationError(
-                    "Forward current, forward voltage, forward surge current, and average forward current rectified must not be set for non-diodes and non-LEDs."
-                )
+        # if self.type.name not in ["Diode", "Light-emitting diode (LED)"]:
+        #     if (
+        #         self.forward_current
+        #         or self.forward_voltage
+        #         or self.forward_surge_current
+        #         or self.forward_current_avg_rectified
+        #     ):
+        #         raise ValidationError(
+        #             "Forward current, forward voltage, forward surge current, and average forward current rectified must not be set for non-diodes and non-LEDs."
+        #         )
 
     def get_absolute_url(self):
         return reverse(
@@ -394,6 +454,11 @@ class Category(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ["name"]
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name

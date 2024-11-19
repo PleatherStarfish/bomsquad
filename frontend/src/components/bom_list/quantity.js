@@ -8,7 +8,7 @@ export const Types = Object.freeze({
   INVENTORY: "inventory",
 });
 
-const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames, hideLoadingTag = false }) => {
+const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames = "", hideLoadingTag = false }) => {
   const [quantity, setQuantity] = React.useState();
   const { data, isLoading, error } = useHook(...Object.values(hookArgs));
 

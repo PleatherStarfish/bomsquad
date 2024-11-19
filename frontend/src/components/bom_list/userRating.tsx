@@ -19,6 +19,7 @@ interface UserRatingProps {
   moduleName: string;
   bomItemName: string;
   moduleId: string;
+  tooltipText?: string;
 }
 
 const UserRating: React.FC<UserRatingProps> = ({ moduleBomListItemId, componentId, initialRating, moduleName, bomItemName, moduleId }) => {
