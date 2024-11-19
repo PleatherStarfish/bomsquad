@@ -96,9 +96,6 @@ class Command(BaseCommand):
                             name=component_type_name
                         )
 
-                        # Determine if the size is 0805
-                        size_standard = size_0805 if row.get("Size") == "0805" else None
-
                         # Retrieve or update the Component
                         try:
                             component = Component.objects.get(
@@ -125,9 +122,11 @@ class Command(BaseCommand):
                             if component.mounting_style != MOUNTING_STYLE:
                                 component.mounting_style = MOUNTING_STYLE
                                 updated = True
-                            if component.size != size_standard:
-                                component.size = size_standard
+                            if component.size != size_0805:
+                                component.size = size_0805
                                 updated = True
+                            if component.category != resistors_category:
+                                component.category = resistors_category
                             if component.link != link:
                                 component.link = link
                                 updated = True
@@ -154,7 +153,7 @@ class Command(BaseCommand):
                                 wattage=wattage,
                                 tolerance=tolerance,
                                 mounting_style=MOUNTING_STYLE,
-                                size=size_standard,
+                                size=size_0805,
                                 link=link,
                                 description="",
                             )
