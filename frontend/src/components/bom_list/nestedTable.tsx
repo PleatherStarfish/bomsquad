@@ -50,7 +50,6 @@ const getBaseUrl = (): string => {
 };
 
 const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
-  console.log(data)
   const {
     bom_specifies_a_choice_of_values,
     components_options,
@@ -98,7 +97,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     {
       hide: 1700,
       name: <small>Type</small>,
-      selector: (row) => row.type,
+      selector: (row) => row.type?.name || "Unknown",
       sortable: true,
       wrap: true,
     },
@@ -151,13 +150,13 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       sortable: true,
       wrap: true,
     },
-    {
-      cell: (row) => row.forward_current,
-      name: <small>Forward Current</small>,
-      omit: type.name !== "Diodes",
-      sortable: true,
-      wrap: true,
-    },
+    // {
+    //   cell: (row) => row.forward_current,
+    //   name: <small>Forward Current</small>,
+    //   omit: type.name !== "Diodes",
+    //   sortable: true,
+    //   wrap: true,
+    // },
     {
       cell: (row) => row.forward_voltage,
       name: <small>Forward Voltage</small>,
@@ -165,16 +164,16 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       sortable: true,
       wrap: true,
     },
+    // {
+    //   cell: (row) => row.forward_surge_current,
+    //   name: <small>Forward Surge Current</small>,
+    //   omit: type.name !== "Diodes",
+    //   sortable: true,
+    //   wrap: true,
+    // },
     {
-      cell: (row) => row.forward_surge_current,
-      name: <small>Forward Surge Current</small>,
-      omit: type.name !== "Diodes",
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row) => row.forward_current_avg_rectified,
-      name: <small>Forward Current Avg Rectified</small>,
+      cell: (row) => row.max_forward_current,
+      name: <small>Max Forward Current</small>,
       omit: type.name !== "Diodes",
       sortable: true,
       wrap: true,

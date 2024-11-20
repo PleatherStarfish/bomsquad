@@ -68,10 +68,8 @@ class ComponentAdmin(BaseAdmin):
             {
                 "classes": ("collapse",),
                 "fields": (
-                    "forward_current",
                     "forward_voltage",
-                    "forward_surge_current",
-                    "forward_current_avg_rectified",
+                    "max_forward_current",
                 ),
             },
         ),

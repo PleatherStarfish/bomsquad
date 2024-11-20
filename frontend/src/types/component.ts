@@ -32,10 +32,8 @@ export interface Component {
   farads_unit?: string;
   voltage_rating?: string;
   current_rating?: string;
-  forward_current?: string;
   forward_voltage?: string;
-  forward_surge_current?: string;
-  forward_current_avg_rectified?: string;
+  max_forward_current?: string;
   tolerance?: string;
   price: number;
   pcs: number;

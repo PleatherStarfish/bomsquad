@@ -31,7 +31,7 @@ export interface Component {
   } | null;
   supplier_item_no?: string | null; // Supplier's item number
   supplier_has_no_item_no?: boolean; // Whether the supplier has no item number
-  type: string;
+  type: Types;
   category?: {
     id: string; // UUID of the category
     name: string; // Name of the category
@@ -47,10 +47,8 @@ export interface Component {
   farads_unit?: "mF" | "nF" | "pF" | "μF"; // Capacitance unit
   voltage_rating?: string; // Voltage rating of the component
   current_rating?: string; // Current rating of the component
-  forward_current?: string | null; // Maximum forward current (e.g., for diodes)
   forward_voltage?: string | null; // Forward voltage drop
-  forward_surge_current?: string | null; // Maximum forward surge current
-  forward_current_avg_rectified?: string | null; // Average forward current rectified
+  max_forward_current?: string | null; // Average forward current rectified
   tolerance?: string | null; // Tolerance of the component
   price?: {
     amount: number; // Price value

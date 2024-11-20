@@ -1,5 +1,5 @@
 import { Module, ModuleFilterParams } from "../types/modules";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
@@ -63,10 +63,6 @@ const InfiniteModulesList: React.FC = () => {
   const [filters, setFilters] = useState<ModuleFilterParams>({});
   const { data, fetchNextPage, hasNextPage, refetch, isLoading } = useModules(filters);
   const filtersApplied = Object.keys(filters).length > 0;
-
-  useEffect(() => {
-    console.log(watch()); // Logs the form data
-  }, [watch()]); 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const newFilters: ModuleFilterParams = {

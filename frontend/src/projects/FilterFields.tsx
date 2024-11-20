@@ -84,7 +84,6 @@ const FilterFields: React.FC<{ control: any }> = ({ control }) => {
               isDisabled={isLoading}
               onBlur={field.onBlur}
               onChange={(newValue) => {
-                console.log(newValue)
                 field.onChange(newValue?.value)
               }}
               options={options.mounting_styles}

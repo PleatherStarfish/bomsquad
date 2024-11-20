@@ -89,7 +89,6 @@ const UserInventoryTree = () => {
                 }
               }
               
-              console.log(edges)
               traverseTree(node[key], nodeId, level + 1, newPath);
             }
           }
@@ -98,7 +97,7 @@ const UserInventoryTree = () => {
       
 
       traverseTree(data);
-      setGraphData({ nodes, edges });
+      setGraphData({ edges, nodes });
     }
   }, [data]);
 

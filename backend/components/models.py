@@ -132,25 +132,13 @@ class Component(BaseModel):
     voltage_rating = models.CharField(max_length=24, blank=True)
     current_rating = models.CharField(max_length=24, blank=True)
     wattage = models.CharField(max_length=24, blank=True)
-    forward_current = models.CharField(
-        max_length=24,
-        blank=True,
-        null=True,
-        help_text="The maximum forward current of the component.",
-    )
     forward_voltage = models.CharField(
         max_length=24,
         blank=True,
         null=True,
         help_text="The forward voltage drop of the component.",
     )
-    forward_surge_current = models.CharField(
-        max_length=24,
-        blank=True,
-        null=True,
-        help_text="The maximum forward surge current of the component.",
-    )
-    forward_current_avg_rectified = models.CharField(
+    max_forward_current = models.CharField(
         max_length=24,
         blank=True,
         null=True,
@@ -290,10 +278,8 @@ class Component(BaseModel):
                 )
         # elif self.type.name == "Diode":
         #     if not (
-        #         self.forward_current
-        #         or self.forward_voltage
-        #         or self.forward_surge_current
-        #         or self.forward_current_avg_rectified
+        #         self.forward_voltage
+        #         or self.max_forward_current
         #     ):
         #         raise ValidationError(
         #             "If this component is a diode, you must set at least one of the forward current, forward voltage, forward surge current, or average forward current rectified."
@@ -302,10 +288,8 @@ class Component(BaseModel):
         # Validation to ensure diode-specific fields are not set for non-diodes and non-LEDs
         # if self.type.name not in ["Diode", "Light-emitting diode (LED)"]:
         #     if (
-        #         self.forward_current
-        #         or self.forward_voltage
-        #         or self.forward_surge_current
-        #         or self.forward_current_avg_rectified
+        #         self.forward_voltage
+        #         or self.max_forward_current
         #     ):
         #         raise ValidationError(
         #             "Forward current, forward voltage, forward surge current, and average forward current rectified must not be set for non-diodes and non-LEDs."
