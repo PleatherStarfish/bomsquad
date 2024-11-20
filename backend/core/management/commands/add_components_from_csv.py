@@ -19,7 +19,10 @@ OHMS_UNITS_MAP = {
     "M": "MΩ",
 }
 
-MOUNTING_STYLE = "smt"  # Default mounting style for resistors (Surface Mount)
+MOUNTING_STYLES = {
+    "smt": "Surface Mount",
+    "th": "Through Hole",
+}  # Valid mounting styles
 
 
 class Command(BaseCommand):
@@ -35,18 +38,6 @@ class Command(BaseCommand):
         csv_file = kwargs["csv_file"]
 
         try:
-            # Fetch the SizeStandard for "0805"
-            try:
-                size_0805 = SizeStandard.objects.get(name="0805")
-            except SizeStandard.DoesNotExist:
-                raise ValueError("SizeStandard '0805' does not exist in the database.")
-
-            # Fetch the Category for "Resistors"
-            try:
-                resistors_category = Category.objects.get(id=102)
-            except Category.DoesNotExist:
-                raise ValueError("Category 'Resistors' does not exist in the database.")
-
             with open(csv_file, "r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
 
@@ -74,11 +65,36 @@ class Command(BaseCommand):
                         tolerance = row["Tolerance"] if "Tolerance" in row else None
                         price = Money(row["Price"], "USD") if row["Price"] else None
                         link = row["Link"]
+                        mounting_style = row["Mounting Style"].lower()
+                        size_name = row["Size"]
+                        category_name = int(row["Category"])
+
+                        # Validate Mounting Style
+                        if mounting_style not in MOUNTING_STYLES:
+                            raise ValueError(
+                                f"Invalid Mounting Style '{mounting_style}' for SKU {sku}"
+                            )
 
                         # Validate Ohms Unit
                         if not ohms_unit:
                             raise ValueError(
                                 f"Invalid Ohms Unit '{raw_ohms_unit}' for SKU {sku}"
+                            )
+
+                        # Fetch SizeStandard
+                        try:
+                            size = SizeStandard.objects.get(name=size_name)
+                        except SizeStandard.DoesNotExist:
+                            raise ValueError(
+                                f"SizeStandard '{size_name}' does not exist."
+                            )
+
+                        # Fetch Category
+                        try:
+                            category = Category.objects.get(name=category_name)
+                        except Category.DoesNotExist:
+                            raise ValueError(
+                                f"Category with name '{category_name}' does not exist."
                             )
 
                         # Supplier setup (e.g., Tayda Electronics)
@@ -119,14 +135,14 @@ class Command(BaseCommand):
                             if component.tolerance != tolerance:
                                 component.tolerance = tolerance
                                 updated = True
-                            if component.mounting_style != MOUNTING_STYLE:
-                                component.mounting_style = MOUNTING_STYLE
+                            if component.mounting_style != mounting_style:
+                                component.mounting_style = mounting_style
                                 updated = True
-                            if component.size != size_0805:
-                                component.size = size_0805
+                            if component.size != size:
+                                component.size = size
                                 updated = True
-                            if component.category != resistors_category:
-                                component.category = resistors_category
+                            if component.category != category:
+                                component.category = category
                                 updated = True
                             if component.link != link:
                                 component.link = link
@@ -148,13 +164,13 @@ class Command(BaseCommand):
                                 supplier_item_no=sku,
                                 type=component_type,
                                 manufacturer=manufacturer,
-                                category=resistors_category,
+                                # category=category,
                                 ohms=ohms,
                                 ohms_unit=ohms_unit,
                                 wattage=wattage,
                                 tolerance=tolerance,
-                                mounting_style=MOUNTING_STYLE,
-                                size=size_0805,
+                                mounting_style=mounting_style,
+                                # size=size,
                                 link=link,
                                 description="",
                             )
