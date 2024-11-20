@@ -67,7 +67,7 @@ class Command(BaseCommand):
                         link = row["Link"]
                         mounting_style = row["Mounting Style"].lower()
                         size_name = row["Size"]
-                        category_name = int(row["Category"])
+                        category_name = row["Category"]
 
                         # Validate Mounting Style
                         if mounting_style not in MOUNTING_STYLES:
@@ -164,13 +164,13 @@ class Command(BaseCommand):
                                 supplier_item_no=sku,
                                 type=component_type,
                                 manufacturer=manufacturer,
-                                # category=category,
+                                category=category,
                                 ohms=ohms,
                                 ohms_unit=ohms_unit,
                                 wattage=wattage,
                                 tolerance=tolerance,
                                 mounting_style=mounting_style,
-                                # size=size,
+                                size=size,
                                 link=link,
                                 description="",
                             )
