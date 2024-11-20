@@ -1,0 +1,42 @@
+SKU,Farads,Farads Unit,Voltage,Tolerance,Manufacturer,Size,Price,Link,Category
+A-944,1000.0,pF,50V,10%,MULTICOMP,0805,0.03,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/1000pf-50v-npo-cog-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-945,1.0,nF,50V,10%,YAGEO,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/1nf-50v-x7r-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-946,22.0,pF,100V,5%,MULTICOMP,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/22pf-100v-npo-cog-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-947,22.0,pF,100V,5%,Walsin Technology Corp.,0805,0.03,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/22pf-100v-npo-cog-mlcc-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3514,1.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/1pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3515,5.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/5pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3500,10.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/10pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3501,15.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/15pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3502,22.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/22pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3516,33.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/33pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3517,47.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/47pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3518,56.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/56pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3519,68.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/68pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3520,82.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/82pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3503,100.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/100pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3504,220.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/220pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3505,330.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/330pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3506,470.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/470pf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3521,560.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/560pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3522,680.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/680pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3523,820.0,pF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/820pf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-943,1000.0,pF,50V,10%,Walsin Technology Corp.,0805,0.01,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/1000pf-50v-x7r-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3524,1.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/1nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3525,3.3,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/3-3nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3526,3.9,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/3-9nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3527,4.7,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/4-7nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3528,5.6,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/5-6nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3529,6.8,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/6-8nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3530,8.2,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/8-2nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-948,0.01,μF,50V,10%,MULTICOMP,0805,0.03,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/0.01uf-50v-x7r-smd-ceramic-chip-capacitor-0805.html.html,Ceramic Capacitors
+A-3507,10.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/10nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3508,22.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/22nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3509,33.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/33nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3510,47.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/47nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3531,56.0,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/56nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3532,68.0,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/68nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-942,100.0,nF,50V,10%,KEMET Corp.,0805,0.20,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/0.1uf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
+A-3511,100.0,nF,50V,,Samsung,0805,0.04,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/100nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3512,220.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/220nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3513,330.0,nF,50V,,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/330nf-50v-smd-ceramic-chip-capacitor.html,Ceramic Capacitors
+A-3533,470.0,nF,50V,10%,Samsung,0805,0.02,https://www.taydaelectronics.com/capacitors/smd-ceramic-chip-capacitors/0805/470nf-50v-smd-ceramic-chip-capacitor-0805.html,Ceramic Capacitors
