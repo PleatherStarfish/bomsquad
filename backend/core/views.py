@@ -19,7 +19,7 @@ def robots_txt(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-# connection.queriesconnection.queries@cache_page(60 * 60)  # Cache this view for 60 minutes
+@cache_page(60 * 15)  # Cache this view for 15 minutes
 def homepage(request):
     # Fetch the most recent modules that are not under construction
     modules = Module.objects.filter(bom_under_construction=False).order_by(
