@@ -127,6 +127,7 @@ class Command(BaseCommand):
                                 updated = True
                             if component.category != resistors_category:
                                 component.category = resistors_category
+                                updated = True
                             if component.link != link:
                                 component.link = link
                                 updated = True
