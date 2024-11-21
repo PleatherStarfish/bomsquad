@@ -178,7 +178,8 @@ class Component(BaseModel):
         """
         if not self.description:
             self.description = self.generate_description()
-            super().save(*args, **kwargs)
+
+        super().save(*args, **kwargs)
 
     def generate_description(self):
         """
