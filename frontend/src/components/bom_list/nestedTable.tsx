@@ -9,7 +9,7 @@ import AddComponentModal from "./addComponentModal";
 import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
 import DataTable, { TableColumn } from "react-data-table-component";
-import { FlagIcon } from "@heroicons/react/24/outline";
+import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
 import Tippy from '@tippyjs/react';
 import UserRating from "./UserRating";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
@@ -78,8 +78,6 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(components_options);
 
-  console.log(componentsData)
-
   if (componentsAreError) {
     return (
       <div className="p-3 ml-[47px] bg-gray-100">
@@ -112,21 +110,63 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       wrap: true,
     },
     {
-      name: <small>Supplier</small>,
-      selector: (row) => row.supplier?.name || "",
-      sortable: true,
+      cell: (row) => (
+        row.supplier_items && row.supplier_items.length > 0 ? (
+          <ul className="pl-5 list-disc">
+            {row.supplier_items.map((item, index) => (
+              <li className="mb-1" key={item.id || index}>
+                <b>{item.supplier?.short_name}{": "}</b>
+                {item.supplier_item_no ? (
+                  <a
+                    className="text-blue-500 hover:text-blue-700"
+                    href={item.link}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {item.supplier_item_no}
+                  </a>
+                ) : (
+                  <a
+                    className="flex items-center text-blue-500 hover:text-blue-700"
+                    href={item.link}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <LinkIcon className="inline-block w-4 h-4" />
+                    <span className="ml-1">Supplier Link</span>
+                  </a>
+                )}
+                {item.price && (
+                  <span className="text-xs text-gray-600">
+                    {" "}
+                    (${roundToCurrency(item.price, "USD")})
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <a
+            className="flex items-center text-blue-500 hover:text-blue-700"
+            href={row.link}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {row.supplier?.short_name ? (
+              `${row.supplier.short_name} ${row.supplier_item_no}`
+            ) : (
+              <>
+                <LinkIcon className="inline-block w-4 h-4" />
+                <span className="ml-1">Supplier Link</span>
+              </>
+            )}
+          </a>
+        )
+      ),
+      name: <small>Supplier Items</small>,
+      sortable: false,
       wrap: true,
-    },
-    {
-      cell: (row) => {
-        return <a className="text-blue-500 hover:text-blue-700" href={row.link}>
-          {row?.supplier_item_no ? row?.supplier_item_no : "[ none ]"}
-        </a>
-      },
-      name: <small>Supp. Item #</small>,
-      sortable: true,
-      wrap: true,
-    },
+    },    
     {
       cell: (row) => (
         <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>

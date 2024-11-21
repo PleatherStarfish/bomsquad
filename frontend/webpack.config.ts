@@ -1,5 +1,6 @@
 import { Configuration } from "webpack";
 import Dotenv from "dotenv-webpack";
+import TerserPlugin from "terser-webpack-plugin";
 import { exec } from "child_process";
 import path from "path";
 import webpack from "webpack";
@@ -32,6 +33,15 @@ const config: Configuration = {
   },
   optimization: {
     minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
     splitChunks: false,
   },
   output: {
