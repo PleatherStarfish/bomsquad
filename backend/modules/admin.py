@@ -1,5 +1,4 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
 from .models import (
     Manufacturer,
     Module,
@@ -8,6 +7,7 @@ from .models import (
     ModuleBomListItem,
     ModuleBomListComponentForItemRating,
     PcbVersion,
+    Substitution,
 )
 from core.admin import BaseAdmin
 
@@ -36,15 +36,20 @@ class ModuleBomListItemAdmin(BaseAdmin):
         "pcb_version__version",
     )
 
-    def lookup_allowed(self, key, value=None):
-        return True
+    def lookup_allowed(self, lookup, value=None):
+        allowed_lookups = [
+            "module",
+            "type",
+            "module__manufacturer__name",
+        ]
+        return lookup in allowed_lookups or super().lookup_allowed(lookup, value)
 
 
 class ManufacturerAdmin(BaseAdmin):
     model = Manufacturer
 
 
-class ModuleAdmin(admin.ModelAdmin):
+class ModuleAdmin(BaseAdmin):
     list_display = ("name", "manufacturer", "version")
     list_filter = ("manufacturer", "discontinued")
     search_fields = ("name", "manufacturer__name")
@@ -97,6 +102,9 @@ class ModuleAdmin(admin.ModelAdmin):
         ),
     )
 
+    def lookup_allowed(self, key, value=None):
+        return True
+
 
 class WantToBuildModulesAdmin(BaseAdmin):
     model = WantToBuildModules
@@ -114,6 +122,41 @@ class PcbVersionAdmin(BaseAdmin):
     model = PcbVersion
 
 
+class SubstitutionAdmin(BaseAdmin):
+    model = Substitution
+
+    # Display important fields in the list view
+    list_display = (
+        "module_bom_list_item",
+        "original_component_description",
+        "confirmed_by_manufacturer",
+    )
+
+    # Add filters for relevant fields
+    list_filter = (
+        "module_bom_list_item__module",
+        "confirmed_by_manufacturer",
+    )
+
+    # Add search fields for easy lookup
+    search_fields = (
+        "module_bom_list_item__description",
+        "original_component_description",
+        "substitute_components__name",
+        "notes",
+    )
+
+    # Add an inline view to manage substitute components
+    filter_horizontal = ("substitute_components",)
+
+    def lookup_allowed(self, lookup, value=None):
+        allowed_lookups = [
+            "module_bom_list_item__module",
+            "confirmed_by_manufacturer",
+        ]
+        return lookup in allowed_lookups or super().lookup_allowed(lookup, value)
+
+
 # Register your models here.
 admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(Module, ModuleAdmin)
@@ -124,3 +167,4 @@ admin.site.register(
     ModuleBomListComponentForItemRating, ModuleBomListComponentForItemRatingAdmin
 )
 admin.site.register(PcbVersion, PcbVersionAdmin)
+admin.site.register(Substitution, SubstitutionAdmin)

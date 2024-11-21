@@ -52,6 +52,7 @@ def homepage(request):
     component_count_display = f"{(component_count // 5) * 5}+"
 
     context = {
+        "user": request.user,
         "projects": project_data,
         "project_count": project_count,
         "component_count": component_count_display,

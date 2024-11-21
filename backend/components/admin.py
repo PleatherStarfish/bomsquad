@@ -105,7 +105,6 @@ class ComponentAdmin(BaseAdmin):
 
     inlines = [ComponentSupplierItemInline]
 
-    # Option 1: Override lookup_allowed to allow all lookups (use with caution)
     def lookup_allowed(self, key, value=None):
         return True
 

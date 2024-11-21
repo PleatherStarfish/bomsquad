@@ -286,3 +286,36 @@ class ModuleBomListComponentForItemRating(BaseModel):
             models.Index(fields=["user", "component", "module_bom_list_item"]),
         ]
         unique_together = ("module_bom_list_item", "component", "user")
+
+
+class Substitution(BaseModel):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    module_bom_list_item = models.ForeignKey(
+        ModuleBomListItem, on_delete=models.CASCADE, related_name="substitutions"
+    )
+    original_component_description = models.CharField(
+        max_length=255,
+        blank=False,
+        help_text="Description of the original component (e.g., '100k resistor').",
+    )
+    substitute_components = models.ManyToManyField(
+        Component,
+        related_name="substitute_in_substitutions",
+        help_text="List of substitute components for the original component.",
+    )
+    notes = models.TextField(
+        blank=True, help_text="Additional notes about the substitution."
+    )
+    confirmed_by_manufacturer = models.BooleanField(
+        default=False,
+        help_text="Indicates whether the substitution is confirmed by the manufacturer.",
+    )
+
+    class Meta:
+        verbose_name_plural = "Substitutions"
+
+    def __str__(self):
+        substitutes = ", ".join(
+            [str(comp) for comp in self.substitute_components.all()]
+        )
+        return f"Substitution for {self.module_bom_list_item}: {self.original_component_description} -> {substitutes}"
