@@ -7,7 +7,6 @@ const useGetModuleBomListItems = (moduleId: string) => {
   const moduleIdCleaned = removeAfterUnderscore(moduleId);
 
   const { data: moduleBom, isLoading: moduleBomIsLoading, isError: moduleBomIsError } = useQuery<BomItem[]>({
-    queryKey: ["moduleBomListItems", moduleId],
     queryFn: async () => {
       try {
         const response = await axios.get(`/api/module/${moduleIdCleaned}/bom-list-items/`);
@@ -17,9 +16,10 @@ const useGetModuleBomListItems = (moduleId: string) => {
         throw new Error("Network response was not ok");
       }
     },
+    queryKey: ["moduleBomListItems", moduleId],
   });
 
-  return { moduleBom, moduleBomIsLoading, moduleBomIsError };
+  return { moduleBom, moduleBomIsError, moduleBomIsLoading };
 };
 
 export default useGetModuleBomListItems;

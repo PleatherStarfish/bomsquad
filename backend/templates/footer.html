@@ -1,10 +1,10 @@
-<div class="grid w-screen gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-4 sm:px-12 lg:grid-cols-3 lg:gap-4 lg:px-48 bg-gray-50">
+<div class="grid gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-4 sm:px-12 lg:grid-cols-3 lg:gap-4 lg:px-48 bg-gray-50">
     <!-- Subscription Form Section, at the top on mobile, right column on desktop -->
     <div class="order-first mb-8 text-center lg:mb-0 col-span-full lg:col-span-1 lg:row-start-1 lg:col-start-3 lg:text-left lg:order-none">
         <form method="post" action="{% url 'subscription' %}" class="flex flex-col items-center lg:items-start">
             {% csrf_token %}
             <label class="block mb-2 font-semibold text-gray-900">Subscribe for updates</label>
-            <input type="email" name="email" placeholder="Enter Email to Subscribe" class="w-2/5 p-2 mb-4 border border-gray-300 rounded">
+            <input type="email" name="email" placeholder="Enter Email to Subscribe" class="w-3/5 p-2 mb-4 border border-gray-300 rounded lg:w-4/5">
             <button class="w-2/5 px-4 py-2 text-white rounded lg:w-auto bg-brandgreen-500 hover:bg-brandgreen-700" type="submit">Submit</button>
         </form>
         {% if messages %}

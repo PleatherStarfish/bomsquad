@@ -1,3 +1,5 @@
+import { Component } from "./component"
+
 export interface Manufacturer {
   id: string;
   link?: string;
@@ -11,56 +13,6 @@ export interface PcbVersion {
   module: string;
   order: number;
   version: string;
-}
-
-export interface Component {
-  id: string; // UUID
-  description: string; // Description of the component
-  manufacturer?: {
-    id: string; // UUID of the manufacturer
-    name: string; // Manufacturer's name
-  } | null;
-  manufacturer_part_no?: string; // Manufacturer's part number
-  manufacturer_link?: string; // Link to the manufacturer's page
-  mounting_style?: "smt" | "th"; // Mounting style: Surface Mount (SMT) or Through Hole (TH)
-  supplier?: {
-    id: string; // UUID of the supplier
-    name: string; // Supplier's full name
-    short_name: string; // Supplier's short name
-    url: string; // URL to the supplier's website
-  } | null;
-  supplier_item_no?: string | null; // Supplier's item number
-  supplier_has_no_item_no?: boolean; // Whether the supplier has no item number
-  type: Types;
-  category?: {
-    id: string; // UUID of the category
-    name: string; // Name of the category
-    parent?: string; // ID of the parent category, if applicable
-  } | null;
-  size?: {
-    id: string; // UUID of the size standard
-    name: string; // Name of the size standard (e.g., 0805, SOIC14)
-  } | null;
-  ohms?: number | null; // Resistance value in Ohms
-  ohms_unit?: "kΩ" | "MΩ" | "Ω"; // Resistance unit
-  farads?: number | null; // Capacitance value in Farads
-  farads_unit?: "mF" | "nF" | "pF" | "μF"; // Capacitance unit
-  voltage_rating?: string; // Voltage rating of the component
-  current_rating?: string; // Current rating of the component
-  forward_voltage?: string | null; // Forward voltage drop
-  max_forward_current?: string | null; // Average forward current rectified
-  tolerance?: string | null; // Tolerance of the component
-  price?: {
-    amount: number; // Price value
-    currency: string; // Currency of the price (e.g., USD)
-  };
-  pcs: number; // Number of components per price unit
-  unit_price: number; // Price per single component unit
-  discontinued: boolean; // Whether the component is discontinued
-  notes?: string; // Additional notes
-  link: string; // Link to the component's details
-  allow_comments: boolean; // Whether comments are allowed for this component
-  user_submission_hold: boolean; // Whether user submissions are on hold
 }
 
 

@@ -3,8 +3,23 @@ from modules.serializers import (
     SupplierSerializer,
     TypeSerializer,
 )
-from components.models import Component, SizeStandard, Category
+from components.models import Component, SizeStandard, Category, ComponentSupplierItem
 from rest_framework import serializers
+
+
+class ComponentSupplierItemSerializer(serializers.ModelSerializer):
+    supplier = SupplierSerializer()
+
+    class Meta:
+        model = ComponentSupplierItem
+        fields = [
+            "id",
+            "supplier",
+            "supplier_item_no",
+            "price",
+            "pcs",
+            "link",
+        ]
 
 
 class NestedCategorySerializer(serializers.ModelSerializer):
@@ -44,6 +59,7 @@ class ComponentSerializer(serializers.ModelSerializer):
     unit_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
     )
+    supplier_items = ComponentSupplierItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Component
@@ -65,4 +81,5 @@ class ComponentSerializer(serializers.ModelSerializer):
             "notes",
             "link",
             "allow_comments",
+            "supplier_items",
         ]

@@ -16,7 +16,8 @@ import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
-import { BomItem, Component } from "../../types/bomListItem";
+import { BomItem } from "../../types/bomListItem";
+import { Component } from "../../types/component";
 
 interface NestedTableProps {
   data: BomItem;
@@ -76,6 +77,8 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const { user } = useAuthenticatedUser();
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(components_options);
+
+  console.log(componentsData)
 
   if (componentsAreError) {
     return (
