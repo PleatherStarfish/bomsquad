@@ -6,7 +6,6 @@ const useGetUserNote = (moduleId, moduleType) => {
   const csrftoken = Cookies.get('csrftoken');
 
   return useQuery({
-    queryKey: ['userNote', moduleId, moduleType],
     queryFn: async () => {
       const response = await axios.get(`/api/user-notes/${moduleType}/${moduleId}/`, {
         headers: {
@@ -16,6 +15,7 @@ const useGetUserNote = (moduleId, moduleType) => {
       });
       return response.data;
     },
+    queryKey: ['userNote', moduleId, moduleType],
     retry: false
   });
 };

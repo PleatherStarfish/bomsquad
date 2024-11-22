@@ -2,6 +2,7 @@ from rest_framework import serializers
 from accounts.models import CustomUser, UserNotes
 from shopping_list.models import UserShoppingList
 from allauth.account.admin import EmailAddress
+from core.views import get_exchange_rate
 import json
 
 
@@ -77,4 +78,34 @@ class UserNotesSerializer(serializers.ModelSerializer):
             "want_to_build_module": {"required": False},
             "built_module": {"required": False},
             "user_shopping_list_saved": {"required": False},
+        }
+
+
+class UserCurrencySerializer(serializers.Serializer):
+    default_currency = serializers.CharField()
+    currency_name = serializers.CharField()
+    exchange_rate = serializers.FloatField()
+
+    def to_representation(self, instance):
+        """
+        Customize the representation of the user's currency data.
+        """
+        user = self.context.get("request").user
+        default_currency = user.default_currency if user.is_authenticated else "USD"
+        exchange_rate = 1.0
+        currency_name = "US Dollar"
+
+        if user.is_authenticated:
+            try:
+                exchange_rate = get_exchange_rate(default_currency)
+                currency_name = dict(CustomUser.CURRENCIES).get(
+                    default_currency, "Unknown Currency"
+                )
+            except ValueError:
+                pass
+
+        return {
+            "default_currency": default_currency,
+            "currency_name": currency_name,
+            "exchange_rate": exchange_rate,
         }

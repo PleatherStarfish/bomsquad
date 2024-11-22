@@ -359,6 +359,11 @@ class ComponentSupplierItem(BaseModel):
     price = MoneyField(
         max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
     )
+    unit_price = models.GeneratedField(
+        expression=F("price") / F("pcs"),
+        output_field=models.DecimalField(max_digits=8, decimal_places=2),
+        db_persist=True,  # Persisting in the database for querying and indexing
+    )
     pcs = models.IntegerField(
         default=1, help_text="Number of items purchased per price (if sold in a set)."
     )

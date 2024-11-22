@@ -3,6 +3,7 @@ from django.urls import path
 # User-related views
 from accounts.views import (
     UserNotesView,
+    UserCurrencyView,
     delete_user,
     get_user_me,
     get_user_history,
@@ -58,6 +59,8 @@ from shopping_list.views import (
 urlpatterns = [
     path("get-user-me/", get_user_me, name="user-me"),
     path("get-user-history/", get_user_history, name="user-history"),
+    path("currency/", UserCurrencyView.as_view(), name="user_currency"),
+    path("user-update-currency/", UserCurrencyView.as_view(), name="user_currency"),
     path("delete-user-me/", delete_user, name="delete-user"),
     path("kofi/", kofi_payment_webhook, name="kofi_webhook"),
     path("modules/<str:type>/", UserModulesView.as_view(), name="user-modules"),

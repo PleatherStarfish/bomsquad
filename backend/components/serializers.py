@@ -9,6 +9,9 @@ from rest_framework import serializers
 
 class ComponentSupplierItemSerializer(serializers.ModelSerializer):
     supplier = SupplierSerializer()
+    unit_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, read_only=True
+    )
 
     class Meta:
         model = ComponentSupplierItem
@@ -17,6 +20,7 @@ class ComponentSupplierItemSerializer(serializers.ModelSerializer):
             "supplier",
             "supplier_item_no",
             "price",
+            "unit_price",
             "pcs",
             "link",
         ]

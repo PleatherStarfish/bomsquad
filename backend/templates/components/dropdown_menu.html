@@ -1,7 +1,7 @@
 {% load static %}
 
 <div class="flex items-center space-x-2">
-  <div class="pr-4 border-r border-gray-100">
+  <div>
     <a href="https://ko-fi.com/bomsquad">
       <img
         width="150px"
@@ -10,8 +10,21 @@
       />
     </a>
   </div>
+  <div class="relative pr-2 border-r border-gray-100">
+    <select
+      id="currency-selector"
+      class="px-3 py-2 text-white bg-[#212529] transition-all border-0 w-[75px] outline-none"
+      onchange="updateCurrency(this.value)"
+    >
+        <!-- Add options dynamically with JavaScript -->
+    </select>
+    <span
+      class="absolute inset-y-0 flex items-center text-gray-400 pointer-events-none right-3"
+    >
+    </span>
+  </div>
   <button
-    class="block ml-4 text-white menu-button text-decoration-none focus:outline-none"
+    class="block pl-2 ml-4 text-white menu-button text-decoration-none focus:outline-none"
     aria-label="User menu"
     aria-haspopup="true"
     aria-expanded="false"

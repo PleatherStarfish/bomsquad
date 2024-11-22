@@ -175,6 +175,98 @@
     });    
     </script>
 
+    <script>
+      function updateCurrency(newCurrency) {
+        localStorage.setItem("currency", newCurrency);
+        console.log(`Currency updated to: ${newCurrency}`);
+    
+        const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+        
+        // Update user's default currency on the server if authenticated
+        if (isAuthenticated) {
+          fetch("{% url 'user_currency' %}", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}", // Include CSRF token for security
+            },
+            body: JSON.stringify({ default_currency: newCurrency }),
+          })
+            .then((response) => {
+              if (response.ok) {
+                console.log("User's default currency updated successfully.");
+              } else {
+                console.error("Failed to update user's default currency.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating user's default currency:", error);
+            });
+        }
+      }
+    
+      document.addEventListener("DOMContentLoaded", function () {
+        const currencies = [
+          { code: "USD", symbol: "$", name: "US Dollar" },
+          { code: "EUR", symbol: "€", name: "Euro" },
+          { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+          { code: "GBP", symbol: "£", name: "British Pound" },
+          { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+          { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+          { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
+          { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
+          { code: "HKD", symbol: "HK$", name: "Hong Kong Dollar" },
+          { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
+          { code: "SEK", symbol: "kr", name: "Swedish Krona" },
+          { code: "KRW", symbol: "₩", name: "South Korean Won" },
+          { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+          { code: "NOK", symbol: "kr", name: "Norwegian Krone" },
+          { code: "INR", symbol: "₹", name: "Indian Rupee" },
+        ];
+    
+        const currencySelector = document.getElementById("currency-selector");
+    
+        function getDefaultCurrency() {
+          const userDefaultCurrency = "{{ request.user.default_currency|default:'' }}";
+          const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+          if (isAuthenticated && userDefaultCurrency) {
+            return userDefaultCurrency;
+          }
+          return localStorage.getItem("currency") || "USD";
+        }
+    
+        function populateWithSymbols() {
+          currencySelector.innerHTML = "";
+          currencies.forEach((currency) => {
+            const option = document.createElement("option");
+            option.value = currency.code;
+            option.textContent = currency.symbol;
+            currencySelector.appendChild(option);
+          });
+          currencySelector.value = getDefaultCurrency();
+        }
+    
+        function populateWithFullNames() {
+          currencySelector.innerHTML = "";
+          currencies.forEach((currency) => {
+            const option = document.createElement("option");
+            option.value = currency.code;
+            option.textContent = `${currency.name} (${currency.code})`;
+            currencySelector.appendChild(option);
+          });
+          currencySelector.value = getDefaultCurrency();
+        }
+    
+        currencySelector.addEventListener("focus", populateWithFullNames);
+        currencySelector.addEventListener("blur", populateWithSymbols);
+        populateWithSymbols();
+    
+        currencySelector.addEventListener("change", function () {
+          updateCurrency(this.value);
+        });
+      });
+    </script>   
+
     {% block javascript %}{% endblock javascript %}
   </body>
 </html>

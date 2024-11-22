@@ -2,8 +2,8 @@ import 'tippy.js/dist/tippy.css';
 
 import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
-import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 import { getFaradConversions, getOhmConversions } from '../conversions';
+import { roundToCurrency } from "../../utils/currencies"
 
 import AddComponentModal from "./addComponentModal";
 import Alert from "../../ui/Alert";
@@ -12,6 +12,7 @@ import DataTable, { TableColumn } from "react-data-table-component";
 import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
 import Tippy from '@tippyjs/react';
 import UserRating from "./UserRating";
+import useGetUserCurrency from "../../services/useGetUserCurrency"
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
@@ -77,6 +78,16 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const { user } = useAuthenticatedUser();
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(components_options);
+  const { data: currencyData } = useGetUserCurrency();
+
+  const convertUnitPrice = (unitPrice: number | null): string => {
+    if (!currencyData || unitPrice === null || unitPrice === undefined) return "N/A";
+    const converted = unitPrice * currencyData.exchange_rate;
+    return `${currencyData.currency_symbol}${roundToCurrency(
+      converted,
+      currencyData.default_currency
+    )}`;
+  };
 
   if (componentsAreError) {
     return (
@@ -110,12 +121,12 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       wrap: true,
     },
     {
-      cell: (row) => (
-        row.supplier_items && row.supplier_items.length > 0 ? (
+      cell: (row) =>
+        (row.supplier_items || []).length > 0 ? (
           <ul className="pl-5 list-disc">
-            {row.supplier_items.map((item, index) => (
-              <li className="mb-1" key={item.id || index}>
-                <b>{item.supplier?.short_name}{": "}</b>
+            {row.supplier_items?.map((item) => (
+              <li key={item.id}>
+                <b>{item.supplier?.short_name}: </b>
                 {item.supplier_item_no ? (
                   <a
                     className="text-blue-500 hover:text-blue-700"
@@ -136,36 +147,19 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                     <span className="ml-1">Supplier Link</span>
                   </a>
                 )}
-                {item.price && (
+                {item.unit_price && (
                   <span className="text-xs text-gray-600">
                     {" "}
-                    (${roundToCurrency(item.price, "USD")})
+                    ({convertUnitPrice(item.unit_price)})
                   </span>
                 )}
               </li>
             ))}
           </ul>
         ) : (
-          <a
-            className="flex items-center text-blue-500 hover:text-blue-700"
-            href={row.link}
-            rel="noreferrer"
-            target="_blank"
-          >
-            {row.supplier?.short_name ? (
-              `${row.supplier.short_name} ${row.supplier_item_no}`
-            ) : (
-              <>
-                <LinkIcon className="inline-block w-4 h-4" />
-                <span className="ml-1">Supplier Link</span>
-              </>
-            )}
-          </a>
-        )
-      ),
-      name: <small>Supplier Items</small>,
-      sortable: false,
-      wrap: true,
+          "No supplier items"
+        ),
+      name: "Supplier Items",
     },    
     {
       cell: (row) => (
@@ -193,13 +187,6 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       sortable: true,
       wrap: true,
     },
-    // {
-    //   cell: (row) => row.forward_current,
-    //   name: <small>Forward Current</small>,
-    //   omit: type.name !== "Diodes",
-    //   sortable: true,
-    //   wrap: true,
-    // },
     {
       cell: (row) => row.forward_voltage,
       name: <small>Forward Voltage</small>,
@@ -207,36 +194,10 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       sortable: true,
       wrap: true,
     },
-    // {
-    //   cell: (row) => row.forward_surge_current,
-    //   name: <small>Forward Surge Current</small>,
-    //   omit: type.name !== "Diodes",
-    //   sortable: true,
-    //   wrap: true,
-    // },
     {
       cell: (row) => row.max_forward_current,
       name: <small>Max Forward Current</small>,
       omit: type.name !== "Diodes",
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row) => {
-        return (
-          <span>
-            {row.price?.currency &&
-              `${getCurrencySymbol(
-                row.price?.currency
-              )}${roundToCurrency(
-                row.unit_price,
-                row.price.currency
-              )}`}
-          </span>
-        );
-      },
-      hide: 1700,
-      name: <small>Price</small>,
       sortable: true,
       wrap: true,
     },

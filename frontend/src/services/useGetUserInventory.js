@@ -14,11 +14,11 @@ const useGetUserInventory = () => {
     isLoading: inventoryDataIsLoading,
     isError: inventoryDataIsError,
   } = useQuery({
-    queryKey: ["inventory"],
-    queryFn: fetchData
+    queryFn: fetchData,
+    queryKey: ["inventory"]
   });
 
-  return { inventoryData, inventoryDataIsLoading, inventoryDataIsError };
+  return { inventoryData, inventoryDataIsError, inventoryDataIsLoading };
 };
 
 export default useGetUserInventory;

@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import cx from 'classnames';
 
 export const Types = Object.freeze({
+  INVENTORY: "inventory",
   SHOPPING: "shopping",
   SHOPPING_ANON: "shopping_anon",
-  INVENTORY: "inventory",
 });
 
 const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames = "", hideLoadingTag = false }) => {

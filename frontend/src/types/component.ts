@@ -21,6 +21,7 @@ export interface ComponentSupplierItem {
   supplier: ComponentSupplier;
   supplier_item_no?: string;
   price?: number;
+  unit_price?: number;
   pcs: number;
   link?: string;
 }

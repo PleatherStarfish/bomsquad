@@ -5,6 +5,63 @@ from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from components.models import Component
 from django.db import connection
+from datetime import timedelta
+from django.utils.timezone import now
+from accounts.models import ExchangeRate
+from core.openexchangerates import get_latest_exchange_rates
+
+
+def get_exchange_rate(target_currency: str) -> float:
+    """
+    Retrieve the exchange rate for the given target currency against USD.
+
+    If the rate exists in the database and is fresh (updated within the last 24 hours),
+    it will return the cached value. Otherwise, it fetches the latest rate from the
+    Open Exchange Rates API, updates the database, and returns the rate.
+
+    Args:
+        target_currency (str): The target currency code (e.g., "EUR", "GBP").
+
+    Returns:
+        float: The exchange rate for USD to the target currency.
+
+    Raises:
+        ValueError: If the exchange rate is not available for the given currency.
+    """
+    target_currency = target_currency.upper()
+
+    try:
+        # Attempt to retrieve the exchange rate from the database
+        exchange_rate = ExchangeRate.objects.get(
+            base_currency="USD",
+            target_currency=target_currency,
+        )
+        # Check if the cached rate is fresh
+        if exchange_rate.last_updated > now() - timedelta(hours=24):
+            return exchange_rate.rate
+    except ExchangeRate.DoesNotExist:
+        exchange_rate = None
+
+    # Fetch the latest rate from the API
+    rates = get_latest_exchange_rates(base_currency="USD")
+    rate = rates.get("rates", {}).get(target_currency)
+
+    if rate is None:
+        raise ValueError(f"Exchange rate not available for USD to {target_currency}")
+
+    # Update or create the exchange rate record in the database
+    if exchange_rate:
+        exchange_rate.rate = rate
+        exchange_rate.last_updated = now()
+        exchange_rate.save()
+    else:
+        ExchangeRate.objects.create(
+            base_currency="USD",
+            target_currency=target_currency,
+            rate=rate,
+        )
+
+    return rate
 
 
 def robots_txt(request):
@@ -19,7 +76,6 @@ def robots_txt(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-@cache_page(60 * 15)  # Cache this view for 15 minutes
 def homepage(request):
     # Fetch the most recent modules that are not under construction
     modules = Module.objects.filter(bom_under_construction=False).order_by(

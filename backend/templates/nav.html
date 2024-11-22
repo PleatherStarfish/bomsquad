@@ -91,31 +91,47 @@
         <!-- Profile dropdown -->
         <div class="relative text-end">
           {% if user.is_authenticated %} 
-            {% dropdown_items user as dropdown_items %}
-            {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %} 
-          {% else %}
-          <div class="flex items-center space-x-2">
-            <div class="pr-4 border-r border-gray-100">
-              <a href="https://ko-fi.com/bomsquad">
-                <img
-                  width="150px"
-                  src="{% static 'images/kofi_button_blue.png' %}"
-                  alt="Support on Ko-fi"
-                />
-              </a>
+            <div class="relative text-end">
+                {% dropdown_items user as dropdown_items %}
+                {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %}                
             </div>
-            <a
-              href="{% url 'account_login' %}"
-              class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
-              >Log in</a
-            >
-            <a
-              href="{% url 'account_signup' %}"
-              class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
-              >Sign up</a
-            >
-          </div>
-          {% endif %}
+        {% else %}
+            <div class="flex items-center space-x-2">
+                <div class="flex items-center pr-4 space-x-4 border-r border-gray-100">
+                    <a href="https://ko-fi.com/bomsquad">
+                        <img
+                          class="transition-opacity duration-200 hover:opacity-90"
+                          width="150px"
+                          src="{% static 'images/kofi_button_blue.png' %}"
+                          alt="Support on Ko-fi"
+                        />
+                    </a>
+                    <div style="margin-left: 4px" class="relative">
+                        <select
+                          id="currency-selector"
+                          class="px-3 py-2 text-white bg-[#212529] transition-all border-0 w-[65px] outline-none"
+                          onchange="updateCurrency(this.value)"
+                        >
+                            <!-- Add options dynamically with JavaScript -->
+                        </select>
+                        <span
+                          class="absolute inset-y-0 flex items-center text-gray-400 pointer-events-none right-3"
+                        >
+                        </span>
+                    </div>
+                </div>
+                <a
+                  href="{% url 'account_login' %}"
+                  class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
+                  >Log in</a
+                >
+                <a
+                  href="{% url 'account_signup' %}"
+                  class="text-white py-2 px-4 inline-flex items-center border rounded border-[#212529] hover:border-gray-300 transition-all duration-200"
+                  >Sign up</a
+                >
+            </div>
+        {% endif %}
         </div>
       </div>
       {% include "components/mobile_hamburger_menu.html" %}

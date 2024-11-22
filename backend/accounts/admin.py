@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from core.admin import BaseAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser, UserNotes, KofiPayment
+from .models import CustomUser, UserNotes, KofiPayment, ExchangeRate
 
 
 class CustomUserAdmin(UserAdmin):
@@ -22,6 +22,7 @@ class CustomUserAdmin(UserAdmin):
                     "premium_until",
                     "premium_until_via_kofi",
                     "premium_until_via_patreon",
+                    "default_currency",
                 )
             },
         ),
@@ -38,6 +39,12 @@ class UserNotesAdmin(BaseAdmin):
     model = UserNotes
 
 
+class ExchangeRateAdmin(BaseAdmin):
+    list_display = ("base_currency", "target_currency", "rate", "last_updated")
+    readonly_fields = ("last_updated",)
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserNotes, UserNotesAdmin)
 admin.site.register(KofiPayment)
+admin.site.register(ExchangeRate, ExchangeRateAdmin)

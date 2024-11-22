@@ -1,3 +1,5 @@
+import { Currency } from "./currency"
+
 interface KofiPayment {
   kofi_transaction_id: string; // UUID format
   email: string;
@@ -27,6 +29,12 @@ interface EmailAddress {
   primary: boolean;
 }
 
+export interface UserCurrency {
+  default_currency: Currency;
+  currency_name: string;
+  exchange_rate: number;
+}
+
 interface User {
   id: number;
   username: string;
@@ -34,7 +42,7 @@ interface User {
   last_name: string;
   emails: EmailAddress[];
   date_joined: string; // ISO 8601 format (e.g., "2023-01-01T00:00:00Z")
-  default_currency: string;
+  default_currency: Currency;
   end_of_premium_display_date?: string | null; // Nullable ISO 8601 date
   is_premium: boolean;
   unique_module_ids: number[];

@@ -8,11 +8,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from accounts.serializers import UserCurrencySerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.db.transaction import non_atomic_requests
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
 from .models import CustomUser, KofiPayment, UserNotes, WantToBuildModules, BuiltModules
+from core.views import get_exchange_rate
 from datetime import datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
@@ -26,16 +28,21 @@ logger = logging.getLogger(__name__)
 def convert_to_usd(amount, currency):
     # TODO: replace hardcoded conversion rates with API
     conversion_rates = {
-        "USD": 1.0,
-        "EUR": 0.85,
-        "JPY": 110.5,
-        "GBP": 0.72,
-        "AUD": 1.30,
-        "CAD": 1.25,
-        "CHF": 0.92,
-        "CNY": 6.45,
-        "INR": 73.5,
-        "BRL": 5.25,
+        "USD": 1.0,  # US Dollar
+        "EUR": 0.85,  # Euro
+        "JPY": 110.5,  # Japanese Yen
+        "GBP": 0.72,  # British Pound
+        "AUD": 1.30,  # Australian Dollar
+        "CAD": 1.25,  # Canadian Dollar
+        "CHF": 0.92,  # Swiss Franc
+        "CNY": 6.45,  # Chinese Yuan
+        "HKD": 7.8,  # Hong Kong Dollar
+        "NZD": 1.4,  # New Zealand Dollar
+        "SEK": 8.6,  # Swedish Krona
+        "KRW": 1150.0,  # South Korean Won
+        "SGD": 1.35,  # Singapore Dollar
+        "NOK": 8.9,  # Norwegian Krone
+        "INR": 73.5,  # Indian Rupee
     }
 
     if currency not in conversion_rates:
@@ -317,3 +324,72 @@ def get_all_notes(request, module_type):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     return Response(notes, status=status.HTTP_200_OK)
+
+
+class UserCurrencyView(APIView):
+    """
+    API endpoint to retrieve, update, and list the authenticated user's chosen default currency.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """
+        Retrieve the user's chosen default currency.
+        If `options` query param is provided, return all available currency options.
+        """
+        if request.query_params.get("options") == "true":
+            currencies = CustomUser.CURRENCIES
+            return Response(
+                {
+                    "currencies": [
+                        {"code": code, "name": name} for code, name in currencies
+                    ]
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        serializer = UserCurrencySerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        """
+        Update the user's default currency and fetch the new exchange rate.
+        """
+        new_currency = request.data.get("default_currency")
+
+        # Validate the currency
+        if not any(new_currency == code for code, _ in CustomUser.CURRENCIES):
+            return Response(
+                {"error": "Invalid currency code."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            # Retrieve the exchange rate using the provided utility function
+            exchange_rate_to_usd = get_exchange_rate(new_currency)
+        except ValueError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "error": "An unexpected error occurred while fetching exchange rates."
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Update the user's default currency
+        request.user.default_currency = new_currency
+        request.user.save()
+
+        return Response(
+            {
+                "message": "Default currency updated successfully.",
+                "default_currency": new_currency,
+                "exchange_rate_to_usd": exchange_rate_to_usd,
+            },
+            status=status.HTTP_200_OK,
+        )

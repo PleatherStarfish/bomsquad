@@ -24,6 +24,7 @@ django-maintenance-mode==0.21.1
 django-mptt==0.16.0
 django-mptt-admin==2.7.0
 django-admin-honeypot-updated-2021==1.2.0
+requests==2.32.3
 sendgrid==6.10.0
 sentry-sdk==2.17.0
 mailchimp-marketing==3.0.80

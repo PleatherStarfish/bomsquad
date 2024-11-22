@@ -4,6 +4,7 @@ from core.models import BaseModel
 from modules.models import WantToBuildModules, BuiltModules
 from shopping_list.models import UserShoppingListSaved
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 
 
 import uuid
@@ -26,38 +27,21 @@ class KofiPayment(models.Model):
 
 class CustomUser(AbstractUser):
     CURRENCIES = [
+        ("USD", "US Dollar"),
+        ("EUR", "Euro"),
+        ("JPY", "Japanese Yen"),
+        ("GBP", "British Pound"),
         ("AUD", "Australian Dollar"),
-        ("AED", "United Arab Emirates Dirham"),
-        ("BRL", "Brazilian Real"),
         ("CAD", "Canadian Dollar"),
         ("CHF", "Swiss Franc"),
-        ("CNH", "Chinese Yuan"),
-        ("CZK", "Czech Koruna"),
-        ("DKK", "Danish Krone"),
-        ("EUR", "Euro"),
-        ("GBP", "British Pound"),
+        ("CNY", "Chinese Yuan"),
         ("HKD", "Hong Kong Dollar"),
-        ("HUF", "Hungarian Forint"),
-        ("IDR", "Indonesian Rupiah"),
-        ("INR", "Indian Rupee"),
-        ("ILS", "Israeli New Shekel"),
-        ("JPY", "Japanese Yen"),
-        ("KRW", "South Korean Won"),
-        ("MXN", "Mexican Peso"),
-        ("MYR", "Malaysian Ringgit"),
-        ("NOK", "Norwegian Krone"),
         ("NZD", "New Zealand Dollar"),
-        ("PHP", "Philippine Peso"),
-        ("PLN", "Polish Złoty"),
-        ("QAR", "Qatari Riyal"),
-        ("RUB", "Russian Ruble"),
-        ("SAR", "Saudi Riyal"),
         ("SEK", "Swedish Krona"),
+        ("KRW", "South Korean Won"),
         ("SGD", "Singapore Dollar"),
-        ("THB", "Thai Baht"),
-        ("TRY", "Turkish Lira"),
-        ("USD", "US Dollar"),
-        ("ZAR", "South African Rand"),
+        ("NOK", "Norwegian Krone"),
+        ("INR", "Indian Rupee"),
     ]
     id = models.BigAutoField(auto_created=True, primary_key=True)
     username = models.CharField(max_length=30, unique=True, blank=True)
@@ -195,3 +179,16 @@ class UserNotes(BaseModel):
                 name="unique_user_shopping_list_saved",
             ),
         ]
+
+
+class ExchangeRate(models.Model):
+    base_currency = models.CharField(max_length=3)  # e.g., 'USD'
+    target_currency = models.CharField(max_length=3)  # e.g., 'EUR'
+    rate = models.DecimalField(max_digits=12, decimal_places=6)  # Exchange rate
+    last_updated = models.DateTimeField(default=now)  # Tracks the last update time
+
+    class Meta:
+        unique_together = ("base_currency", "target_currency")
+
+    def __str__(self):
+        return f"{self.base_currency} -> {self.target_currency}: {self.rate}"
