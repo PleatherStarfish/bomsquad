@@ -5,7 +5,7 @@ import requests
 class OpenExchangeRatesError(Exception):
     """Custom exception for Open Exchange Rates errors."""
 
-    print(Exception)
+    print("OpenExchangeRatesError")
 
 
 def get_latest_exchange_rates(base_currency="USD"):

@@ -1,6 +1,7 @@
 import bleach
+from django.db.models import Min, Max, F, Sum, Case, When, Value
 from accounts.models import UserNotes, CustomUser
-from components.models import Component
+from components.models import Component, ComponentSupplierItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import F, FloatField, Sum
@@ -484,38 +485,71 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
 @api_view(["GET"])
 def get_user_shopping_list_total_price(request):
     """
-    This GET endpoint calculates the total cost of all components
-    in the authenticated user's shopping list using the unit price.
-
-    It retrieves the user's shopping list items, checks if any exist,
-    calculates the total cost by multiplying quantity and unit price,
-    and returns this total in a JSON response.
+    This GET endpoint calculates:
+    - total_min_price: The cheapest total cost for the shopping cart.
+    - total_max_price: The most expensive total cost for the shopping cart.
+    - total_price (deprecated): The total cost using the `unit_price` field of `Component`.
     """
 
-    # Get all the shopping list items for the user
+    # Get all shopping list items for the user
     shopping_list_items = UserShoppingList.objects.filter(user=request.user)
 
-    # Check if user has any items in shopping list
     if not shopping_list_items.exists():
         return Response(
             {"detail": "No components in shopping list."},
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    # Calculate total price of all components for the user using unit_price field
-    total_price = shopping_list_items.aggregate(
+    # Get all supplier items for the components in the shopping list
+    supplier_items = ComponentSupplierItem.objects.filter(
+        component__in=shopping_list_items.values_list("component", flat=True)
+    ).annotate(
+        min_price=F("unit_price") * F("pcs"),
+        max_price=F("unit_price") * F("pcs"),
+    )
+
+    # Aggregate min and max prices for each component
+    supplier_prices = supplier_items.values("component").annotate(
+        min_price=Min("min_price"), max_price=Max("max_price")
+    )
+
+    # Calculate total min and max prices for the shopping cart
+    total_min_price = sum(
+        price["min_price"]
+        * shopping_list_items.get(component=price["component"]).quantity
+        for price in supplier_prices
+        if price["min_price"]
+    )
+    total_max_price = sum(
+        price["max_price"]
+        * shopping_list_items.get(component=price["component"]).quantity
+        for price in supplier_prices
+        if price["max_price"]
+    )
+
+    # Deprecated price calculation using `unit_price` from the `Component`
+    deprecated_total_price = shopping_list_items.aggregate(
         total_price=Sum(F("quantity") * F("component__unit_price"))
     )["total_price"]
 
-    return Response({"total_price": total_price}, status=status.HTTP_200_OK)
+    return Response(
+        {
+            "total_min_price": total_min_price,
+            "total_max_price": total_max_price,
+            "total_price": deprecated_total_price,  # Deprecated
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list_total_component_price(request, component_pk):
     """
-    This GET endpoint calculates the total cost of a specific component ('component_pk')
-    in the authenticated user's shopping list using a database field for unit price.
+    This GET endpoint calculates:
+    - total_min_price: The cheapest total cost for a specific component in the shopping list.
+    - total_max_price: The most expensive total cost for the specific component.
+    - total_price (deprecated): The total cost using the `unit_price` field of the `Component`.
     """
 
     # Fetch the component by primary key
@@ -531,14 +565,50 @@ def get_user_shopping_list_total_component_price(request, component_pk):
         user=request.user, component=component
     )
 
-    # Calculate total price directly in the database using the unit_price field
-    total_price = shopping_list_items.aggregate(
-        total_price=Sum(
-            F("quantity") * F("component__unit_price"), output_field=FloatField()
+    if not shopping_list_items.exists():
+        return Response(
+            {"detail": "No shopping list items found for the specified component."},
+            status=status.HTTP_404_NOT_FOUND,
         )
+
+    # Get all supplier items for this component
+    supplier_items = ComponentSupplierItem.objects.filter(component=component).annotate(
+        min_price=F("unit_price") * F("pcs"),
+        max_price=F("unit_price") * F("pcs"),
+    )
+
+    # Aggregate min and max prices for the component
+    supplier_prices = supplier_items.aggregate(
+        total_min_price=Min("min_price"),
+        total_max_price=Max("max_price"),
+    )
+
+    total_min_price = supplier_prices["total_min_price"] or 0
+    total_max_price = supplier_prices["total_max_price"] or 0
+
+    # Adjust min and max prices based on quantities in the shopping list
+    total_min_price *= (
+        shopping_list_items.aggregate(total_quantity=Sum("quantity"))["total_quantity"]
+        or 0
+    )
+    total_max_price *= (
+        shopping_list_items.aggregate(total_quantity=Sum("quantity"))["total_quantity"]
+        or 0
+    )
+
+    # Deprecated price calculation using `unit_price` from the `Component`
+    deprecated_total_price = shopping_list_items.aggregate(
+        total_price=Sum(F("quantity") * F("component__unit_price"))
     )["total_price"]
 
-    return Response({"total_price": total_price}, status=status.HTTP_200_OK)
+    return Response(
+        {
+            "total_min_price": total_min_price,
+            "total_max_price": total_max_price,
+            "total_price": deprecated_total_price,  # Deprecated
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 @permission_classes([IsAuthenticated])

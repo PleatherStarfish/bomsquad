@@ -11,11 +11,11 @@ const LocationsList = ({ row, pointerEvents }) => {
       {locations.length > 0 ? (
         locations.map((location, index) => (
           <Pill 
+            border="border-1" 
+            color="bg-white" 
             key={index} 
             showArrow={index !== locations.length - 1} 
             showXMark={false} 
-            border="border-1" 
-            color="bg-white" 
             textColor="text-slate-500"
           >
             {location}
@@ -31,20 +31,20 @@ const LocationsList = ({ row, pointerEvents }) => {
 const LocationsTable = ({ data, onRowClicked, pointerEvents = "pointer-events-auto" }) => {
   const columns = [
     {
-      name: "Location",
-      cell: (row) => <LocationsList row={row} pointerEvents={pointerEvents} />,
-      sortable: false,
-      wrap: false,
+      cell: (row) => <LocationsList pointerEvents={pointerEvents} row={row} />,
       grow: 3,
-      pointerOnHover: true
+      name: "Location",
+      pointerOnHover: true,
+      sortable: false,
+      wrap: false
     },
     {
+      maxWidth: "50px",
       name: "Quantity",
+      pointerOnHover: true,
       selector: (row) => row.quantity,
       sortable: false,
-      wrap: false,
-      maxWidth: "50px",
-      pointerOnHover: true
+      wrap: false
     },
   ];
 
@@ -52,10 +52,10 @@ const LocationsTable = ({ data, onRowClicked, pointerEvents = "pointer-events-au
     <DataTable
       columns={columns}
       data={data}
-      onRowClicked={onRowClicked}
-      noHeader
       dense
       highlightOnHover
+      noHeader
+      onRowClicked={onRowClicked}
     />
   );
 };

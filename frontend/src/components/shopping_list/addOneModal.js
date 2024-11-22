@@ -54,25 +54,25 @@ const AddOneModal = ({
 
   return (
     <Modal
+      onSubmit={handleAddToInventory}
       open={!!component?.id}
       setOpen={setComponent}
-      title={"Add to inventory?"}
       submitButtonText={"Add"}
+      title={"Add to inventory?"}
       type="warning"
-      onSubmit={handleAddToInventory}
     >
       <div>
         {component?.supplier_item_no ? `Are you sure you want to add ${component?.supplier?.short_name} ${component?.supplier_item_no} to your inventory? This will remove this item from your shopping list.` : `Are you sure you want to add ${component?.description} to your inventory? This will remove this item from your shopping list.`}
       </div>
       <InventoryModalContent 
-        isLoadingQuantity={isLoadingQuantity} 
+        component={component} 
+        isErrorLocation={isErrorLocation} 
         isErrorQuantity={isErrorQuantity} 
         isLoadingLocation={isLoadingLocation} 
-        isErrorLocation={isErrorLocation} 
-        component={component}
+        isLoadingQuantity={isLoadingQuantity}
         locationArray={locationArray}
-        setLocationArray={setLocationArray}
         savedLocationsData={savedLocationsData}
+        setLocationArray={setLocationArray}
       />
     </Modal>
   );

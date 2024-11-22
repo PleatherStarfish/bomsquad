@@ -76,16 +76,20 @@ class Component(BaseModel):
     manufacturer_link = models.URLField(blank=True, null=False)
     mounting_style = models.CharField(choices=MOUNTING_STYLE, max_length=50, blank=True)
     supplier = models.ForeignKey(
-        ComponentSupplier, blank=True, null=True, on_delete=models.PROTECT
+        ComponentSupplier,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        help_text="Deprecated",
     )
     supplier_item_no = models.CharField(
         max_length=100,
         unique=True,
         null=True,
         blank=True,
-        help_text="This must be set unless 'supplier_has_no_item_no' is checked.",
+        help_text="Deprecated - This must be set unless 'supplier_has_no_item_no' is checked.",
     )
-    supplier_has_no_item_no = models.BooleanField(default=False)
+    supplier_has_no_item_no = models.BooleanField(default=False, help_text="Deprecated")
     type = models.ForeignKey(Types, on_delete=models.PROTECT)
     category = TreeForeignKey(
         "Category",
@@ -155,10 +159,11 @@ class Component(BaseModel):
         default_currency="USD",
         blank=False,
         default=0,
+        help_text="Deprecated",
     )
     pcs = models.IntegerField(
         default=1,
-        help_text="The number of component that are purchased per price (if they are sold in a set). Defaults to 1.",
+        help_text="Deprecated - The number of component that are purchased per price (if they are sold in a set). Defaults to 1.",
     )
     unit_price = models.GeneratedField(
         expression=F("price") / F("pcs"),
@@ -167,9 +172,8 @@ class Component(BaseModel):
     )
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
-    link = models.URLField(blank=False)
+    link = models.URLField(blank=False, help_text="Deprecated")
     allow_comments = models.BooleanField("allow comments", default=True)
-    user_submission_hold = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """

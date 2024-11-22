@@ -336,21 +336,28 @@ class UserCurrencyView(APIView):
     def get(self, request):
         """
         Retrieve the user's chosen default currency.
-        If `options` query param is provided, return all available currency options.
         """
-        if request.query_params.get("options") == "true":
-            currencies = CustomUser.CURRENCIES
-            return Response(
-                {
-                    "currencies": [
-                        {"code": code, "name": name} for code, name in currencies
-                    ]
-                },
-                status=status.HTTP_200_OK,
-            )
+        user = request.user
+        default_currency = user.default_currency or "USD"
+        exchange_rate = 1.0
+        currency_name = "US Dollar"
 
-        serializer = UserCurrencySerializer(request.user)
-        return Response(serializer.data)
+        if user.is_authenticated:
+            try:
+                exchange_rate = get_exchange_rate(default_currency)
+                currency_name = dict(CustomUser.CURRENCIES).get(
+                    default_currency, "Unknown Currency"
+                )
+            except ValueError:
+                pass
+
+        response_data = {
+            "default_currency": default_currency,
+            "currency_name": currency_name,
+            "exchange_rate": exchange_rate,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def patch(self, request):
         """

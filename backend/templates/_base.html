@@ -194,14 +194,9 @@
           })
             .then((response) => {
               if (response.ok) {
-                console.log("User's default currency updated successfully.");
-              } else {
-                console.error("Failed to update user's default currency.");
+                window.location.reload();
               }
             })
-            .catch((error) => {
-              console.error("Error updating user's default currency:", error);
-            });
         }
       }
     

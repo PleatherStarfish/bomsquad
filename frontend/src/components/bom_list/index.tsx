@@ -175,7 +175,7 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
       name: <div>Notes</div>, 
       selector: (row) => row.notes,
       // Truncated display
-sortable: true,
+      sortable: true,
       wrap: true,
     },
   ];

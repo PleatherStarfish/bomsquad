@@ -10,7 +10,7 @@ const ComponentIdItem = ({ componentId, locationArrays, setLocationArrays }) => 
   const { componentsData, isLoading: componentsAreLoading, isError: componentsAreError } = useGetComponentsByIds([componentId]);
   const { data: locations, isLoading: isLoadingLocation, isError: isErrorLocation } = useGetInventoryLocations(componentId);
 
-  const { data: quantityInInventoryAnon, isLoading: isLoadingQuantity, isError: isErrorQuantity } = useGetUserAnonymousShoppingListQuantity(componentId);
+  const { isLoading: isLoadingQuantity, isError: isErrorQuantity } = useGetUserAnonymousShoppingListQuantity(componentId);
 
   if (componentsAreLoading || isLoadingLocation || isLoadingQuantity) {
     return <div className="text-center animate-pulse">Loading...</div>;
@@ -28,15 +28,15 @@ const ComponentIdItem = ({ componentId, locationArrays, setLocationArrays }) => 
 
   return (
       <InventoryModalContent 
-        isLoadingQuantity={isLoadingQuantity} 
+        component={componentsData} 
+        isErrorLocation={isErrorLocation} 
         isErrorQuantity={isErrorQuantity} 
         isLoadingLocation={isLoadingLocation} 
-        isErrorLocation={isErrorLocation} 
-        component={componentsData} 
+        isLoadingQuantity={isLoadingQuantity} 
         locationArray={locationArrays}
-        setLocationArray={(newLocationArray) => setLocationArrays(componentId, newLocationArray)}
         savedLocationsData={savedLocationsData}
-        showComponentHeading={true}
+        setLocationArray={(newLocationArray) => setLocationArrays(componentId, newLocationArray)}
+        showComponentHeading
       />
   );
 };
@@ -57,7 +57,7 @@ const UniqueComponentIdsList = ({locationArrays, setLocationArrays}) => {
     <div className="overflow-auto max-h-[400px]">
       {uniqueComponentIds &&
         uniqueComponentIds.map((componentId) => (
-          <ComponentIdItem key={componentId} componentId={componentId} locationArrays={locationArrays[componentId] || []} setLocationArrays={setLocationArrays} />
+          <ComponentIdItem componentId={componentId} key={componentId} locationArrays={locationArrays[componentId] || []} setLocationArrays={setLocationArrays} />
         ))}
     </div>
   );
