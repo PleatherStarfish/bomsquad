@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   BuildingOffice2Icon,
   FolderIcon,
@@ -19,10 +20,10 @@ type NavigationItem = {
 };
 
 const initialNavigation: NavigationItem[] = [
-  { name: "Built", to: "built", icon: BuildingOffice2Icon, current: true },
-  { name: "Want to Build", to: "want-to-build", icon: WrenchIcon, current: false },
-  { name: "Inventory", to: "inventory", icon: FolderIcon, current: false },
-  { name: "Shopping List", to: "shopping-list", icon: ShoppingCartIcon, current: false },
+  { current: true, icon: BuildingOffice2Icon, name: "Built", to: "built" },
+  { current: false, icon: WrenchIcon, name: "Want to Build", to: "want-to-build" },
+  { current: false, icon: FolderIcon, name: "Inventory", to: "inventory" },
+  { current: false, icon: ShoppingCartIcon, name: "Shopping List", to: "shopping-list" },
 ];
 
 const UserPage: React.FC = () => {
@@ -41,14 +42,14 @@ const UserPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const matchingTab = navigation.find((tab) =>
+    const matchingTab = initialNavigation.find((tab) =>
       location.pathname.includes(tab.to)
     );
     if (matchingTab) {
       setSelectedTab(matchingTab.name);
       setNavigation(updateNavigationCurrentStatus(matchingTab.name));
     }
-  }, [location, navigation]);
+  }, [location]);
 
   if (userIsLoading) {
     return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
@@ -69,24 +70,24 @@ const UserPage: React.FC = () => {
           {navigation.map((item) => (
             <li key={item.name}>
               <Link
-                to={item.to}
+                aria-current={item.name === selectedTab ? "page" : undefined}
                 className={cx(
                   item.current
                     ? "bg-gray-200 text-[#548a6a]"
                     : "text-gray-400 hover:text-[#548a6a]",
                   "flex flex-col items-center justify-center py-2 px-4 text-sm font-semibold"
                 )}
-                aria-current={item.name === selectedTab ? "page" : undefined}
                 onClick={() => handleTabChange(item.name)}
+                to={item.to}
               >
                 <item.icon
+                  aria-hidden="true"
                   className={cx(
                     item.current
                       ? "text-[#548a6a]"
                       : "text-gray-400 group-hover/item:text-[#548a6a]",
                     "h-6 w-6"
                   )}
-                  aria-hidden="true"
                 />
                 <span className="mt-1 text-center">{item.name}</span>
               </Link>
@@ -106,30 +107,30 @@ const UserPage: React.FC = () => {
         >
           <div className="flex flex-col h-full px-6 pb-4 overflow-y-auto bg-gray-100 gap-y-5">
             <nav className="z-20 flex flex-col flex-1 h-full">
-              <ul role="list" className="flex flex-col flex-1 h-full gap-y-7">
+              <ul className="flex flex-col flex-1 h-full gap-y-7" role="list">
                 <li>
-                  <ul role="list" className="mt-8 -mx-2 space-y-1">
+                  <ul className="mt-8 -mx-2 space-y-1" role="list">
                     {navigation.map((item) => (
                       <li key={item.name}>
                         <Link
-                          to={item.to}
+                          aria-current={item.name === selectedTab ? "page" : undefined}
                           className={cx(
                             item.current
                               ? "bg-gray-200 text-[#548a6a]"
                               : "text-gray-400 hover:text-[#548a6a]",
                             "group/item flex gap-x-3 rounded-md px-2 py-3 text-sm leading-6 font-semibold hover:bg-gray-200"
                           )}
-                          aria-current={item.name === selectedTab ? "page" : undefined}
                           onClick={() => handleTabChange(item.name)}
+                          to={item.to}
                         >
                           <item.icon
+                            aria-hidden="true"
                             className={cx(
                               item.current
                                 ? "text-[#548a6a]"
                                 : "text-gray-400 group-hover/item:text-[#548a6a]",
                               "h-6 w-6 shrink-0"
                             )}
-                            aria-hidden="true"
                           />
                           <span className="invisible transition-all opacity-0 whitespace-nowrap group-hover/slideout:visible group-hover/slideout:opacity-100">
                             {item.name}

@@ -144,7 +144,6 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                     target="_blank"
                   >
                     <LinkIcon className="inline-block w-4 h-4" />
-                    <span className="ml-1">Supplier Link</span>
                   </a>
                 )}
                 {item.unit_price && (
