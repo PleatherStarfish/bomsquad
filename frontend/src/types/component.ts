@@ -33,6 +33,7 @@ export interface Component {
     id: string;
     name: string;
   } | null;
+  qualities?: string;
   manufacturer_part_no?: string;
   manufacturer_link?: string;
   mounting_style?: "smt" | "th"; 

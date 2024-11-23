@@ -42,6 +42,11 @@ interface ListSliceProps {
   displayTotals?: boolean;
 }
 
+const getBaseUrl = () => {
+  const { protocol, hostname, port } = window.location;
+  return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+};
+
 const ListSlice: React.FC<ListSliceProps> = ({
   name,
   index,
@@ -121,7 +126,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
             "text-gray-300": index === 0,
           })}
         >
-          {row.component.description}
+          <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.component.id}`}>{row.component.description}</a>
         </span>
       ),
       name: <div className="font-bold text-gray-400">Description</div>,

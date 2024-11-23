@@ -178,7 +178,6 @@
     <script>
       function updateCurrency(newCurrency) {
         localStorage.setItem("currency", newCurrency);
-        console.log(`Currency updated to: ${newCurrency}`);
     
         const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
         
@@ -193,10 +192,21 @@
             body: JSON.stringify({ default_currency: newCurrency }),
           })
             .then((response) => {
-              if (response.ok) {
-                window.location.reload();
+              console.log("Response status:", response.status); // Debug response status
+              if (response.ok || response.status === 403) {
+                console.log("Reloading page...");
+                window.location.replace(window.location.href); // Force reload
+              } else {
+                console.error("Error updating currency:", response.statusText);
               }
             })
+            .catch((error) => {
+              console.error("Network error:", error);
+              window.location.replace(window.location.href); // Reload on error
+            });
+        } else {
+          console.log("User not authenticated, reloading...");
+          window.location.replace(window.location.href); // Reload for unauthenticated users
         }
       }
     

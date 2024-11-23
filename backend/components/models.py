@@ -6,7 +6,8 @@ from core.models import BaseModel
 from django.urls import reverse
 from django.db.models import F
 from mptt.models import MPTTModel, TreeForeignKey
-from django.core.validators import MinValueValidator
+
+
 import uuid
 
 OHMS_UNITS = (
@@ -314,35 +315,61 @@ class Component(BaseModel):
 
     @classmethod
     def get_unique_values(cls, field_name, value_type):
-        cache_key = f"unique_{field_name}_values"
-        field_values = cache.get(cache_key)
-
-        if field_values is None:
-            field_values = list(
-                cls.objects.values_list(field_name, flat=True).distinct()
-            )
-            field_values = [value_type(val) for val in field_values if val is not None]
-            cache.set(cache_key, field_values, timeout=60 * 60)
+        """
+        Get unique values for a specific field without caching.
+        """
+        # Use distinct on the specific field
+        field_values = list(
+            cls.objects.order_by(field_name)
+            .values_list(field_name, flat=True)
+            .distinct()
+        )
+        # Filter None values and apply the value_type conversion
+        field_values = [value_type(val) for val in field_values if val is not None]
 
         return field_values
 
     @classmethod
     def get_unique_ohms_or_farads_values(cls, field1, field2):
-        values = cache.get(f"unique_{field1}_{field2}_values")
-        if values is None:
-            queryset = (
-                cls.objects.values_list(field1, field2)
-                .order_by(field2, field1)
-                .distinct()
-                .exclude(**{field1: None, field2: None})
+        """
+        Retrieve unique (value, unit) combinations for ohms or farads,
+        sorted by unit priority and numeric value.
+        """
+        # Define the unit order
+        UNIT_ORDER = {
+            "Ω": 1,
+            "kΩ": 2,
+            "MΩ": 3,
+            "pF": 1,
+            "nF": 2,
+            "μF": 3,
+            "mF": 4,
+        }
+
+        # Fetch unique combinations of value and unit, excluding invalid rows
+        queryset = (
+            cls.objects.filter(
+                **{f"{field1}__isnull": False, f"{field2}__isnull": False}
             )
-            values = [
-                f"{float(val[0])} {val[1]}"
-                for val in queryset
-                if val[0] is not None and val[1] is not None
-            ]
-            cache.set(f"unique_{field1}_{field2}_values", values, timeout=60 * 60)
-        return values
+            .exclude(**{field2: ""})
+            .values_list(field1, field2)
+            .distinct()
+        )
+
+        # Use a set to remove duplicates
+        unique_values = set(queryset)
+
+        # Sort the queryset by unit order and value
+        sorted_values = sorted(
+            unique_values,
+            key=lambda item: (
+                UNIT_ORDER.get(item[1], 1000),  # Prioritize unit order
+                float(item[0]),  # Then sort by numeric value
+            ),
+        )
+
+        # Format the sorted values into strings
+        return [f"{float(value)} {unit}" for value, unit in sorted_values]
 
 
 class ComponentSupplierItem(BaseModel):

@@ -1,12 +1,33 @@
 from components.models import Component, ComponentManufacturer, ComponentSupplier, Types
 from components.serializers import ComponentSerializer
 from django.core.paginator import Paginator
+from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+from components.models import FARAD_UNITS, OHMS_UNITS
 from uuid import UUID
+import re
+import json
+
+
+def validate_numeric_with_unit(value, valid_units):
+
+    # Regex to match numeric value and unit
+    match = re.match(r"([\d.]+)\s*([^\d\s]+)", value)
+    if not match:
+        raise ValidationError("Invalid format. Use 'value unit' (e.g., '1.0 kΩ').")
+
+    value, unit = match.groups()
+    if unit not in valid_units:
+        raise ValidationError(
+            f"Invalid unit '{unit}'. Valid units: {', '.join(valid_units)}."
+        )
+
+    return float(value), unit
 
 
 def extract_uuids(pks):
@@ -23,57 +44,77 @@ class ComponentView(APIView):
     def get(self, request):
         # Get the page number and search query from the request query parameters
         page_number = request.query_params.get("page", 1)
+        print("page_number: ", page_number)
         search_query = request.query_params.get("search", "")
 
-        # Retrieve filter parameters from the request's query parameters
-        ohms_filter = request.query_params.get("ohms", None)
-        farads_filter = request.query_params.get("farads", None)
-        voltage_rating_filter = request.query_params.get("voltage_rating", None)
-        tolerance_filter = request.query_params.get("tolerance", None)
-        mounting_style_filter = request.query_params.get("mounting_style", None)
-        manufacturer_filter = request.query_params.get("manufacturer", None)
-        supplier_filter = request.query_params.get("supplier", None)
-        type_filter = request.query_params.get("type", None)
+        # Build the filters dictionary from query parameters
+        filters = {
+            "ohms": request.query_params.get("ohms"),
+            "farads": request.query_params.get("farads"),
+            "voltage_rating": request.query_params.get("voltage_rating"),
+            "tolerance": request.query_params.get("tolerance"),
+            "mounting_style": request.query_params.get("mounting_style"),
+            "manufacturer": request.query_params.get("manufacturer"),
+            "supplier": request.query_params.get("supplier"),
+            "type": request.query_params.get("type"),
+        }
+
+        # Remove any keys with `None` values
+        filters = {key: value for key, value in filters.items() if value is not None}
+
+        print("Filters:", filters)  # Debugging output
 
         # Start with a base queryset
         components = Component.objects.select_related("manufacturer", "supplier").all()
 
-        # Apply search query filter if present
+        # Apply TrigramSimilarity search if present
         if search_query:
-            components = components.filter(
-                Q(description__icontains=search_query)
-                | Q(manufacturer__name__icontains=search_query)
-                | Q(supplier__name__icontains=search_query)
-                | Q(supplier_item_no__icontains=search_query)
-                | Q(type__name__icontains=search_query)
-                | Q(ohms__icontains=search_query)
-                | Q(farads__icontains=search_query)
-                | Q(voltage_rating__icontains=search_query)
-                | Q(tolerance__icontains=search_query)
-                | Q(notes__icontains=search_query)
+            components = (
+                components.annotate(
+                    similarity=TrigramSimilarity("description", search_query)
+                    + TrigramSimilarity("manufacturer__name", search_query)
+                    + TrigramSimilarity("supplier__name", search_query)
+                    + TrigramSimilarity("type__name", search_query)
+                )
+                .filter(similarity__gt=0.3)
+                .order_by("-similarity")
             )
 
-        # Apply additional filters if present
-        if ohms_filter:
-            components = components.filter(ohms__icontains=ohms_filter)
-        if farads_filter:
-            components = components.filter(farads__icontains=farads_filter)
-        if voltage_rating_filter:
+        # Dynamically apply filters
+        try:
+            if "ohms" in filters:
+                value, unit = validate_numeric_with_unit(
+                    filters["ohms"], dict(OHMS_UNITS).keys()
+                )
+                components = components.filter(ohms=value, ohms_unit=unit)
+
+            if "farads" in filters:
+                value, unit = validate_numeric_with_unit(
+                    filters["farads"], dict(FARAD_UNITS).keys()
+                )
+                components = components.filter(farads=value, farads_unit=unit)
+
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=400)
+
+        if "voltage_rating" in filters:
             components = components.filter(
-                voltage_rating__icontains=voltage_rating_filter
+                voltage_rating__icontains=filters["voltage_rating"]
             )
-        if tolerance_filter:
-            components = components.filter(tolerance__icontains=tolerance_filter)
-        if mounting_style_filter:
+        if "tolerance" in filters:
+            components = components.filter(tolerance__icontains=filters["tolerance"])
+        if "mounting_style" in filters:
             components = components.filter(
-                mounting_style__icontains=mounting_style_filter
+                mounting_style__icontains=filters["mounting_style"]
             )
-        if manufacturer_filter:
-            components = components.filter(manufacturer__pk=UUID(manufacturer_filter))
-        if supplier_filter:
-            components = components.filter(supplier__pk=UUID(supplier_filter))
-        if type_filter:
-            components = components.filter(type__name__icontains=type_filter)
+        if "manufacturer" in filters:
+            components = components.filter(
+                manufacturer__pk=UUID(filters["manufacturer"])
+            )
+        if "supplier" in filters:
+            components = components.filter(supplier__pk=UUID(filters["supplier"]))
+        if "type" in filters:
+            components = components.filter(type__name__icontains=filters["type"])
 
         # Sort by description after applying all filters
         components = components.order_by("description")

@@ -1,5 +1,6 @@
-import React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+
+import React from "react";
 import _ from "lodash";
 import cx from "classnames";
 
@@ -8,19 +9,24 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
 
   return (
     <nav
-      className="inline-flex -space-x-px rounded-md shadow-sm isolate"
       aria-label="Pagination"
+      className="inline-flex -space-x-px rounded-md shadow-sm isolate"
     >
+      {/* Previous Button */}
       <a
-        href="#"
-        onClick={() => navigate(Math.max(1, currentPage - 1))}
         className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(Math.max(1, currentPage - 1));
+        }}
       >
         <span className="sr-only">Previous</span>
-        <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+        <ChevronLeftIcon aria-hidden="true" className="w-5 h-5" />
       </a>
 
-      {pageNumbers.map((pageNumber) => {
+      {/* Page Numbers */}
+      {pageNumbers.map((pageNumber, index) => {
         if (
           pageNumber === 1 ||
           pageNumber === 2 ||
@@ -29,19 +35,21 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
         ) {
           return (
             <a
-              key={pageNumber}
-              href="#"
               aria-current={currentPage === pageNumber ? "page" : undefined}
-              onClick={() => navigate(pageNumber)}
               className={cx(
                 "relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:outline-offset-0",
                 {
-                  "bg-brandgreen-500 text-white":
-                    currentPage === pageNumber,
+                  "bg-brandgreen-500 text-white": currentPage === pageNumber,
                   "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-100":
                     currentPage !== pageNumber,
                 }
               )}
+              href="#"
+              key={index}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(pageNumber);
+              }}
             >
               {pageNumber}
             </a>
@@ -49,23 +57,27 @@ const Pagination = ({ currentPage, totalPages, navigate }) => {
         } else if (pageNumber === 3 || pageNumber === totalPages - 1) {
           return (
             <span
-              key={pageNumber}
               className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900"
+              key={index}
             >
               ...
             </span>
           );
         }
-        return null; // Don't render anything for the other pages.
+        return null; // Skip rendering for hidden page numbers
       })}
 
+      {/* Next Button */}
       <a
-        href="#"
-        onClick={() => navigate(Math.min(totalPages, currentPage + 1))}
         className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(Math.min(totalPages, currentPage + 1));
+        }}
       >
         <span className="sr-only">Next</span>
-        <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />
+        <ChevronRightIcon aria-hidden="true" className="w-5 h-5" />
       </a>
     </nav>
   );

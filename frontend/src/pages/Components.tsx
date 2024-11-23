@@ -1,23 +1,26 @@
 import 'tippy.js/dist/tippy.css';
 
+import DataTable, { TableColumn } from "react-data-table-component";
 import Quantity, { Types } from "../components/bom_list/quantity";
 import React, { useEffect, useState } from "react";
-import { getFaradConversions, getOhmConversions } from '../components/conversions';
-import useGetUserCurrency from "../services/useGetUserCurrency";
 
 import AddComponentModal from "../components/bom_list/addComponentModal";
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
-import DataTable, { TableColumn } from "react-data-table-component";
+import { Component } from "../types/component"
+import {
+  LinkIcon,
+} from "@heroicons/react/24/outline";
 import Pagination from "../components/components/Pagination";
 import SearchForm from "../components/components/SearchForm";
-import Tippy from '@tippyjs/react';
+import { roundToCurrency } from "../utils/currencies";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 import { useForm } from "react-hook-form";
 import useGetComponents from "../services/useGetComponents";
 import useGetUserAnonymousShoppingListQuantity from "../services/useGetUserAnonymousShoppingListQuantity";
+import useGetUserCurrency from "../services/useGetUserCurrency";
+import { useSearchParams } from "react-router-dom";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
-import { Component } from "../types/component"
 
 const getBaseUrl = () => {
   const { protocol, hostname, port } = window.location;
@@ -38,29 +41,74 @@ const customStyles = {
 };
 
 const Components: React.FC = () => {
-  const { register, handleSubmit, control } = useForm();
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [formData, setFormData] = useState<Record<string, any>>({});
-  const [shoppingModalOpen, setShoppingModalOpen] = useState<string | undefined>();
   const [inventoryModalOpen, setInventoryModalOpen] = useState<string | undefined>();
+  const [shoppingModalOpen, setShoppingModalOpen] = useState<string | undefined>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { register, control, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      filters: JSON.parse(searchParams.get("filters") || "{}"),
+      search: searchParams.get("search") || "",
+    },
+  });
 
-  const { user } = useAuthenticatedUser();
-  const { componentsData, componentsAreLoading, componentsAreError } =
-    useGetComponents({
-      filters: Object.fromEntries(
-        Object.entries(formData).filter(([key]) => key !== "search")
-      ),
-      order: null,
-      page: currentPage,
-      search: formData?.search,
-    });
-    const { data: userCurrency } = useGetUserCurrency();
+  // Fetch data based on watched form state
+  const { componentsData, componentsAreLoading, componentsAreError, refetchComponents } = useGetComponents({
+    filters: JSON.parse(searchParams.get("filters") || "{}"),
+    page: Number(searchParams.get("page") || currentPage),
+    search: searchParams.get("search") || "",
+  });
 
-  useEffect(() => {
-    if (componentsData?.page) {
-      setCurrentPage(componentsData.page);
-    }
-  }, [componentsData?.page]);
+    const { data: currencyData } = useGetUserCurrency();
+    const { user } = useAuthenticatedUser();
+  
+    const onSubmit = (data: any) => {
+      const { search, type, manufacturer, supplier, mounting_style, ...otherFilters } = data;
+    
+      const filters = {
+        manufacturer: manufacturer !== "all" ? manufacturer : undefined,
+        mounting_style: mounting_style !== "all" ? mounting_style : undefined,
+        supplier: supplier !== "all" ? supplier : undefined,
+        type: type !== "all" ? type : undefined,
+        ...Object.fromEntries(
+          Object.entries(otherFilters).filter(
+            ([, value]) => value !== "all" && value !== "" && value !== undefined
+          )
+        ),
+      };
+    
+      const structuredData = {
+        filters,
+        search: search || "",
+      };
+    
+      refetchComponents({
+        newFilters: filters, 
+        newPage: 1,
+        newSearch: structuredData.search,
+      });
+    
+      setSearchParams({
+        filters: JSON.stringify(filters),
+        page: "1",
+        search: structuredData.search,
+      });
+    
+      setCurrentPage(1); // Reset to page 1
+    };
+
+    // Sync `searchParams` with form state
+    useEffect(() => {
+      setValue("filters", JSON.parse(searchParams.get("filters") || "{}"));
+      setValue("search", searchParams.get("search") || "");
+      setCurrentPage(Number(searchParams.get("page") || 1));
+    }, [searchParams, setValue]);
+
+    useEffect(() => {
+      if (componentsData?.page) {
+        setCurrentPage(componentsData.page);
+      }
+    }, [componentsData?.page]);
 
   if (componentsAreError) {
     return (
@@ -70,18 +118,39 @@ const Components: React.FC = () => {
     );
   }
 
-  const onSubmit = (data: Record<string, any>) => {
-    const updatedFormData = Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [
-        key,
-        value === "all" ? undefined : value,
-      ])
-    );
-    setFormData(updatedFormData);
+  const convertUnitPrice = (unitPrice: number | null): string => {
+    if (!currencyData || unitPrice === null || unitPrice === undefined) return "N/A";
+    const converted = unitPrice * currencyData.exchange_rate;
+    return `${currencyData.currency_symbol}${roundToCurrency(
+      converted,
+      currencyData.default_currency
+    )}`;
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > (componentsData?.total_pages || 0)) return;
+    const totalPages = Math.ceil((componentsData?.count || 0) / resultsPerPage);
+
+    // Ensure valid page navigation
+    if (newPage < 1 || newPage > totalPages) {
+      console.warn("Invalid page navigation attempt:", newPage);
+      return;
+    }
+  
+    // Update query parameters
+    setSearchParams({
+      filters: searchParams.get("filters") || "{}",
+      page: String(newPage),
+      search: searchParams.get("search") || "",
+    });
+  
+    // Trigger a re-fetch with the new page number
+    refetchComponents({
+      newFilters: JSON.parse(searchParams.get("filters") || "{}"),
+      newPage,
+      newSearch: searchParams.get("search") || "",
+    });
+  
+    // Update the current page state
     setCurrentPage(newPage);
   };
 
@@ -112,69 +181,61 @@ const Components: React.FC = () => {
       wrap: true,
     },
     {
-      name: <div>Supplier</div>,
-      selector: (row: Component) => row.supplier?.name || "",
-      sortable: true,
-      wrap: true,
+      cell: (row) =>
+        (row.supplier_items || []).length > 0 ? (
+          <ul className="pl-5 list-disc">
+            {row.supplier_items?.map((item) => (
+              <li key={item.id}>
+                <b>{item.supplier?.short_name}: </b>
+                {item.supplier_item_no ? (
+                  <a
+                    className="text-blue-500 hover:text-blue-700"
+                    href={item.link}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {item.supplier_item_no}
+                  </a>
+                ) : (
+                  <a
+                    className="flex items-center text-blue-500 hover:text-blue-700"
+                    href={item.link}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <LinkIcon className="inline-block w-4 h-4" />
+                  </a>
+                )}
+                {item.unit_price && (
+                  <span className="text-xs text-gray-600">
+                    {" "}
+                    ({convertUnitPrice(item.unit_price)})
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          "No supplier items"
+        ),
+      name: "Suppliers",
+      sortable: false,
+      width: "210px",
     },
     {
-      cell: (row: Component) => {
-        return (
-          <a className="text-blue-500 hover:text-blue-700" href={row.link}>
-            {row?.supplier_item_no ? row?.supplier_item_no : "[ none ]"}
-          </a>
-        );
-      },
-      name: <div>Supp. Item #</div>,
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row: Component) => (
-        row.farads ? (
-          <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>
-            <span>{row.farads} {row.farads_unit || 'µF'}</span>
-          </Tippy>
-        ) : ""
-      ),
-      name: <div>Farads</div>,
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row: Component) => (
-        row.ohms ? (
-          <Tippy content={<div dangerouslySetInnerHTML={{ __html: getOhmConversions(row.ohms, row.ohms_unit) }} />}>
-            <span>{row.ohms} {row.ohms_unit || 'Ω'}</span>
-          </Tippy>
-        ) : ""
-      ),
-      name: <div>Ohms</div>,
-      sortable: true,
+      cell: (row: Component) => row.qualities || "", // Use the backend-generated qualities field
+      name: <div>Qualities</div>,
+      sortable: false, // Sorting this column might not be straightforward
       wrap: true,
     },
     {
       cell: (row: Component) => {
         if (!row.unit_price) return "N/A";
 
-        const symbol = userCurrency?.currency_symbol || "$";
+        const symbol = currencyData?.currency_symbol || "$";
         return `${symbol}${row.unit_price}`;
       },
       name: <div>Price</div>,
-      sortable: true,
-      wrap: true,
-    },
-    {
-      hide: 1700,
-      name: <div>Tolerance</div>,
-      selector: (row: Component) => row.tolerance || "",
-      sortable: true,
-      wrap: true,
-    },
-    {
-      hide: 1700,
-      name: <div>V. Rating</div>,
-      selector: (row: Component) => row.voltage_rating || "",
       sortable: true,
       wrap: true,
     },
@@ -283,86 +344,47 @@ const Components: React.FC = () => {
             ohms={componentsData?.unique_values?.ohms ?? []}
             onSubmit={onSubmit}
             register={register}
-            supplier={componentsData?.unique_values?.supplier ?? []} 
-            tolerance={componentsData?.unique_values?.tolerance ?? []} 
+            supplier={componentsData?.unique_values?.supplier ?? []}
+            tolerance={componentsData?.unique_values?.tolerance ?? []}
             type={componentsData?.unique_values?.type ?? []}
             voltage_rating={componentsData?.unique_values?.voltage_rating ?? []}
           />
         </div>
       </div>
       <h1 className="my-6 text-3xl">Components</h1>
-      {!!user?.username || (
-        <div className="mb-8">
-          <Alert variant="warning">
-            <div className="alert alert-warning" role="alert">
-              <a
-                className="text-blue-500 hover:text-blue-700"
-                href="/accounts/login/"
-              >
-                <b>Login</b>
-              </a>{" "}
-              to add components to your shopping list and inventory.
+        <>
+          {!user?.username && (
+            <div className="mb-8">
+              <Alert variant="warning">
+                <div className="alert alert-warning" role="alert">
+                  <a
+                    className="text-blue-500 hover:text-blue-700"
+                    href="/accounts/login/"
+                  >
+                    <b>Login</b>
+                  </a>{" "}
+                  to add components to your shopping list and inventory.
+                </div>
+              </Alert>
             </div>
-          </Alert>
-        </div>
-      )}
+          )}
+        </>
       <div id="table__wrapper">
         <DataTable
           columns={columns}
           customStyles={customStyles}
-          data={componentsData?.results}
-          exportHeaders
-          fixedHeader
-          progressComponent={
-            <div className="text-center text-gray-500 animate-pulse">
-              Loading...
-            </div>
-          }
+          data={componentsData?.results || []}
           progressPending={componentsAreLoading}
           responsive
-          // @ts-ignore
-          subHeaderAlign="right"
-          subHeaderWrap
         />
       </div>
       {componentsData?.results && (
         <div className="flex items-center justify-between py-4 bg-white border-t border-gray-200">
-          <div className="flex justify-between flex-1 sm:hidden">
-            <a
-              className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous
-            </a>
-            <a
-              className="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next
-            </a>
-          </div>
-          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing{" "}
-                <span className="font-medium">
-                  {((currentPage || 1) - 1) * 10 + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">{(currentPage || 1) * 10}</span>{" "}
-                of{" "}
-                <span className="font-medium">
-                  {componentsData?.count || 0}
-                </span>{" "}
-                results
-              </p>
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              navigate={handlePageChange}
-              totalPages={totalPages}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            navigate={handlePageChange}
+            totalPages={totalPages}
+          />
         </div>
       )}
     </div>

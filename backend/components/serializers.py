@@ -65,6 +65,9 @@ class ComponentSerializer(serializers.ModelSerializer):
     )
     supplier_items = ComponentSupplierItemSerializer(many=True, read_only=True)
 
+    # Add a custom field for combined qualities
+    qualities = serializers.SerializerMethodField()
+
     class Meta:
         model = Component
         fields = [
@@ -86,4 +89,21 @@ class ComponentSerializer(serializers.ModelSerializer):
             "link",
             "allow_comments",
             "supplier_items",
+            "qualities",  # Include the custom field
         ]
+
+    def get_qualities(self, obj):
+        """
+        Combine various component qualities into a single string.
+        """
+        qualities = [
+            f"{obj.ohms} {obj.ohms_unit}" if obj.ohms and obj.ohms_unit else None,
+            (
+                f"{obj.farads} {obj.farads_unit}"
+                if obj.farads and obj.farads_unit
+                else None
+            ),
+            f"Voltage: {obj.voltage_rating}" if obj.voltage_rating else None,
+            f"Tolerance: {obj.tolerance}" if obj.tolerance else None,
+        ]
+        return ", ".join(filter(None, qualities)) or "N/A"
