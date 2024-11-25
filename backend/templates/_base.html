@@ -157,22 +157,24 @@
     </script>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const logo = document.getElementById("the_logo");
+      $(function () {
+        const logo = $("#the_logo");
         const initialScale = 1;
         const shrinkScale = 0.7; // 20% shrink
         const maxScroll = 50; // The scroll amount to reach full shrink
     
         // Set the transform origin to the top
-        logo.style.transformOrigin = "top";
+        logo.css("transform-origin", "top");
     
-        window.addEventListener("scroll", () => {
-            const scrollY = window.scrollY;
-            const scale = Math.max(shrinkScale, initialScale - (scrollY / maxScroll) * (initialScale - shrinkScale));
-            logo.style.transform = `scale(${scale})`;
-            logo.style.transition = "transform 0.2s ease-out";
+        $(window).on("scroll", () => {
+          const scrollY = window.scrollY;
+          const scale = Math.max(shrinkScale, initialScale - (scrollY / maxScroll) * (initialScale - shrinkScale));
+          logo.css({
+            transform: `scale(${scale})`,
+            transition: "transform 0.2s ease-out",
+          });
         });
-    });    
+      });
     </script>
 
     <script>
@@ -180,7 +182,7 @@
         localStorage.setItem("currency", newCurrency);
     
         const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
-        
+    
         // Update user's default currency on the server if authenticated
         if (isAuthenticated) {
           fetch("{% url 'user_currency' %}", {
@@ -210,7 +212,7 @@
         }
       }
     
-      document.addEventListener("DOMContentLoaded", function () {
+      $(document).ready(function () {
         const currencies = [
           { code: "USD", symbol: "$", name: "US Dollar" },
           { code: "EUR", symbol: "€", name: "Euro" },
@@ -229,7 +231,7 @@
           { code: "INR", symbol: "₹", name: "Indian Rupee" },
         ];
     
-        const currencySelector = document.getElementById("currency-selector");
+        const currencySelector = $("#currency-selector");
     
         function getDefaultCurrency() {
           const userDefaultCurrency = "{{ request.user.default_currency|default:'' }}";
@@ -241,32 +243,32 @@
         }
     
         function populateWithSymbols() {
-          currencySelector.innerHTML = "";
+          currencySelector.empty();
           currencies.forEach((currency) => {
-            const option = document.createElement("option");
-            option.value = currency.code;
-            option.textContent = currency.symbol;
-            currencySelector.appendChild(option);
+            const option = $("<option>")
+              .val(currency.code)
+              .text(currency.symbol);
+            currencySelector.append(option);
           });
-          currencySelector.value = getDefaultCurrency();
+          currencySelector.val(getDefaultCurrency());
         }
     
         function populateWithFullNames() {
-          currencySelector.innerHTML = "";
+          currencySelector.empty();
           currencies.forEach((currency) => {
-            const option = document.createElement("option");
-            option.value = currency.code;
-            option.textContent = `${currency.name} (${currency.code})`;
-            currencySelector.appendChild(option);
+            const option = $("<option>")
+              .val(currency.code)
+              .text(`${currency.name} (${currency.code})`);
+            currencySelector.append(option);
           });
-          currencySelector.value = getDefaultCurrency();
+          currencySelector.val(getDefaultCurrency());
         }
     
-        currencySelector.addEventListener("focus", populateWithFullNames);
-        currencySelector.addEventListener("blur", populateWithSymbols);
+        currencySelector.on("focus", populateWithFullNames);
+        currencySelector.on("blur", populateWithSymbols);
         populateWithSymbols();
     
-        currencySelector.addEventListener("change", function () {
+        currencySelector.on("change", function () {
           updateCurrency(this.value);
         });
       });

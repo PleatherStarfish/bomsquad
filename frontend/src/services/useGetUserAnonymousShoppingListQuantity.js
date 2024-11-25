@@ -17,14 +17,16 @@ const useGetUserAnonymousShoppingListQuantity = (componentPk) => {
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["userAnonymousInventoryQuantity", componentPkCleaned],
-    queryFn: fetchUserInventoryQuantity,
     // Only run the query if componentPkCleaned is not null/undefined
-    enabled: !!componentPkCleaned
+enabled: !!componentPkCleaned,
+    
+queryFn: fetchUserInventoryQuantity,
+    
+    queryKey: ["userAnonymousInventoryQuantity", componentPkCleaned]
   });
 
   // Return data along with isLoading and isError states
-  return { data, isLoading, isError };
+  return { data, isError, isLoading };
 };
 
 export default useGetUserAnonymousShoppingListQuantity;

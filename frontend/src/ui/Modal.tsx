@@ -29,9 +29,9 @@ export const Types = {
   ),
 };
 
-interface ModalProps {
+export interface ModalProps {
   open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>> | ((arg0: boolean) => void);
   title: string;
   submitButtonText: string;
   onSubmit?: () => void;

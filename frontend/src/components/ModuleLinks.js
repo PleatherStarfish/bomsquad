@@ -4,7 +4,7 @@ import React from 'react';
 
 function ModuleLinks({ module }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 text-xs">
       {module.manufacturer_page_link && (
         <a href={module.manufacturer_page_link}>
           <Button variant='light' Icon={LinkIcon} iconLocation='right'>

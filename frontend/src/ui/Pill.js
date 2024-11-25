@@ -1,5 +1,4 @@
-import { ArrowLongRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
-
+import { ArrowLongRightIcon } from "@heroicons/react/24/solid";
 import React from "react";
 import cx from "classnames";
 

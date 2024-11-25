@@ -70,6 +70,8 @@ export interface BomListProps {
   bomUnderConstruction: boolean;
   moduleId: string;
   moduleName: string;
+  handleExportButtonClick: (arg0: boolean) => void
+  exportModalOpen: boolean
 }
 
 export interface WantToBuildModules {

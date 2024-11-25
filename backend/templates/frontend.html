@@ -12,7 +12,7 @@
 <div class="container py-12 mx-auto transition-opacity duration-500 opacity-0" id="comments-section">
   <div id="comments">
     <div class="flex justify-between">
-      <h2 class="pb-10 text-2xl font-bold text-left card-title">Community Comments</h2>
+      <h2 class="pb-10 text-xl font-semibold text-left card-title font-display">Community Comments</h2>
       {% get_comment_count for module as comment_count %}
       {% if comment_count > 1 %}
         <h5 class="text-right">{{ comment_count }} comments</h5>
@@ -40,11 +40,10 @@
 {% block javascript %}
 <script src="{% static 'js/main.bundle.js' %}"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      const commentsSection = document.getElementById('comments-section');
-      commentsSection.classList.remove('opacity-0');
-    }, 1500);
+  $(function () {
+    setTimeout(function () {
+      $('#comments-section').removeClass('opacity-0');
+    }, 3000);
   });
 </script>
 {% endblock javascript %}

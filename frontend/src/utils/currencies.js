@@ -60,12 +60,12 @@ export const roundToCurrency = (amount, currencyCode = "USD") => {
 };
 
 const CURRENCY_SYMBOLS = {
-  AUD: "$", BRL: "R$", CAD: "$", CHF: "CHF", CNH: "¥", CZK: "Kč",
+  AED: "د.إ", AUD: "$", BRL: "R$", CAD: "$", CHF: "CHF", CNH: "¥", CZK: "Kč",
   DKK: "kr", EUR: "€", GBP: "£", HKD: "$", HUF: "Ft", IDR: "Rp",
-  INR: "₹", ILS: "₪", JPY: "¥", KRW: "₩", MXN: "$", MYR: "RM",
+  ILS: "₪", INR: "₹", JPY: "¥", KRW: "₩", MXN: "$", MYR: "RM",
   NOK: "kr", NZD: "$", PHP: "₱", PLN: "zł", QAR: "QR", RUB: "₽",
-  SAR: "SR", SEK: "kr", SGD: "$", THB: "฿", TRY: "₺", USD: "$",
-  ZAR: "R", AED: "د.إ",
+  SAR: "SR", SEK: "kr", SGD: "$", THB: "฿", TRY: "₺",
+  USD: "$", ZAR: "R",
 };
 
 const getCurrencySymbol = (currencyCode) => {

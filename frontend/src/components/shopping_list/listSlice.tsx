@@ -21,9 +21,9 @@ import NumericInput from "react-numeric-input";
 import Quantity from "./Quantity";
 import TotalPriceForComponent from "./TotalPriceForComponent"
 import TotalQuantity from "./TotalQuantity";
+import convertUnitPrice from "../../utils/convertUnitPrice"
 import cx from "classnames";
 import { get } from "lodash";
-import { roundToCurrency } from "../../utils/currencies";
 import useDeleteModuleFromShoppingList from "../../services/useDeleteModuleFromShoppingList";
 import useGetUserCurrency from "../../services/useGetUserCurrency"
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
@@ -72,15 +72,6 @@ const ListSlice: React.FC<ListSliceProps> = ({
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteModuleFromShoppingList();
   const { data: currencyData } = useGetUserCurrency();
-
-  const convertUnitPrice = (unitPrice: number | null): string => {
-    if (!currencyData || unitPrice === null || unitPrice === undefined) return "N/A";
-    const converted = unitPrice * currencyData.exchange_rate;
-    return `${currencyData.currency_symbol}${roundToCurrency(
-      converted,
-      currencyData.default_currency
-    )}`;
-  };
 
   const bgStyles = `
   .rdt_TableHeadRow { background-color: ${backgroundColor}; }
@@ -162,7 +153,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
                 {item.unit_price && (
                   <span className="text-xs text-gray-600">
                     {" "}
-                    ({convertUnitPrice(item.unit_price)})
+                    ({convertUnitPrice(item.unit_price, currencyData)})
                   </span>
                 )}
               </li>

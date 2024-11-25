@@ -41,6 +41,7 @@ const useUpdateShoppingList = () => {
     onSuccess: () => {
       // Invalidate the relevant query to trigger a refetch
       queryClient.invalidateQueries({queryKey: ["userShoppingList"]});
+      queryClient.invalidateQueries({ exact: false, queryKey: ["userShoppingListTotalPrice"] });
     },
   });
 

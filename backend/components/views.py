@@ -44,7 +44,6 @@ class ComponentView(APIView):
     def get(self, request):
         # Get the page number and search query from the request query parameters
         page_number = request.query_params.get("page", 1)
-        print("page_number: ", page_number)
         search_query = request.query_params.get("search", "")
 
         # Build the filters dictionary from query parameters
@@ -61,8 +60,6 @@ class ComponentView(APIView):
 
         # Remove any keys with `None` values
         filters = {key: value for key, value in filters.items() if value is not None}
-
-        print("Filters:", filters)  # Debugging output
 
         # Start with a base queryset
         components = Component.objects.select_related("manufacturer", "supplier").all()

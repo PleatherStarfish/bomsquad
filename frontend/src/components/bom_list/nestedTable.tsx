@@ -1,24 +1,24 @@
 import 'tippy.js/dist/tippy.css';
 
+import DataTable, { TableColumn } from "react-data-table-component";
+import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
 import Quantity, { Types } from "./quantity";
 import React, { useState } from "react";
 import { getFaradConversions, getOhmConversions } from '../conversions';
-import { roundToCurrency } from "../../utils/currencies"
 
 import AddComponentModal from "./addComponentModal";
 import Alert from "../../ui/Alert";
+import { BomItem } from "../../types/bomListItem";
 import Button from "../../ui/Button";
-import DataTable, { TableColumn } from "react-data-table-component";
-import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
+import { Component } from "../../types/component";
 import Tippy from '@tippyjs/react';
 import UserRating from "./UserRating";
-import useGetUserCurrency from "../../services/useGetUserCurrency"
+import convertUnitPrice from "../../utils/convertUnitPrice"
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
+import useGetUserCurrency from "../../services/useGetUserCurrency"
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
-import { BomItem } from "../../types/bomListItem";
-import { Component } from "../../types/component";
 
 interface NestedTableProps {
   data: BomItem;
@@ -80,15 +80,6 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     useGetComponentsByIds(components_options);
   const { data: currencyData } = useGetUserCurrency();
 
-  const convertUnitPrice = (unitPrice: number | null): string => {
-    if (!currencyData || unitPrice === null || unitPrice === undefined) return "N/A";
-    const converted = unitPrice * currencyData.exchange_rate;
-    return `${currencyData.currency_symbol}${roundToCurrency(
-      converted,
-      currencyData.default_currency
-    )}`;
-  };
-
   if (componentsAreError) {
     return (
       <div className="p-3 ml-[47px] bg-gray-100">
@@ -149,7 +140,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                 {item.unit_price && (
                   <span className="text-xs text-gray-600">
                     {" "}
-                    ({convertUnitPrice(item.unit_price)})
+                    ({convertUnitPrice(item.unit_price, currencyData)})
                   </span>
                 )}
               </li>
@@ -158,7 +149,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
         ) : (
           "No supplier items"
         ),
-      name: "Supplier Items",
+      name: <small>Supplier Items</small>,
     },    
     {
       cell: (row) => (

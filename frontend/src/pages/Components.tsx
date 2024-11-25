@@ -198,7 +198,7 @@ const Components: React.FC = () => {
                   </a>
                 ) : (
                   <a
-                    className="flex items-center text-blue-500 hover:text-blue-700"
+                    className="text-blue-500 hover:text-blue-700"
                     href={item.link}
                     rel="noreferrer"
                     target="_blank"
@@ -226,17 +226,6 @@ const Components: React.FC = () => {
       cell: (row: Component) => row.qualities || "", // Use the backend-generated qualities field
       name: <div>Qualities</div>,
       sortable: false, // Sorting this column might not be straightforward
-      wrap: true,
-    },
-    {
-      cell: (row: Component) => {
-        if (!row.unit_price) return "N/A";
-
-        const symbol = currencyData?.currency_symbol || "$";
-        return `${symbol}${row.unit_price}`;
-      },
-      name: <div>Price</div>,
-      sortable: true,
       wrap: true,
     },
     {
@@ -352,6 +341,7 @@ const Components: React.FC = () => {
         </div>
       </div>
       <h1 className="my-6 text-3xl">Components</h1>
+      {componentsAreLoading ? <div className="text-center animate-pulse">Loading...</div> : <>
         <>
           {!user?.username && (
             <div className="mb-8">
@@ -369,24 +359,25 @@ const Components: React.FC = () => {
             </div>
           )}
         </>
-      <div id="table__wrapper">
-        <DataTable
-          columns={columns}
-          customStyles={customStyles}
-          data={componentsData?.results || []}
-          progressPending={componentsAreLoading}
-          responsive
-        />
-      </div>
-      {componentsData?.results && (
-        <div className="flex items-center justify-between py-4 bg-white border-t border-gray-200">
-          <Pagination
-            currentPage={currentPage}
-            navigate={handlePageChange}
-            totalPages={totalPages}
+        <div id="table__wrapper">
+          <DataTable
+            columns={columns}
+            customStyles={customStyles}
+            data={componentsData?.results || []}
+            progressPending={componentsAreLoading}
+            responsive
           />
         </div>
-      )}
+        {componentsData?.results && (
+          <div className="flex items-center justify-between py-4 bg-white border-t border-gray-200">
+            <Pagination
+              currentPage={currentPage}
+              navigate={handlePageChange}
+              totalPages={totalPages}
+            />
+          </div>
+        )}
+      </>}
     </div>
   );
 };

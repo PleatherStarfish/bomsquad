@@ -1,5 +1,5 @@
 import React from "react";
-import { roundToCurrency } from "../../utils/currencies";
+import convertUnitPrice from "../../utils/convertUnitPrice"
 import useGetUserCurrency from "../../services/useGetUserCurrency";
 import useGetUserShoppingListTotalPrice from "../../services/useGetUserShoppingListTotalPrice";
 
@@ -21,21 +21,12 @@ const ListPriceSum: React.FC<ListPriceSumProps> = () => {
     );
   }
 
-  const convertPrice = (price: number | null): string => {
-    if (!currencyData || price === null || price === undefined) return "N/A";
-    const converted = price * currencyData.exchange_rate;
-    return `${currencyData.currency_symbol}${roundToCurrency(
-      converted,
-      currencyData.default_currency
-    )}`;
-  };
-
-  const totalMinPrice = convertPrice(totalPriceData?.total_min_price || 0);
-  const totalMaxPrice = convertPrice(totalPriceData?.total_max_price || 0);
+  const totalMinPrice = convertUnitPrice(totalPriceData?.total_min_price || 0, currencyData);
+  const totalMaxPrice = convertUnitPrice(totalPriceData?.total_max_price || 0, currencyData);
 
   return (
     <span className="text-xs font-bold">
-      {totalMinPrice} - {totalMaxPrice}
+      {totalMinPrice === totalMaxPrice ? totalMinPrice : `${totalMinPrice} - ${totalMaxPrice}`}
     </span>
   );
 };

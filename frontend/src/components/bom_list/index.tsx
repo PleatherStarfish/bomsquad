@@ -4,14 +4,16 @@ import { BomItem, BomListProps, PcbVersion } from "../../types/bomListItem";
 import { Cart, CheckLg, Folder2 } from "react-bootstrap-icons";
 import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useMemo, useState } from "react";
-import { flatMap, sortBy, uniq } from 'lodash-es';
+import { flatMap, uniqBy } from "lodash-es";
 
 import Alert from "../../ui/Alert";
+import CheckboxGridModal from "./checkboxGridModal"
+import DropdownButton from "../../ui/DropdownButton"
+import FullPageModal from "../../ui/FullPageModal"
 import NestedTable from "./nestedTable";
-import Tabs from "../../ui/Tabs";
+import RadioGroup from "../../ui/RadioGroup";
 import Tippy from "@tippyjs/react";
 import { prefetchComponentsData } from "../../services/usePreloadComponentsData";
-import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useModuleBomListItems from "../../services/useModuleBomListItems";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -25,25 +27,34 @@ export const customStyles = {
 
 // Helper function to extract unique PCB version names sorted by order
 const getUniqueSortedPCBVersionNames = (data: BomItem[]): string[] => {
-  return uniq(
-    flatMap(data, (item: BomItem) =>
-      sortBy(item.pcb_version, (version: PcbVersion) => version.order)
-        .map((version: PcbVersion) => version.version)
-    )
+  const flattenedVersions = flatMap(data, (item: BomItem) => item.pcb_version);
+  const sortedVersions = flattenedVersions.sort((a, b) => b.order - a.order);
+  const uniqueVersions = uniqBy(
+    sortedVersions,
+    (version: PcbVersion) => version.version
   );
+  return uniqueVersions.map((version) => version.version);
 };
 
 // Helper function to generate a unique key for each item and selected tab
-const generateUniqueKey = (itemId: string, tabName: string) => `${itemId}_${tabName}`;
+const generateUniqueKey = (itemId: string, tabName: string) =>
+  `${itemId}_${tabName}`;
 
-const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstruction }) => {
+const BomList: React.FC<BomListProps> = ({
+  moduleId,
+  moduleName,
+  bomUnderConstruction,
+  handleExportButtonClick,
+  exportModalOpen
+}) => {
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
   const [uniquePCBVersions, setUniquePCBVersions] = useState<string[]>([]);
-  const { user } = useAuthenticatedUser();
+  const [exportOutput, setExportOutput] = useState<string>("");
   const queryClient = useQueryClient();
 
   // Fetch module BOM data
-  const { moduleBom, moduleBomIsLoading, moduleBomIsError } = useModuleBomListItems(moduleId);
+  const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
+    useModuleBomListItems(moduleId);
   const moduleBomList: BomItem[] = Array.isArray(moduleBom) ? moduleBom : [];
 
   // Annotate each item with moduleName and moduleId for easier usage
@@ -53,10 +64,28 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
     moduleName,
   }));
 
-  const hasOptionalColumn = useMemo(() => moduleBomData.some((item) => item.optional), [moduleBomData]);
+  const hasOptionalColumn = () => moduleBomData.some((item) => item.optional);
+
+  const handleExportCsv = () => {
+    // Mocked CSV export logic
+    const csvContent = "data:text/csv;charset=utf-8," + exportOutput;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "bom.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const handleExportText = () => {
+    // Copy text export to clipboard
+    navigator.clipboard.writeText(exportOutput);
+    alert("Text exported to clipboard");
+  };
 
   useEffect(() => {
     setUniquePCBVersions(getUniqueSortedPCBVersionNames(moduleBomData));
+    console.log(getUniqueSortedPCBVersionNames(moduleBomData));
   }, [moduleBomData.length]);
 
   useEffect(() => {
@@ -64,27 +93,29 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   }, [uniquePCBVersions]);
 
   const filteredData = useMemo(() => {
-    return moduleBomData
-      // Step 1: Filter `moduleBomData` to include only items associated with the selected PCB version tab.
-      .filter((item) =>
-        item.pcb_version.some((version) => version.version === selectedTab)
-      )
-      // Step 2: Reduce the filtered list to ensure unique entries by combining each item ID with the selected tab.
-      // This prevents duplication of items appearing in multiple versions.
-      .reduce<BomItem[]>((uniqueItems, item) => {
-        // Generate a unique key for each item by combining its ID with the selected tab.
-        const uniqueKey = generateUniqueKey(item.id, selectedTab || "");
-  
-        // Step 3: Check if an item with this unique key is already in the list.
-        // If not, add the item to the unique list with its unique key as the ID.
-        if (!uniqueItems.some((uniqueItem) => uniqueItem.id === uniqueKey)) {
-          uniqueItems.push({
-            ...item,
-            id: uniqueKey,
-          });
-        }
-        return uniqueItems;
-      }, []);
+    return (
+      moduleBomData
+        // Step 1: Filter `moduleBomData` to include only items associated with the selected PCB version tab.
+        .filter((item) =>
+          item.pcb_version.some((version) => version.version === selectedTab)
+        )
+        // Step 2: Reduce the filtered list to ensure unique entries by combining each item ID with the selected tab.
+        // This prevents duplication of items appearing in multiple versions.
+        .reduce<BomItem[]>((uniqueItems, item) => {
+          // Generate a unique key for each item by combining its ID with the selected tab.
+          const uniqueKey = generateUniqueKey(item.id, selectedTab || "");
+
+          // Step 3: Check if an item with this unique key is already in the list.
+          // If not, add the item to the unique list with its unique key as the ID.
+          if (!uniqueItems.some((uniqueItem) => uniqueItem.id === uniqueKey)) {
+            uniqueItems.push({
+              ...item,
+              id: uniqueKey,
+            });
+          }
+          return uniqueItems;
+        }, [])
+    );
   }, [selectedTab, moduleBomData]);
 
   const handleRowHover = (componentsOptions: string[]) => {
@@ -105,7 +136,9 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   }
 
   if (moduleBomIsLoading) {
-    return <div className="text-center text-gray-500 animate-pulse">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 animate-pulse">Loading...</div>
+    );
   }
 
   if (moduleBomIsError) {
@@ -163,7 +196,7 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
       wrap: true,
     },
     {
-      cell: (row) => row.optional && <CheckLg className="w-5 h-5"/>,
+      cell: (row) => row.optional && <CheckLg className="w-5 h-5" />,
       maxWidth: "50px",
       name: <div>Optional</div>,
       omit: !hasOptionalColumn,
@@ -172,7 +205,7 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
     {
       format: (row) => <div className="truncate">{row.notes}</div>,
       grow: 2,
-      name: <div>Notes</div>, 
+      name: <div>Notes</div>,
       selector: (row) => row.notes,
       // Truncated display
       sortable: true,
@@ -212,52 +245,98 @@ const BomList: React.FC<BomListProps> = ({ moduleId, moduleName, bomUnderConstru
   ];
 
   return (
-    <div className="mb-8">
-      {!user && (
-        <Alert padding="compact" variant="warning">
-          <div className="alert alert-warning" role="alert">
-            <a className="text-blue-500 hover:text-blue-700" href="/accounts/login/">
-              <b>Login</b>
-            </a>{" "}
-            to compare the BOM against your personal inventory.
+    <>
+      <div className="mb-8">
+        {uniquePCBVersions.length > 1 && selectedTab && (
+          <div className="w-full mb-8">
+            <RadioGroup
+              centered={false}
+              defaultSelected={selectedTab}
+              layout="horizontal"
+              legend="Select a PCB Version"
+              legendSrOnly
+              name="pcb-version"
+              onChange={setSelectedTab}
+              options={uniquePCBVersions.map((name) => ({
+                id: name,
+                title: name,
+              }))}
+            />
           </div>
-        </Alert>
-      )}
-      {uniquePCBVersions.length > 1 && selectedTab && (
-        <div className="p-4 mb-4 bg-gray-100 rounded-lg">
-          <h2 className="mb-2 font-bold text-md">PCB Versions:</h2>
-          <Tabs
-            activeTabColor="bg-[#568b6d] text-white hover:text-white hover:bg-[#4f7f63]"
-            inactiveTabColor="bg-[#c9e2d3] text-gray-800 hover:bg-[#afd4be]"
-            onClick={setSelectedTab}
-            tabs={uniquePCBVersions.map((name) => ({
-              current: name === selectedTab,
-              name,
-            }))}
+        )}
+        {filteredData && (
+          <DataTable
+            columns={columns}
+            conditionalRowStyles={conditionalRowStyles}
+            customStyles={customStyles}
+            data={filteredData}
+            expandableRows
+            expandableRowsComponent={NestedTable}
+            expandOnRowClicked
+            fixedHeader={false}
+            fixedHeaderScrollHeight="500vh"
+            keyField="id"
+            onRowMouseEnter={(row: BomItem) =>
+              handleRowHover(row.components_options)
+            }
+            progressComponent={
+              <div className="text-center text-gray-500 animate-pulse">
+                Loading...
+              </div>
+            }
+            progressPending={moduleBomIsLoading}
+            responsive
           />
-        </div>
-      )}
-      {filteredData && (
-        <DataTable
-          columns={columns}
-          conditionalRowStyles={conditionalRowStyles}
-          customStyles={customStyles}
-          data={filteredData}
-          expandableRows
-          expandableRowsComponent={NestedTable}
-          expandOnRowClicked
-          fixedHeader={false}
-          fixedHeaderScrollHeight="500vh"
-          keyField="id"
-          onRowMouseEnter={(row: BomItem) => handleRowHover(row.components_options)}
-          progressComponent={
-            <div className="text-center text-gray-500 animate-pulse">Loading...</div>
-          }
-          progressPending={moduleBomIsLoading}
-          responsive
+        )}
+      </div>
+      <FullPageModal
+        customButtons={
+          <div className="flex w-full">
+            <div className="grow">
+            <button
+              className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md shadow-sm sm:ml-3 sm:w-auto hover:bg-blue-700"
+              onClick={() => {
+                const combinedText = Object.entries(exportOutput)
+                  .map(([supplier, output]) => `--- ${supplier} ---\n${output}`)
+                  .join("\n\n");
+                navigator.clipboard.writeText(combinedText).then(() => {
+                  alert("Copied to clipboard!");
+                });
+              }}
+              type="button"
+            >
+              Copy to Supplier Import Tool
+            </button>
+            </div>
+            <button
+              className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              onClick={() => handleExportButtonClick(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+            <DropdownButton 
+              onExportCsv={handleExportCsv}
+              onExportText={handleExportText} 
+            />
+          </div>
+        }
+        onSubmit={() => {
+          alert("Exporting BOM...");
+          handleExportButtonClick(false);
+        }}
+        open={exportModalOpen}
+        setOpen={handleExportButtonClick}
+        submitButtonText="Export"
+        title="Quick BOM Export"
+        type="info"
+      >
+        <CheckboxGridModal
+          bomData={moduleBom ?? []}
+          setExportOutput={(output) => setExportOutput(output)}
         />
-      )}
-    </div>
+      </FullPageModal>
+    </>
   );
 };
 
