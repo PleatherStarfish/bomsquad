@@ -73,7 +73,7 @@ class ComponentView(APIView):
                     + TrigramSimilarity("supplier__name", search_query)
                     + TrigramSimilarity("type__name", search_query)
                 )
-                .filter(similarity__gt=0.3)
+                .filter(similarity__gt=0.1)
                 .order_by("-similarity")
             )
 
