@@ -10,7 +10,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ children }) => {
 
   return (
     <button
-      className="px-4 py-2 font-medium text-white bg-[#3c82f6] hover:bg-blue-700 rounded-md flex items-center"
+      className="px-4 py-1.5 font-medium text-white bg-[#3c82f6] hover:bg-blue-700 rounded-md flex items-center"
       onClick={() => setOpen(!open)}
     >
       {children}

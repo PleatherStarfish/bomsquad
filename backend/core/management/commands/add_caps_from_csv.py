@@ -18,6 +18,7 @@ FARAD_UNITS_MAP = {
     "PF": "pF",
     "NF": "nF",
     "UF": "μF",
+    "μF": "μF",
     "MF": "mF",
 }
 
@@ -41,7 +42,7 @@ class Command(BaseCommand):
         """
         try:
             raw_value = float(raw_value)
-            raw_unit = raw_unit.upper()  # Case-insensitive
+            raw_unit = raw_unit.strip()  # Remove extra whitespace if any
             normalized_unit = FARAD_UNITS_MAP.get(raw_unit)
             if not normalized_unit:
                 raise ValueError(f"Invalid capacitance unit: {raw_unit}")
@@ -71,23 +72,35 @@ class Command(BaseCommand):
         try:
             with open(csv_file, "r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
+                self.stdout.write(
+                    self.style.SUCCESS(f"CSV file '{csv_file}' loaded successfully.")
+                )
 
                 # Ensure capacitor type exists
                 component_type_name = "Capacitor"
                 component_type, _ = Types.objects.get_or_create(
                     name=component_type_name
                 )
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Ensured component type '{component_type_name}' exists."
+                    )
+                )
 
                 # Supplier setup (e.g., Tayda Electronics)
                 supplier_name = "Tayda Electronics"
                 try:
                     supplier = ComponentSupplier.objects.get(name=supplier_name)
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Found supplier '{supplier_name}'.")
+                    )
                 except ComponentSupplier.DoesNotExist:
                     raise ValueError(
                         f"Supplier '{supplier_name}' does not exist in the database."
                     )
 
                 for row in reader:
+                    self.stdout.write(self.style.NOTICE(f"Processing row: {row}"))
                     try:
                         # Extract data from CSV
                         sku = row["SKU"]
@@ -106,6 +119,11 @@ class Command(BaseCommand):
                         farads, farads_unit = self.normalize_capacitance(
                             raw_farads, raw_farads_unit
                         )
+                        self.stdout.write(
+                            self.style.NOTICE(
+                                f"Normalized capacitance: {farads} {farads_unit}."
+                            )
+                        )
 
                         # Validate Mounting Style
                         if mounting_style not in MOUNTING_STYLES:
@@ -118,87 +136,50 @@ class Command(BaseCommand):
                             manufacturer_name
                         )
 
-                        # Fetch SizeStandard
-                        try:
-                            size = SizeStandard.objects.get(name=size_name)
-                        except SizeStandard.DoesNotExist:
-                            raise ValueError(
-                                f"SizeStandard '{size_name}' does not exist."
+                        # Fetch or create SizeStandard
+                        size, _ = SizeStandard.objects.get_or_create(name=size_name)
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f"Ensured SizeStandard '{size_name}' exists."
                             )
+                        )
 
-                        # Fetch Category
-                        try:
-                            category = Category.objects.get(name=category_name)
-                        except Category.DoesNotExist:
-                            raise ValueError(
-                                f"Category with name '{category_name}' does not exist."
+                        # Fetch or create Category
+                        category, _ = Category.objects.get_or_create(name=category_name)
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f"Ensured Category '{category_name}' exists."
                             )
+                        )
+
+                        description = f"{farads}{farads_unit} {category_name} ({MOUNTING_STYLES[mounting_style]}) by {manufacturer_name or 'Various'}"
 
                         # Retrieve or update the Component
-                        try:
-                            component = Component.objects.get(
-                                supplier=supplier, supplier_item_no=sku
-                            )
-
-                            # Update fields if necessary
-                            updated = False
-                            if component.manufacturer != manufacturer:
-                                component.manufacturer = manufacturer
-                                updated = True
-                            if component.farads != farads:
-                                component.farads = farads
-                                updated = True
-                            if component.farads_unit != farads_unit:
-                                component.farads_unit = farads_unit
-                                updated = True
-                            if component.voltage_rating != voltage_rating:
-                                component.voltage_rating = voltage_rating
-                                updated = True
-                            if component.tolerance != tolerance:
-                                component.tolerance = tolerance
-                                updated = True
-                            if component.mounting_style != mounting_style:
-                                component.mounting_style = mounting_style
-                                updated = True
-                            if component.size != size:
-                                component.size = size
-                                updated = True
-                            if component.category != category:
-                                component.category = category
-                                updated = True
-                            if component.link != link:
-                                component.link = link
-                                updated = True
-
-                            if updated:
-                                component.description = ""
-                                component.save()
-                                self.stdout.write(
-                                    self.style.WARNING(
-                                        f"Updated Component: {component.description}"
-                                    )
-                                )
-
-                        except Component.DoesNotExist:
-                            # Create a new Component if it doesn't exist
-                            component = Component.objects.create(
-                                supplier=supplier,
-                                supplier_item_no=sku,
-                                type=component_type,
-                                manufacturer=manufacturer,
-                                category=category,
-                                farads=farads,
-                                farads_unit=farads_unit,
-                                voltage_rating=voltage_rating,
-                                tolerance=tolerance,
-                                mounting_style=mounting_style,
-                                size=size,
-                                link=link,
-                                description="",
-                            )
+                        component, created = Component.objects.update_or_create(
+                            supplier=supplier,
+                            supplier_item_no=sku,
+                            defaults={
+                                "type": component_type,
+                                "manufacturer": manufacturer,
+                                "category": category,
+                                "farads": farads,
+                                "farads_unit": farads_unit,
+                                "voltage_rating": voltage_rating,
+                                "tolerance": tolerance,
+                                "mounting_style": mounting_style,
+                                "size": size,
+                                "link": link,
+                                "description": description,
+                            },
+                        )
+                        if created:
                             self.stdout.write(
-                                self.style.SUCCESS(
-                                    f"Created Component: {component.description}"
+                                self.style.SUCCESS(f"Created new Component: {sku}.")
+                            )
+                        else:
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    f"Updated existing Component: {sku}."
                                 )
                             )
 
@@ -211,14 +192,19 @@ class Command(BaseCommand):
                                 defaults={"price": price, "pcs": 1, "link": link},
                             )
                         )
-                        if not supplier_item_created:
+                        if supplier_item_created:
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    f"Created new SupplierItem for SKU: {sku}."
+                                )
+                            )
+                        else:
                             supplier_item.price = price
                             supplier_item.link = link
                             supplier_item.save()
-
                             self.stdout.write(
                                 self.style.NOTICE(
-                                    f"Updated SupplierItem: SKU {sku}, Price {price}"
+                                    f"Updated SupplierItem for SKU: {sku}."
                                 )
                             )
 
@@ -226,6 +212,11 @@ class Command(BaseCommand):
                         self.stderr.write(
                             self.style.ERROR(f"Error processing row {row}: {e}")
                         )
+                        with open(
+                            "failed_rows.csv", "a", encoding="utf-8"
+                        ) as error_file:
+                            writer = csv.DictWriter(error_file, fieldnames=row.keys())
+                            writer.writerow(row)
 
             self.stdout.write(self.style.SUCCESS("Database update completed."))
 

@@ -1,7 +1,13 @@
-import { Controller, Control, UseFormGetValues, UseFormReset } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  UseFormGetValues,
+  UseFormReset,
+} from "react-hook-form";
 import React, { useMemo, useEffect } from "react";
 import { flatMap, groupBy, uniqBy, isEqual } from "lodash-es";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+import { LinkIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
 import { BomItem } from "../../types/bomListItem";
@@ -9,13 +15,15 @@ import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 
 interface CheckboxGridModalProps {
   bomData: BomItem[];
-  control: Control<{[key: string]: boolean}, any>;
+  control: Control<{ [key: string]: boolean }, any>;
   formattedOutput: Record<string, string>;
-  getValues: UseFormGetValues<{[key: string]: boolean}>;
+  getValues: UseFormGetValues<{ [key: string]: boolean }>;
   reset: UseFormReset<{ [key: string]: boolean }>;
   selectedPCBVersion?: string;
   setHasSelection: (arg0: boolean) => void;
-  setFormattedOutput: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setFormattedOutput: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
 }
 
 const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
@@ -38,9 +46,13 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
       );
 
   // Fetch supplier items for all components in filtered BOM data
-  const componentIds = flatMap(filteredBomData, (item) => item.components_options);
+  const componentIds = flatMap(
+    filteredBomData,
+    (item) => item.components_options
+  );
 
-  const { componentsData, componentsAreLoading } = useGetComponentsByIds(componentIds);
+  const { componentsData, componentsAreLoading } =
+    useGetComponentsByIds(componentIds);
 
   const { suppliers, groupedComponents } = useMemo(() => {
     if (!componentsData) {
@@ -77,7 +89,10 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
 
         return {
           description: item.description,
-          supplierItems: uniqBy(supplierItems, (supplierItem) => supplierItem?.id),
+          supplierItems: uniqBy(
+            supplierItems,
+            (supplierItem) => supplierItem?.id
+          ),
         };
       }),
       (component) => component.description
@@ -95,9 +110,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
     const selectedSupplierItems = flatMap(groupedComponents, (component) =>
       component.supplierItems.filter(
         (item) =>
-          formState[
-            `${component.description}-${item?.supplier}-${item?.id}`
-          ]
+          formState[`${component.description}-${item?.supplier}-${item?.id}`]
       )
     );
 
@@ -200,25 +213,36 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                           checked={field.value || false}
                                           className="w-4 h-4"
                                           onChange={(e) => {
-                                            field.onChange(e.target.checked)
-                                            generateFormattedOutput()
+                                            field.onChange(e.target.checked);
+                                            generateFormattedOutput();
                                           }}
                                           type="checkbox"
                                         />
                                       )}
                                     />
-                                    <a
-                                      className="text-blue-500 hover:underline text-2xs"
-                                      href={item?.link}
-                                      rel="noreferrer"
-                                      target="_blank"
-                                    >
-                                      {item?.itemNumber}
-                                    </a>
+                                    {item?.itemNumber ? (
+                                      <a
+                                        className="text-blue-500 hover:underline text-2xs"
+                                        href={item?.link}
+                                        rel="noreferrer"
+                                        target="_blank"
+                                      >
+                                        {item?.itemNumber}
+                                      </a>
+                                    ) : (
+                                      <a
+                                        className="text-blue-500 hover:underline text-2xs"
+                                        href={item?.link}
+                                        rel="noreferrer"
+                                        target="_blank"
+                                      >
+                                        <LinkIcon className="inline-block w-3 h-3" />
+                                      </a>
+                                    )}
                                     <span className="text-2xs text-gray-600">
                                       {item?.price
                                         ? `($${item?.price})`
-                                        : "N/A"}
+                                        : ""}
                                     </span>
                                   </div>
                                 ))
