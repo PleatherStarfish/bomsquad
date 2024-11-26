@@ -1,6 +1,6 @@
 import { Controller, Control, UseFormGetValues, UseFormReset } from "react-hook-form";
-import React, { useMemo, useEffect, useState } from "react";
-import { flatMap, groupBy, uniqBy } from "lodash-es";
+import React, { useMemo, useEffect } from "react";
+import { flatMap, groupBy, uniqBy, isEqual } from "lodash-es";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
@@ -9,23 +9,25 @@ import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 
 interface CheckboxGridModalProps {
   bomData: BomItem[];
-  control: Control<{[key: string]: boolean}, any>
-  getValues: UseFormGetValues<{[key: string]: boolean}>
+  control: Control<{[key: string]: boolean}, any>;
+  formattedOutput: Record<string, string>;
+  getValues: UseFormGetValues<{[key: string]: boolean}>;
   reset: UseFormReset<{ [key: string]: boolean }>;
   selectedPCBVersion?: string;
   setHasSelection: (arg0: boolean) => void;
+  setFormattedOutput: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
   bomData,
   control,
+  formattedOutput,
   getValues,
   reset,
   selectedPCBVersion,
   setHasSelection,
+  setFormattedOutput,
 }) => {
-  const [formattedOutput, setFormattedOutput] = useState<Record<string, string>>({});
-
   // Filter BOM data by selected PCB version
   const filteredBomData = !selectedPCBVersion
     ? []
@@ -84,17 +86,16 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
     return { groupedComponents, suppliers };
   }, [componentsData, filteredBomData]);
 
-  // Handle user interaction and generate formatted output
-  useEffect(() => {
+  // Function to generate and set formatted output
+  const generateFormattedOutput = () => {
     const formState = getValues();
     const isSelected = Object.values(formState).some((value) => value === true);
     setHasSelection(isSelected);
 
-    const selectedItems = getValues();
     const selectedSupplierItems = flatMap(groupedComponents, (component) =>
       component.supplierItems.filter(
         (item) =>
-          selectedItems[
+          formState[
             `${component.description}-${item?.supplier}-${item?.id}`
           ]
       )
@@ -122,13 +123,17 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
       }
     });
 
-    setFormattedOutput(output);
-  }, [groupedComponents, getValues, setHasSelection]);
+    // Only update if output has changed
+    if (!isEqual(formattedOutput, output)) {
+      setFormattedOutput(output);
+    }
+  };
 
+  // Reset logic
   useEffect(() => {
-    reset()
-    setFormattedOutput({})
-  }, [reset, selectedPCBVersion])
+    reset();
+    setFormattedOutput({});
+  }, [reset, selectedPCBVersion]);
 
   return (
     <motion.div
@@ -194,9 +199,10 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                           {...field}
                                           checked={field.value || false}
                                           className="w-4 h-4"
-                                          onChange={(e) =>
+                                          onChange={(e) => {
                                             field.onChange(e.target.checked)
-                                          }
+                                            generateFormattedOutput()
+                                          }}
                                           type="checkbox"
                                         />
                                       )}

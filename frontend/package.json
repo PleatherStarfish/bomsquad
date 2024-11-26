@@ -18,6 +18,7 @@
     "choices.js": "^11.0.2",
     "chroma-js": "^3.1.2",
     "classnames": "^2.3.2",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.11.11",
     "fuse.js": "^6.6.2",
     "heroicons": "^2.0.16",
@@ -47,6 +48,7 @@
     "vis-network": "^9.1.9",
     "webpack": "^5.90.3",
     "webpack-cli": "^4.10.0",
+    "xlsx": "^0.18.5",
     "zustand": "^4.3.6"
   },
   "scripts": {

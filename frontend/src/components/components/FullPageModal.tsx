@@ -6,6 +6,7 @@ import React from "react";
 import cx from "classnames";
 
 interface FullPageModalProps extends Omit<ModalProps, "type"> {
+  pcb?: string;
   subtitle?: string;
   type?: keyof typeof Types;
   customButtons?: React.ReactNode;
@@ -18,6 +19,7 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
   title,
   submitButtonText,
   onSubmit = () => {},
+  pcb = "",
   type = "info",
   customButtons,
   bgOpacity = "bg-opacity-75",
@@ -110,6 +112,7 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
                   >
                     {title}
                   </Dialog.Title>
+                  <small className="text-xs pb-4">{pcb}</small>
                   <div className="text-sm pb-4">
                     {subtitle}
                   </div>

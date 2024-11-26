@@ -7,11 +7,18 @@ import React, { useEffect, useMemo, useState } from "react";
 import { animateScroll } from "react-scroll";
 import { flatMap, uniqBy } from "lodash-es";
 import { useForm } from "react-hook-form";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import {
+  Dropdown,
+  DropdownButton,
+  DropdownContent,
+  DropdownList,
+  DropdownItem,
+} from "../../ui/DropdownButtons";
 
 import Alert from "../../ui/Alert";
 import CheckboxGridModal from "./checkboxGridModal";
-import DropdownButton from "../../ui/DropdownButton";
 import FullPageModal from "../components/FullPageModal";
 import NestedTable from "./nestedTable";
 import RadioGroup from "../../ui/RadioGroup";
@@ -53,7 +60,7 @@ const BomList: React.FC<BomListProps> = ({
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
   const [uniquePCBVersions, setUniquePCBVersions] = useState<string[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [exportOutput, setExportOutput] = useState<string>("");
+  const [formattedOutput, setFormattedOutput] = useState<Record<string, string>>({});
   const [userSelection, setUserSelection] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { control, getValues, reset } = useForm<{
@@ -116,6 +123,109 @@ const BomList: React.FC<BomListProps> = ({
   const handleRowHover = (componentsOptions: string[]) => {
     prefetchComponentsData(queryClient, componentsOptions);
   };
+
+  const exportData = (format: "csv" | "json" | "xlsx") => {
+    switch (format) {
+      case "csv":
+        exportAsCsv(formattedOutput);
+        break;
+      case "xlsx":
+        exportAsXlsx(formattedOutput);
+        break;
+      case "json":
+        exportAsJson(formattedOutput);
+        break;
+      default:
+        break;
+    }
+  };
+  
+  const exportAsCsv = (formattedOutput: Record<string, string>) => {
+    Object.entries(formattedOutput).forEach(([supplier, data]) => {
+      if (typeof data !== "string") {
+        console.error(`Expected a string but got ${typeof data} for supplier: ${supplier}`);
+        return; // Skip invalid entries
+      }
+  
+      // Replace pipes with commas
+      const csvData = supplier === "Mouser" ? data.replace(/\|/g, ",") : data;
+  
+      const fileName = `${supplier}_export.csv`;
+      const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+      saveAs(blob, fileName);
+    });
+  };
+  
+  const exportAsXlsx = (formattedOutput: Record<string, string>) => {
+    Object.entries(formattedOutput).forEach(([supplier, data]) => {
+      if (typeof data !== "string") {
+        console.error(`Expected a string but got ${typeof data} for supplier: ${supplier}`);
+        return; // Skip invalid entries
+      }
+  
+      // Convert string data into rows
+      const delimiter = supplier === "Mouser" ? "|" : ",";
+      const rows = data.split("\n").map((row) => row.split(delimiter));
+  
+      // Convert rows into a worksheet
+      const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  
+      // Create a workbook and append the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, supplier);
+  
+      // Write the workbook to a Blob and save it
+      const xlsxData = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([xlsxData], { type: "application/octet-stream" });
+      saveAs(blob, `${supplier}_export.xlsx`);
+    });
+  };
+  
+  
+  const exportAsJson = (formattedOutput: Record<string, string>) => {
+    Object.entries(formattedOutput).forEach(([supplierName, data]) => {
+      if (typeof data !== "string") {
+        console.error(`Expected a string but got ${typeof data} for supplier: ${supplierName}`);
+        return; // Skip invalid entries
+      }
+  
+      // Determine the delimiter based on the supplier
+      const delimiter = supplierName === "Mouser" ? "|" : ",";
+  
+      // Parse data into rows
+      const rows = data.split("\n").map((line) => line.trim().split(delimiter));
+  
+      // Extract headers
+      const headers = rows.shift();
+      if (!headers || headers.length === 0) {
+        console.error(`Missing or invalid headers for supplier: ${supplierName}`);
+        return; // Skip if headers are missing
+      }
+  
+      // Parse rows into JSON objects
+      const jsonData = rows
+        .filter((row) => row.length === headers.length) // Ensure rows match header count
+        .map((row) =>
+          row.reduce((acc, value, index) => {
+            acc[headers[index]] = value;
+            return acc;
+          }, {} as Record<string, string>)
+        );
+  
+      // Check if JSON data is empty
+      if (jsonData.length === 0) {
+        console.warn(`No data to export for supplier: ${supplierName}`);
+        return;
+      }
+  
+      // Save JSON
+      const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], {
+        type: "application/json",
+      });
+      saveAs(jsonBlob, `${supplierName}_export.json`);
+    });
+  };
+  
 
   // Short-circuit and display an alert if BOM is under construction
   if (bomUnderConstruction) {
@@ -308,10 +418,22 @@ const BomList: React.FC<BomListProps> = ({
             >
               Cancel
             </button>
-            <DropdownButton
-              onExportCsv={() => {}}
-              onExportText={() => {}}
-            />
+            <Dropdown>
+              <DropdownButton>Open Menu</DropdownButton>
+              <DropdownContent position="top">
+                <DropdownList>
+                  <DropdownItem onClick={() => exportData("xlsx")}>
+                    Export Excel
+                  </DropdownItem>
+                  <DropdownItem onClick={() => exportData("csv")}>
+                    Export CSV
+                  </DropdownItem>
+                  <DropdownItem onClick={() => exportData("json")}>
+                    Export JSON
+                  </DropdownItem>
+                </DropdownList>
+              </DropdownContent>
+            </Dropdown>
           </div>
         }
         onSubmit={() => {
@@ -325,7 +447,7 @@ const BomList: React.FC<BomListProps> = ({
         title={`Quick Export the BOM for ${moduleName}${ uniquePCBVersions.length > 1 ? ` - ${selectedTab}` : "" }`}
         type="info"
       >
-          <CheckboxGridModal bomData={moduleBom ?? []} control={control} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setHasSelection={setHasSelection} />
+          <CheckboxGridModal bomData={moduleBom ?? []} control={control} formattedOutput={formattedOutput} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setHasSelection={setHasSelection} setFormattedOutput={setFormattedOutput} />
       </FullPageModal>
     </>
   );

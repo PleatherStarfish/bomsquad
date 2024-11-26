@@ -5,11 +5,15 @@ import React from "react";
 interface DropdownButtonProps {
   onExportCsv: () => void;
   onExportText: () => void;
+  onExportXlsx: () => void;
+  onExportJson: () => void;
 }
 
 const DropdownButton: React.FC<DropdownButtonProps> = ({
   onExportCsv,
   onExportText,
+  onExportXlsx,
+  onExportJson,
 }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -46,10 +50,34 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
               </button>
             )}
           </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <button
+                className={`${
+                  active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                } block px-4 py-2 text-sm w-full text-left`}
+                onClick={onExportXlsx}
+              >
+                Export as .xlsx
+              </button>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <button
+                className={`${
+                  active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                } block px-4 py-2 text-sm w-full text-left`}
+                onClick={onExportJson}
+              >
+                Export as JSON
+              </button>
+            )}
+          </Menu.Item>
         </div>
       </Menu.Items>
     </Menu>
   );
 };
 
-export default DropdownButton
+export default DropdownButton;
