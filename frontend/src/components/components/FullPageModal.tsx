@@ -1,11 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useRef } from "react";
-import { ModalProps, Types } from "./Modal";
+import { ModalProps, Types } from "../../ui/Modal";
 
 import React from "react";
 import cx from "classnames";
 
 interface FullPageModalProps extends Omit<ModalProps, "type"> {
+  subtitle?: string;
   type?: keyof typeof Types;
   customButtons?: React.ReactNode;
 }
@@ -13,6 +14,7 @@ interface FullPageModalProps extends Omit<ModalProps, "type"> {
 const FullPageModal: React.FC<FullPageModalProps> = ({
   open,
   setOpen,
+  subtitle,
   title,
   submitButtonText,
   onSubmit = () => {},
@@ -101,13 +103,16 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
                   "flex flex-col max-h-[90vh]" // Ensure max height is constrained
                 )}
               >
-                <div className="flex-1 overflow-y-auto p-8">
+                <div className="flex-1 overflow-y-auto p-8" id="modal-content-container">
                   <Dialog.Title
                     as="h3"
-                    className="text-2xl text-center font-semibold leading-6 text-gray-900 py-4 font-display"
+                    className="text-2xl text-left font-semibold leading-6 text-gray-900 py-4 font-display"
                   >
                     {title}
                   </Dialog.Title>
+                  <div className="text-sm pb-4">
+                    {subtitle}
+                  </div>
                   <div className="w-full mt-2">{children}</div>
                 </div>
                 <div className="p-4 border-t border-gray-300">

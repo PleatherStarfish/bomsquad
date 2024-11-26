@@ -45,7 +45,7 @@ const ModuleDetail: React.FC = () => {
 
   return (
     <div className="space-y-10">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-6 bg-gray-100 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-6 bg-gradient-to-r from-slate-50 to-gray-100 rounded-lg">
         {/* Left Side: Image */}
         <div className="flex justify-center md:col-span-2 py-12">
           {module.large_image_webp && (

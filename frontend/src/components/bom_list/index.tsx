@@ -4,12 +4,15 @@ import { BomItem, BomListProps, PcbVersion } from "../../types/bomListItem";
 import { Cart, CheckLg, Folder2 } from "react-bootstrap-icons";
 import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useMemo, useState } from "react";
+import { animateScroll } from "react-scroll";
 import { flatMap, uniqBy } from "lodash-es";
+import { useForm } from "react-hook-form";
+
 
 import Alert from "../../ui/Alert";
-import CheckboxGridModal from "./checkboxGridModal"
-import DropdownButton from "../../ui/DropdownButton"
-import FullPageModal from "../../ui/FullPageModal"
+import CheckboxGridModal from "./checkboxGridModal";
+import DropdownButton from "../../ui/DropdownButton";
+import FullPageModal from "../components/FullPageModal";
 import NestedTable from "./nestedTable";
 import RadioGroup from "../../ui/RadioGroup";
 import Tippy from "@tippyjs/react";
@@ -45,12 +48,17 @@ const BomList: React.FC<BomListProps> = ({
   moduleName,
   bomUnderConstruction,
   handleExportButtonClick,
-  exportModalOpen
+  exportModalOpen,
 }) => {
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
   const [uniquePCBVersions, setUniquePCBVersions] = useState<string[]>([]);
-  const [exportOutput, setExportOutput] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const [exportOutput, setExportOutput] = useState<string>("");
+  const [userSelection, setUserSelection] = useState<boolean>(false);
   const queryClient = useQueryClient();
+  const { control, getValues, reset } = useForm<{
+    [key: string]: boolean;
+  }>();
 
   // Fetch module BOM data
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
@@ -66,23 +74,6 @@ const BomList: React.FC<BomListProps> = ({
 
   const hasOptionalColumn = () => moduleBomData.some((item) => item.optional);
 
-  const handleExportCsv = () => {
-    // Mocked CSV export logic
-    const csvContent = "data:text/csv;charset=utf-8," + exportOutput;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "bom.csv");
-    document.body.appendChild(link);
-    link.click();
-  };
-
-  const handleExportText = () => {
-    // Copy text export to clipboard
-    navigator.clipboard.writeText(exportOutput);
-    alert("Text exported to clipboard");
-  };
-
   useEffect(() => {
     setUniquePCBVersions(getUniqueSortedPCBVersionNames(moduleBomData));
     console.log(getUniqueSortedPCBVersionNames(moduleBomData));
@@ -91,6 +82,10 @@ const BomList: React.FC<BomListProps> = ({
   useEffect(() => {
     setSelectedTab(uniquePCBVersions[0]);
   }, [uniquePCBVersions]);
+
+  const setHasSelection = (selected: boolean) => {
+     setUserSelection(selected)
+  }
 
   const filteredData = useMemo(() => {
     return (
@@ -291,22 +286,20 @@ const BomList: React.FC<BomListProps> = ({
       </div>
       <FullPageModal
         customButtons={
-          <div className="flex w-full">
+          <div className="flex w-full gap-x-4">
             <div className="grow">
-            <button
-              className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md shadow-sm sm:ml-3 sm:w-auto hover:bg-blue-700"
-              onClick={() => {
-                const combinedText = Object.entries(exportOutput)
-                  .map(([supplier, output]) => `--- ${supplier} ---\n${output}`)
-                  .join("\n\n");
-                navigator.clipboard.writeText(combinedText).then(() => {
-                  alert("Copied to clipboard!");
-                });
-              }}
-              type="button"
-            >
-              Copy to Supplier Import Tool
-            </button>
+              {userSelection && <button
+                className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-[#3c82f6] rounded-md shadow-sm sm:ml-3 sm:w-auto hover:bg-blue-700 cursor-pointer"
+                onClick={() =>
+                  animateScroll.scrollToBottom({
+                    containerId: "modal-content-container",
+                    duration: 300,
+                    smooth: true,
+                  })
+                }
+              >
+                See as text & copy/paste
+              </button>}
             </div>
             <button
               className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
@@ -315,9 +308,9 @@ const BomList: React.FC<BomListProps> = ({
             >
               Cancel
             </button>
-            <DropdownButton 
-              onExportCsv={handleExportCsv}
-              onExportText={handleExportText} 
+            <DropdownButton
+              onExportCsv={() => {}}
+              onExportText={() => {}}
             />
           </div>
         }
@@ -328,13 +321,11 @@ const BomList: React.FC<BomListProps> = ({
         open={exportModalOpen}
         setOpen={handleExportButtonClick}
         submitButtonText="Export"
-        title="Quick BOM Export"
+        subtitle="Export your BOM in .csv, .xlsx, or JSON formats. Supported import tools include Mouser, DigiKey, or TME via file export or copy/paste. Login or create an account to see the intersection of shopping lists for multiple BOMs using the meta-shopping list tool."
+        title={`Quick Export the BOM for ${moduleName}${ uniquePCBVersions.length > 1 ? ` - ${selectedTab}` : "" }`}
         type="info"
       >
-        <CheckboxGridModal
-          bomData={moduleBom ?? []}
-          setExportOutput={(output) => setExportOutput(output)}
-        />
+          <CheckboxGridModal bomData={moduleBom ?? []} control={control} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setHasSelection={setHasSelection} />
       </FullPageModal>
     </>
   );
