@@ -129,7 +129,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                   </a>
                 ) : (
                   <a
-                    className="flex items-center text-blue-500 hover:text-blue-700"
+                    className="text-blue-500 hover:text-blue-700"
                     href={item.link}
                     rel="noreferrer"
                     target="_blank"

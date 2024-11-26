@@ -1,6 +1,6 @@
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TrashIcon,
   XMarkIcon,
@@ -71,97 +71,98 @@ const SolderingMode = ({
 
   const conditionalRowStyles = [
     {
-      when: row => darkMode,
       style: {
         backgroundColor: '#212529',
-        color: 'white',
         borderColor: "white",
+        color: 'white',
       },
+      when: () => darkMode,
     },
   ];
 
   const columns = [
     {
+      grow: 1,
       name: "Name",
       selector: (row) => row.component.description,
       sortable: true,
       wrap: true,
-      grow: 1,
     },
     {
       name: <div>Farads</div>,
+      omit: (row) => row.component.type !== "Capacitor",
       selector: (row) => row.farads,
       sortable: true,
       wrap: true,
-      omit: (row) => row.component.type !== "Capacitor",
     },
     {
       name: <div>Ohms</div>,
+      omit: (row) => row.component.type !== "Resistor",
       selector: (row) => row.ohms,
       sortable: true,
       wrap: true,
-      omit: (row) => row.component.type !== "Resistor",
     },
     {
-      name: <div>Qty.</div>,
       cell: (row) => (
         <EditableQuantity
-          row={row}
-          quantityIdToEdit={quantityIdToEdit}
-          updatedQuantityToSubmit={updatedQuantityToSubmit}
+          handleClick={handleClick}
           handleQuantityChange={handleQuantityChange}
           handleSubmitQuantity={handleSubmitQuantity}
+          quantityIdToEdit={quantityIdToEdit}
+          row={row}
           setQuantityIdToEdit={setQuantityIdToEdit}
           setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
-          handleClick={handleClick}
+          updatedQuantityToSubmit={updatedQuantityToSubmit}
         />
       ),
+      name: <div>Qty.</div>,
       sortable: true,
       width: quantityIdToEdit ? "260px" : "100px",
     },
     {
-      name: <div>Location</div>,
       cell: (row) => (
         <EditableLocation
-          row={row}
-          locationIdToEdit={locationIdToEdit}
-          updatedLocationToSubmit={updatedLocationToSubmit}
-          handleLocationChange={handleLocationChange}
-          setLocationIdToEdit={setLocationIdToEdit}
-          handleSubmitLocation={handleSubmitLocation}
-          handlePillClick={handlePillClick}
           handleClick={handleClick}
-          textSize={"text-lg"}
+          handleLocationChange={handleLocationChange}
+          handlePillClick={handlePillClick}
+          handleSubmitLocation={handleSubmitLocation}
+          locationIdToEdit={locationIdToEdit}
+          row={row}
+          setLocationIdToEdit={setLocationIdToEdit}
           setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+          textSize={"text-lg"}
+          updatedLocationToSubmit={updatedLocationToSubmit}
         />
       ),
-      sortable: true,
-      wrap: true,
-      width: !!locationIdToEdit ? "350px" : undefined,
       minWidth: "200px",
+      name: <div>Location</div>,
       sortFunction: locationsSort,
+      // eslint-disable-next-line sort-keys
+      sortable: true,
+      width: !!locationIdToEdit ? "350px" : undefined,
+      wrap: true,
     },
     {
-      name: "",
-      sortable: false,
       cell: (row) => {
         return (
           <TrashIcon
-            role="button"
             className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
               setDataToDelete(row.component);
               setDeleteModalOpen(true);
             }}
+            role="button"
           />
         );
       },
+      name: "",
+      sortable: false,
       width: "50px",
     },
   ];
 
   return (
-    <Transition.Root show={open} as={Fragment}>
+    <Transition.Root as={Fragment} show={open}>
       <Dialog as="div" className={cx("relative z-30", {"dark": darkMode})} onClose={setOpen}>
         <div className="fixed inset-0" />
 
@@ -184,8 +185,8 @@ const SolderingMode = ({
                         <div className="flex">
                           <Switch
                             checked={darkMode}
-                            onChange={setDarkMode}
                             className="relative inline-flex flex-shrink-0 w-20 transition-colors duration-200 ease-in-out bg-white border-2 ring-gray-400 rounded-full cursor-pointer dark:ring-white dark:bg-[#212529] h-11 outline-none ring-0"
+                            onChange={setDarkMode}
                           >
                             <span className="sr-only">Use setting</span>
                             <span
@@ -195,24 +196,24 @@ const SolderingMode = ({
                               )}
                             >
                               <span
+                                aria-hidden="true"
                                 className={cx(
                                   darkMode
                                     ? "opacity-0 duration-100 ease-out"
                                     : "opacity-100 duration-200 ease-in",
                                   "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
                                 )}
-                                aria-hidden="true"
                               >
                                 <SunIcon className="w-14 h-14 fill-yellow-300" />
                               </span>
                               <span
+                                aria-hidden="true"
                                 className={cx(
                                   darkMode
                                     ? "opacity-100 duration-200 ease-in"
                                     : "opacity-0 duration-100 ease-out",
                                   "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
                                 )}
-                                aria-hidden="true"
                               >
                                 <MoonIcon className="w-14 h-14 fill-sky-500" />
                               </span>
@@ -224,17 +225,17 @@ const SolderingMode = ({
                         </Dialog.Title>
                         <div className="flex items-center justify-end h-20 ml-3">
                           <button
-                            type="button"
                             className="text-gray-400 bg-white rounded-md dark:bg-[#212529] hover:text-gray-500 dark:hover:text-gray-50 focus:outline-none"
                             onClick={() => {
                               setDarkMode(false)
                               setOpen(false)
                             }}
+                            type="button"
                           >
                             <span className="sr-only">Close panel</span>
                             <XMarkIcon
-                              className="w-20 h-20"
                               aria-hidden="true"
+                              className="w-20 h-20"
                             />
                           </button>
                         </div>
@@ -242,17 +243,17 @@ const SolderingMode = ({
                     </div>
                     <div className="relative flex-1 px-4 mt-6 sm:px-6">
                       <div className="pr-2 grow md:w-full">
-                        <label htmlFor="search" className="sr-only">
+                        <label className="sr-only" htmlFor="search">
                           Search
                         </label>
                         <input
-                          type="text"
-                          name="search"
-                          id="search"
                           className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-[#3a4141] text-gray-900 dark:ring-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:border-0 dark:focus:border-white text-3xl"
-                          placeholder="search"
-                          value={searchTerm}
+                          id="search"
+                          name="search"
                           onChange={(e) => setSearchTerm(e.target.value)}
+                          placeholder="search"
+                          type="text"
+                          value={searchTerm}
                         />
                         {!!inventoryData?.length ? (
                           <>
@@ -261,42 +262,42 @@ const SolderingMode = ({
                               <style>{darkMode ? darkModeStyles : ''}</style>
                             </Helmet>
                               <DataTable
-                                fixedHeader
-                                pagination
-                                responsive
-                                subHeaderAlign="right"
-                                subHeaderWrap
-                                exportHeaders
-                                progressComponent={
-                                  <div className="text-center text-gray-500 animate-pulse">
-                                    Loading...
-                                  </div>
-                                }
                                 columns={columns}
                                 conditionalRowStyles={conditionalRowStyles}
+                                customStyles={customStyles}
                                 data={
                                   _.isArray(dataSearched) &&
                                   !_.isEmpty(dataSearched)
                                     ? dataSearched.map((x) => x.item)
                                     : inventoryData
                                 }
+                                exportHeaders
+                                fixedHeader
+                                pagination
+                                progressComponent={
+                                  <div className="text-center text-gray-500 animate-pulse">
+                                    Loading...
+                                  </div>
+                                }
                                 progressPending={inventoryDataIsLoading}
-                                customStyles={customStyles}
+                                responsive
+                                subHeaderAlign="right"
+                                subHeaderWrap
                               />
                             </div>
                             <Modal
-                              open={deleteModalOpen}
-                              setOpen={setDeleteModalOpen}
-                              title={"Delete component?"}
-                              submitButtonText={"Delete"}
                               onSubmit={() => {
                                 setDataToDelete(undefined);
                                 handleDelete(dataToDelete.id);
                               }}
+                              open={deleteModalOpen}
+                              setOpen={setDeleteModalOpen}
+                              submitButtonText={"Delete"}
+                              title={"Delete component?"}
                             >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
                           </>
                         ) : (
-                          <Alert variant="transparent" centered>
+                          <Alert centered variant="transparent">
                             <span>
                               There are no components in your inventory.{" "}
                               <a className="text-blue-500" href="/components">

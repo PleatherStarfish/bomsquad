@@ -441,13 +441,17 @@ const BomList: React.FC<BomListProps> = ({
           handleExportButtonClick(false);
         }}
         open={exportModalOpen}
+        pcb={uniquePCBVersions.length > 1 ? selectedTab : ""}
         setOpen={handleExportButtonClick}
         submitButtonText="Export"
-        subtitle="Export your BOM in .csv, .xlsx, or JSON formats. Supported import tools include Mouser, DigiKey, or TME via file export or copy/paste. Login or create an account to see the intersection of shopping lists for multiple BOMs using the meta-shopping list tool."
-        title={`Quick Export the BOM for ${moduleName}${ uniquePCBVersions.length > 1 ? ` - ${selectedTab}` : "" }`}
+        subtitle={<span>Export your BOM in .csv, .xlsx, or JSON formats. Supported import tools include Mouser, DigiKey, or TME via file export or copy/paste. <a
+          className="text-blue-500 hover:text-blue-700"
+          href="https://bom-squad.com/accounts/login/"
+        >Login</a> or <a className="text-blue-500 hover:text-blue-700" href="https://bom-squad.com/accounts/signup/" >create an account</a> to see the intersection of shopping lists for multiple BOMs using the meta-shopping list tool.</span>}
+        title={`Quick Export the BOM for ${moduleName}`}
         type="info"
       >
-          <CheckboxGridModal bomData={moduleBom ?? []} control={control} formattedOutput={formattedOutput} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setHasSelection={setHasSelection} setFormattedOutput={setFormattedOutput} />
+          <CheckboxGridModal bomData={moduleBom ?? []} control={control} formattedOutput={formattedOutput} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setFormattedOutput={setFormattedOutput} setHasSelection={setHasSelection} />
       </FullPageModal>
     </>
   );

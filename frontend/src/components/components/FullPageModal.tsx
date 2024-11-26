@@ -7,7 +7,7 @@ import cx from "classnames";
 
 interface FullPageModalProps extends Omit<ModalProps, "type"> {
   pcb?: string;
-  subtitle?: string;
+  subtitle?: React.JSX.Element;
   type?: keyof typeof Types;
   customButtons?: React.ReactNode;
 }
@@ -112,8 +112,10 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
                   >
                     {title}
                   </Dialog.Title>
-                  <small className="text-xs pb-4">{pcb}</small>
-                  <div className="text-sm pb-4">
+                  <div className="text-xs mb-4">
+                    <small>{pcb}</small>
+                  </div>
+                  <div className="text-sm mb-4">
                     {subtitle}
                   </div>
                   <div className="w-full mt-2">{children}</div>
