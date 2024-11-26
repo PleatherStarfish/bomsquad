@@ -16,10 +16,13 @@ from difflib import get_close_matches
 
 FARAD_UNITS_MAP = {
     "PF": "pF",
+    "pF": "pF",
     "NF": "nF",
+    "nF": "nF",
     "UF": "μF",
     "μF": "μF",
     "MF": "mF",
+    "mF": "mF",
 }
 
 MOUNTING_STYLES = {
