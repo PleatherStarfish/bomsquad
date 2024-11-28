@@ -248,7 +248,7 @@ def get_component_dropdowns(request):
 @login_required
 @api_view(["POST"])
 def create_component(request):
-    component_data = request.data.get("component")
+    component_data = request.data.get("component", {})
     supplier_items_data = request.data.get("supplier_items", [])
 
     # Ensure voltage_rating has a default value
@@ -320,7 +320,13 @@ def create_component(request):
                     data=item_data
                 )
                 if not supplier_item_serializer.is_valid():
-                    supplier_item_errors.append(supplier_item_serializer.errors)
+                    supplier_item_errors.append(
+                        {
+                            "supplier_item_no": supplier_item_serializer.errors.get(
+                                "supplier_item_no", "Invalid supplier item number."
+                            )
+                        }
+                    )
                 else:
                     supplier_item_serializer.save()
 
@@ -341,6 +347,9 @@ def create_component(request):
         )
 
     return Response(
-        {"message": "Component and supplier items created successfully."},
+        {
+            "message": "Component and supplier items created successfully.",
+            "component": component_serializer.data,
+        },
         status=status.HTTP_201_CREATED,
     )
