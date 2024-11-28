@@ -198,9 +198,22 @@ class Component(BaseModel):
         field before saving the model.
         """
         current_user = kwargs.pop("current_user", None)
-        if not self.submitted_by and self.user_submitted_status != "approved":
+        if (
+            self._state.adding
+            and not self.submitted_by
+            and self.user_submitted_status != "approved"
+        ):
             if current_user and not current_user.is_staff:
                 self.submitted_by = current_user
+
+        if not self._state.adding:  # Ensure this is not a new object
+            previous_instance = Component.objects.get(pk=self.pk)
+            if (
+                previous_instance.user_submitted_status == "pending"
+                and self.user_submitted_status == "approved"
+            ):
+                # Update all related supplier items to approved
+                self.supplier_items.update(user_submitted_status="approved")
 
         if not self.description:
             self.description = self.generate_description()
@@ -399,6 +412,12 @@ class Component(BaseModel):
 
 
 class ComponentSupplierItem(BaseModel):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     component = models.ForeignKey(
         Component, related_name="supplier_items", on_delete=models.CASCADE
@@ -427,9 +446,35 @@ class ComponentSupplierItem(BaseModel):
     link = models.URLField(
         blank=True, null=True, help_text="URL to the supplier's page for the component."
     )
+    submitted_by = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="User who submitted this component, if user-submitted.",
+    )
+    user_submitted_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="approved"
+    )
 
     class Meta:
         unique_together = ("component", "supplier")
+
+    def save(self, *args, **kwargs):
+        """
+        Override the save method to automatically generate the description
+        field before saving the model.
+        """
+        current_user = kwargs.pop("current_user", None)
+        if (
+            self._state.adding
+            and not self.submitted_by
+            and self.user_submitted_status != "approved"
+        ):
+            if current_user and not current_user.is_staff:
+                self.submitted_by = current_user
+
+        super().save(*args, **kwargs)
 
 
 class SizeStandard(MPTTModel):

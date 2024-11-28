@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import Select, { GroupBase, OptionsOrGroups } from "react-select";
-import {
-  AddComponentFormInputs,
-} from "../../types/createComponentForm";
+import makeAnimated from "react-select/animated";
+
+import { AddComponentFormInputs } from "../../types/createComponentForm";
 import {
   useGetComponentDropdownOptions,
   useCreateComponent,
@@ -11,6 +11,9 @@ import {
 import Alert from "../../ui/Alert";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import SupplierItems from "./SupplierItems";
+import VirtualizedMenuList from "./VirtualizedMenuList";
+
+const animatedComponents = makeAnimated();
 
 const mountingStyleOptions = [
   { label: "Surface Mount (SMT)", value: "smt" },
@@ -62,11 +65,12 @@ const validationRules = {
   tolerance: {
     relevantTypes: ["Capacitor", "Resistor", "Potentiometer", "Trimpot"],
     rules: {
-      required: "Tolerance is required",
-      validate: (value: string | undefined) =>
-        (value !== undefined &&
-          /^(\+\/-|\+|-|\+-|-+)?\d+(\.\d+)?%$/.test(value)) ||
-        "Invalid tolerance format (e.g., '+5%', '+/-10%', '-+3%')",
+      rules: {
+        validate: (value: string | undefined) =>
+          !value ||
+          /^(\+\/-|\+|-|\+-|-+)?\d+(\.\d+)?%$/.test(value) ||
+          "Invalid tolerance format (e.g., '+5%', '+/-10%', '-+3%')",
+      },
     },
   },
   voltage_rating: {
@@ -78,10 +82,27 @@ const validationRules = {
       "Trimpot",
     ],
     rules: {
-      required: "Voltage rating is required",
-      validate: (value: string | undefined) =>
-        (value !== undefined && /^\d+(\.\d+)?(V|kV|mV)$/.test(value)) ||
-        "Invalid voltage rating format (e.g., '5V', '0.3kV', '120mV')",
+      validate: (value: string | undefined) => {
+        if (!value) return true; // Allow empty values if not required
+        const match = value.match(/^(\d+(\.\d+)?)(V|kV|mV)$/);
+        if (!match) return "Invalid voltage rating format (e.g., '5V', '0.3kV', '120mV')";
+        const numericValue = parseFloat(match[1]);
+        if (numericValue <= 0) return "Voltage must be greater than 0";
+        return true;
+      },
+    },
+  },
+  wattage: {
+    relevantTypes: ["Resistor", "Potentiometer", "Trimpot"],
+    rules: {
+      validate: (value: string | undefined) => {
+        if (!value) return true; // Allow empty values if not required
+        const match = value.match(/^(\d+(\.\d+)?)W$/);
+        if (!match) return "Invalid wattage format (e.g., '5W', '0.3W')";
+        const numericValue = parseFloat(match[1]);
+        if (numericValue <= 0) return "Wattage must be greater than 0";
+        return true;
+      },
     },
   },
 };
@@ -96,31 +117,37 @@ const transformSubmissionData = (data) => {
       manufacturer: extractValue(data.manufacturer),
       manufacturer_part_no: data.manufacturer_part_no,
       mounting_style: extractValue(data.mounting_style),
+      ohms: extractValue(data.ohms),
+      ohms_unit: extractValue(data.ohms_unit),
       tolerance: data.tolerance || null,
       type: extractValue(data.type),
-      voltage_rating: data.voltage_rating || null, // Ensure null if not provided
+      voltage_rating: data.voltage_rating || null,
+      wattage: data.wattage || null,
     },
     supplier_items: data.supplier_items.map((item) => ({
       currency: item.currency,
-      link: item.link || "", // Default to empty string if missing
+      link: item.link || "",
       pcs: item.pcs ? parseInt(item.pcs, 1) : null,
-      price: parseFloat(item.price || 0), // Ensure valid float
+      price: parseFloat(item.price || 0),
       supplier: extractValue(item.supplier),
       supplier_item_no: item.supplier_item_no || "",
     })),
   };
 };
 
-
 const typesRelevantTo: Record<string, string[]> = {
   farads: ["Capacitor"],
   ohms: ["Resistor", "Photoresistor (LDR)", "Potentiometer", "Trimpot"],
   tolerance: ["Capacitor", "Resistor", "Potentiometer", "Trimpot"],
   voltage_rating: ["Resistor", "Capacitor", "Jack", "Potentiometer", "Trimpot"],
+  wattage: ["Resistor", "Potentiometer", "Trimpot"],
 };
 
-const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
+const AddComponentForm: React.FC<{
+  formRef?: React.RefObject<HTMLFormElement>;
+}> = ({ formRef }) => {
   const {
+    clearErrors,
     control,
     register,
     handleSubmit,
@@ -140,11 +167,9 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
     isLoading,
     isError,
   } = useGetComponentDropdownOptions();
-  console.log(dropdownOptions);
   const createComponentMutation = useCreateComponent();
 
   const onSubmit = (data: AddComponentFormInputs) => {
-    console.log("data1", data);
     if (!data.supplier_items || data.supplier_items.length === 0) {
       setError("supplier_items", {
         message: "At least one supplier item is required.",
@@ -154,8 +179,6 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
     }
 
     const transformedData = transformSubmissionData(data);
-
-    console.log("transformedData", transformedData);
 
     createComponentMutation.mutate(transformedData, {
       onError: (error: Error) => {
@@ -183,6 +206,8 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
 
   const isRelevant = (field: string) =>
     typesRelevantTo[field]?.includes(selectedType) || false;
+
+  const requiredMarker = <span className="text-red-500">*</span>;
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading dropdown options.</div>;
@@ -221,6 +246,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
     <form
       className="grid grid-cols-1 md:grid-cols-2 gap-6"
       onSubmit={handleSubmit(onSubmit)}
+      ref={formRef}
     >
       {/* Manufacturer */}
       <div>
@@ -228,7 +254,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
           className="block text-sm font-medium text-gray-700"
           htmlFor="manufacturer"
         >
-          Manufacturer
+          Manufacturer {requiredMarker}
         </label>
         <Controller
           control={control}
@@ -238,6 +264,10 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
               {...field}
               className="react-select-container"
               classNamePrefix="react-select"
+              components={{
+                MenuList: VirtualizedMenuList,
+                ...animatedComponents,
+              }}
               options={
                 dropdownOptions?.manufacturers?.map((manufacturer: any) => ({
                   label: manufacturer.name,
@@ -263,7 +293,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
           className="block text-sm font-medium text-gray-700"
           htmlFor="manufacturer_part_no"
         >
-          Manufacturer Part No.
+          Manufacturer Part No. {requiredMarker}
         </label>
         <input
           {...register("manufacturer_part_no", {
@@ -286,7 +316,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
           className="block text-sm font-medium text-gray-700"
           htmlFor="mounting_style"
         >
-          Mounting Style
+          Mounting Style {requiredMarker}
         </label>
         <Controller
           control={control}
@@ -314,7 +344,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
           className="block text-sm font-medium text-gray-700"
           htmlFor="type"
         >
-          Type
+          Type {requiredMarker}
         </label>
         <Controller
           control={control}
@@ -342,7 +372,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
               className="block text-sm font-medium text-gray-700"
               htmlFor="ohms"
             >
-              Ohms
+              Ohms {requiredMarker}
             </label>
             <input
               {...register("ohms")}
@@ -357,7 +387,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
               className="block text-sm font-medium text-gray-700"
               htmlFor="ohms_unit"
             >
-              Ohms Unit
+              Ohms Unit {requiredMarker}
             </label>
             <Controller
               control={control}
@@ -386,7 +416,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
               className="block text-sm font-medium text-gray-700"
               htmlFor="farads"
             >
-              Farads
+              Farads {requiredMarker}
             </label>
             <input
               {...register(
@@ -408,7 +438,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
               className="block text-sm font-medium text-gray-700"
               htmlFor="farads_unit"
             >
-              Farads Unit
+              Farads Unit {requiredMarker}
             </label>
             <Controller
               control={control}
@@ -441,10 +471,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
             Tolerance
           </label>
           <input
-            {...register(
-              "tolerance",
-              isRelevant("tolerance") ? validationRules.tolerance.rules : {}
-            )}
+            {...register("tolerance")}
             className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-brandgreen-500 focus:border-brandgreen-500 sm:text-sm"
             id="tolerance"
             type="text"
@@ -464,12 +491,7 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
             Voltage Rating
           </label>
           <input
-            {...register(
-              "voltage_rating",
-              isRelevant("voltage_rating")
-                ? validationRules.voltage_rating.rules
-                : {}
-            )}
+            {...register("voltage_rating")}
             className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-brandgreen-500 focus:border-brandgreen-500 sm:text-sm"
             id="voltage_rating"
             type="text"
@@ -482,22 +504,36 @@ const AddComponentForm: React.FC<{ onClickSubmit: () => void }> = () => {
         </div>
       )}
 
+      {isRelevant("wattage") && (
+        <div>
+          <label
+            className="block text-sm font-medium text-gray-700"
+            htmlFor="wattage"
+          >
+            Wattage
+          </label>
+          <input
+            {...register(
+              "wattage",
+              isRelevant("wattage") ? validationRules.wattage.rules : {}
+            )}
+            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-brandgreen-500 focus:border-brandgreen-500 sm:text-sm"
+            id="wattage"
+            type="text"
+          />
+          {errors.wattage && (
+            <p className="text-red-500 text-sm">{errors.wattage.message}</p>
+          )}
+        </div>
+      )}
+
       <SupplierItems
+        clearErrors={clearErrors}
         control={control}
         errors={errors}
         register={register}
         suppliers={dropdownOptions?.suppliers ?? []}
       />
-
-      {/* Submit Button */}
-      <div className="md:col-span-2 flex justify-end">
-        <button
-          className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
-          type="submit"
-        >
-          Submit
-        </button>
-      </div>
     </form>
   );
 };

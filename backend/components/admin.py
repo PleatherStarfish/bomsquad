@@ -125,6 +125,10 @@ class ComponentAdmin(BaseAdmin):
     def lookup_allowed(self, key, value=None):
         return True
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related("supplier", "type", "submitted_by")
+
 
 class TypesAdmin(BaseAdmin):
     model = Types
@@ -146,6 +150,38 @@ class SizeStandardAdmin(ImportExportModelAdmin, DjangoMpttAdmin):
     model = SizeStandard
 
 
+class ComponentSupplierItemInline(admin.TabularInline):
+    model = ComponentSupplierItem
+    extra = 1
+    fields = (
+        "supplier",
+        "supplier_item_no",
+        "price",
+        "pcs",
+        "link",
+    )
+    readonly_fields = ()
+    verbose_name = "Supplier Item"
+    verbose_name_plural = "Supplier Items"
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        for form in formset.forms:
+            if "pcs" in form.fields:
+                form.fields["pcs"].initial = 1
+            if "price" in form.fields:
+                form.fields["price"].initial = 0.00
+        return formset
+
+
+class ComponentSupplierItemAdmin(ImportExportModelAdmin):
+    model = ComponentSupplierItem
+    list_display = ("supplier", "supplier_item_no", "price", "pcs", "link", "component")
+    list_filter = ("supplier", "user_submitted_status")
+    search_fields = ("supplier_item_no", "component__description", "supplier__name")
+    ordering = ("-datetime_updated",)
+
+
 # Register your models here.
 admin.site.register(Component, ComponentAdmin)
 admin.site.register(Types, TypesAdmin)
@@ -153,3 +189,4 @@ admin.site.register(ComponentSupplier, ComponentSupplierAdmin)
 admin.site.register(ComponentManufacturer, ComponentManufacturerAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(SizeStandard, SizeStandardAdmin)
+admin.site.register(ComponentSupplierItem, ComponentSupplierItemAdmin)

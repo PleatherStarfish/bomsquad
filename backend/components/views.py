@@ -248,6 +248,7 @@ def get_component_dropdowns(request):
 @api_view(["POST"])
 def create_component(request):
     component_data = request.data.get("component")
+    print(component_data)
     supplier_items_data = request.data.get("supplier_items", [])
 
     component_data["voltage_rating"] = component_data.get("voltage_rating") or ""
@@ -274,6 +275,8 @@ def create_component(request):
                 item_data = supplier_item_data.copy()
                 item_data["pcs"] = item_data.get("pcs") or 1  # Default pcs to 1
                 item_data["component"] = component.id  # Attach the correct component ID
+                item_data["submitted_by"] = request.user.id  # Set the user
+                item_data["user_submitted_status"] = "pending"  # Set the status
 
                 supplier_item_serializer = CreateComponentSupplierItemSerializer(
                     data=item_data

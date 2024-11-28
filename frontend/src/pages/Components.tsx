@@ -2,7 +2,7 @@ import "tippy.js/dist/tippy.css";
 
 import DataTable, { TableColumn } from "react-data-table-component";
 import Quantity, { Types } from "../components/bom_list/quantity";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 
 import AddComponentModal from "../components/bom_list/addComponentModal";
@@ -22,7 +22,7 @@ import useGetUserAnonymousShoppingListQuantity from "../services/useGetUserAnony
 import useGetUserCurrency from "../services/useGetUserCurrency";
 import { useSearchParams } from "react-router-dom";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
-import AddComponentForm from "../components/user_submissions/AddComponentForm"
+import AddComponentForm from "../components/user_submissions/AddComponentForm";
 
 const getBaseUrl = () => {
   const { protocol, hostname, port } = window.location;
@@ -58,6 +58,16 @@ const Components: React.FC = () => {
       search: searchParams.get("search") || "",
     },
   });
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleFormSubmit = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true })
+      );
+    }
+  };
 
   // Fetch data based on watched form state
   const {
@@ -425,6 +435,22 @@ const Components: React.FC = () => {
         )}
       </div>
       <FullPageModal
+        customButtons={
+          <div className="flex justify-end space-x-4">
+            <button
+              className="mt-4 px-4 py-2 text-sm font-medium text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
+              onClick={() => setFullPageModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
+              onClick={handleFormSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        }
         onSubmit={() => {
           console.log("Component added!");
           setFullPageModalOpen(false);
@@ -432,15 +458,18 @@ const Components: React.FC = () => {
         open={fullPageModalOpen}
         setOpen={setFullPageModalOpen}
         submitButtonText="Save"
+        subtitle={
+          <p>
+            New components can be added to your inventory and shopping list.
+            They can be suggested as options for BOM list items. New components
+            will be marked as &quot;pending&quot; until reviewed by the BOM
+            Squad team.
+          </p>
+        }
         title="Add a Component"
       >
         <div>
-        <AddComponentForm
-          onClickSubmit={() => {
-            console.log("Form Submitted:");
-            setFullPageModalOpen(false);
-          }}
-        />
+          <AddComponentForm formRef={formRef} />
         </div>
       </FullPageModal>
     </>

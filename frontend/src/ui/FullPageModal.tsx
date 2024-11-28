@@ -105,9 +105,9 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
                   >
                     {title}
                   </Dialog.Title>
-                  <div className="text-xs mb-4">
+                  {subsubtitle && <div className="text-xs mb-4">
                     <small>{subsubtitle}</small>
-                  </div>
+                  </div>}
                   <div className="text-sm mb-4">
                     {subtitle}
                   </div>
