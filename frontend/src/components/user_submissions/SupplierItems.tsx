@@ -4,17 +4,19 @@ import {
   Control,
   Controller,
   UseFormRegister,
+  UseFormClearErrors,
 } from "react-hook-form";
-import Select from "react-select";
+import Select, { GroupBase, OptionsOrGroups } from "react-select";
 import { currencyLookup } from "../../types/currency";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import Alert from "../../ui/Alert";
+import { AddComponentFormInputs } from "../../types/createComponentForm";
 
 interface SupplierItemsProps {
-  clearErrors: any;
-  control: Control<any>;
-  register: UseFormRegister<any>;
-  suppliers: { name: string; id: string }[]; // Suppliers for React Select
+  clearErrors: UseFormClearErrors<AddComponentFormInputs>;
+  control: Control<AddComponentFormInputs>;
+  register: UseFormRegister<AddComponentFormInputs>;
+  suppliers: { name: string; id: string }[];
   errors: any;
 }
 
@@ -74,7 +76,7 @@ const SupplierItems: React.FC<SupplierItemsProps> = ({
                     options={suppliers.map((item) => ({
                       label: item.name,
                       value: item.id,
-                    }))}
+                    })) as unknown as OptionsOrGroups<string, GroupBase<string>>}
                     placeholder="Select Supplier"
                   />
                 )}

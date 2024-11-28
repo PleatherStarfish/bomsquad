@@ -175,6 +175,23 @@ class CreateComponentSerializer(serializers.ModelSerializer):
         model = Component
         fields = "__all__"
 
+    def validate(self, data):
+        # Check for duplicate manufacturer part number
+        manufacturer_part_no = data.get("manufacturer_part_no")
+        if (
+            manufacturer_part_no
+            and Component.objects.filter(
+                manufacturer_part_no=manufacturer_part_no
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                {
+                    "manufacturer_part_no": "This manufacturer part number already exists."
+                }
+            )
+
+        return data
+
     def save(self, **kwargs):
         # Set voltage_rating to None if not provided or empty
         self.validated_data["voltage_rating"] = (
@@ -187,6 +204,40 @@ class CreateComponentSupplierItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentSupplierItem
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        self.existing_supplier_items = kwargs.pop("existing_supplier_items", [])
+        super().__init__(*args, **kwargs)
+
+    def validate(self, data):
+        # Check for duplicate supplier item numbers in the database
+        supplier_item_no = data.get("supplier_item_no")
+        supplier = data.get("supplier")
+
+        if supplier_item_no and supplier:
+            # Check for duplicates in the existing supplier items from the request
+            if any(
+                item["supplier_item_no"] == supplier_item_no
+                and item["supplier"] == supplier
+                for item in self.existing_supplier_items
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "supplier_item_no": f"Supplier item number '{supplier_item_no}' for supplier '{supplier}' is duplicated in the input data."
+                    }
+                )
+
+            # Check for duplicates in the database
+            if ComponentSupplierItem.objects.filter(
+                supplier_item_no=supplier_item_no, supplier=supplier
+            ).exists():
+                raise serializers.ValidationError(
+                    {
+                        "supplier_item_no": f"Supplier item number '{supplier_item_no}' for supplier '{supplier}' already exists in the database."
+                    }
+                )
+
+        return data
 
     def validate_component(self, value):
         if not value:

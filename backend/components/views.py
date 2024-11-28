@@ -7,6 +7,7 @@ from components.models import (
     ComponentSupplier,
     Category,
     SizeStandard,
+    ComponentSupplierItem,
 )
 from components.serializers import (
     ComponentSerializer,
@@ -248,50 +249,98 @@ def get_component_dropdowns(request):
 @api_view(["POST"])
 def create_component(request):
     component_data = request.data.get("component")
-    print(component_data)
     supplier_items_data = request.data.get("supplier_items", [])
 
+    # Ensure voltage_rating has a default value
     component_data["voltage_rating"] = component_data.get("voltage_rating") or ""
 
     try:
         with transaction.atomic():
+            # Validate and save the component
             component_serializer = CreateComponentSerializer(
                 data=component_data, context={"request": request}
             )
-            if component_serializer.is_valid():
-                component = component_serializer.save(
-                    submitted_by=request.user,
-                    user_submitted_status="pending",
-                )
-            else:
+            if not component_serializer.is_valid():
                 return Response(
-                    {"component_errors": component_serializer.errors},
+                    {
+                        "fieldErrors": {
+                            "component_errors": component_serializer.errors
+                        },
+                        "message": "Failed to submit component.",
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            component = component_serializer.save(
+                submitted_by=request.user,
+                user_submitted_status="pending",
+            )
 
-            # Supplier items save logic
+            # Track supplier item errors
+            supplier_item_errors = []
+            seen_supplier_items = set()
+
+            # Validate and save supplier items
             for supplier_item_data in supplier_items_data:
-                # Work on a copy of supplier_item_data to avoid side effects
+                # Prepare supplier item data
                 item_data = supplier_item_data.copy()
-                item_data["pcs"] = item_data.get("pcs") or 1  # Default pcs to 1
-                item_data["component"] = component.id  # Attach the correct component ID
-                item_data["submitted_by"] = request.user.id  # Set the user
-                item_data["user_submitted_status"] = "pending"  # Set the status
+                item_data["pcs"] = item_data.get("pcs") or 1
+                item_data["component"] = component.id
+                item_data["submitted_by"] = request.user.id
+                item_data["user_submitted_status"] = "pending"
 
+                supplier_item_key = (
+                    item_data.get("supplier"),
+                    item_data.get("supplier_item_no"),
+                )
+
+                # Check for duplicates in the current request
+                if supplier_item_key in seen_supplier_items:
+                    supplier_item_errors.append(
+                        {
+                            "supplier_item_no": f"Duplicate supplier item number '{supplier_item_key[1]}' for supplier '{supplier_item_key[0]}' in the request."
+                        }
+                    )
+                    continue
+
+                seen_supplier_items.add(supplier_item_key)
+
+                # Validate against the database
+                if ComponentSupplierItem.objects.filter(
+                    supplier=supplier_item_key[0], supplier_item_no=supplier_item_key[1]
+                ).exists():
+                    supplier_item_errors.append(
+                        {
+                            "supplier_item_no": f"Supplier item number '{supplier_item_key[1]}' for supplier '{supplier_item_key[0]}' already exists in the database."
+                        }
+                    )
+                    continue
+
+                # Validate and save using the serializer
                 supplier_item_serializer = CreateComponentSupplierItemSerializer(
                     data=item_data
                 )
-                if supplier_item_serializer.is_valid():
-                    supplier_item_serializer.save()
+                if not supplier_item_serializer.is_valid():
+                    supplier_item_errors.append(supplier_item_serializer.errors)
                 else:
-                    print(
-                        f"Supplier Item Validation Errors: {supplier_item_serializer.errors}"
-                    )
+                    supplier_item_serializer.save()
+
+            # Handle supplier item errors
+            if supplier_item_errors:
+                return Response(
+                    {
+                        "fieldErrors": {"supplier_item_errors": supplier_item_errors},
+                        "message": "Failed to submit supplier items.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
     except Exception as e:
         return Response(
-            {"error": "Transaction failed due to an error."},
+            {"error": f"Transaction failed due to an error: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return Response(component_serializer.data, status=status.HTTP_201_CREATED)
+    return Response(
+        {"message": "Component and supplier items created successfully."},
+        status=status.HTTP_201_CREATED,
+    )

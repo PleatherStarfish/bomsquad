@@ -30,14 +30,13 @@ const useGetComponentDropdownOptions = (): UseQueryResult<any, Error> => {
 // Submit a new component
 const useCreateComponent = (): UseMutationResult<
   any, // Replace with the response type if known
-  Error,
+  Error | { fieldErrors: Record<string, string[]> },
   TransformedComponentData
 > => {
   const csrftoken = Cookies.get("csrftoken");
 
   return useMutation({
     mutationFn: async (componentData: TransformedComponentData) => {
-      console.log("IN SERVICE", componentData)
       try {
         const response = await axios.post("/api/components/create/", componentData, {
           headers: {
@@ -50,13 +49,15 @@ const useCreateComponent = (): UseMutationResult<
         return response.data;
       } catch (error: any) {
         if (error.response && error.response.data) {
-          throw new Error(
-            `Failed to submit component: ${JSON.stringify(error.response.data)}`
-          );
+          const fieldErrors = error.response.data;
+          throw { fieldErrors, message: "Failed to submit component." };
         } else {
           throw new Error("An unexpected error occurred while submitting the component.");
         }
       }
+    },
+    onError: (error: any) => {
+      console.error("Create Component Error:", error);
     },
   });
 };

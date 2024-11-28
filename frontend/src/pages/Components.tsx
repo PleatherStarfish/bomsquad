@@ -9,6 +9,7 @@ import AddComponentModal from "../components/bom_list/addComponentModal";
 import HeaderWithButton from "../ui/HeaderWithButton";
 import Alert from "../ui/Alert";
 import Button from "../ui/Button";
+import Notification from "../ui/Notification";
 import FullPageModal from "../ui/FullPageModal";
 import { Component } from "../types/component";
 import { LinkIcon } from "@heroicons/react/24/outline";
@@ -43,6 +44,15 @@ const customStyles = {
 };
 
 const Components: React.FC = () => {
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+  }>({
+    message: "",
+    show: false,
+    title: "",
+  });
   const [inventoryModalOpen, setInventoryModalOpen] = useState<
     string | undefined
   >();
@@ -83,6 +93,15 @@ const Components: React.FC = () => {
 
   const { data: currencyData } = useGetUserCurrency();
   const { user } = useAuthenticatedUser();
+
+  const handleSuccess = () => {
+    setFullPageModalOpen(false)
+    setNotification({
+      message: "Your new component has been successfully submitted.",
+      show: true,
+      title: "Component Added",
+    });
+  };
 
   const onSubmit = (data: any) => {
     const {
@@ -452,7 +471,6 @@ const Components: React.FC = () => {
           </div>
         }
         onSubmit={() => {
-          console.log("Component added!");
           setFullPageModalOpen(false);
         }}
         open={fullPageModalOpen}
@@ -469,9 +487,20 @@ const Components: React.FC = () => {
         title="Add a Component"
       >
         <div>
-          <AddComponentForm formRef={formRef} />
+          <AddComponentForm formRef={formRef} handleSuccess={handleSuccess} />
         </div>
       </FullPageModal>
+      <Notification
+        message={notification.message}
+        setShow={(value) =>
+          setNotification((prev) => ({
+            ...prev,
+            show: typeof value === "function" ? value(prev.show) : value,
+          }))
+        }
+        show={notification.show}
+        title={notification.title}
+      />
     </>
   );
 };

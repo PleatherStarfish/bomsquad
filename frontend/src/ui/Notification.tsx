@@ -1,32 +1,37 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { Fragment } from "react";
+import { Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
-import { CheckCircleIcon } from '@heroicons/react/24/outline'
-import { Fragment } from 'react'
-import { Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+interface NotificationProps {
+  show: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  title: string;
+  message: string;
+}
 
-const Notification = ({ show, setShow, title, message }) => {
-
+const Notification: React.FC<NotificationProps> = ({ show, setShow, title, message }) => {
   useEffect(() => {
-    if(show) {
+    if (show) {
       const timer = setTimeout(() => {
-        setShow(false)
-      }, 4000)
-      return () => clearTimeout(timer)
+        setShow(false);
+      }, 6000);
+      return () => clearTimeout(timer);
     }
-  }, [show, setShow])
+  }, [show, setShow]);
 
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
       <div
         aria-live="assertive"
-        className="fixed inset-0 flex items-end justify-end px-4 py-6 pointer-events-none sm:p-6"
+        className="fixed inset-0 flex items-start justify-end px-4 py-6 pointer-events-none sm:p-6"
+        style={{ top: "75px", zIndex: 9999999 }}
       >
         <div className="flex flex-col items-center w-full space-y-4 sm:items-end">
-          {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+          {/* Notification panel */}
           <Transition
-            show={show}
             as={Fragment}
             enter="transform ease-out duration-300 transition"
             enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
@@ -34,12 +39,13 @@ const Notification = ({ show, setShow, title, message }) => {
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
+            show={show}
           >
             <div className="w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
               <div className="p-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    <CheckCircleIcon className="w-6 h-6 text-brandgreen-400" aria-hidden="true" />
+                    <CheckCircleIcon aria-hidden="true" className="w-6 h-6 text-brandgreen-400" />
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5">
                     <p className="text-sm font-medium text-gray-900">{title}</p>
@@ -47,14 +53,12 @@ const Notification = ({ show, setShow, title, message }) => {
                   </div>
                   <div className="flex flex-shrink-0 ml-4">
                     <button
-                      type="button"
                       className="inline-flex text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      onClick={() => {
-                        setShow(false)
-                      }}
+                      onClick={() => setShow(false)}
+                      type="button"
                     >
                       <span className="sr-only">Close</span>
-                      <XMarkIcon className="w-5 h-5" aria-hidden="true" />
+                      <XMarkIcon aria-hidden="true" className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -64,7 +68,7 @@ const Notification = ({ show, setShow, title, message }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Notification
+export default Notification;
