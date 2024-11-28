@@ -14,6 +14,7 @@ from components.serializers import (
     CreateComponentSerializer,
     CreateComponentSupplierItemSerializer,
 )
+from django.views.decorators.cache import cache_page
 from django.http import JsonResponse
 from django.db import transaction
 
@@ -223,6 +224,7 @@ def get_components_by_ids(request, pks):
     return Response(serializer.data)
 
 
+@cache_page(60 * 60)
 @login_required
 @api_view(["GET"])
 def get_component_dropdowns(request):
