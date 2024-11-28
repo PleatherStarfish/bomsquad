@@ -24,6 +24,7 @@ import useGetUserCurrency from "../services/useGetUserCurrency";
 import { useSearchParams } from "react-router-dom";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
 import AddComponentForm from "../components/user_submissions/AddComponentForm";
+import cv from "classnames"
 
 const getBaseUrl = () => {
   const { protocol, hostname, port } = window.location;
@@ -59,6 +60,7 @@ const Components: React.FC = () => {
   const [shoppingModalOpen, setShoppingModalOpen] = useState<
     string | undefined
   >();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [fullPageModalOpen, setFullPageModalOpen] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -466,7 +468,7 @@ const Components: React.FC = () => {
               className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
               onClick={handleFormSubmit}
             >
-              Submit
+              <p className={cv({"animate-pulse": isSubmitting})}>{isSubmitting ? "Submiting..." : "Submit"}</p>
             </button>
           </div>
         }
@@ -487,7 +489,7 @@ const Components: React.FC = () => {
         title="Add a Component"
       >
         <div>
-          <AddComponentForm formRef={formRef} handleSuccess={handleSuccess} />
+          <AddComponentForm formRef={formRef} handleSuccess={handleSuccess} isSubmitting={isSubmitting} setIsSubmitting={setIsSubmitting} />
         </div>
       </FullPageModal>
       <Notification

@@ -146,13 +146,14 @@ const typesRelevantTo: Record<string, string[]> = {
 const AddComponentForm: React.FC<{
   formRef?: React.RefObject<HTMLFormElement>;
   handleSuccess: () => void;
-}> = ({ formRef, handleSuccess }) => {
+  isSubmitting: boolean;
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ formRef, isSubmitting, setIsSubmitting, handleSuccess }) => {
   const [alert, setAlert] = useState<{
     type: "error" | "info" | "success";
     message: string;
     detailedMessage?: string;
   } | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     clearErrors,

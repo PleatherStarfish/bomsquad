@@ -279,56 +279,55 @@ def create_component(request):
             supplier_item_errors = []
             seen_supplier_items = set()
 
-            # Validate and save supplier items
+            # Validate and process supplier items
             for supplier_item_data in supplier_items_data:
                 # Prepare supplier item data
                 item_data = supplier_item_data.copy()
-                item_data["pcs"] = item_data.get("pcs") or 1
-                item_data["component"] = component.id
-                item_data["submitted_by"] = request.user.id
-                item_data["user_submitted_status"] = "pending"
+                supplier = item_data.get("supplier")
+                supplier_item_no = item_data.get("supplier_item_no")
 
-                supplier_item_key = (
-                    item_data.get("supplier"),
-                    item_data.get("supplier_item_no"),
-                )
+                supplier_item_key = (supplier, supplier_item_no)
 
                 # Check for duplicates in the current request
                 if supplier_item_key in seen_supplier_items:
                     supplier_item_errors.append(
                         {
-                            "supplier_item_no": f"Duplicate supplier item number '{supplier_item_key[1]}' for supplier '{supplier_item_key[0]}' in the request."
+                            "supplier_item_no": f"Duplicate supplier item number '{supplier_item_no}' for supplier '{supplier}' in the request."
                         }
                     )
                     continue
 
                 seen_supplier_items.add(supplier_item_key)
 
-                # Validate against the database
-                if ComponentSupplierItem.objects.filter(
-                    supplier=supplier_item_key[0], supplier_item_no=supplier_item_key[1]
-                ).exists():
-                    supplier_item_errors.append(
-                        {
-                            "supplier_item_no": f"Supplier item number '{supplier_item_key[1]}' for supplier '{supplier_item_key[0]}' already exists in the database."
-                        }
-                    )
-                    continue
+                # Check if the supplier item already exists in the database
+                existing_supplier_item = ComponentSupplierItem.objects.filter(
+                    supplier=supplier, supplier_item_no=supplier_item_no
+                ).first()
 
-                # Validate and save using the serializer
-                supplier_item_serializer = CreateComponentSupplierItemSerializer(
-                    data=item_data
-                )
-                if not supplier_item_serializer.is_valid():
-                    supplier_item_errors.append(
-                        {
-                            "supplier_item_no": supplier_item_serializer.errors.get(
-                                "supplier_item_no", "Invalid supplier item number."
-                            )
-                        }
-                    )
+                if existing_supplier_item:
+                    # Attach existing supplier item to the new component
+                    existing_supplier_item.component = component
+                    existing_supplier_item.save()
                 else:
-                    supplier_item_serializer.save()
+                    # Create a new supplier item
+                    item_data["pcs"] = item_data.get("pcs") or 1
+                    item_data["component"] = component.id
+                    item_data["submitted_by"] = request.user.id
+                    item_data["user_submitted_status"] = "pending"
+
+                    supplier_item_serializer = CreateComponentSupplierItemSerializer(
+                        data=item_data
+                    )
+                    if not supplier_item_serializer.is_valid():
+                        supplier_item_errors.append(
+                            {
+                                "supplier_item_no": supplier_item_serializer.errors.get(
+                                    "supplier_item_no", "Invalid supplier item number."
+                                )
+                            }
+                        )
+                    else:
+                        supplier_item_serializer.save()
 
             # Handle supplier item errors
             if supplier_item_errors:
