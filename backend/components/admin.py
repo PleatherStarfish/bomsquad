@@ -56,6 +56,13 @@ class ComponentAdmin(BaseAdmin):
             },
         ),
         (
+            "Submission Details",
+            {
+                "classes": ("collapse",),  # Collapsible section for admin usability
+                "fields": ("submitted_by", "user_submitted_status"),
+            },
+        ),
+        (
             "Resistor Specific Fields",
             {"classes": ("collapse",), "fields": ("ohms", "ohms_unit", "wattage")},
         ),
@@ -88,10 +95,18 @@ class ComponentAdmin(BaseAdmin):
         "supplier_item_no",
         "size",
         "category",
+        "submitted_by",
+        "user_submitted_status",
     )
 
     # Add filters for relevant fields
-    list_filter = ("mounting_style", "supplier", "type", "discontinued")
+    list_filter = (
+        "mounting_style",
+        "supplier",
+        "type",
+        "discontinued",
+        "user_submitted_status",
+    )
 
     # Add search fields for easy lookup
     search_fields = (
@@ -102,6 +117,8 @@ class ComponentAdmin(BaseAdmin):
         "manufacturer_part_no",
         "supplier_item_no",
     )
+
+    ordering = ("-datetime_updated",)
 
     inlines = [ComponentSupplierItemInline]
 

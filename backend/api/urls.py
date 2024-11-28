@@ -27,6 +27,8 @@ from modules.views import (
 # Module and components-related views
 from components.views import (
     ComponentView,
+    get_component_dropdowns,
+    create_component,
     get_components_by_ids,
 )
 
@@ -186,6 +188,8 @@ urlpatterns = [
         name="unique-components",
     ),
     path("components/", ComponentView.as_view(), name="component-list"),
+    path("components/options/", get_component_dropdowns, name="component-options"),
+    path("components/create/", create_component, name="component-create"),
     path("components/<str:pks>/", get_components_by_ids, name="component-list-by-ids"),
     path("module/<slug:slug>/", ModuleDetailView.as_view(), name="module-detail"),
     path(

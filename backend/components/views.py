@@ -1,13 +1,31 @@
-from components.models import Component, ComponentManufacturer, ComponentSupplier, Types
-from components.serializers import ComponentSerializer
+from components.models import (
+    Component,
+    ComponentManufacturer,
+    ComponentSupplier,
+    Types,
+    ComponentManufacturer,
+    ComponentSupplier,
+    Category,
+    SizeStandard,
+)
+from components.serializers import (
+    ComponentSerializer,
+    CreateComponentSerializer,
+    CreateComponentSupplierItemSerializer,
+)
+from django.http import JsonResponse
+from django.db import transaction
+
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from components.models import FARAD_UNITS, OHMS_UNITS
 from uuid import UUID
 import re
@@ -202,3 +220,75 @@ def get_components_by_ids(request, pks):
 
     serializer = ComponentSerializer(components, many=True)
     return Response(serializer.data)
+
+
+@login_required
+@api_view(["GET"])
+def get_component_dropdowns(request):
+    try:
+        types = list(Types.objects.values("id", "name"))
+        manufacturers = list(ComponentManufacturer.objects.values("id", "name"))
+        suppliers = list(ComponentSupplier.objects.values("id", "name"))
+        categories = list(Category.objects.values("id", "name"))
+        sizes = list(SizeStandard.objects.values("id", "name"))
+        return JsonResponse(
+            {
+                "types": types,
+                "manufacturers": manufacturers,
+                "suppliers": suppliers,
+                "categories": categories,
+                "sizes": sizes,
+            }
+        )
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@login_required
+@api_view(["POST"])
+def create_component(request):
+    component_data = request.data.get("component")
+    supplier_items_data = request.data.get("supplier_items", [])
+
+    component_data["voltage_rating"] = component_data.get("voltage_rating") or ""
+
+    try:
+        with transaction.atomic():
+            component_serializer = CreateComponentSerializer(
+                data=component_data, context={"request": request}
+            )
+            if component_serializer.is_valid():
+                component = component_serializer.save(
+                    submitted_by=request.user,
+                    user_submitted_status="pending",
+                )
+            else:
+                return Response(
+                    {"component_errors": component_serializer.errors},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Supplier items save logic
+            for supplier_item_data in supplier_items_data:
+                # Work on a copy of supplier_item_data to avoid side effects
+                item_data = supplier_item_data.copy()
+                item_data["pcs"] = item_data.get("pcs") or 1  # Default pcs to 1
+                item_data["component"] = component.id  # Attach the correct component ID
+
+                supplier_item_serializer = CreateComponentSupplierItemSerializer(
+                    data=item_data
+                )
+                if supplier_item_serializer.is_valid():
+                    supplier_item_serializer.save()
+                else:
+                    print(
+                        f"Supplier Item Validation Errors: {supplier_item_serializer.errors}"
+                    )
+
+    except Exception as e:
+        return Response(
+            {"error": "Transaction failed due to an error."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return Response(component_serializer.data, status=status.HTTP_201_CREATED)

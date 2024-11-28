@@ -319,3 +319,43 @@ class Substitution(BaseModel):
             [str(comp) for comp in self.substitute_components.all()]
         )
         return f"Substitution for {self.module_bom_list_item}: {self.original_component_description} -> {substitutes}"
+
+
+class SuggestedComponentForBomListItem(BaseModel):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    module_bom_list_item = models.ForeignKey(
+        ModuleBomListItem,
+        on_delete=models.CASCADE,
+        related_name="suggested_component_bom_list_items",
+    )
+    suggested_component = models.ForeignKey(
+        Component,
+        on_delete=models.CASCADE,
+        related_name="suggested_component_for_bom_list_items",
+    )
+    suggested_by = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="User who suggested this component.",
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="pending",
+        help_text="Approval status of the suggested component.",
+    )
+
+    class Meta:
+        verbose_name = "Suggested Component for BOM List Item"
+        verbose_name_plural = "Suggested Components for BOM List Item"
+
+    def __str__(self):
+        return f"{self.suggested_component} for {self.module_bom_list_item} ({self.status})"

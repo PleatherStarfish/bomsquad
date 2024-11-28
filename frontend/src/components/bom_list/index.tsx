@@ -8,6 +8,7 @@ import { animateScroll } from "react-scroll";
 import { flatMap, uniqBy } from "lodash-es";
 import { useForm } from "react-hook-form";
 import * as XLSX from "xlsx";
+// @ts-ignore
 import { saveAs } from "file-saver";
 import {
   Dropdown,
@@ -19,7 +20,7 @@ import {
 
 import Alert from "../../ui/Alert";
 import CheckboxGridModal from "./checkboxGridModal";
-import FullPageModal from "../components/FullPageModal";
+import FullPageModal from "../../ui/FullPageModal";
 import NestedTable from "./nestedTable";
 import RadioGroup from "../../ui/RadioGroup";
 import Tippy from "@tippyjs/react";
@@ -441,9 +442,9 @@ const BomList: React.FC<BomListProps> = ({
           handleExportButtonClick(false);
         }}
         open={exportModalOpen}
-        pcb={uniquePCBVersions.length > 1 ? selectedTab : ""}
         setOpen={handleExportButtonClick}
         submitButtonText="Export"
+        subsubtitle={uniquePCBVersions.length > 1 ? selectedTab : ""}
         subtitle={<span>Export your BOM in .csv, .xlsx, or JSON formats. Supported import tools include Mouser, DigiKey, or TME via file export or copy/paste. <a
           className="text-blue-500 hover:text-blue-700"
           href="https://bom-squad.com/accounts/login/"

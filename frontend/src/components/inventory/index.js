@@ -80,7 +80,6 @@ const Inventory = () => {
 
   const options = {
     includeScore: true,
-    shouldSort: true,
     keys: [
       "location",
       "component.description",
@@ -90,6 +89,7 @@ const Inventory = () => {
       "component.supplier_item_no",
       "component.type.name",
     ],
+    shouldSort: true,
   };
 
   const fuse =
@@ -241,25 +241,25 @@ const Inventory = () => {
 
   const columns = [
     {
+      grow: 1,
       name: "Name",
       selector: (row) => row.component.description,
       sortable: true,
       wrap: true,
-      grow: 1,
     },
     {
+      hide: 1700,
       name: <div>Type</div>,
       selector: (row) => row.component.type?.name,
       sortable: true,
       wrap: true,
-      hide: 1700,
     },
     {
+      hide: 1700,
       name: <div>Manufacturer</div>,
       selector: (row) => row.component.manufacturer?.name,
       sortable: true,
       wrap: true,
-      hide: 1700,
     },
     {
       name: <div>Supplier</div>,
@@ -272,8 +272,8 @@ const Inventory = () => {
       selector: (row) => {
         return (
           <a
-            href={row.component.link}
             className="text-blue-500 hover:text-blue-700"
+            href={row.component.link}
           >
             {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
           </a>
@@ -284,19 +284,20 @@ const Inventory = () => {
     },
     {
       name: <div>Farads</div>,
+      omit: (row) => row.component.type !== "Capacitor",
       selector: (row) => row.farads,
       sortable: true,
       wrap: true,
-      omit: (row) => row.component.type !== "Capacitor",
     },
     {
       name: <div>Ohms</div>,
+      omit: (row) => row.component.type !== "Resistor",
       selector: (row) => row.ohms,
       sortable: true,
       wrap: true,
-      omit: (row) => row.component.type !== "Resistor",
     },
     {
+      hide: 1700,
       name: <div>Price</div>,
       selector: (row) =>
         row.component.unit_price && row.component.price_currency
@@ -304,80 +305,79 @@ const Inventory = () => {
           : row.component.unit_price,
       sortable: true,
       wrap: true,
-      hide: 1700,
     },
     {
+      hide: 1700,
       name: <div>Tolerance</div>,
       selector: (row) => row.component.tolerance,
       sortable: true,
       wrap: true,
-      hide: 1700,
     },
     {
+      hide: 1700,
       name: <div>V. Rating</div>,
       selector: (row) => row.component.voltage_rating,
       sortable: true,
       wrap: true,
-      hide: 1700,
     },
     {
-      name: <div>Qty.</div>,
       cell: (row) => (
         <EditableQuantity
-          row={row}
-          quantityIdToEdit={quantityIdToEdit}
-          updatedQuantityToSubmit={updatedQuantityToSubmit}
+          handleClick={handleClick}
           handleQuantityChange={handleQuantityChange}
           handleSubmitQuantity={handleSubmitQuantity}
+          quantityIdToEdit={quantityIdToEdit}
+          row={row}
           setQuantityIdToEdit={setQuantityIdToEdit}
           setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
-          handleClick={handleClick}
+          updatedQuantityToSubmit={updatedQuantityToSubmit}
         />
       ),
+      name: <div>Qty.</div>,
       sortable: true,
       width: quantityIdToEdit ? "200px" : "100px",
     },
     {
-      name: <div>Location</div>,
       cell: (row) => (
         <div className="flex flex-col w-full">
             <EditableLocation
-              row={row}
-              locationIdToEdit={locationIdToEdit}
-              updatedLocationToSubmit={updatedLocationToSubmit}
-              handleLocationChange={handleLocationChange}
-              setLocationIdToEdit={setLocationIdToEdit}
-              handleSubmitLocation={handleSubmitLocation}
-              handlePillClick={handlePillClick}
               handleClick={handleClick}
+              handleLocationChange={handleLocationChange}
+              handlePillClick={handlePillClick}
+              handleSubmitLocation={handleSubmitLocation}
+              locationIdToEdit={locationIdToEdit}
+              row={row}
+              setLocationIdToEdit={setLocationIdToEdit}
               setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+              updatedLocationToSubmit={updatedLocationToSubmit}
             />
           {error && row.id === locationIdToEdit && (
             <div className="mt-1 text-xs text-red-500">{error}</div>
           )}
         </div>
       ),
-      sortable: true,
-      wrap: true,
-      width: !!locationIdToEdit ? "350px" : undefined,
       minWidth: "200px",
+      name: <div>Location</div>,
       sortFunction: locationsSort,
+      sortable: true,
+      width: !!locationIdToEdit ? "350px" : undefined,
+      wrap: true,
     },
     {
-      name: "",
-      sortable: false,
       cell: (row) => {
         return (
           <TrashIcon
-            role="button"
             className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
-              setDataToDelete({id: row.id, component: row.component});
+              setDataToDelete({component: row.component, id: row.id});
               setDeleteModalOpen(true);
             }}
+            role="button"
           />
         );
       },
+      name: "",
+      sortable: false,
       width: "50px",
     },
   ];
@@ -390,7 +390,7 @@ const Inventory = () => {
             {inventoryData && inventoryData.length > 0 && (
               <>
                 <div className="pr-2 grow md:w-full">
-                  <label htmlFor="search" className="sr-only">
+                  <label className="sr-only" htmlFor="search">
                     Search
                   </label>
                   <SearchInput
@@ -400,10 +400,10 @@ const Inventory = () => {
                 </div>
                 <div className="flex gap-2 flex-nowrap">
                   <Button
-                    version="primary"
                     Icon={LightBulbIcon}
                     iconLocation="left"
                     onClick={() => setOpenSolderingMode(true)}
+                    version="primary"
                   >
                     Soldering Mode
                   </Button>
@@ -414,12 +414,12 @@ const Inventory = () => {
                     <Button version="primary">Version History</Button>
                   </Link>
                   <Button
-                    version="primary"
                     onClick={
                       user.is_premium
                         ? handleDownloadCSV
                         : handleGetPremiumModal
                     }
+                    version="primary"
                   >
                     Download CSV
                   </Button>
@@ -428,70 +428,70 @@ const Inventory = () => {
             )}
           </div>
           <DataTable
-            fixedHeader
-            pagination
-            responsive
-            subHeaderAlign="right"
-            subHeaderWrap
-            exportHeaders
-            progressComponent={
-              <div className="text-center text-gray-500 animate-pulse">
-                Loading...
-              </div>
-            }
             columns={columns}
+            customStyles={customStyles}
             data={
               _.isArray(dataSearched) && !_.isEmpty(dataSearched)
                 ? dataSearched.map((x) => x.item)
                 : inventoryData
             }
-            progressPending={inventoryDataIsLoading}
-            customStyles={customStyles}
+            exportHeaders
+            fixedHeader
+            pagination
             paginationPerPage={30}
             paginationRowsPerPageOptions={[30, 50, 100]}
+            progressComponent={
+              <div className="text-center text-gray-500 animate-pulse">
+                Loading...
+              </div>
+            }
+            progressPending={inventoryDataIsLoading}
+            responsive
+            subHeaderAlign="right"
+            subHeaderWrap
           />
           <SolderingMode
-            open={openSolderingMode}
-            setOpen={setOpenSolderingMode}
+            dataSearched={dataSearched}
+            dataToDelete={dataToDelete}
+            deleteModalOpen={deleteModalOpen}
+            handleClick={handleClick}
+            handleDelete={handleDelete}
+            handleLocationChange={handleLocationChange}
+            handlePillClick={handlePillClick}
+            handleQuantityChange={handleQuantityChange}
+            handleSubmitLocation={handleSubmitLocation}
+            handleSubmitQuantity={handleSubmitQuantity}
             inventoryData={inventoryData}
             inventoryDataIsLoading={inventoryDataIsLoading}
-            handleClick={handleClick}
-            locationsSort={locationsSort}
-            quantityIdToEdit={quantityIdToEdit}
-            setQuantityIdToEdit={setQuantityIdToEdit}
-            updatedQuantityToSubmit={updatedQuantityToSubmit}
-            setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
             locationIdToEdit={locationIdToEdit}
-            setLocationIdToEdit={setLocationIdToEdit}
-            updatedLocationToSubmit={updatedLocationToSubmit}
-            setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
-            deleteModalOpen={deleteModalOpen}
-            setDeleteModalOpen={setDeleteModalOpen}
-            dataToDelete={dataToDelete}
-            setDataToDelete={setDataToDelete}
+            locationsSort={locationsSort}
+            open={openSolderingMode}
+            quantityIdToEdit={quantityIdToEdit}
             searchTerm={searchTerm}
+            setDataToDelete={setDataToDelete}
+            setDeleteModalOpen={setDeleteModalOpen}
+            setLocationIdToEdit={setLocationIdToEdit}
+            setOpen={setOpenSolderingMode}
+            setQuantityIdToEdit={setQuantityIdToEdit}
             setSearchTerm={setSearchTerm}
-            dataSearched={dataSearched}
-            handleQuantityChange={handleQuantityChange}
-            handleSubmitQuantity={handleSubmitQuantity}
-            handleLocationChange={handleLocationChange}
-            handleSubmitLocation={handleSubmitLocation}
-            handleDelete={handleDelete}
-            handlePillClick={handlePillClick}
+            setUpdatedLocationToSubmit={setUpdatedLocationToSubmit}
+            setUpdatedQuantityToSubmit={setUpdatedQuantityToSubmit}
+            updatedLocationToSubmit={updatedLocationToSubmit}
+            updatedQuantityToSubmit={updatedQuantityToSubmit}
           />
           <Modal
-            open={deleteModalOpen}
-            setOpen={setDeleteModalOpen}
-            title={"Delete component?"}
-            submitButtonText={"Delete"}
             onSubmit={() => {
               setDataToDelete(undefined);
               handleDelete(dataToDelete?.id);
             }}
+            open={deleteModalOpen}
+            setOpen={setDeleteModalOpen}
+            submitButtonText={"Delete"}
+            title={"Delete component?"}
           >{`Are you sure you want to delete ${dataToDelete?.component.description}?`}</Modal>
         </>
       ) : (
-        <Alert variant="transparent" centered>
+        <Alert centered variant="transparent">
           <span>
             There are no components in your inventory.{" "}
             <a className="text-blue-500" href="/components">
@@ -502,27 +502,27 @@ const Inventory = () => {
       )}
       {!user.is_premium && (
         <Modal
-          open={showGetPremiumModal}
-          title={`This is a feature for our Patreon supporters`}
-          type="info"
           buttons={
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                 <button
-                  type="button"
                   className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
                   onClick={() => navigate('/premium')}
+                  type="button"
                 >
                   Support
                 </button>
               <button
-                type="button"
                 className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                 onClick={() => setShowGetPremiumModal(false)}
+                type="button"
               >
                 Cancel
               </button>
             </div>
           }
+          open={showGetPremiumModal}
+          title={`This is a feature for our Patreon supporters`}
+          type="info"
         >
           {`BOM Squad depends on our Patreon supports to keep our servers online. Please help support the project and get access to version history.`}
         </Modal>

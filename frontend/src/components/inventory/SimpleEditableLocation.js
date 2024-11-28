@@ -40,25 +40,25 @@ const SimpleEditableLocation = ({
           <div className="flex gap-1.5 pb-1 pt-2">
             <form className="flex content-center w-full gap-1 align-middle">
               <input
-                type="text"
                 className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                value={localLocationString}
                 onChange={(e) => setLocalLocationString(e.target.value)}
+                type="text"
+                value={localLocationString}
               />
               <Button
-                variant="muted"
                 onClick={() => {
                   setLocalLocationString([]);
                   submitLocationChange([])
                   setIsEditable(false);
                 }}
+                variant="muted"
               >
                 Cancel
               </Button>
               <Button
+                onClick={handleSubmit}
                 type="submit"
                 variant="primary"
-                onClick={handleSubmit}
               >
                 Update
               </Button>
@@ -76,9 +76,9 @@ const SimpleEditableLocation = ({
             ? locationArray.map((item, index) => (
                 <Pill
                   key={index}
-                  textSize="text-xs"
-                  showArrow={index !== locationArray.length - 1}
                   onClick={() => {}}
+                  showArrow={index !== locationArray.length - 1}
+                  textSize="text-xs"
                 >
                   {item}
                 </Pill>

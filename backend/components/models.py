@@ -68,6 +68,12 @@ class ComponentManufacturer(BaseModel):
 
 
 class Component(BaseModel):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=True)
     manufacturer = models.ForeignKey(
@@ -134,9 +140,9 @@ class Component(BaseModel):
         blank=True,
         help_text="If the component type involves capacitance, this value MUST be set.",
     )
-    voltage_rating = models.CharField(max_length=24, blank=True)
-    current_rating = models.CharField(max_length=24, blank=True)
-    wattage = models.CharField(max_length=24, blank=True)
+    voltage_rating = models.CharField(max_length=24, null=True, blank=True)
+    current_rating = models.CharField(max_length=24, null=True, blank=True)
+    wattage = models.CharField(max_length=24, null=True, blank=True)
     forward_voltage = models.CharField(
         max_length=24,
         blank=True,
@@ -173,7 +179,17 @@ class Component(BaseModel):
     )
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
-    link = models.URLField(blank=False, help_text="Deprecated")
+    link = models.URLField(blank=True, help_text="Deprecated")
+    submitted_by = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="User who submitted this component, if user-submitted.",
+    )
+    user_submitted_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="approved"
+    )
     allow_comments = models.BooleanField("allow comments", default=True)
 
     def save(self, *args, **kwargs):
@@ -181,6 +197,11 @@ class Component(BaseModel):
         Override the save method to automatically generate the description
         field before saving the model.
         """
+        current_user = kwargs.pop("current_user", None)
+        if not self.submitted_by and self.user_submitted_status != "approved":
+            if current_user and not current_user.is_staff:
+                self.submitted_by = current_user
+
         if not self.description:
             self.description = self.generate_description()
 
@@ -241,20 +262,23 @@ class Component(BaseModel):
         ordering = ["type", "mounting_style", "description"]
 
     def __str__(self):
-        if self.type.name == "Potentiometers":
-            return f"{self.description} | {self.mounting_style} | {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
-        elif self.type.name == "Resistors":
-            return f"{self.ohms} | {self.mounting_style} | {self.ohms_unit} | {self.type} ({self.supplier.name} {self.supplier_item_no})"
-        elif self.type.name == "Capacitors":
-            return f"{self.farads} | {self.mounting_style} | {self.farads_unit} | {self.type} ({self.supplier.name} {self.supplier_item_no})"
-        else:
-            return f"{self.description} | {self.mounting_style} | {self.type.name} ({self.supplier.name} {self.supplier_item_no})"
+        type_name = self.type.name if self.type else "Unknown Type"
+        supplier_name = self.supplier.name if self.supplier else "Unknown Supplier"
+        supplier_item_no = (
+            self.supplier_item_no if self.supplier_item_no else "No Item Number"
+        )
+        mounting_style = self.mounting_style or "No Mounting Style"
 
-    def clean(self):
-        if not self.supplier_has_no_item_no and not self.supplier_item_no:
-            raise ValidationError(
-                "Supplier item number is required if 'supplier has no item number' is False."
-            )
+        if type_name == "Potentiometers":
+            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} ({supplier_name} {supplier_item_no})"
+        elif type_name == "Resistors":
+            return f"{self.ohms or 'No Ohms'} | {mounting_style} | {self.ohms_unit or 'No Unit'} | {type_name} ({supplier_name} {supplier_item_no})"
+        elif type_name == "Capacitors":
+            return f"{self.farads or 'No Farads'} | {mounting_style} | {self.farads_unit or 'No Unit'} | {type_name} ({supplier_name} {supplier_item_no})"
+        else:
+            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} ({supplier_name} {supplier_item_no})"
+
+    def clean(self, *args, **kwargs):
         if self.type.name == "Resistor":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(
@@ -282,24 +306,26 @@ class Component(BaseModel):
                 raise ValidationError(
                     "Farad value and unit must not be set for potentiometers."
                 )
-        # elif self.type.name == "Diode":
-        #     if not (
-        #         self.forward_voltage
-        #         or self.max_forward_current
-        #     ):
-        #         raise ValidationError(
-        #             "If this component is a diode, you must set at least one of the forward current, forward voltage, forward surge current, or average forward current rectified."
-        #         )
 
-        # Validation to ensure diode-specific fields are not set for non-diodes and non-LEDs
-        # if self.type.name not in ["Diode", "Light-emitting diode (LED)"]:
-        #     if (
-        #         self.forward_voltage
-        #         or self.max_forward_current
-        #     ):
-        #         raise ValidationError(
-        #             "Forward current, forward voltage, forward surge current, and average forward current rectified must not be set for non-diodes and non-LEDs."
-        #         )
+        current_user = kwargs.pop("current_user", None)
+
+        # If the current user is an admin, short-circuit validation
+        if current_user and current_user.is_staff:
+            return
+
+        # Validate user-submitted components
+        if not self.submitted_by and self.user_submitted_status != "approved":
+            raise ValidationError(
+                "A user-submitted component with a non-approved status must have a `submitted_by` user."
+            )
+
+        if self.user_submitted_status == "pending" and not self.submitted_by:
+            raise ValidationError("Pending components must have a `submitted_by` user.")
+
+        if self.user_submitted_status not in ["approved", "rejected", "pending"]:
+            raise ValidationError(
+                f"Invalid `user_submitted_status`: {self.user_submitted_status}. Allowed values are: pending, approved, rejected."
+            )
 
     def get_absolute_url(self):
         return reverse(

@@ -3,7 +3,15 @@ from modules.serializers import (
     SupplierSerializer,
     TypeSerializer,
 )
-from components.models import Component, SizeStandard, Category, ComponentSupplierItem
+from components.models import (
+    Component,
+    SizeStandard,
+    Category,
+    ComponentSupplierItem,
+    ComponentSupplier,
+    Types,
+    ComponentManufacturer,
+)
 from rest_framework import serializers
 
 
@@ -107,3 +115,80 @@ class ComponentSerializer(serializers.ModelSerializer):
             f"Tolerance: {obj.tolerance}" if obj.tolerance else None,
         ]
         return ", ".join(filter(None, qualities)) or "N/A"
+
+
+class AddComponentDropdownOptionsSerializer:
+    @staticmethod
+    def get_data():
+        """
+        Fetches and returns dropdown data for types, manufacturers, suppliers,
+        categories, and sizes as dictionaries with 'id' and 'name' keys.
+        """
+        return {
+            "types": Types.objects.values("id", "name"),
+            "manufacturers": ComponentManufacturer.objects.values("id", "name"),
+            "suppliers": ComponentSupplier.objects.values("id", "short_name"),
+        }
+
+
+OHMS_UNITS = (
+    ("Ω", "Ω"),
+    ("kΩ", "kΩ"),
+    ("MΩ", "MΩ"),
+)
+
+FARAD_UNITS = (
+    ("mF", "mF"),
+    ("μF", "μF"),
+    ("nF", "nF"),
+    ("pF", "pF"),
+)
+
+MOUNTING_STYLE = [
+    ("smt", "Surface Mount (SMT)"),
+    ("th", "Through Hole"),
+]
+
+CURRENCIES = [
+    ("USD", "US Dollar"),
+    ("EUR", "Euro"),
+    ("JPY", "Japanese Yen"),
+    ("GBP", "British Pound"),
+    ("AUD", "Australian Dollar"),
+    ("CAD", "Canadian Dollar"),
+    ("CHF", "Swiss Franc"),
+    ("CNY", "Chinese Yuan"),
+    ("HKD", "Hong Kong Dollar"),
+    ("NZD", "New Zealand Dollar"),
+    ("SEK", "Swedish Krona"),
+    ("KRW", "South Korean Won"),
+    ("SGD", "Singapore Dollar"),
+    ("NOK", "Norwegian Krone"),
+    ("INR", "Indian Rupee"),
+]
+
+
+class CreateComponentSerializer(serializers.ModelSerializer):
+    pcs = serializers.IntegerField(required=False, default=1)
+
+    class Meta:
+        model = Component
+        fields = "__all__"
+
+    def save(self, **kwargs):
+        # Set voltage_rating to None if not provided or empty
+        self.validated_data["voltage_rating"] = (
+            self.validated_data.get("voltage_rating") or None
+        )
+        return super().save(**kwargs)
+
+
+class CreateComponentSupplierItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComponentSupplierItem
+        fields = "__all__"
+
+    def validate_component(self, value):
+        if not value:
+            raise serializers.ValidationError("Component field is required.")
+        return value

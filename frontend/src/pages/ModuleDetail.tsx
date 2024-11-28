@@ -1,6 +1,7 @@
-import { ArrowDownOnSquareIcon, LinkIcon } from "@heroicons/react/24/outline";
+import { LinkIcon } from "@heroicons/react/24/outline";
 import React, {useState} from "react";
 
+import HeaderWithButton from "../ui/HeaderWithButton"
 import AddModuleButtons from "../components/AddModuleButtons";
 import BomList from "../components/bom_list";
 import chroma from "chroma-js";
@@ -44,7 +45,7 @@ const ModuleDetail: React.FC = () => {
     : categoryColors.default;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-16">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-6 bg-gradient-to-r from-slate-50 to-gray-100 rounded-lg">
         {/* Left Side: Image */}
         <div className="flex justify-center md:col-span-2 py-12">
@@ -155,22 +156,11 @@ const ModuleDetail: React.FC = () => {
       </div>
       <div>
         <div className="pb-5">
-          <div className="relative">
-            <div aria-hidden="true" className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex items-center justify-between">
-              <h1 className="bg-white pr-3 text-3xl font-semibold text-gray-900 font-display">Components</h1>
-              <button
-                className="inline-flex items-center gap-x-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:text-white hover:bg-[#4f7f63] transition-all"
-                onClick={() =>  handleModalOpenClose(true)}
-                type="button"
-              >
-                <ArrowDownOnSquareIcon className="w-5 h-5" />
-                <span>Quick BOM Export</span>
-              </button>
-            </div>
-          </div>
+          <HeaderWithButton
+            buttonText="Quick BOM Export"
+            onButtonClick={() => handleModalOpenClose(true)}
+            title="Components"
+          />
           {!user && (<span className="text-xs">
             <a
               className="text-blue-500 hover:text-blue-700"

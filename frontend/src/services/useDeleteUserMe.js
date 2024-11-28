@@ -25,7 +25,7 @@ const useDeleteUser = () => {
     }
   });
 
-  return { mutate, isSuccess, isError, isLoading };
+  return { isError, isLoading, isSuccess, mutate };
 };
 
 export default useDeleteUser;

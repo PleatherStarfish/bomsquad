@@ -30,21 +30,21 @@ const EditableLocation = ({
               onSubmit={(e) => e.preventDefault()}
             >
               <ControlledInput
-                type="text"
                 className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                value={updatedLocationToSubmit ?? row.location}
                 onChange={(e) => handleLocationChange(e)}
+                type="text"
+                value={updatedLocationToSubmit ?? row.location}
               />
               <Button
-                variant="muted"
                 onClick={() => setLocationIdToEdit(undefined)}
+                variant="muted"
               >
                 Cancel
               </Button>
               <Button
+                onClick={() => handleSubmitLocation(row.id)}
                 type="submit"
                 variant="primary"
-                onClick={() => handleSubmitLocation(row.id)}
               >
                 Update
               </Button>
@@ -60,8 +60,8 @@ const EditableLocation = ({
             filteredLocation.map((item, index) => (
               <Pill
                 key={index}
-                showArrow={index !== filteredLocation.length - 1}
                 onClick={() => handlePillClick(row.id, index)}
+                showArrow={index !== filteredLocation.length - 1}
                 textSize={textSize}
               >
                 {item}

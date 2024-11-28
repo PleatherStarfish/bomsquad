@@ -11,7 +11,7 @@ const useAuthenticatedUser = () => {
         withCredentials: true,
       });
       return response.data;
-    } catch (error) {
+    } catch {
       throw new Error("Failed to fetch authenticated user");
     }
   };
@@ -21,11 +21,11 @@ const useAuthenticatedUser = () => {
     isLoading: userIsLoading,
     isError: userIsError,
   } = useQuery<User, Error>({
-    queryKey,
     queryFn: fetchData,
+    queryKey,
   });
 
-  return { user, userIsLoading, userIsError };
+  return { user, userIsError, userIsLoading };
 };
 
 export default useAuthenticatedUser;
