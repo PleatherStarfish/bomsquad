@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { useQuery, useMutation, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useMutation, UseMutationResult, UseQueryResult, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { TransformedComponentData } from "../types/createComponentForm";
 
@@ -31,9 +31,10 @@ const useGetComponentDropdownOptions = (): UseQueryResult<any, Error> => {
 const useCreateComponent = (): UseMutationResult<
   any, // Replace with the response type if known
   Error | { fieldErrors: Record<string, string[]> },
-  TransformedComponentData
+  TransformedComponentData & { quantity?: number }
 > => {
   const csrftoken = Cookies.get("csrftoken");
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (componentData: TransformedComponentData) => {
@@ -59,6 +60,9 @@ const useCreateComponent = (): UseMutationResult<
     onError: (error: any) => {
       console.error("Create Component Error:", error);
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    }
   });
 };
 

@@ -24,6 +24,7 @@ export interface AddComponentFormInputs {
   max_forward_current?: string;
   tolerance?: string;
   supplier_items?: SupplierItemInput[]; // Nested supplier items
+  quantity?: number;
 }
 
 export interface SupplierItemInput {
@@ -36,6 +37,7 @@ export interface SupplierItemInput {
 }
 
 export type TransformedComponentData = {
-  component: AddComponentFormInputs
-  supplier_items: SupplierItemInput[]
+  component: AddComponentFormInputs;
+  quantity?: number;
+  supplier_items: SupplierItemInput[];
 }

@@ -111,14 +111,14 @@ const ListSlice: React.FC<ListSliceProps> = ({
   const labelColumns: TableColumn<AggregatedComponent>[] = [
     {
       cell: (row) => (
-        <span
-          className={cx({
+        <div
+          className={cx("h-[47px] overflow-scroll", {
             "text-black": index !== 0,
             "text-gray-300": index === 0,
           })}
         >
           <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.component.id}`}>{row.component.description}</a>
-        </span>
+        </div>
       ),
       name: <div className="font-bold text-gray-400">Description</div>,
       sortable: false,
@@ -127,7 +127,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
     {
       cell: (row) =>
         (row.component.supplier_items || []).length > 0 ? (
-          <ul className="pl-5 list-disc">
+          <ul className="pl-5 list-disc h-[47px] overflow-scroll">
             {row.component.supplier_items?.map((item) => (
               <li key={item.id}>
                 <b>{item.supplier?.short_name}: </b>

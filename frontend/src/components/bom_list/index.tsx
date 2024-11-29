@@ -84,7 +84,6 @@ const BomList: React.FC<BomListProps> = ({
 
   useEffect(() => {
     setUniquePCBVersions(getUniqueSortedPCBVersionNames(moduleBomData));
-    console.log(getUniqueSortedPCBVersionNames(moduleBomData));
   }, [moduleBomData.length]);
 
   useEffect(() => {

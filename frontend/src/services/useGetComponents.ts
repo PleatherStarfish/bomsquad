@@ -35,16 +35,12 @@ const useGetComponents = ({
 }: UseGetComponentsParams) => {
   const queryClient = useQueryClient();
 
-  console.log("Filters in useGetComponents:", filters);
-  console.log("Page in useGetComponents:", page);
-
   const {
     data: componentsData,
     isLoading: componentsAreLoading,
     isError: componentsAreError,
   } = useQuery<ComponentData>({
     queryFn: async () => {
-      console.log("Fetching components for page:", page);
       const response = await axios.get<ComponentData>("/api/components/", {
         params: { page, search, ...filters, order },
       });

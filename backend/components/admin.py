@@ -140,6 +140,7 @@ class ComponentSupplierAdmin(BaseAdmin):
 
 class ComponentManufacturerAdmin(BaseAdmin):
     model = ComponentManufacturer
+    search_fields = ["name"]
 
 
 class CategoryAdmin(ImportExportModelAdmin, DjangoMpttAdmin):

@@ -30,8 +30,6 @@ const useUserShoppingList = () => {
         .sortBy("component.supplier?.short_name")
         .value();
 
-      console.log("aggregatedComponents", aggregatedComponents)
-
       return { aggregatedComponents, groupedByModule };
     },
     queryKey: ["userShoppingList"],

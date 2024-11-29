@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Control,
   Controller,
@@ -5,9 +6,12 @@ import {
   UseFormRegister,
   useWatch,
 } from "react-hook-form";
+import Select from "react-select";
 
-import Dropdown from "../../ui/Dropdown";
-import React from "react";
+interface Option {
+  label: string;
+  value: string;
+}
 
 interface SearchFormProps {
   type: string[];
@@ -24,45 +28,9 @@ interface SearchFormProps {
   onSubmit: (data: any) => void;
 }
 
-const typesRelevantTo: Record<string, string[]> = {
-  farads: ["Capacitor"],
-  ohms: ["Resistor", "Photoresistor (LDR)", "Potentiometer", "Trimpot"],
-  tolerance: ["Capacitor", "Resistor", "Potentiometer", "Trimpot"],
-  voltage_rating: ["Resistor", "Capacitor", "Jack", "Potentiometer", "Trimpot"],
+const mapToOptions = (data: string[]): Option[] => {
+  return data.map((item) => ({ label: item, value: item }));
 };
-
-type Option = {
-  label: string;
-  value: string;
-};
-
-const renderDropdown = (
-  label: string,
-  name: string,
-  options: (Option | string)[],
-  control: Control<any>
-) => (
-  <div className="flex flex-col w-full" key={name}>
-    <label
-      className="block mb-2 font-semibold text-gray-700 text-md"
-      htmlFor={name}
-    >
-      {label}
-    </label>
-    <Controller
-      control={control}
-      defaultValue="all"
-      name={name}
-      render={({ field }) => (
-        <Dropdown
-          options={["all", ...options]} // "all" prepended to the options array
-          setValue={field.onChange}
-          value={field.value}
-        />
-      )}
-    />
-  </div>
-);
 
 const SearchForm: React.FC<SearchFormProps> = ({
   type,
@@ -71,45 +39,53 @@ const SearchForm: React.FC<SearchFormProps> = ({
   mounting_style,
   farads,
   ohms,
-  tolerance,
-  voltage_rating,
+  // tolerance,
+  // voltage_rating,
   register,
   handleSubmit,
   control,
   onSubmit,
 }) => {
+  console.log("type", type)
+  console.log("manufacturer", manufacturer)
+  console.log("supplier", supplier)
+  console.log("mounting_style", mounting_style)
+  console.log("farads", farads)
+  console.log("ohms", ohms)
+
   const currentType: string = useWatch({
     control,
     defaultValue: "",
     name: "type",
   });
 
-  const dropdownLabelMap: Record<string, string> = {
-    farads: "Farads",
-    ohms: "Ohms",
-    tolerance: "Tolerance",
-    voltage_rating: "Voltage Ratings",
-  };
-  
-  const dropdownValuesMap: Record<string, string[]> = {
-    farads: farads,
-    ohms: ohms,
-    tolerance: tolerance,
-    voltage_rating: voltage_rating,
-  };
-
-  const relevantDropdowns = Object.entries(typesRelevantTo)
-  .filter(([_, relevantTypes]) => relevantTypes.includes(currentType))
-  .map(([key]) =>
-    renderDropdown(
-      dropdownLabelMap[key],
-      key,
-      dropdownValuesMap[key].map((item) => ({
-        label: item,
-        value: item,
-      })),
-      control
-    )
+  const renderDropdown = (
+    label: string,
+    name: string,
+    options: Option[],
+    control: Control<any>
+  ) => (
+    <div className="flex flex-col w-full" key={name}>
+      <label
+        className="block mb-2 font-semibold text-gray-700 text-md"
+        htmlFor={name}
+      >
+        {label}
+      </label>
+      <Controller
+        control={control}
+        defaultValue={null} // Default value as null to match React Select expectations
+        name={name}
+        render={({ field }) => (
+          <Select
+            isClearable
+            onChange={(selectedOption) => field.onChange(selectedOption?.value)}
+            options={[{ label: "All", value: "all" }, ...options]}
+            value={options.find((option) => option.value === field.value)}
+          />
+        )}
+      />
+    </div>
   );
 
   return (
@@ -134,26 +110,33 @@ const SearchForm: React.FC<SearchFormProps> = ({
         </div>
         {/* Dropdown Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full px-2">
-          {renderDropdown("Type", "type", type, control)}
+          {renderDropdown("Type", "type", mapToOptions(type), control)}
           {renderDropdown(
             "Manufacturer",
             "manufacturer",
+            // @ts-ignore
             manufacturer,
             control
           )}
-          {renderDropdown("Supplier", "supplier", supplier, control)}
+          {renderDropdown(
+            "Supplier",
+            "supplier",
+            // @ts-ignore
+            supplier,
+            control
+          )}
           {renderDropdown(
             "Mounting Style",
             "mounting_style",
+            // @ts-ignore
             mounting_style,
             control
           )}
+          {currentType === "Capacitor" &&
+            renderDropdown("Farads", "farads", mapToOptions(farads), control)}
+          {currentType === "Resistor" &&
+            renderDropdown("Ohms", "ohms", mapToOptions(ohms), control)}
         </div>
-        {relevantDropdowns.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-200 rounded p-6 w-full">
-            {relevantDropdowns}
-          </div>
-        )}
         {/* Submit Button */}
         <div className="w-full px-2 md:w-1/2 lg:w-1/3">
           <button

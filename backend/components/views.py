@@ -14,6 +14,7 @@ from components.serializers import (
     CreateComponentSerializer,
     CreateComponentSupplierItemSerializer,
 )
+from inventory.models import UserInventory
 from django.views.decorators.cache import cache_page
 from django.http import JsonResponse
 from django.db import transaction
@@ -252,6 +253,7 @@ def get_component_dropdowns(request):
 def create_component(request):
     component_data = request.data.get("component", {})
     supplier_items_data = request.data.get("supplier_items", [])
+    quantity = request.data.get("quantity")  # Optional quantity parameter
 
     # Ensure voltage_rating has a default value
     component_data["voltage_rating"] = component_data.get("voltage_rating") or ""
@@ -340,6 +342,26 @@ def create_component(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            # If quantity is provided, add the component to the user's inventory
+            if quantity is not None:
+                try:
+                    quantity = int(quantity)  # Ensure quantity is an integer
+                    if quantity < 0:
+                        raise ValueError("Quantity must be non-negative.")
+                    UserInventory.objects.create(
+                        user=request.user,
+                        component=component,
+                        quantity=quantity,
+                    )
+                except ValueError as ve:
+                    return Response(
+                        {
+                            "fieldErrors": {"quantity": str(ve)},
+                            "message": "Invalid quantity value.",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
     except Exception as e:
         return Response(

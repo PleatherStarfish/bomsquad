@@ -107,8 +107,8 @@ const validationRules = {
   },
 };
 
-const transformSubmissionData = (data) => {
-  const extractValue = (field) => (field && field.value ? field.value : field);
+const transformSubmissionData = (data: any) => {
+  const extractValue = (field: any) => (field && field.value ? field.value : field);
 
   return {
     component: {
@@ -124,6 +124,7 @@ const transformSubmissionData = (data) => {
       voltage_rating: data.voltage_rating || null,
       wattage: data.wattage || null,
     },
+    quantity: data.quantity,
     supplier_items: data.supplier_items.map((item) => ({
       currency: item.currency,
       link: item.link || "",
@@ -148,13 +149,15 @@ const AddComponentForm: React.FC<{
   handleSuccess: () => void;
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ formRef, isSubmitting, setIsSubmitting, handleSuccess }) => {
+  allowInventoryOption?: boolean;
+}> = ({ formRef, isSubmitting, setIsSubmitting, handleSuccess, allowInventoryOption = false }) => {
   const [alert, setAlert] = useState<{
     type: "error" | "info" | "success";
     message: string;
     detailedMessage?: string;
   } | null>(null);
 
+  const [addToInventory, setAddToInventory] = useState(false);
   const {
     clearErrors,
     control,
@@ -623,6 +626,47 @@ const AddComponentForm: React.FC<{
           register={register}
           suppliers={dropdownOptions?.suppliers ?? []}
         />
+
+        {/* Conditional Inventory Section */}
+        {allowInventoryOption && (
+          <div className="col-span-full">
+            <div className="flex items-center">
+              <input
+                checked={addToInventory}
+                className="mr-2"
+                id="add_to_inventory"
+                onChange={(e) => setAddToInventory(e.target.checked)}
+                type="checkbox"
+              />
+              <label className="text-sm font-medium text-gray-700" htmlFor="add_to_inventory">
+                Add this component to your inventory
+              </label>
+            </div>
+            {addToInventory && (
+              <div className="mt-4">
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="quantity"
+                >
+                  Quantity
+                </label>
+                <input
+                  {...register("quantity", {
+                    validate: (value) => (value ?? 1) > 0 || "Quantity must be a positive number",
+                    valueAsNumber: true,
+                  })}
+                  className="block w-full md:w-24 mt-1 border-gray-300 rounded-md shadow-sm focus:ring-brandgreen-500 focus:border-brandgreen-500 sm:text-sm"
+                  id="quantity"
+                  min={1}
+                  type="number"
+                />
+                {errors.quantity && (
+                  <p className="text-red-500 text-sm">{errors.quantity.message}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </form>
     </>
   );

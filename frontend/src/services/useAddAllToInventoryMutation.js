@@ -17,14 +17,14 @@ const useAddAllToInventoryMutation = () => {
       });
       return response.data;
     },
+    onError: (error) => {
+      // Optionally handle error, perhaps logging or displaying a notification
+      console.error('Error adding all to inventory:', error);
+    },
     onSuccess: () => {
       // Invalidate and refetch the inventory queries after mutation
       queryClient.invalidateQueries(['inventory']);
       queryClient.invalidateQueries(['userShoppingList']); // Added if you want to also update the shopping list view
-    },
-    onError: (error) => {
-      // Optionally handle error, perhaps logging or displaying a notification
-      console.error('Error adding all to inventory:', error);
     }
   });
 

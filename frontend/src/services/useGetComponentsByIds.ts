@@ -19,11 +19,11 @@ const useGetComponentsByIds = (componentPks: string[]) => {
     isLoading: componentsAreLoading, 
     isError: componentsAreError 
   } = useQuery<Component[], Error>({
-    queryKey: ["getComponentsByIds", componentPks],
     queryFn: () => getComponentsByIds(componentPks),
+    queryKey: ["getComponentsByIds", componentPks],
   });
 
-  return { componentsData, componentsAreLoading, componentsAreError };
+  return { componentsAreError, componentsAreLoading, componentsData };
 };
 
 export default useGetComponentsByIds;
