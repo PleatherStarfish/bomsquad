@@ -98,6 +98,7 @@ class ComponentSerializer(serializers.ModelSerializer):
             "allow_comments",
             "supplier_items",
             "qualities",  # Include the custom field
+            "user_submitted_status",
         ]
 
     def get_qualities(self, obj):

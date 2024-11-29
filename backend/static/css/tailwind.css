@@ -82,6 +82,7 @@
 }
 
 @layer components {
+
     /* Homepage Grid Layout */
     .homepage-grid {
         @apply grid p-6;

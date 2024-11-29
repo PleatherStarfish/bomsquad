@@ -11,6 +11,7 @@ import Alert from "../ui/Alert";
 import Button from "../ui/Button";
 import Notification from "../ui/Notification";
 import FullPageModal from "../ui/FullPageModal";
+import RowWarning, { getBaseUrl } from "../ui/RowWarning";
 import { Component } from "../types/component";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import Pagination from "../components/components/Pagination";
@@ -24,12 +25,7 @@ import useGetUserCurrency from "../services/useGetUserCurrency";
 import { useSearchParams } from "react-router-dom";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
 import AddComponentForm from "../components/user_submissions/AddComponentForm";
-import cv from "classnames"
-
-const getBaseUrl = () => {
-  const { protocol, hostname, port } = window.location;
-  return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
-};
+import cv from "classnames";
 
 const customStyles = {
   headCells: {
@@ -60,7 +56,7 @@ const Components: React.FC = () => {
   const [shoppingModalOpen, setShoppingModalOpen] = useState<
     string | undefined
   >();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [fullPageModalOpen, setFullPageModalOpen] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -97,7 +93,7 @@ const Components: React.FC = () => {
   const { user } = useAuthenticatedUser();
 
   const handleSuccess = () => {
-    setFullPageModalOpen(false)
+    setFullPageModalOpen(false);
     setNotification({
       message: "Your new component has been successfully submitted.",
       show: true,
@@ -154,6 +150,19 @@ const Components: React.FC = () => {
     setCurrentPage(Number(searchParams.get("page") || 1));
   }, [searchParams, setValue]);
 
+  // Ah yes, another bizarre useEffect hack to get around the quirks of react-data-table-component...
+  useEffect(() => {
+    const tableWrapper = document.getElementById("table__wrapper");
+
+    if (tableWrapper && tableWrapper.children) {
+      Array.from(tableWrapper.children).forEach((child) => {
+        if (child instanceof HTMLElement) {
+          child.style.overflow = "visible";
+        }
+      });
+    }
+  }, [componentsData]);
+
   useEffect(() => {
     if (componentsData?.page) {
       setCurrentPage(componentsData.page);
@@ -204,16 +213,38 @@ const Components: React.FC = () => {
   const resultsPerPage = 30;
   const totalPages = Math.ceil((componentsData?.count || 0) / resultsPerPage);
 
+  const conditionalRowStyles = [
+    {
+      style: {
+        borderRadius: "8px",
+        boxShadow: "inset 0 0 0 2px #db2777",
+        overflow: "visible",
+      },
+      when: (row: Component) => row.user_submitted_status === "pending",
+    },
+  ];
+
   const columns: TableColumn<Component>[] = [
     {
-      cell: (row: Component) => (
-        <a
-          className="text-blue-500 hover:text-blue-700"
-          href={`${getBaseUrl()}/components/${row.id}`}
-        >
-          {row.description}
-        </a>
-      ),
+      cell: (row: Component) => {
+        return (
+          <RowWarning id={row.id} user_submitted_status={row.user_submitted_status ?? "approved"}>
+            {row.discontinued ? (
+              <span>
+                <s>{row.description}</s>{" "}
+                <span className="italic font-bold text-red-500">DISCONTINUED</span>
+              </span>
+            ) : (
+              <a
+                className="text-blue-500 hover:text-blue-700"
+                href={`${getBaseUrl()}/components/${row.id}`}
+              >
+                {row.description}
+              </a>
+            )}
+          </RowWarning>
+        );
+      },
       grow: 1,
       minWidth: "250px",
       name: "Name",
@@ -434,9 +465,10 @@ const Components: React.FC = () => {
                 </div>
               )}
             </>
-            <div id="table__wrapper">
+            <div id="table__wrapper" style={{overflowX: "visible"}}>
               <DataTable
                 columns={columns}
+                conditionalRowStyles={conditionalRowStyles}
                 customStyles={customStyles}
                 data={componentsData?.results || []}
                 progressPending={componentsAreLoading}
@@ -468,7 +500,9 @@ const Components: React.FC = () => {
               className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
               onClick={handleFormSubmit}
             >
-              <p className={cv({"animate-pulse": isSubmitting})}>{isSubmitting ? "Submiting..." : "Submit"}</p>
+              <p className={cv({ "animate-pulse": isSubmitting })}>
+                {isSubmitting ? "Submiting..." : "Submit"}
+              </p>
             </button>
           </div>
         }
@@ -489,7 +523,12 @@ const Components: React.FC = () => {
         title="Add a Component"
       >
         <div>
-          <AddComponentForm formRef={formRef} handleSuccess={handleSuccess} isSubmitting={isSubmitting} setIsSubmitting={setIsSubmitting} />
+          <AddComponentForm
+            formRef={formRef}
+            handleSuccess={handleSuccess}
+            isSubmitting={isSubmitting}
+            setIsSubmitting={setIsSubmitting}
+          />
         </div>
       </FullPageModal>
       <Notification

@@ -1,22 +1,23 @@
-import 'tippy.js/dist/tippy.css';
+import "tippy.js/dist/tippy.css";
 
 import DataTable, { TableColumn } from "react-data-table-component";
 import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
 import Quantity, { Types } from "./quantity";
-import React, { useState } from "react";
-import { getFaradConversions, getOhmConversions } from '../conversions';
+import React, { useState, useEffect } from "react";
+import { getFaradConversions, getOhmConversions } from "../conversions";
 
 import AddComponentModal from "./addComponentModal";
 import Alert from "../../ui/Alert";
 import { BomItem } from "../../types/bomListItem";
 import Button from "../../ui/Button";
+import RowWarning, { getBaseUrl } from "../../ui/RowWarning";
 import { Component } from "../../types/component";
-import Tippy from '@tippyjs/react';
+import Tippy from "@tippyjs/react";
 import UserRating from "./UserRating";
-import convertUnitPrice from "../../utils/convertUnitPrice"
+import convertUnitPrice from "../../utils/convertUnitPrice";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
-import useGetUserCurrency from "../../services/useGetUserCurrency"
+import useGetUserCurrency from "../../services/useGetUserCurrency";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 
@@ -46,11 +47,6 @@ export const customStyles = {
   },
 };
 
-const getBaseUrl = (): string => {
-  const { protocol, hostname, port } = window.location;
-  return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
-};
-
 const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const {
     bom_specifies_a_choice_of_values,
@@ -64,8 +60,12 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     description,
   } = data;
 
-  const [shoppingModalOpen, setShoppingModalOpen] = useState<string | undefined>();
-  const [inventoryModalOpen, setInventoryModalOpen] = useState<string | undefined>();
+  const [shoppingModalOpen, setShoppingModalOpen] = useState<
+    string | undefined
+  >();
+  const [inventoryModalOpen, setInventoryModalOpen] = useState<
+    string | undefined
+  >();
 
   if (components_options.length < 1) {
     return (
@@ -80,17 +80,48 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     useGetComponentsByIds(components_options);
   const { data: currencyData } = useGetUserCurrency();
 
+  // Ah yes, another bizarre useEffect hack to get around the quirks of react-data-table-component...
+  useEffect(() => {
+    const tableWrapper = document.getElementById("table__wrapper");
+
+    if (tableWrapper && tableWrapper.children) {
+      Array.from(tableWrapper.children).forEach((child) => {
+        if (child instanceof HTMLElement) {
+          child.style.overflow = "visible";
+        }
+      });
+    }
+  }, [components_options]);
+
   if (componentsAreError) {
     return (
-      <div className="p-3 ml-[47px] bg-gray-100">
-        Error loading components.
-      </div>
+      <div className="p-3 ml-[47px] bg-gray-100">Error loading components.</div>
     );
   }
 
   const columns: TableColumn<Component>[] = [
     {
-      cell: (row) => row.discontinued ? <span><s>{row.description}</s> <span className="italic font-bold text-red-500">DISCONTINUED</span></span> : <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.id}`}>{row.description}</a>,
+      cell: (row: Component) => {
+        return (
+          <RowWarning id={row.id} left="-31px" user_submitted_status={row.user_submitted_status ?? "approved"}>
+            <div className="ml-1.5">
+              {row.discontinued ? (
+                <span>
+                  <s>{row.description}</s>{" "}
+                  <span className="italic font-bold text-red-500">DISCONTINUED</span>
+                </span>
+              ) : (
+                <a
+                  className="text-blue-500 hover:text-blue-700"
+                  href={`${getBaseUrl()}/components/${row.id}`}
+                >
+                  {row.description}
+                </a>
+              )}
+            </div>
+          </RowWarning>
+        );
+      },
       grow: 1,
       minWidth: "200px",
       name: <small>Name</small>,
@@ -150,10 +181,18 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
           "No supplier items"
         ),
       name: <small>Supplier Items</small>,
-    },    
+    },
     {
       cell: (row) => (
-        <Tippy content={<div dangerouslySetInnerHTML={{ __html: getFaradConversions(row.farads, row.farads_unit) }} />}>
+        <Tippy
+          content={
+            <div
+              dangerouslySetInnerHTML={{
+                __html: getFaradConversions(row.farads, row.farads_unit),
+              }}
+            />
+          }
+        >
           <span>
             {row.farads} {row.farads_unit}
           </span>
@@ -166,7 +205,15 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     },
     {
       cell: (row) => (
-        <Tippy content={<div dangerouslySetInnerHTML={{ __html: getOhmConversions(row.ohms, row.ohms_unit) }} />}>
+        <Tippy
+          content={
+            <div
+              dangerouslySetInnerHTML={{
+                __html: getOhmConversions(row.ohms, row.ohms_unit),
+              }}
+            />
+          }
+        >
           <span>
             {row.ohms} {row.ohms_unit}
           </span>
@@ -235,9 +282,9 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     },
     {
       cell: (row) => (
-        <UserRating 
-          bomItemName={description} 
-          componentId={row.id} 
+        <UserRating
+          bomItemName={description}
+          componentId={row.id}
           initialRating={0}
           moduleBomListItemId={modulebomlistitem_pk}
           moduleId={module_pk}
@@ -263,7 +310,11 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
             </Button>
             <AddComponentModal
               componentId={row.id}
-              componentName={row.supplier_item_no ? `${row.supplier?.short_name} ${row.supplier_item_no}` : row.description}
+              componentName={
+                row.supplier_item_no
+                  ? `${row.supplier?.short_name} ${row.supplier_item_no}`
+                  : row.description
+              }
               // @ts-ignore
               moduleId={module_pk}
               open={inventoryModalOpen === row.id}
@@ -283,9 +334,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                       {`${
                         row.description
                         // @ts-ignore
-                      } ${type.toLowerCase()}s by ${
-                        row.supplier?.name
-                      } `}
+                      } ${type.toLowerCase()}s by ${row.supplier?.name} `}
                     </a>
                   </span>
                   <span>
@@ -294,7 +343,11 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                   </span>
                 </>
               }
-              title={row.supplier_item_no ? `Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?` : `Add ${row.description} to Inventory?`}
+              title={
+                row.supplier_item_no
+                  ? `Add ${row.supplier?.short_name} ${row.supplier_item_no} to Inventory?`
+                  : `Add ${row.description} to Inventory?`
+              }
               type={Types.INVENTORY}
             />
           </>
@@ -322,7 +375,11 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
             </Button>
             <AddComponentModal
               componentId={row.id}
-              componentName={row.supplier_item_no ? `${row.supplier?.short_name} ${row.supplier_item_no}` : row.description}
+              componentName={
+                row.supplier_item_no
+                  ? `${row.supplier?.short_name} ${row.supplier_item_no}`
+                  : row.description
+              }
               // @ts-ignore
               hookArgs={{
                 component_pk: row.id,
@@ -347,9 +404,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                       {`${
                         row.description
                         // @ts-ignore
-                      } ${type.toLowerCase()}s by ${
-                        row.supplier?.name
-                      } `}
+                      } ${type.toLowerCase()}s by ${row.supplier?.name} `}
                     </a>
                   </span>
                   <span>
@@ -374,7 +429,11 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       cell: () => {
         return (
           <span className="invisible group-hover/row:visible">
-            <a href="https://forms.gle/5avb2JmrxJT2uw426" rel="noreferrer" target="_blank">
+            <a
+              href="https://forms.gle/5avb2JmrxJT2uw426"
+              rel="noreferrer"
+              target="_blank"
+            >
               <Button
                 Icon={FlagIcon}
                 iconOnly
@@ -398,33 +457,59 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       classNames: ["group/row"],
       when: () => true,
     },
+    {
+      style: {
+        borderRadius: "8px",
+        boxShadow: "inset 0 0 0 2px #db2777",
+        overflow: "visible",
+      },
+      when: (row: Component) => row.user_submitted_status === "pending",
+    },
   ];
 
   return (
     <div className="py-1 px-4 ml-[47px] bg-sky-50">
       {bom_specifies_a_choice_of_values && (
-        <Alert align="center" expand={false} icon padding="compact" variant="sky">
+        <Alert
+          align="center"
+          expand={false}
+          icon
+          padding="compact"
+          variant="sky"
+        >
           <p>
-          This BOM item specifies a choice of several different component value options. Please check <a className="underline hover:text-sky-800" href={bom_link} rel="noreferrer" target="_blank">the BOM</a> for details.
+            This BOM item specifies a choice of several different component
+            value options. Please check{" "}
+            <a
+              className="underline hover:text-sky-800"
+              href={bom_link}
+              rel="noreferrer"
+              target="_blank"
+            >
+              the BOM
+            </a>{" "}
+            for details.
           </p>
         </Alert>
       )}
-      <DataTable
-        columns={columns}
-        compact
-        conditionalRowStyles={conditionalRowStyles}
-        customStyles={customStyles}
-        // @ts-ignore
-        data={componentsData}
-        progressComponent={
-          <div className="flex justify-center w-full p-6 bg-sky-50">
-            <div className="text-center text-gray-500 animate-pulse">
-              Loading...
+      <div id="table__wrapper" style={{overflowX: "visible"}}>
+        <DataTable
+          columns={columns}
+          compact
+          conditionalRowStyles={conditionalRowStyles}
+          customStyles={customStyles}
+          // @ts-ignore
+          data={componentsData}
+          progressComponent={
+            <div className="flex justify-center w-full p-6 bg-sky-50">
+              <div className="text-center text-gray-500 animate-pulse">
+                Loading...
+              </div>
             </div>
-          </div>
-        }
-        progressPending={componentsAreLoading}
-      />
+          }
+          progressPending={componentsAreLoading}
+        />
+      </div>
     </div>
   );
 };

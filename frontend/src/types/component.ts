@@ -24,6 +24,7 @@ export interface ComponentSupplierItem {
   unit_price?: number;
   pcs: number;
   link?: string;
+  user_submitted_status?: "approved" | "pending" | "rejected"; // Indicates if the component has been approved or rejected
 }
 
 export interface Component {
@@ -76,5 +77,6 @@ export interface Component {
   allow_comments: boolean;
   user_submission_hold: boolean;
   supplier_items?: ComponentSupplierItem[];
+  user_submitted_status?: "approved" | "pending" | "rejected"; // Indicates if the component has been approved or rejected
 }
 
