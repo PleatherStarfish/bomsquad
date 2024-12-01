@@ -1,6 +1,7 @@
 from pathlib import Path
 import socket
 import os
+import sys
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from storages.backends.s3boto3 import S3Boto3Storage
@@ -317,6 +318,9 @@ SOCIALACCOUNT_PROVIDERS = {
         "OAUTH_PKCE_ENABLED": True,
     }
 }
+
+if "test" in sys.argv:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
 RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")

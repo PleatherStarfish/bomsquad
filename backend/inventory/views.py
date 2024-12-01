@@ -1,4 +1,5 @@
 from uuid import UUID
+import uuid
 from components.models import Component
 from django.db.models import Sum, Func
 from django.db import models
@@ -142,8 +143,9 @@ class UserInventoryView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes([IsAuthenticated])
+# Tests
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_inventory_quantity(request, component_pk):
     total_quantity = UserInventory.objects.filter(
         component__id=component_pk, user=request.user
@@ -155,28 +157,40 @@ def get_user_inventory_quantity(request, component_pk):
     return Response({"quantity": total_quantity}, status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
+# Tests
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_inventory_quantities_for_bom_list_item(request, modulebomlistitem_pk):
     """
-    Get sum of components in user inventory that fulfill a given bom list item
+    Get sum of components in user inventory that fulfill a given BOM list item
     """
-    bom_list_item = ModuleBomListItem.objects.get(id=modulebomlistitem_pk)
-    inventory = UserInventory.objects.filter(
-        component__in=bom_list_item.components_options.all(), user=request.user
-    )
+    try:
+        bom_list_item = ModuleBomListItem.objects.get(id=modulebomlistitem_pk)
 
-    # Use aggregate function to get the sum of 'quantity' attribute
-    quantity_sum = inventory.aggregate(total=Sum("quantity"))["total"]
+        # Fetch IDs of components associated with the BOM list item
+        components_in_bom = bom_list_item.components_options.values_list(
+            "id", flat=True
+        )
 
-    # quantity_sum will be None if there are no items, so default to 0
-    quantity_sum = quantity_sum if quantity_sum is not None else 0
+        # Filter inventory to include only components matching the BOM list item and belonging to the user
+        inventory = UserInventory.objects.filter(
+            component_id__in=components_in_bom, user=request.user
+        ).distinct()  # Ensure no duplicates
 
-    return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
+        # Aggregate the sum of 'quantity' for the filtered inventory
+        quantity_sum = inventory.aggregate(total=Sum("quantity"))["total"] or 0
+
+        return Response({"quantity": quantity_sum}, status=status.HTTP_200_OK)
+    except ModuleBomListItem.DoesNotExist:
+        return Response(
+            {"error": "Module BOM List Item not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
-@permission_classes([IsAuthenticated])
+# Test
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_component_locations(request, component_pk):
     """
     Get all unique locations for a particular component in the user's inventory,
@@ -189,9 +203,9 @@ def get_component_locations(request, component_pk):
         .distinct()
     )
 
-    if not locations_and_quantities:
+    if not locations_and_quantities.exists():
         # Return an empty JSON object
-        return Response({}, status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
 
     # Prepare the response data
     locations_with_quantity = [
@@ -202,8 +216,9 @@ def get_component_locations(request, component_pk):
     return Response(locations_with_quantity, status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
+# Tests
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_components_locations(request):
     """
     Get all unique locations for multiple components in the user's inventory,
@@ -218,6 +233,14 @@ def get_components_locations(request):
     components_locations = {}
 
     for component_pk in component_pks:
+        try:
+            # Validate UUID
+            uuid.UUID(component_pk)
+        except ValueError:
+            # Skip invalid UUIDs
+            components_locations[component_pk] = []
+            continue
+
         # Fetch unique locations and corresponding quantity for each component using Django ORM
         locations_and_quantities = (
             UserInventory.objects.filter(component__id=component_pk, user=request.user)

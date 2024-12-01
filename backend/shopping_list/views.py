@@ -423,26 +423,33 @@ class ArchivedShoppingListsView(APIView):
             )
 
 
-@permission_classes([IsAuthenticated])
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_shopping_list_quantity(
     request, component_pk, modulebomlistitem_pk, module_pk
 ):
-    shopping_list_item = UserShoppingList.objects.filter(
-        component__id=component_pk,
-        module__id=module_pk,
-        bom_item__id=modulebomlistitem_pk,
-        user=request.user,
-    )
+    try:
+        shopping_list_item = UserShoppingList.objects.filter(
+            component__id=component_pk,
+            module__id=module_pk,
+            bom_item__id=modulebomlistitem_pk,
+            user=request.user,
+        )
 
-    # Check if inventory exists
-    if shopping_list_item.exists():
-        # Access the first inventory object in the QuerySet
-        # and retrieve the 'quantity' attribute
-        quantity = shopping_list_item.first().quantity
-        return Response({"quantity": quantity}, status=status.HTTP_200_OK)
-    else:
-        return Response({"quantity": 0}, status=status.HTTP_200_OK)
+        # Check if inventory exists
+        if shopping_list_item.exists():
+            # Access the first inventory object in the QuerySet
+            # and retrieve the 'quantity' attribute
+            quantity = shopping_list_item.first().quantity
+            return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+        else:
+            return Response({"quantity": 0}, status=status.HTTP_200_OK)
+    except Exception as e:
+        # Handle invalid parameters or unexpected errors
+        return Response(
+            {"error": f"An error occurred: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @permission_classes([IsAuthenticated])
@@ -813,5 +820,8 @@ def archive_shopping_list(request):
 def get_all_unique_component_ids(request):
     user = request.user
     shopping_list = UserShoppingList.objects.filter(user=user)
-    component_ids = shopping_list.values_list("component_id", flat=True).distinct()
+    # Convert UUIDs to strings
+    component_ids = list(
+        map(str, shopping_list.values_list("component_id", flat=True).distinct())
+    )
     return Response(component_ids, status=status.HTTP_200_OK)

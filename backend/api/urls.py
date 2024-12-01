@@ -78,7 +78,7 @@ urlpatterns = [
     ),
     path("inventory/", UserInventoryView.as_view(), name="user-inventory"),
     path(
-        "inventory/bom-list-item/<int:modulebomlistitem_pk>/aggregate-sum/",
+        "inventory/bom-list-item/<uuid:modulebomlistitem_pk>/aggregate-sum/",
         get_user_inventory_quantities_for_bom_list_item,
         name="user-inventory-quantities-for-bom-list-item",
     ),
