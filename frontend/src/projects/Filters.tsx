@@ -6,16 +6,15 @@ import {
   UseFormWatch,
   useFieldArray,
 } from "react-hook-form";
-import React, { useCallback, useState } from "react";
+import React from "react";
 
 import Accordion from "../ui/Accordion";
-import AsyncSelect from "react-select/async";
+import AsyncComponentSelect from "../components/components/AsyncComponentSelect";
 import ClearableNumberInput from "./ClearableNumberInput";
 import FilterFields from "./FilterFields";
 import { FormValues } from "./InfiniteModulesList";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import debounce from "lodash/debounce";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
@@ -47,7 +46,9 @@ interface ComponentOption {
 }
 
 // API call to fetch component options
-const fetchComponentOptions = async (inputValue: string): Promise<ComponentOption[]> => {
+const fetchComponentOptions = async (
+  inputValue: string
+): Promise<ComponentOption[]> => {
   const response = await axios.get("/api/components-autocomplete/", {
     params: { q: inputValue },
     xsrfCookieName: "csrftoken",
@@ -74,31 +75,36 @@ const Filters: React.FC<FiltersProps> = ({
   setValue,
   watch,
   onSubmit,
-  onAnimationComplete
+  onAnimationComplete,
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "component_groups",
   });
 
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch component options with React Query using the current search term
-  const { data: componentOptions = [], isLoading } = useComponentAutocomplete(searchTerm);
+  // const { data: componentOptions = [], isLoading } =
+  //   useComponentAutocomplete(searchTerm);
 
-  const componentGroups = useWatch({
-    control,
-    name: "component_groups",
-  }) || [];
+  const componentGroups =
+    useWatch({
+      control,
+      name: "component_groups",
+    }) || [];
 
   // Debounced function for loading options
-  const debouncedLoadOptions = useCallback(
-    debounce((inputValue: string, callback: (options: ComponentOption[]) => void) => {
-      setSearchTerm(inputValue);
-      callback(componentOptions);
-    }, 200), // 200ms delay
-    [componentOptions]
-  );
+  // const debouncedLoadOptions = useCallback(
+  //   debounce(
+  //     (inputValue: string, callback: (options: ComponentOption[]) => void) => {
+  //       setSearchTerm(inputValue);
+  //       callback(componentOptions);
+  //     },
+  //     200
+  //   ), // 200ms delay
+  //   [componentOptions]
+  // );
 
   // Custom onChange handlers for min and max inputs
   const handleMinChange = (index: number, value: string) => {
@@ -107,7 +113,7 @@ const Filters: React.FC<FiltersProps> = ({
       setValue(`component_groups.${index}.max`, value);
     }
   };
-  
+
   const handleMaxChange = (index: number, value: string) => {
     const min = componentGroups[index]?.min || "";
     if (value !== "" && parseInt(value) < parseInt(min || "0")) {
@@ -152,7 +158,10 @@ const Filters: React.FC<FiltersProps> = ({
               rounded={false}
               title="Advanced"
             >
-              <div className="flex flex-col w-full space-y-8" id="components-container">
+              <div
+                className="flex flex-col w-full space-y-8"
+                id="components-container"
+              >
                 {fields.map((field, index) => {
                   const minValue = watch(`component_groups.${index}.min`);
                   const maxValue = watch(`component_groups.${index}.max`);
@@ -163,13 +172,7 @@ const Filters: React.FC<FiltersProps> = ({
                         <label className="block mb-2 font-semibold text-gray-700 text-md">{`Component [${
                           index + 1
                         }]`}</label>
-                        <AsyncSelect
-                          cacheOptions
-                          className="w-full h-10"
-                          isLoading={isLoading}
-                          loadOptions={debouncedLoadOptions}
-                          menuPortalTarget={document.body}
-                          menuPosition="fixed"
+                        <AsyncComponentSelect
                           onChange={(selected) =>
                             setValue(`component_groups.${index}`, {
                               component: selected?.value || "",
@@ -178,15 +181,16 @@ const Filters: React.FC<FiltersProps> = ({
                               min: minValue || "",
                             })
                           }
-                          placeholder="Search components..."
-                          styles={{
-                            menu: (provided) => ({
-                              ...provided,
-                              maxHeight: 200,
-                              overflowY: "auto",
-                            }),
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                          }}
+                          value={
+                            componentGroups[index]?.component
+                              ? {
+                                  label:
+                                    componentGroups[index]
+                                      .component_description,
+                                  value: componentGroups[index].component,
+                                }
+                              : null
+                          }
                         />
                         <div className="flex items-center w-full gap-4 mt-2">
                           <label className="text-sm font-semibold text-gray-700">

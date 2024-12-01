@@ -1,3 +1,4 @@
+import uuid
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -628,3 +629,130 @@ class GetComponentsLocationsTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.json(), expected_data)
+
+
+class UserInventoryViewTest(APITestCase):
+    def setUp(self):
+        # Create a test user
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        # Create a test component type and manufacturer
+        self.component_type = Types.objects.create(name="Resistor")
+        self.manufacturer = ComponentManufacturer.objects.create(
+            name="Test Manufacturer"
+        )
+
+        # Create a test component
+        self.component = Component.objects.create(
+            description="Test Resistor",
+            type=self.component_type,
+            manufacturer=self.manufacturer,
+            manufacturer_part_no="TR-001",
+            mounting_style="th",
+        )
+
+    def test_get_user_inventory(self):
+        # Create sample inventory for the user
+        UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=10
+        )
+
+        response = self.client.get("/api/inventory/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["quantity"], 10)
+
+    def test_post_user_inventory_create(self):
+        data = {
+            "quantity": 5,
+            "location": ["Shelf 1", "Bin A"],
+        }
+        response = self.client.post(
+            f"/api/inventory/{self.component.id}/create-or-update/", data
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["quantity"], 5)
+        self.assertEqual(response.data["location"], ["Shelf 1", "Bin A"])
+
+    def test_post_user_inventory_update(self):
+        # Create an initial inventory item
+        inventory = UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=5, location=["Shelf 1"]
+        )
+
+        data = {
+            "quantity": 10,
+            "editMode": True,
+            "location": ["Shelf 1"],
+        }
+        response = self.client.post(
+            f"/api/inventory/{self.component.id}/create-or-update/", data
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        inventory.refresh_from_db()
+        self.assertEqual(inventory.quantity, 10)
+
+    def test_delete_user_inventory(self):
+        # Create an inventory item to delete
+        inventory = UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=5
+        )
+
+        response = self.client.delete(f"/api/inventory/{inventory.id}/delete/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(UserInventory.objects.filter(id=inventory.id).exists())
+
+    def test_patch_user_inventory_location_update(self):
+        # Create an inventory item
+        inventory = UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=5, location=["Shelf 1"]
+        )
+
+        data = {
+            "location": ["Shelf 2"],
+        }
+        response = self.client.patch(f"/api/inventory/{inventory.id}/update/", data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        inventory.refresh_from_db()
+        self.assertEqual(inventory.location, ["Shelf 2"])
+
+    def test_patch_user_inventory_duplicate_location(self):
+        # Create two inventory items with the same user and component
+        inventory1 = UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=5, location=["Shelf 1"]
+        )
+        UserInventory.objects.create(
+            user=self.user, component=self.component, quantity=10, location=["Shelf 2"]
+        )
+
+        data = {
+            "location": ["Shelf 2"],
+        }
+        response = self.client.patch(f"/api/inventory/{inventory1.id}/update/", data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data)
+        self.assertEqual(
+            response.data["error"],
+            "A user inventory item with this location already exists.",
+        )
+
+    def test_post_user_inventory_invalid_component(self):
+        invalid_uuid = uuid.uuid4()
+        data = {
+            "quantity": 5,
+            "location": ["Shelf 1", "Bin A"],
+        }
+        response = self.client.post(
+            f"/api/inventory/{invalid_uuid}/create-or-update/", data
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_nonexistent_inventory(self):
+        non_existent_uuid = uuid.uuid4()
+        response = self.client.delete(f"/inventory/{non_existent_uuid}/delete/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "User inventory not found")

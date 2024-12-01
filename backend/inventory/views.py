@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404
 import json
 from django.db.models import Q
 from django.http import JsonResponse
+from rest_framework.exceptions import NotFound
 
 
 class UserInventoryView(APIView):
@@ -24,7 +25,7 @@ class UserInventoryView(APIView):
     Handles GET, POST, DELETE, and PATCH methods for the user's inventory.
     """
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -41,9 +42,23 @@ class UserInventoryView(APIView):
 
         # Handle location if it is a list
         if isinstance(location, list):
-            location = ", ".join(location).strip()
+            location = ", ".join(
+                location
+            ).strip()  # Converts list to a comma-separated string
+
+        if isinstance(location, list):  # If already a list, use it directly
+            location_list = location
+        elif isinstance(location, str):  # If a string, split it into a list
+            location_list = [loc.strip() for loc in location.split(",") if loc.strip()]
+        else:
+            location_list = None
 
         location_list = location.split(",") if location else None
+
+        try:
+            component = Component.objects.get(id=component_pk)
+        except Component.DoesNotExist:
+            raise NotFound(detail="Component not found", code=status.HTTP_404_NOT_FOUND)
 
         # Filter the user inventory items by user, component_id, and location
         if location_list is not None:
@@ -110,6 +125,11 @@ class UserInventoryView(APIView):
 
         # Retrieve the user inventory item by inventory_pk
         user_inventory_item = UserInventory.objects.filter(pk=inventory_pk).first()
+
+        if not user_inventory_item:
+            return Response(
+                {"error": "Inventory item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         # Check if the location already exists for this user and component
         if location_list is not None:

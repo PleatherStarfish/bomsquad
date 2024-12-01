@@ -22,6 +22,7 @@ import useUpdateUserInventory from "../../services/useUpdateUserInventory";
 import FullPageModal from "../../ui/FullPageModal";
 import Notification from "../../ui/Notification";
 import AddComponentForm from "../../components/user_submissions/AddComponentForm";
+import AsyncComponentSelect from "../components/AsyncComponentSelect"
 import cv from "classnames"
 
 type InventoryRow = {
@@ -97,8 +98,16 @@ const Inventory = () => {
     title: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  const handleComponentSelect = (selected: { label: string; value: string } | null) => {
+    setSelectedComponent(selected);
+  };
 
   const handleFormSubmit = () => {
     if (formRef.current) {
@@ -116,8 +125,6 @@ const Inventory = () => {
       title: "Component Added",
     });
   };
-
-  // const navigate = useNavigate();
 
   const { userIsLoading, userIsError } = useAuthenticatedUser();
 
@@ -229,10 +236,6 @@ const Inventory = () => {
   if (inventoryDataIsError || userIsError) {
     return <div>Error fetching data</div>;
   }
-
-  // const handleGetPremiumModal = () => {
-  //   setShowGetPremiumModal(true);
-  // };
 
   const handleDownloadCSV = () => {
     const csvData =
@@ -489,10 +492,6 @@ const Inventory = () => {
                     expandOnHover
                     Icon={FolderArrowDownIcon}
                     onClick={handleDownloadCSV}
-                    //   user?.is_premium
-                    //     ? handleDownloadCSV
-                    //     : handleGetPremiumModal
-                    // }
                     variant="primary"
                   >
                     Download CSV
@@ -571,33 +570,6 @@ const Inventory = () => {
           </span>
         </Alert>
       )}
-      {/* {!user.is_premium && (
-        <Modal
-          buttons={
-            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
-                  onClick={() => navigate('/premium')}
-                  type="button"
-                >
-                  Support
-                </button>
-              <button
-                className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                onClick={() => setShowGetPremiumModal(false)}
-                type="button"
-              >
-                Cancel
-              </button>
-            </div>
-          }
-          open={showGetPremiumModal}
-          title={`This is a feature for our Patreon supporters`}
-          type="info"
-        >
-          {`BOM Squad depends on our Patreon supports to keep our servers online. Please help support the project and get access to version history.`}
-        </Modal>
-      )} */}
       <FullPageModal
         customButtons={
           <div className="flex justify-end space-x-4">
@@ -634,13 +606,31 @@ const Inventory = () => {
         title="Add a Component"
       >
         <div>
-          <AddComponentForm
-            allowInventoryOption
-            formRef={formRef}
-            handleSuccess={handleSuccess}
-            isSubmitting={isSubmitting}
-            setIsSubmitting={setIsSubmitting}
-          />
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 pb-3 mt-1 font-display mb-3">Select a component from the database</h4>
+            <div className="flex mb-6">
+              <AsyncComponentSelect
+                onChange={handleComponentSelect}
+                placeholder="Search components..."
+                value={selectedComponent}
+              />
+            </div>
+          </div>
+          <div className="relative flex items-center justify-center my-6">
+            <div className="flex-1 border-t border-gray-300" />
+            <span className="px-4 text-gray-500 bg-white">OR</span>
+            <div className="flex-1 border-t border-gray-300" />
+          </div>
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 mt-1 font-display">Add a component to the database</h4>
+            <AddComponentForm
+              allowInventoryOption
+              formRef={formRef}
+              handleSuccess={handleSuccess}
+              isSubmitting={isSubmitting}
+              setIsSubmitting={setIsSubmitting}
+            />
+          </div>
         </div>
       </FullPageModal>
       <Notification

@@ -1,6 +1,8 @@
 import { FilterOptions } from "../types/modules";
-import axios from "axios";
+
 import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
 
 const fetchFilterOptions = async (): Promise<FilterOptions> => {
   axios.defaults.xsrfCookieName = 'csrftoken';
@@ -11,8 +13,8 @@ const fetchFilterOptions = async (): Promise<FilterOptions> => {
 
 const useFilterOptions = () => {
   return useQuery<FilterOptions, Error>({
-    queryKey: ["filterOptions"],
     queryFn: fetchFilterOptions,
+    queryKey: ["filterOptions"],
   });
 };
 
