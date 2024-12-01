@@ -36,13 +36,8 @@ class ModuleBomListItemAdmin(BaseAdmin):
         "pcb_version__version",
     )
 
-    def lookup_allowed(self, lookup, value=None):
-        allowed_lookups = [
-            "module",
-            "type",
-            "module__manufacturer__name",
-        ]
-        return lookup in allowed_lookups or super().lookup_allowed(lookup, value)
+    def lookup_allowed(self, key, value=None):
+        return True
 
 
 class ManufacturerAdmin(BaseAdmin):
