@@ -52,7 +52,7 @@ class WantTooBuildModuleSerializer(serializers.ModelSerializer):
 class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Types
-        fields = ["name"]
+        fields = ["id", "name"]
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -71,7 +71,7 @@ class ModuleBomListItemSerializer(serializers.ModelSerializer):
     sum_of_user_options_from_inventory = serializers.IntegerField(required=False)
     sum_of_user_options_from_shopping_list = serializers.IntegerField(required=False)
     pcb_version = PCBVersionSerializer(many=True)
-    type = serializers.CharField(source="type.name")
+    type = TypeSerializer()
     bom_link = serializers.URLField(source="module.bom_link", read_only=True)
 
     class Meta:

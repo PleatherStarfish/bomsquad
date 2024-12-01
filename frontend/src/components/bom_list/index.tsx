@@ -72,6 +72,7 @@ const BomList: React.FC<BomListProps> = ({
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
     useModuleBomListItems(moduleId);
   const moduleBomList: BomItem[] = Array.isArray(moduleBom) ? moduleBom : [];
+  console.log(moduleBomList)
 
   // Annotate each item with moduleName and moduleId for easier usage
   const moduleBomData: BomItem[] = moduleBomList.map((item) => ({
@@ -289,7 +290,7 @@ const BomList: React.FC<BomListProps> = ({
     },
     {
       name: <div>Type</div>,
-      selector: (row) => row.type.description || "",
+      selector: (row) => row.type.name,
       sortable: true,
       wrap: true,
     },

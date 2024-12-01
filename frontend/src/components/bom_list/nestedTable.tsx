@@ -334,7 +334,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                       {`${
                         row.description
                         // @ts-ignore
-                      } ${type.toLowerCase()}s by ${row.supplier?.name} `}
+                      } ${type.name.toLowerCase()}s by ${row.supplier?.name} `}
                     </a>
                   </span>
                   <span>
@@ -404,7 +404,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                       {`${
                         row.description
                         // @ts-ignore
-                      } ${type.toLowerCase()}s by ${row.supplier?.name} `}
+                      } ${type.name.toLowerCase()}s by ${row.supplier?.name} `}
                     </a>
                   </span>
                   <span>
