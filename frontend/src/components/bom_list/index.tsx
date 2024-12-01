@@ -289,7 +289,7 @@ const BomList: React.FC<BomListProps> = ({
     },
     {
       name: <div>Type</div>,
-      selector: (row) => row.type.name, // Assuming `type` is an object with a `name` property
+      selector: (row) => row.type.description || "",
       sortable: true,
       wrap: true,
     },
@@ -419,7 +419,7 @@ const BomList: React.FC<BomListProps> = ({
               Cancel
             </button>
             <Dropdown>
-              <DropdownButton>Open Menu</DropdownButton>
+              <DropdownButton>Export selection</DropdownButton>
               <DropdownContent position="top">
                 <DropdownList>
                   <DropdownItem onClick={() => exportData("xlsx")}>
