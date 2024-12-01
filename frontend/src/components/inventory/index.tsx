@@ -17,8 +17,8 @@ import find  from "lodash/find";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useDeleteUserInventory from "../../services/useDeleteUserInventory";
 import useGetUserInventory from "../../services/useGetUserInventory";
-// import { useNavigate } from 'react-router-dom';
 import useUpdateUserInventory from "../../services/useUpdateUserInventory";
+import useAddOrUpdateUserInventory from "../../services/useAddOrUpdateUserInventory"
 import FullPageModal from "../../ui/FullPageModal";
 import Notification from "../../ui/Notification";
 import AddComponentForm from "../../components/user_submissions/AddComponentForm";
@@ -86,7 +86,6 @@ const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dataSearched, setDataSearched] = useState<InventoryRow[] | undefined>();
   const [openSolderingMode, setOpenSolderingMode] = useState(false);
-  // const [showGetPremiumModal, setShowGetPremiumModal] = useState(false);
   const [fullPageModalOpen, setFullPageModalOpen] = useState(false);
   const [notification, setNotification] = useState<{
     show: boolean;
@@ -102,18 +101,67 @@ const Inventory = () => {
     label: string;
     value: string;
   } | null>(null);
+  const [isTopSectionValid, setIsTopSectionValid] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleComponentSelect = (selected: { label: string; value: string } | null) => {
-    setSelectedComponent(selected);
+  const { userIsLoading, userIsError } = useAuthenticatedUser();
+
+  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
+    useGetUserInventory();
+
+  const { updateUserInventoryMutate } = useUpdateUserInventory();
+  const { mutate: addOrUpdateInventory } = useAddOrUpdateUserInventory();
+
+
+  const deleteMutation = useDeleteUserInventory();
+
+  const handleTopSectionChange = () => {
+    setIsTopSectionValid(Boolean(selectedComponent && updatedQuantityToSubmit && updatedQuantityToSubmit > 0));
   };
 
   const handleFormSubmit = () => {
-    if (formRef.current) {
-      formRef.current.dispatchEvent(
-        new Event("submit", { bubbles: true, cancelable: true })
-      );
+    if (isTopSectionValid) {
+      if (selectedComponent && updatedQuantityToSubmit && updatedQuantityToSubmit > 0) {
+        const data = {
+          editMode: false,
+          location: null, 
+          quantity: updatedQuantityToSubmit,
+        };
+
+        try {
+          addOrUpdateInventory(
+            {
+              componentId: selectedComponent.value,
+              data,
+            },
+            {
+              onError: (error) => {
+                console.error("Failed to add or update component:", error);
+              },
+              onSuccess: () => {
+                console.log("Component added or updated successfully.");
+                setSelectedComponent(null); // Reset selection
+                setUpdatedQuantityToSubmit(undefined); // Reset quantity
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Error invoking mutation:", error);
+        }
+      } else {
+        console.warn("Top section validation failed.");
+      }
+    } else if (formRef.current) {
+      try {
+        formRef.current.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true })
+        );
+      } catch (error) {
+        console.error("Error submitting form:", error);
+      }
+    } else {
+      console.warn("No valid form to submit.");
     }
   };
 
@@ -125,15 +173,6 @@ const Inventory = () => {
       title: "Component Added",
     });
   };
-
-  const { userIsLoading, userIsError } = useAuthenticatedUser();
-
-  const { inventoryData, inventoryDataIsLoading, inventoryDataIsError } =
-    useGetUserInventory();
-
-  const {updateUserInventoryMutate} = useUpdateUserInventory();
-
-  const deleteMutation = useDeleteUserInventory();
 
   const options: Fuse.IFuseOptions<InventoryRow> = {
     includeScore: true,
@@ -609,11 +648,25 @@ const Inventory = () => {
           <div className="bg-gray-100 p-4 rounded-lg">
             <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 pb-3 mt-1 font-display mb-3">Select a component from the database</h4>
             <div className="flex mb-6">
-              <AsyncComponentSelect
-                onChange={handleComponentSelect}
-                placeholder="Search components..."
-                value={selectedComponent}
-              />
+            <AsyncComponentSelect
+              onChange={(selected) => {
+                setSelectedComponent(selected);
+                handleTopSectionChange();
+              }}
+              placeholder="Search components..."
+              value={selectedComponent}
+            />
+            <input
+              className="w-20 p-2 border border-gray-300 rounded"
+              min={1}
+              onChange={(e) => {
+                setUpdatedQuantityToSubmit(Number(e.target.value));
+                handleTopSectionChange();
+              }}
+              placeholder="Qty"
+              type="number"
+              value={updatedQuantityToSubmit || ""}
+            />
             </div>
           </div>
           <div className="relative flex items-center justify-center my-6">
