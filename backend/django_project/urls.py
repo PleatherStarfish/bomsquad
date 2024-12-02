@@ -127,6 +127,10 @@ frontend_redirect_urls = [
 
 
 urlpatterns = [
+    path(
+        "ads.txt",
+        TemplateView.as_view(template_name="ads.txt", content_type="text/plain"),
+    ),
     path("admin/", include("admin_honeypot.urls", namespace="admin_honeypot")),
     path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
