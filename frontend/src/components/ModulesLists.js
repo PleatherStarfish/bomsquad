@@ -87,19 +87,19 @@ const ModulesList = ({ type }) => {
       handleDeleteNote();
     } else if (noteId) {
       updateNoteMutation.mutate({ note: currentNote }, {
+        onError: (error) => console.error("Error updating note:", error),
         onSuccess: () => {
           queryClient.invalidateQueries(['userNotes', type]); // Refetch notes
           handleCloseNoteForm();
-        },
-        onError: (error) => console.error("Error updating note:", error)
+        }
       });
     } else {
-      addNoteMutation.mutate({ note: currentNote, module_id: moduleId }, {
+      addNoteMutation.mutate({ module_id: moduleId, note: currentNote }, {
+        onError: (error) => console.error("Error adding note:", error),
         onSuccess: () => {
           queryClient.invalidateQueries(['userNotes', type]); // Refetch notes
           handleCloseNoteForm();
-        },
-        onError: (error) => console.error("Error adding note:", error)
+        }
       });
     }
   };
@@ -125,8 +125,8 @@ const ModulesList = ({ type }) => {
         <b>Notes:</b> {expandedNotes[moduleId] ? note : truncateNote(note, maxLength)}
         {isTruncated && (
           <button
-            onClick={() => handleToggleExpand(moduleId)}
             className="ml-2 text-blue-500 underline hover:text-blue-700"
+            onClick={() => handleToggleExpand(moduleId)}
           >
             {expandedNotes[moduleId] ? 'Hide' : 'See all'}
           </button>
@@ -139,26 +139,26 @@ const ModulesList = ({ type }) => {
     <>
       {noteFormVisible && (
         <Modal
+          onSubmit={handleSubmit}
           open={noteFormVisible}
           setOpen={setNoteFormVisible}
-          title={notes[selectedModule?.id] ? "Edit Note" : "Add Note"}
           submitButtonText={notes[selectedModule?.id] ? "Update Note" : "Add Note"}
-          onSubmit={handleSubmit}
+          title={notes[selectedModule?.id] ? "Edit Note" : "Add Note"}
           type="info"
         >
           <NoteForm
             key={selectedModule.id} // Ensure NoteForm re-renders when selectedModule changes
-            noteId={selectedModule.note_id}
             moduleId={selectedModule.id}
             moduleType={type === "want-to-build" ? "want-to-build" : "built"}
             note={currentNote}
-            setNote={setCurrentNote}
+            noteId={selectedModule.note_id}
             onClose={handleCloseNoteForm}
+            setNote={setCurrentNote}
           />
           {notes[selectedModule?.id] && (
             <button
-              onClick={handleDeleteNote}
               className="mt-2 text-red-500 underline hover:text-red-700"
+              onClick={handleDeleteNote}
             >
               Delete Note
             </button>
@@ -166,22 +166,22 @@ const ModulesList = ({ type }) => {
         </Modal>
       )}
       <ul
-        role="list"
         className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-col-5"
+        role="list"
       >
         {userModulesList.results.map((result) => (
-          <li key={`${type}${result.module.id}`} className="relative text-center bg-white border rounded-lg">
+          <li className="relative text-center bg-white border rounded-lg" key={`${type}${result.module.id}`}>
             <button
-              onClick={() => handleEditNote(result.module)}
               className="absolute text-xs text-blue-500 top-2 right-2 btn btn-primary hover:text-blue-700"
+              onClick={() => handleEditNote(result.module)}
             >
               {notes[result.module.id] ? 'Edit note' : 'Add note'}
             </button>
             <div className="flex flex-col items-center justify-center flex-1 p-8">
               <img
+                alt=""
                 className="flex-shrink-0 h-32 mx-auto"
                 src={`${result.module.image}`}
-                alt=""
               />
               <a href={`/module/${result.module.slug}/`}>
                 <h3 className="mt-6 text-lg font-semibold text-center text-gray-900">
@@ -201,7 +201,7 @@ const ModulesList = ({ type }) => {
       </ul>
     </>
   ) : (
-    <Alert variant="transparent" centered>
+    <Alert align="center" variant="transparent">
       There are no modules in your{" "}
       {type === "want-to-build" ? "want-to-build" : "modules"} list.{" "}
       <a className="text-blue-500" href="/">

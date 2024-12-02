@@ -1,6 +1,6 @@
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { TableColumn } from "react-data-table-component";
 import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -10,51 +10,39 @@ import EditableLocation from "./inventory/EditableLocation";
 import EditableQuantity from "./inventory/EditableQuantity";
 import { Fragment } from "react";
 import { Helmet } from "react-helmet";
-import { Component } from "../types/component"
 import Modal from "../ui/Modal";
 import _ from "lodash";
 import cx from "classnames";
+import { InventoryRow } from "../components/inventory/index"
 
 interface SolderingModeProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   inventoryData: InventoryRow[]; // Define this interface separately
   inventoryDataIsLoading: boolean;
-  handleClick: (row: InventoryRow, field: string) => void;
+  handleClick: (row: InventoryRow, field: keyof InventoryRow, fieldIdToEdit: string | undefined, setFieldIdToEdit: React.Dispatch<React.SetStateAction<string | undefined>>, setUpdatedFieldToSubmit: React.Dispatch<React.SetStateAction<any>>) => void;
   locationsSort: (a: InventoryRow, b: InventoryRow) => number;
-  quantityIdToEdit: string | null;
-  setQuantityIdToEdit: React.Dispatch<React.SetStateAction<string | null>>;
-  updatedQuantityToSubmit: number | null;
-  setUpdatedQuantityToSubmit: React.Dispatch<
-    React.SetStateAction<number | null>
-  >;
-  locationIdToEdit: string | null;
-  setLocationIdToEdit: React.Dispatch<React.SetStateAction<string | null>>;
-  updatedLocationToSubmit: string | null;
-  setUpdatedLocationToSubmit: React.Dispatch<
-    React.SetStateAction<string | null>
-  >;
+  quantityIdToEdit?: string;
+  setQuantityIdToEdit: Dispatch<SetStateAction<string | undefined>>;
+  updatedQuantityToSubmit?: number;
+  setUpdatedQuantityToSubmit: Dispatch<SetStateAction<number | undefined>>;
+  locationIdToEdit?: string;
+  setLocationIdToEdit: Dispatch<SetStateAction<string | undefined>>;
+  updatedLocationToSubmit?: string;
+  setUpdatedLocationToSubmit: Dispatch<SetStateAction<string | undefined>>;
   deleteModalOpen: boolean;
   setDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  dataToDelete: InventoryRow | null;
-  setDataToDelete: React.Dispatch<React.SetStateAction<InventoryRow | null>>;
+  dataToDelete?: InventoryRow;
+  setDataToDelete: Dispatch<SetStateAction<InventoryRow | undefined>>;
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  dataSearched: InventoryRow[];
+  dataSearched?: InventoryRow[];
   handleQuantityChange: (quantity: number) => void;
   handleSubmitQuantity: (id: string) => void;
   handleLocationChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitLocation: (id: string) => void;
   handleDelete: (id: string) => void;
   handlePillClick: (id: string, index: number) => void;
-}
-
-interface InventoryRow {
-  id: string;
-  user: number;
-  component: Component;
-  quantity: number;
-  location: string[] | null;
 }
 
 const customStyles = {

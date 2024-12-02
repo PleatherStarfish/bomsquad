@@ -24,27 +24,16 @@ import Notification from "../../ui/Notification";
 import AddComponentForm from "../../components/user_submissions/AddComponentForm";
 import AsyncComponentSelect from "../components/AsyncComponentSelect"
 import cv from "classnames"
+import { Component } from "../../types/component"
 
-type InventoryRow = {
+
+export interface InventoryRow {
   id: string;
-  component: {
-    description: string;
-    manufacturer: { name: string };
-    supplier: { name: string };
-    supplier_item_no?: string;
-    type?: { name: string };
-    farads?: string;
-    ohms?: string;
-    unit_price?: string;
-    price_currency?: string;
-    tolerance?: string;
-    voltage_rating?: string;
-    link?: string;
-    notes?: string;
-  };
-  location?: string[];
+  user: number;
+  component: Component;
   quantity: number;
-};
+  location: string[] | null;
+}
 
 const customStyles = {
   headCells: {
@@ -356,13 +345,13 @@ const Inventory = () => {
     {
       hide: 1700,
       name: <div>Manufacturer</div>,
-      selector: (row) => row.component.manufacturer?.name,
+      selector: (row) => row.component.manufacturer?.name || "",
       sortable: true,
       wrap: true,
     },
     {
       name: <div>Supplier</div>,
-      selector: (row) => row.component.supplier?.name,
+      selector: (row) => row.component.supplier?.name || "",
       sortable: true,
       wrap: true,
     },
@@ -394,16 +383,6 @@ const Inventory = () => {
       name: <div>Ohms</div>,
       // @ts-ignore
       omit: (row: InventoryRow) => row.component.type !== "Resistor",
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row) =>
-        row.component.unit_price && row.component.price_currency
-          ? `${row.component.unit_price} ${row.component.price_currency}`
-          : row.component.unit_price,
-      hide: 1700,
-      name: <div>Price</div>,
       sortable: true,
       wrap: true,
     },
@@ -471,11 +450,7 @@ const Inventory = () => {
           <TrashIcon
             className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
-              setDataToDelete({
-                component: row.component,
-                id: row.id,
-                quantity: row.quantity,
-              });
+              setDataToDelete(row);
               setDeleteModalOpen(true);
             }}
             role="button"
@@ -487,6 +462,16 @@ const Inventory = () => {
       width: "50px",
     },
   ];
+
+  if (inventoryDataIsLoading) {
+    return (
+      <Alert align="center" variant="transparent">
+          <div className="text-center text-gray-500 animate-pulse">
+            Loading...
+          </div>
+      </Alert>
+    )
+  }
 
   return (
     <>
@@ -614,13 +599,13 @@ const Inventory = () => {
         customButtons={
           <div className="flex justify-end space-x-4">
             <button
-              className="mt-4 px-4 py-2 text-sm font-medium text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-4 py-2 mt-4 text-sm font-medium text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
               onClick={() => setFullPageModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
+              className="px-4 py-2 mt-4 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-brandgreen-600 hover:bg-brandgreen-700"
               onClick={handleFormSubmit}
             >
               <p className={cv({ "animate-pulse": isSubmitting })}>
@@ -646,9 +631,9 @@ const Inventory = () => {
         title="Add a Component"
       >
         <div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 pb-3 mt-1 font-display mb-3">Select a component from the database</h4>
-            <div className="align-middle flex flex-wrap md:flex-nowrap gap-6 mb-6">
+          <div className="p-4 bg-gray-100 rounded-lg">
+            <h4 className="pb-3 mt-1 mb-3 text-lg font-semibold leading-6 text-left text-gray-900 font-display">Select a component from the database</h4>
+            <div className="flex flex-wrap gap-6 mb-6 align-middle md:flex-nowrap">
               <AsyncComponentSelect
                 onChange={(selected) => {
                   setSelectedComponent(selected);
@@ -675,8 +660,8 @@ const Inventory = () => {
             <span className="px-4 text-gray-500 bg-white">OR</span>
             <div className="flex-1 border-t border-gray-300" />
           </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 mt-1 font-display">Add a component to the database</h4>
+          <div className="p-4 bg-gray-100 rounded-lg">
+            <h4 className="mt-1 text-lg font-semibold leading-6 text-left text-gray-900 font-display">Add a component to the database</h4>
             <AddComponentForm
               allowInventoryOption
               formRef={formRef}

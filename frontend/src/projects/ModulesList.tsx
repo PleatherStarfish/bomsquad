@@ -141,7 +141,6 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
 
         {(index % 4) === 3 && (
           <motion.div
-            className="flex justify-center overflow-hidden bg-white rounded-lg"
             custom={index + 1}
             key={`ad-${index}`}
             variants={slideInFromRight}
@@ -149,6 +148,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
             <Adsense
               client="ca-pub-1549230942850511"
               format="auto"
+              layout="in-feed"
               responsive="true"
               slot="6413550510"
               style={{ display: 'block' }}
