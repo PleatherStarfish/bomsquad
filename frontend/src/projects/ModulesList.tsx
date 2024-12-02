@@ -172,7 +172,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
               <ins
                 className="adsbygoogle"
                 data-ad-client="ca-pub-1549230942850511"
-                data-ad-format="auto"
+                data-ad-format="rectangle"
                 data-ad-slot="6413550510"
                 data-full-width-responsive="true"
                 style={{display: "block"}}
