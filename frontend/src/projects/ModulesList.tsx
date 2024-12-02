@@ -5,6 +5,8 @@ import React from "react";
 import chroma from "chroma-js";
 import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
+import InFeedAd from "../components/components/adSense/inFeedAd";
+
 
 interface ModulesListProps {
   modules: Module[];
@@ -64,6 +66,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
       variants={containerVariants}
     >
       {modules.map((module, index) => (
+        <>
         <motion.div
           className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row"
           custom={index}
@@ -135,8 +138,20 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
             </p>
           </div>
         </motion.div>
-      ))}
-    </motion.div>
+
+        {(index % 4) === 3 && (
+          <motion.div
+            className="flex justify-center overflow-hidden bg-white rounded-lg"
+            custom={index + 1}
+            key={`ad-${index}`}
+            variants={slideInFromRight}
+          >
+            <InFeedAd slot="6605122203" />
+          </motion.div>
+        )}
+      </>
+    ))}
+  </motion.div>
   );
 };
 
