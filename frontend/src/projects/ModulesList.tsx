@@ -5,7 +5,6 @@ import React from "react";
 import chroma from "chroma-js";
 import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
-import { Adsense } from "@ctrl/react-adsense";
 
 interface ModulesListProps {
   modules: Module[];
@@ -66,14 +65,6 @@ const ModulesList: React.FC<ModulesListProps> = ({
 
   return (
     <>
-      <Adsense
-        client="ca-pub-1549230942850511"
-        format="rectangle"
-        layout="in-feed"
-        responsive="true"
-        slot="6413550510"
-        style={{ display: "block" }}
-      />
       <motion.div
         animate={shouldAnimate ? "visible" : "hidden"}
         className="grid grid-cols-1 gap-y-10 lg:gap-y-14"
@@ -174,23 +165,6 @@ const ModulesList: React.FC<ModulesListProps> = ({
                 </p>
               </div>
             </motion.div>
-
-            {index % 4 === 3 && (
-              <motion.div
-                custom={index + 1}
-                key={`ad-${index}`}
-                variants={slideInFromRight}
-              >
-                <Adsense
-                  client="ca-pub-1549230942850511"
-                  format="rectangle"
-                  layout="in-feed"
-                  responsive="true"
-                  slot="6413550510"
-                  style={{ display: "block" }}
-                />
-              </motion.div>
-            )}
           </>
         ))}
       </motion.div>
