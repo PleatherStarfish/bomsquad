@@ -146,7 +146,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
             key={`ad-${index}`}
             variants={slideInFromRight}
           >
-            <InFeedAd layoutKey="-cb-b+1t-6d+9m" slot="6413550510" />
+            <InFeedAd />
           </motion.div>
         )}
       </>
