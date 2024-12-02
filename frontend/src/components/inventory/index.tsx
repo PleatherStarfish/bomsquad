@@ -195,21 +195,22 @@ const Inventory = () => {
       : undefined;
   }, [inventoryData, options]);
 
-  useEffect(() => {
-    // Avoid unnecessary state updates if the search results are unchanged
-    if (fuse) {
-      const results = fuse.search(searchTerm).map((result) => result.item);
-      setDataSearched((prev) => {
-        // Only update state if results have changed
-        if (!_.isEqual(prev, results)) {
-          return results;
-        }
-        return prev;
-      });
-    } else {
-      setDataSearched(undefined);
+  const filteredData = useMemo(() => {
+    if (!fuse || !searchTerm) {
+      return inventoryData;
     }
-  }, [searchTerm, fuse]);
+    const results = fuse.search(searchTerm).map((result) => result.item);
+    return results.filter((row) => row && row.id); // Ensure valid rows
+  }, [fuse, searchTerm, inventoryData]);
+
+  useEffect(() => {
+    setDataSearched((prev) => {
+      if (!_.isEqual(prev, filteredData)) {
+        return filteredData;
+      }
+      return prev;
+    });
+  }, [filteredData]);
   
   const handleQuantityChange = useCallback(async (value: number) => {
     setUpdatedQuantityToSubmit(value);
@@ -647,26 +648,26 @@ const Inventory = () => {
         <div>
           <div className="bg-gray-100 p-4 rounded-lg">
             <h4 className="text-lg text-left font-semibold leading-6 text-gray-900 pb-3 mt-1 font-display mb-3">Select a component from the database</h4>
-            <div className="flex mb-6">
-            <AsyncComponentSelect
-              onChange={(selected) => {
-                setSelectedComponent(selected);
-                handleTopSectionChange();
-              }}
-              placeholder="Search components..."
-              value={selectedComponent}
-            />
-            <input
-              className="w-20 p-2 border border-gray-300 rounded"
-              min={1}
-              onChange={(e) => {
-                setUpdatedQuantityToSubmit(Number(e.target.value));
-                handleTopSectionChange();
-              }}
-              placeholder="Qty"
-              type="number"
-              value={updatedQuantityToSubmit || ""}
-            />
+            <div className="align-middle flex flex-wrap md:flex-nowrap gap-6 mb-6">
+              <AsyncComponentSelect
+                onChange={(selected) => {
+                  setSelectedComponent(selected);
+                  handleTopSectionChange();
+                }}
+                placeholder="Search..."
+                value={selectedComponent}
+              />
+              <input
+                className="h-[36px] w-24 p-2 border border-gray-300 rounded"
+                min={1}
+                onChange={(e) => {
+                  setUpdatedQuantityToSubmit(Number(e.target.value));
+                  handleTopSectionChange();
+                }}
+                placeholder="Qty"
+                type="number"
+                value={updatedQuantityToSubmit || ""}
+              />
             </div>
           </div>
           <div className="relative flex items-center justify-center my-6">

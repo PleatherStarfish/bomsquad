@@ -1,10 +1,8 @@
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import React, { useState } from "react";
-import {
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { TableColumn } from "react-data-table-component";
+import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 import Alert from "../ui/Alert";
 import DataTable from "react-data-table-component";
@@ -12,9 +10,52 @@ import EditableLocation from "./inventory/EditableLocation";
 import EditableQuantity from "./inventory/EditableQuantity";
 import { Fragment } from "react";
 import { Helmet } from "react-helmet";
+import { Component } from "../types/component"
 import Modal from "../ui/Modal";
 import _ from "lodash";
 import cx from "classnames";
+
+interface SolderingModeProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  inventoryData: InventoryRow[]; // Define this interface separately
+  inventoryDataIsLoading: boolean;
+  handleClick: (row: InventoryRow, field: string) => void;
+  locationsSort: (a: InventoryRow, b: InventoryRow) => number;
+  quantityIdToEdit: string | null;
+  setQuantityIdToEdit: React.Dispatch<React.SetStateAction<string | null>>;
+  updatedQuantityToSubmit: number | null;
+  setUpdatedQuantityToSubmit: React.Dispatch<
+    React.SetStateAction<number | null>
+  >;
+  locationIdToEdit: string | null;
+  setLocationIdToEdit: React.Dispatch<React.SetStateAction<string | null>>;
+  updatedLocationToSubmit: string | null;
+  setUpdatedLocationToSubmit: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
+  deleteModalOpen: boolean;
+  setDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  dataToDelete: InventoryRow | null;
+  setDataToDelete: React.Dispatch<React.SetStateAction<InventoryRow | null>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  dataSearched: InventoryRow[];
+  handleQuantityChange: (quantity: number) => void;
+  handleSubmitQuantity: (id: string) => void;
+  handleLocationChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmitLocation: (id: string) => void;
+  handleDelete: (id: string) => void;
+  handlePillClick: (id: string, index: number) => void;
+}
+
+interface InventoryRow {
+  id: string;
+  user: number;
+  component: Component;
+  quantity: number;
+  location: string[] | null;
+}
 
 const customStyles = {
   headCells: {
@@ -32,7 +73,7 @@ const customStyles = {
   },
 };
 
-const SolderingMode = ({
+const SolderingMode: React.FC<SolderingModeProps> = ({
   open,
   setOpen,
   inventoryData,
@@ -61,7 +102,14 @@ const SolderingMode = ({
   handleDelete,
   handlePillClick,
 }) => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  const dataForTable: InventoryRow[] =
+    _.isArray(dataSearched) && !_.isEmpty(dataSearched)
+      ? dataSearched.filter((x: InventoryRow) => x && x.id)
+      : inventoryData;
+  
+  console.log("dataForTable", dataForTable)
 
   const darkModeStyles = `
     .rdt_TableHeadRow { background-color: #212529; color: white; border-color: white; }
@@ -69,36 +117,25 @@ const SolderingMode = ({
     .rdt_Pagination { background-color: #212529; color: white; }
   `;
 
-  const conditionalRowStyles = [
+  const conditionalRowStyles: {
+    when: (row: InventoryRow) => boolean;
+    style: React.CSSProperties;
+  }[] = [
     {
       style: {
-        backgroundColor: '#212529',
+        backgroundColor: "#212529",
         borderColor: "white",
-        color: 'white',
+        color: "white",
       },
       when: () => darkMode,
     },
   ];
 
-  const columns = [
+  const columns: TableColumn<InventoryRow>[] = [
     {
       grow: 1,
       name: "Name",
       selector: (row) => row.component.description,
-      sortable: true,
-      wrap: true,
-    },
-    {
-      name: <div>Farads</div>,
-      omit: (row) => row.component.type !== "Capacitor",
-      selector: (row) => row.farads,
-      sortable: true,
-      wrap: true,
-    },
-    {
-      name: <div>Ohms</div>,
-      omit: (row) => row.component.type !== "Resistor",
-      selector: (row) => row.ohms,
       sortable: true,
       wrap: true,
     },
@@ -148,7 +185,7 @@ const SolderingMode = ({
           <TrashIcon
             className="w-5 h-5 stroke-slate-500 hover:stroke-pink-500"
             onClick={() => {
-              setDataToDelete(row.component);
+              setDataToDelete(row);
               setDeleteModalOpen(true);
             }}
             role="button"
@@ -163,7 +200,11 @@ const SolderingMode = ({
 
   return (
     <Transition.Root as={Fragment} show={open}>
-      <Dialog as="div" className={cx("relative z-30", {"dark": darkMode})} onClose={setOpen}>
+      <Dialog
+        as="div"
+        className={cx("relative z-30", { dark: darkMode })}
+        onClose={setOpen}
+      >
         <div className="fixed inset-0" />
 
         <div className="fixed inset-0 overflow-hidden">
@@ -227,8 +268,8 @@ const SolderingMode = ({
                           <button
                             className="text-gray-400 bg-white rounded-md dark:bg-[#212529] hover:text-gray-500 dark:hover:text-gray-50 focus:outline-none"
                             onClick={() => {
-                              setDarkMode(false)
-                              setOpen(false)
+                              setDarkMode(false);
+                              setOpen(false);
                             }}
                             type="button"
                           >
@@ -250,7 +291,7 @@ const SolderingMode = ({
                           className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-[#3a4141] text-gray-900 dark:ring-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:border-0 dark:focus:border-white text-3xl"
                           id="search"
                           name="search"
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                           placeholder="search"
                           type="text"
                           value={searchTerm}
@@ -258,19 +299,15 @@ const SolderingMode = ({
                         {!!inventoryData?.length ? (
                           <>
                             <div className="bg-white dark:bg-[#212529]">
-                            <Helmet>
-                              <style>{darkMode ? darkModeStyles : ''}</style>
-                            </Helmet>
+                              <Helmet>
+                                <style>{darkMode ? darkModeStyles : ""}</style>
+                              </Helmet>
                               <DataTable
                                 columns={columns}
+                                // @ts-ignore
                                 conditionalRowStyles={conditionalRowStyles}
                                 customStyles={customStyles}
-                                data={
-                                  _.isArray(dataSearched) &&
-                                  !_.isEmpty(dataSearched)
-                                    ? dataSearched.map((x) => x.item)
-                                    : inventoryData
-                                }
+                                data={dataForTable}
                                 exportHeaders
                                 fixedHeader
                                 pagination
@@ -281,23 +318,26 @@ const SolderingMode = ({
                                 }
                                 progressPending={inventoryDataIsLoading}
                                 responsive
+                                // @ts-ignore
                                 subHeaderAlign="right"
                                 subHeaderWrap
                               />
                             </div>
                             <Modal
                               onSubmit={() => {
-                                setDataToDelete(undefined);
-                                handleDelete(dataToDelete.id);
+                                setDataToDelete(null);
+                                if (dataToDelete) {
+                                  handleDelete(dataToDelete.id);
+                                }
                               }}
                               open={deleteModalOpen}
                               setOpen={setDeleteModalOpen}
                               submitButtonText={"Delete"}
                               title={"Delete component?"}
-                            >{`Are you sure you want to delete ${dataToDelete?.description}?`}</Modal>
+                            >{`Are you sure you want to delete ${dataToDelete?.component.description}?`}</Modal>
                           </>
                         ) : (
-                          <Alert centered variant="transparent">
+                          <Alert align="center" variant="transparent">
                             <span>
                               There are no components in your inventory.{" "}
                               <a className="text-blue-500" href="/components">
