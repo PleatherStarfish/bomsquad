@@ -313,7 +313,7 @@ const SolderingMode: React.FC<SolderingModeProps> = ({
                             </div>
                             <Modal
                               onSubmit={() => {
-                                setDataToDelete(null);
+                                setDataToDelete(undefined);
                                 if (dataToDelete) {
                                   handleDelete(dataToDelete.id);
                                 }

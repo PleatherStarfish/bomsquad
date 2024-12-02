@@ -147,7 +147,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
           >
             <Adsense
               client="ca-pub-1549230942850511"
-              format="auto"
+              format="rectangle"
               layout="in-feed"
               responsive="true"
               slot="6413550510"
