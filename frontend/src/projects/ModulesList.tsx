@@ -66,7 +66,7 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
       variants={containerVariants}
     >
       {modules.map((module, index) => (
-        <>
+      <>
         <motion.div
           className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row"
           custom={index}

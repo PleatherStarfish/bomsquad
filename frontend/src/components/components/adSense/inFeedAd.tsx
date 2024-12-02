@@ -1,19 +1,6 @@
 import React, { useEffect } from "react";
 
-// Define the props interface
-interface InFeedAdProps {
-  slot: string; // AdSense slot ID
-  style?: React.CSSProperties; // Inline styles for the ad
-  format?: string; // Ad format, default is "auto"
-  responsive?: string; // Responsive setting, default is "true"
-}
-
-const InFeedAd: React.FC<InFeedAdProps> = ({
-  slot,
-  style = {},
-  format = "auto",
-  responsive = "true",
-}) => {
+const InFeedAd: React.FC = () => {
   useEffect(() => {
     try {
       // @ts-ignore
@@ -27,10 +14,10 @@ const InFeedAd: React.FC<InFeedAdProps> = ({
     <ins
       className="adsbygoogle"
       data-ad-client="ca-pub-1549230942850511"
-      data-ad-format={format}
-      data-ad-slot={slot}
-      data-full-width-responsive={responsive}
-      style={{ display: "block", ...style }}
+      data-ad-format="fluid"
+      data-ad-layout-key="-cb-b+1t-6d+9m"
+      data-ad-slot="6413550510"
+      style={{ display: "block" }}
     />
   );
 };
