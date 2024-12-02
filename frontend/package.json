@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://0.0.0.0:8000/",
   "dependencies": {
+    "@ctrl/react-adsense": "^1.7.0",
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.16",
     "@react-hook/window-size": "^3.1.1",

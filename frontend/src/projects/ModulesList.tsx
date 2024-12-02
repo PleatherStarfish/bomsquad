@@ -5,7 +5,7 @@ import React from "react";
 import chroma from "chroma-js";
 import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
-import InFeedAd from "../components/components/adSense/inFeedAd";
+import { Adsense } from '@ctrl/react-adsense';
 
 
 interface ModulesListProps {
@@ -146,7 +146,13 @@ const ModulesList: React.FC<ModulesListProps> = ({ shouldAnimate, modules, filte
             key={`ad-${index}`}
             variants={slideInFromRight}
           >
-            <InFeedAd />
+            <Adsense
+              client="ca-pub-1549230942850511"
+              format="auto"
+              responsive="true"
+              slot="6413550510"
+              style={{ display: 'block' }}
+            />
           </motion.div>
         )}
       </>
