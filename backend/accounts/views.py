@@ -64,7 +64,7 @@ def get_user_me(request):
         )
 
     serializer = UserSerializer(user)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

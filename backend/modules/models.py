@@ -106,14 +106,13 @@ class Module(BaseModel):
         ("Eurorack", "Eurorack"),
         ("Pedals", "Pedals"),
         ("Serge", "Serge"),
-        # Add other categories as needed
     ]
 
     RACK_UNIT_CHOICES = [
+        ("1U", "1U"),
         ("3U", "3U"),
         ("4U", "4U"),
         ("5U", "5U"),
-        # Add other rack units as needed
     ]
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)

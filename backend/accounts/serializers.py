@@ -17,18 +17,26 @@ class UserSerializer(serializers.ModelSerializer):
     emails = EmailAddressSerializer(
         source="emailaddress_set", many=True, read_only=True
     )
+    email = serializers.SerializerMethodField()
+
+    def get_email(self, obj):
+        """
+        Retrieve the primary email address from the EmailAddress model.
+        """
+        primary_email = EmailAddress.objects.filter(user=obj, primary=True).first()
+        return primary_email.email if primary_email else None
 
     def get_unique_module_ids(self, obj):
-        """
-        Get the IDs of unique modules for the given user in their shopping list.
-        """
-        modules = (
-            UserShoppingList.objects.filter(user=obj)
-            .exclude(module__isnull=True)
-            .values_list("module", flat=True)
-            .distinct()
-        )
-        return list(modules)
+        try:
+            modules = (
+                UserShoppingList.objects.filter(user=obj)
+                .exclude(module__isnull=True)
+                .values_list("module", flat=True)
+                .distinct()
+            )
+            return list(modules)
+        except Exception:
+            return []
 
     class Meta:
         model = CustomUser
@@ -37,6 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
+            "email",
             "emails",
             "date_joined",
             "default_currency",
