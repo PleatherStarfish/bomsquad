@@ -74,7 +74,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
         {modules.map((module, index) => (
           <>
             <motion.div
-              className="flex flex-col items-center overflow-hidden bg-white rounded-lg md:flex-row"
+              className="flex flex-col items-center gap-4 overflow-hidden bg-white rounded-lg md:flex-row"
               custom={index}
               key={module.id}
               variants={slideInFromRight}
@@ -94,7 +94,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
                         />
                         <img
                           alt={module.name}
-                          className="object-cover w-full h-full md:object-contain"
+                          className="object-contain w-full h-full"
                           src={module.thumb_image_jpeg}
                         />
                       </picture>
@@ -103,16 +103,26 @@ const ModulesList: React.FC<ModulesListProps> = ({
                 )}
               </div>
               <div className="flex-1 p-4 md:px-4 md:py-5 sm:p-6">
-                <div className="flex flex-wrap justify-between">
+                <div className="flex flex-col flex-wrap justify-between w-full md:flex-row">
                   {module.slug && (
                     <Link reloadDocument to={`/module/${module.slug}`}>
-                      <h2 className="text-xl font-medium text-gray-900">
+                      <h2 className="text-xl font-medium text-center text-gray-900 md:text-left">
                         {module.name}
                       </h2>
                     </Link>
                   )}
+                  <div className="flex justify-center w-full md:justify-start md:hidden">
+                    <span>
+                      {"by "}<a
+                        className="text-gray-500 hover:text-gray-400"
+                        href={`/manufacturer/${module.manufacturer_slug}`}
+                      >
+                        {module.manufacturer.name}
+                      </a>
+                    </span>
+                  </div>
                   {user && (
-                    <div className="flex py-2 space-x-2 md:py-0">
+                    <div className="flex justify-center py-2 space-x-2 md:justify-end md:py-0">
                       <AddModuleButtons
                         moduleId={module.id}
                         queryName="built"
@@ -124,13 +134,17 @@ const ModulesList: React.FC<ModulesListProps> = ({
                     </div>
                   )}
                 </div>
-                <a
-                  className="text-gray-500 hover:text-gray-400"
-                  href={`/manufacturer/${module.manufacturer_slug}`}
-                >
-                  {module.manufacturer.name}
-                </a>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="justify-center hidden w-full md:justify-start md:flex">
+                  <span>
+                    {"by "}<a
+                      className="text-gray-500 hover:text-gray-400"
+                      href={`/manufacturer/${module.manufacturer_slug}`}
+                    >
+                      {module.manufacturer.name}
+                    </a>
+                  </span>
+                </div>
+                <div className="flex flex-wrap justify-center w-full gap-2 mt-2 md:justify-start">
                   {module.rack_unit && (
                     <span className="px-2 py-0.5 text-xs font-semibold text-white rounded-full bg-blue-700">
                       {module.rack_unit}
@@ -160,7 +174,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
                     </span>
                   )}
                 </div>
-                <p className="mt-4 text-sm text-gray-500 line-clamp-5">
+                <p className="mt-4 text-sm text-center text-gray-500 line-clamp-5 md:text-left">
                   {module.description}
                 </p>
               </div>

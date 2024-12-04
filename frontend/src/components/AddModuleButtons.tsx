@@ -18,6 +18,8 @@ const AddModuleButtons: React.FC<AddModuleButtonsProps> = ({ moduleId, queryName
     refetch: refetchModuleStatus,
   } = useModuleStatus(moduleId);
 
+  console.log(moduleStatus)
+
   const hideBuilt = queryName === "built";
   const hideWtb = queryName === "want-to-build";
 
@@ -35,7 +37,7 @@ const AddModuleButtons: React.FC<AddModuleButtonsProps> = ({ moduleId, queryName
   });
 
   return (
-    <div className="flex flex-col gap-2 mt-4">
+    <div className="flex flex-col gap-2 mt-4 md:mt-0">
       {!hideBuilt && (
         <button
           className={cx(
@@ -50,7 +52,7 @@ const AddModuleButtons: React.FC<AddModuleButtonsProps> = ({ moduleId, queryName
           onClick={() => addToBuilt.mutate()}
           role="button"
         >
-          <BuildingOffice2Icon aria-hidden="true" className="h-4 w-4" />
+          <BuildingOffice2Icon aria-hidden="true" className="w-4 h-4" />
           <span className="sr-only">
             {moduleStatus?.is_built ? "Built" : "Add to built"}
           </span>
@@ -70,7 +72,7 @@ const AddModuleButtons: React.FC<AddModuleButtonsProps> = ({ moduleId, queryName
           onClick={() => addToWtb.mutate()}
           role="button"
         >
-          <WrenchIcon aria-hidden="true" className="h-4 w-4" />
+          <WrenchIcon aria-hidden="true" className="w-4 h-4" />
           <span className="sr-only">
             {moduleStatus?.is_wtb ? "Want to build" : "Add to want-to-build"}
           </span>

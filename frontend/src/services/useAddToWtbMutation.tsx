@@ -32,7 +32,7 @@ const useAddToWtbMutation = (moduleId: string): UseMutationResult<AddToWtbRespon
     mutationKey: ["want-to-build"],
     onSuccess: () => {
       // Invalidate and refetch the want-to-build query after mutation
-      queryClient.invalidateQueries({queryKey: ["want-to-build"]});
+      queryClient.invalidateQueries({ queryKey: ["moduleStatus", moduleId] });
     }
   });
 };
