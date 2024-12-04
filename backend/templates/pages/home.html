@@ -41,12 +41,12 @@
     <ul class="flex flex-col justify-around h-full md:flex-row">
       {% for project in projects %}
         <li class="flex flex-col items-center justify-around py-10 space-y-4 border-b md:space-y-0 md:justify-start md:flex-row md:border-0">
-          <div class="w-20 h-20 mr-4 overflow-hidden rounded lg:w-20 lg:h-20">
-            <div class="flex justify-center w-full h-full md:w-auto">
+          <div class="flex justify-center w-20 h-20 mr-4 overflow-hidden align-middle rounded lg:w-20 lg:h-20">
+            <div class="flex justify-center w-full h-full align-middle md:w-auto">
               <a href="{{ project.module_url }}">
                 <picture>
                   <source srcset="{{ project.thumbnail }}" type="image/webp">
-                  <img src="{{ project.thumbnail }}" alt="{{ project.title }} thumbnail" class="object-cover w-auto h-full">
+                  <img src="{{ project.thumbnail }}" alt="{{ project.title }} thumbnail" class="object-contain w-auto h-full">
                 </picture>
               </a>
             </div>
