@@ -50,6 +50,7 @@
     <script src="https://cdn.jsdelivr.net/npm/cash-dom/dist/cash.min.js"></script>
     <script>(function(){const{protocol:n,host:o,pathname:t,search:a,hash:h}=window.location;t.endsWith("/")||t.endsWith(".html")||window.location.replace(`${n}//${o}${t}/${a}${h}`)})()</script>
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
     <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -65,12 +66,88 @@
       <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
       <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1549230942850511" crossorigin="anonymous"></script>
+      <script type="text/javascript">
+        (function (f, b) { if (!b.__SV) { var e, g, i, h; window.mixpanel = b; b._i = []; b.init = function (e, f, c) { function g(a, d) { var b = d.split("."); 2 == b.length && ((a = a[b[0]]), (d = b[1])); a[d] = function () { a.push([d].concat(Array.prototype.slice.call(arguments, 0))); }; } var a = b; "undefined" !== typeof c ? (a = b[c] = []) : (c = "mixpanel"); a.people = a.people || []; a.toString = function (a) { var d = "mixpanel"; "mixpanel" !== c && (d += "." + c); a || (d += " (stub)"); return d; }; a.people.toString = function () { return a.toString(1) + ".people (stub)"; }; i = "disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split( " "); for (h = 0; h < i.length; h++) g(a, i[h]); var j = "set set_once union unset remove delete".split(" "); a.get_group = function () { function b(c) { d[c] = function () { call2_args = arguments; call2 = [c].concat(Array.prototype.slice.call(call2_args, 0)); a.push([e, call2]); }; } for ( var d = {}, e = ["get_group"].concat( Array.prototype.slice.call(arguments, 0)), c = 0; c < j.length; c++) b(j[c]); return d; }; b._i.push([e, f, c]); }; b.__SV = 1.2; e = f.createElement("script"); e.type = "text/javascript"; e.async = !0; e.src = "undefined" !== typeof MIXPANEL_CUSTOM_LIB_URL ? MIXPANEL_CUSTOM_LIB_URL : "file:" === f.location.protocol && "//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//) ? "https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js" : "//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"; g = f.getElementsByTagName("script")[0]; g.parentNode.insertBefore(e, g); } })(document, window.mixpanel || []);
+      </script>
+      <script>
+        let lastTrackedUrl = null;
+  
+        function trackPageView(url) {
+          if (url !== lastTrackedUrl) {
+            lastTrackedUrl = url;
+  
+            if (window.mixpanel) {
+              mixpanel.track("Page View", { page: url });
+            }
+  
+            if (typeof gtag === "function") {
+              gtag('event', 'page_view', { page_path: url });
+            }
+          }
+        }
+  
+        function monitorUrlChanges() {
+          const originalPushState = window.history.pushState;
+          const originalReplaceState = window.history.replaceState;
+  
+          function handleUrlChange(url) {
+            trackPageView(url || window.location.pathname + window.location.search);
+          }
+  
+          handleUrlChange();
+  
+          window.history.pushState = function (state, title, url) {
+            originalPushState.apply(this, arguments);
+            handleUrlChange(url);
+          };
+  
+          window.history.replaceState = function (state, title, url) {
+            originalReplaceState.apply(this, arguments);
+            handleUrlChange(url);
+          };
+  
+          window.addEventListener("popstate", () => {
+            handleUrlChange();
+          });
+        }
+  
+        document.addEventListener("DOMContentLoaded", function () {
+          mixpanel.init("099a5cb7f4c47e043ee4e55213130e3f", {
+            opt_out_tracking_by_default: true,
+            ip: true,
+          });
+  
+          monitorUrlChanges();
+        });
+      </script>
 
     {% block css %}{% endblock css %}
   </head>
 
   <body class="min-h-screen">
     <header>{% include "nav.html" %}</header>
+
+    <!-- Cookie Consent -->
+    <div id="cookie-consent-banner" class="fixed z-50 hidden max-w-sm transition-all transform bg-gray-600 rounded-lg shadow-lg bottom-4 right-4 sm:bottom-6 sm:right-6">
+      <div class="p-6">
+          <div class="sm:flex sm:items-start">
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <h3 class="text-lg font-medium leading-6 text-white">Cookie Consent</h3>
+                  <p class="mt-2 text-sm text-white">
+                      We use cookies to enhance your browsing experience. Please accept or deny to proceed.
+                  </p>
+              </div>
+          </div>
+          <div class="mt-5 sm:mt-4 sm:flex sm:justify-end">
+              <button id="allow-cookies" class="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-[#13c3ff] rounded-md shadow-sm hover:bg-blue-500 sm:w-auto">
+                  Accept
+              </button>
+              <button id="deny-cookies" class="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-700 bg-gray-300 rounded-md shadow-sm hover:bg-gray-400 sm:ml-3 sm:mt-0 sm:w-auto">
+                  Deny
+              </button>
+          </div>
+      </div>
+    </div>
 
     <div class="flex flex-col min-h-screen">
       {% with request.path|slice:":5" as path %}
@@ -276,6 +353,77 @@
       });
     </script>   
 
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const COOKIE_CONSENT_KEY = "cookie_consent";
+        const banner = document.getElementById("cookie-consent-banner");
+        const acceptButton = document.getElementById("allow-cookies");
+        const denyButton = document.getElementById("deny-cookies");
+      
+        if (!localStorage.getItem(COOKIE_CONSENT_KEY)) {
+          banner.style.display = "block";
+        }
+      
+        function applyCookieSettings(consentStatus) {
+          if (consentStatus === "allow") {
+            loadGoogleAnalytics();
+            loadMixpanel();
+            mixpanel.opt_in_tracking();
+            console.log("Cookies allowed: Analytics enabled.");
+          } else {
+            mixpanel.opt_out_tracking();
+            console.warn("Cookies denied: Analytics disabled.");
+          }
+        }
+      
+        function closeBanner() {
+          banner.style.display = "none";
+        }
+      
+        acceptButton.addEventListener("click", () => {
+          localStorage.setItem(COOKIE_CONSENT_KEY, "allow");
+          applyCookieSettings("allow");
+          closeBanner();
+        });
+      
+        denyButton.addEventListener("click", () => {
+          localStorage.setItem(COOKIE_CONSENT_KEY, "deny");
+          applyCookieSettings("deny");
+          closeBanner();
+        });
+      
+        const storedConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
+        if (storedConsent) {
+          applyCookieSettings(storedConsent);
+        }
+      });
+      
+      function loadGoogleAnalytics() {
+        const script = document.createElement("script");
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-KXVV479GJX";
+        script.async = true;
+        document.head.appendChild(script);
+      
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+        gtag("config", "G-KXVV479GJX");
+      }
+      
+      // Function to load Mixpanel dynamically
+      function loadMixpanel() {
+        mixpanel.init("099a5cb7f4c47e043ee4e55213130e3f", {
+          opt_out_tracking_by_default: true,
+          ip: false, // Disable geolocation
+          property_blacklist: ["$referrer", "$current_url"],
+        });
+        console.log("Mixpanel initialized with privacy settings.");
+      }
+      
+    </script>
+    
     {% block javascript %}{% endblock javascript %}
   </body>
 </html>

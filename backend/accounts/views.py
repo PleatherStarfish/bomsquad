@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from .models import CustomUser, KofiPayment, UserNotes, WantToBuildModules, BuiltModules
 from core.views import get_exchange_rate
 from datetime import datetime, timedelta
+from django.utils.decorators import method_decorator
 from decimal import Decimal
 from uuid import UUID
 import logging

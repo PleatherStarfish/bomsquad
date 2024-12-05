@@ -28,6 +28,7 @@ requests==2.32.3
 sendgrid==6.10.0
 sentry-sdk==2.17.0
 mailchimp-marketing==3.0.80
+mixpanel==4.10.1
 whitenoise==6.3.0
 patreon==0.5.0
 psycopg2-binary==2.9.5

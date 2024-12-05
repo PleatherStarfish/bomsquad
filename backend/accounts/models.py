@@ -67,6 +67,9 @@ class CustomUser(AbstractUser):
         blank=True,
         help_text="Premium expiry date. If subscribed through Patreon, is the date when the Ko-fi subscription ends if not renewed.",
     )
+    cookie_consent_status = models.CharField(
+        max_length=10, choices=[("allow", "Allow"), ("deny", "Deny")], default="deny"
+    )
 
     def __str__(self):
         return self.email
