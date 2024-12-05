@@ -77,12 +77,12 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
-      {% if path == '/projects' or path == '/comp' %}
-        <div id="banner" class="hidden">
+      {% if path != '/user' and path != '/abou' and path != '/acco' and path != '/faq' and path != '/tos' %}
+        <div id="banner" class="hidden {% if path != '/proj' and path != '/comp' %}mb-8{% endif %}">
           <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-lg bg-[#d4e4ea]" role="alert">
             <div class="flex flex-col w-full">
-                <span class="mb-6 text-5xl text-gray-500 font-display">Support the project</span>
-                <span class="text-gray-500">BOM Squad is an <a class="text-blue-500 hover:text-blue-700" href="https://github.com/PleatherStarfish/bomsquad">open-source</a> tool built and maintained by hobbyists. We rely on your support to keep us online. Subscriber on <a class="text-blue-500 hover:text-blue-700" href='https://ko-fi.com/bomsquad'>Ko-fi</a> and help choose the next module and feature we add!</span>
+                <span class="mb-6 text-5xl text-gray-500 font-display">Need seeing your project here?</span>
+                <span class="text-gray-500">BOM Squad is an <a class="text-blue-500 hover:text-blue-700" href="https://github.com/PleatherStarfish/bomsquad">open-source</a> tool built and maintained by hobbyists. Subscribe and support the project on <a class="text-blue-500 hover:text-blue-700" href='https://ko-fi.com/bomsquad'>Ko-fi</a> (a Patreon-type social funding platform) and you get to choose the next project/BOM we add, usually within 48 hours!</span>
             </div>
             <div class="flex justify-end w-full gap-2 mt-2 sm:mt-0 sm:w-auto">
               <button id="banner-hide-button" class="w-min flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-400 hover:bg-slate-500 sm:px-3 sm:py-1.5 sm:text-sm">
@@ -127,7 +127,7 @@
           banner.addClass('hidden');
     
           // Generate a random number of days between 1 and 7
-          var randomDays = Math.floor(Math.random() * 7) + 1;
+          var randomDays = Math.floor(Math.random() * 4) + 1;
     
           // Convert days to milliseconds for the duration
           var randomDuration = randomDays * 24 * 60 * 60 * 1000;

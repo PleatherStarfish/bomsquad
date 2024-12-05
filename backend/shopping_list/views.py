@@ -1,4 +1,5 @@
 import bleach
+import logging
 from django.db.models import Min, Max, F, Sum, Case, When, Value
 from accounts.models import UserNotes, CustomUser
 from components.models import Component, ComponentSupplierItem
@@ -21,6 +22,8 @@ from shopping_list.serializers import (
 from uuid import UUID
 from rest_framework.views import APIView
 from django.db import transaction
+
+logger = logging.getLogger(__name__)
 
 
 class UserShoppingListView(APIView):
@@ -549,8 +552,8 @@ def get_user_shopping_list_total_price(request):
     )
 
 
-@permission_classes([IsAuthenticated])
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_shopping_list_total_component_price(request, component_pk):
     """
     This GET endpoint calculates:
@@ -562,7 +565,9 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     # Fetch the component by primary key
     try:
         component = Component.objects.get(pk=component_pk)
+        logger.debug(f"Fetched component: {component}")
     except Component.DoesNotExist:
+        logger.warning(f"Component with PK {component_pk} not found.")
         return Response(
             {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
         )
@@ -571,8 +576,10 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     shopping_list_items = UserShoppingList.objects.filter(
         user=request.user, component=component
     )
+    logger.debug(f"Shopping list items count: {shopping_list_items.count()}")
 
     if not shopping_list_items.exists():
+        logger.info(f"No shopping list items found for component {component.pk}")
         return Response(
             {"detail": "No shopping list items found for the specified component."},
             status=status.HTTP_404_NOT_FOUND,
@@ -583,30 +590,37 @@ def get_user_shopping_list_total_component_price(request, component_pk):
         min_price=F("unit_price") * F("pcs"),
         max_price=F("unit_price") * F("pcs"),
     )
+    logger.debug(f"Supplier items count: {supplier_items.count()}")
 
     # Aggregate min and max prices for the component
     supplier_prices = supplier_items.aggregate(
         total_min_price=Min("min_price"),
         total_max_price=Max("max_price"),
     )
+    logger.debug(f"Aggregated supplier prices: {supplier_prices}")
 
     total_min_price = supplier_prices["total_min_price"] or 0
     total_max_price = supplier_prices["total_max_price"] or 0
+    logger.debug(f"Initial min price: {total_min_price}, max price: {total_max_price}")
 
     # Adjust min and max prices based on quantities in the shopping list
-    total_min_price *= (
+    total_quantity = (
         shopping_list_items.aggregate(total_quantity=Sum("quantity"))["total_quantity"]
         or 0
     )
-    total_max_price *= (
-        shopping_list_items.aggregate(total_quantity=Sum("quantity"))["total_quantity"]
-        or 0
+    logger.debug(f"Total quantity from shopping list: {total_quantity}")
+
+    total_min_price *= total_quantity
+    total_max_price *= total_quantity
+    logger.debug(
+        f"Adjusted min price: {total_min_price}, max price: {total_max_price} after quantity adjustment"
     )
 
     # Deprecated price calculation using `unit_price` from the `Component`
     deprecated_total_price = shopping_list_items.aggregate(
         total_price=Sum(F("quantity") * F("component__unit_price"))
     )["total_price"]
+    logger.debug(f"Deprecated total price calculation: {deprecated_total_price}")
 
     return Response(
         {
