@@ -360,18 +360,17 @@
         const acceptButton = document.getElementById("allow-cookies");
         const denyButton = document.getElementById("deny-cookies");
 
-        document.getElementById('cookie-consent-banner').style = `
-          display: block;
-          position: fixed;
-          bottom: 4rem;
-          right: 2rem;
-          background-color: #1f2937;
-          color: white;
-          z-index: 50;
-      `;
       
         if (!localStorage.getItem(COOKIE_CONSENT_KEY)) {
-          banner.style.display = "block";
+          document.getElementById('cookie-consent-banner').style = `
+            display: block;
+            position: fixed;
+            bottom: 4rem;
+            right: 2rem;
+            background-color: #1f2937;
+            color: white;
+            z-index: 50;
+        `;
         }
       
         function applyCookieSettings(consentStatus) {
