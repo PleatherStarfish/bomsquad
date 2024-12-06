@@ -561,13 +561,12 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     - total_max_price: The most expensive total cost for the specific component.
     - total_price (deprecated): The total cost using the `unit_price` field of the `Component`.
     """
-
     # Fetch the component by primary key
     try:
         component = Component.objects.get(pk=component_pk)
-        logger.debug(f"Fetched component: {component}")
+        print(f"Fetched component: {component}")
     except Component.DoesNotExist:
-        logger.warning(f"Component with PK {component_pk} not found.")
+        print(f"Component with PK {component_pk} not found.")
         return Response(
             {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
         )
@@ -576,51 +575,55 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     shopping_list_items = UserShoppingList.objects.filter(
         user=request.user, component=component
     )
-    logger.debug(f"Shopping list items count: {shopping_list_items.count()}")
+    print(f"Shopping list items count: {shopping_list_items.count()}")
 
     if not shopping_list_items.exists():
-        logger.info(f"No shopping list items found for component {component.pk}")
+        print(f"No shopping list items found for component {component.pk}")
         return Response(
             {"detail": "No shopping list items found for the specified component."},
             status=status.HTTP_404_NOT_FOUND,
         )
 
     # Get all supplier items for this component
-    supplier_items = ComponentSupplierItem.objects.filter(component=component).annotate(
-        min_price=F("unit_price") * F("pcs"),
-        max_price=F("unit_price") * F("pcs"),
-    )
-    logger.debug(f"Supplier items count: {supplier_items.count()}")
+    supplier_items = ComponentSupplierItem.objects.filter(component=component)
+    print(f"Supplier items count: {supplier_items.count()}")
 
-    # Aggregate min and max prices for the component
-    supplier_prices = supplier_items.aggregate(
-        total_min_price=Min("min_price"),
-        total_max_price=Max("max_price"),
-    )
-    logger.debug(f"Aggregated supplier prices: {supplier_prices}")
+    total_min_price = 0
+    total_max_price = 0
 
-    total_min_price = supplier_prices["total_min_price"] or 0
-    total_max_price = supplier_prices["total_max_price"] or 0
-    logger.debug(f"Initial min price: {total_min_price}, max price: {total_max_price}")
+    if supplier_items.exists():
+        for item in supplier_items:
+            print(
+                f"Supplier Item: Price={item.price}, PCS={item.pcs}, Unit Price={item.unit_price}"
+            )
 
-    # Adjust min and max prices based on quantities in the shopping list
-    total_quantity = (
-        shopping_list_items.aggregate(total_quantity=Sum("quantity"))["total_quantity"]
-        or 0
-    )
-    logger.debug(f"Total quantity from shopping list: {total_quantity}")
+        # Aggregate supplier prices based on unit price
+        supplier_prices = supplier_items.aggregate(
+            total_min_price=Min("unit_price"),  # Use unit price directly
+            total_max_price=Max("unit_price"),
+        )
+        print(f"Adjusted Supplier Prices: {supplier_prices}")
 
-    total_min_price *= total_quantity
-    total_max_price *= total_quantity
-    logger.debug(
-        f"Adjusted min price: {total_min_price}, max price: {total_max_price} after quantity adjustment"
-    )
+        total_min_price = supplier_prices["total_min_price"] or 0
+        total_max_price = supplier_prices["total_max_price"] or 0
+
+        # Apply quantity multiplier only if needed
+        total_quantity = (
+            shopping_list_items.aggregate(total_quantity=Sum("quantity")).get(
+                "total_quantity"
+            )
+            or 0
+        )
+        print(f"Total Quantity: {total_quantity}")
+
+        total_min_price *= total_quantity
+        total_max_price *= total_quantity
 
     # Deprecated price calculation using `unit_price` from the `Component`
     deprecated_total_price = shopping_list_items.aggregate(
         total_price=Sum(F("quantity") * F("component__unit_price"))
     )["total_price"]
-    logger.debug(f"Deprecated total price calculation: {deprecated_total_price}")
+    print(f"Deprecated total price calculation: {deprecated_total_price}")
 
     return Response(
         {
