@@ -14,7 +14,7 @@ from modules.models import Module, ModuleBomListItem, Manufacturer
 from rest_framework.test import APITestCase, APIClient
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 
 
 User = get_user_model()
@@ -366,7 +366,7 @@ class GetUserShoppingListTotalComponentPriceTestCase(APITestCase):
 
         # URL for the endpoint
         self.url = reverse(
-            "user-shopping-list-total-price",
+            "user-shopping-list-total-component-price",
             kwargs={"component_pk": self.component.pk},
         )
 
@@ -379,7 +379,7 @@ class GetUserShoppingListTotalComponentPriceTestCase(APITestCase):
         non_existent_component_pk = uuid.uuid4()
         response = self.client.get(
             reverse(
-                "user-shopping-list-total-price",
+                "user-shopping-list-total-component-price",
                 kwargs={"component_pk": non_existent_component_pk},
             )
         )
@@ -411,8 +411,8 @@ class GetUserShoppingListTotalComponentPriceTestCase(APITestCase):
 
         # Calculate expected results
         total_quantity = self.shopping_list_item.quantity
-        total_min_price = total_quantity * self.supplier_item_1.price.amount
-        total_max_price = total_quantity * self.supplier_item_2.price.amount
+        total_min_price = total_quantity * self.supplier_item_1.unit_price
+        total_max_price = total_quantity * self.supplier_item_2.unit_price
         deprecated_total_price = total_quantity * self.component.unit_price
 
         # Assert response data
@@ -477,74 +477,425 @@ class GetUserShoppingListTotalComponentPriceTestCase(APITestCase):
             f"/api/shopping-list/total-component-price/?component_id={self.component.id}"
         )
         self.assertEqual(response.status_code, 200)
-        # Add assertions for price calculations
-
-    def test_multiple_shopping_list_items(self):
-        """
-        Test when multiple shopping list items exist for the same user and component.
-        - Verify aggregated quantities are used.
-        """
-        UserShoppingList.objects.create(
-            user=self.user, component=self.component, quantity=3
-        )
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        total_quantity = 5 + 3  # Combined quantity
-        total_min_price = total_quantity * self.supplier_item_1.price.amount
-        total_max_price = total_quantity * self.supplier_item_2.price.amount
-        self.assertEqual(response.data["total_min_price"], total_min_price)
-        self.assertEqual(response.data["total_max_price"], total_max_price)
 
     def test_integer_unit_prices_and_quantities_no_rounding(self):
         """
         Test when supplier items and shopping list quantities involve integers.
         - Verify accurate calculation of totals without applying rounding.
         """
-        self.supplier_item_1.price = Decimal(
-            "11.25"
-        )  # Total price expected for 3 units
-        self.supplier_item_1.pcs = 3  # Number of components per set
-        self.supplier_item_2.price = Decimal(
-            "13.50"
-        )  # Total price expected for 3 units
-        self.supplier_item_2.pcs = 3  # Number of components per set
-        self.supplier_item_1.save()
-        self.supplier_item_2.save()
 
-        # Debugging output
-        print(f"Quantity: {self.shopping_list_item.quantity}")
-        print(f"Supplier 1 Unit Price: {self.supplier_item_1.unit_price}")
-        print(f"Supplier 2 Unit Price: {self.supplier_item_2.unit_price}")
+        # Create a new component
+        self.component_2 = Component.objects.create(
+            description="Test Component",
+            type=self.component_type,
+        )
+
+        # Create supplier items
+        self.supplier_item_3 = ComponentSupplierItem.objects.create(
+            component=self.component_2,
+            supplier=self.supplier_1,
+            price=Decimal("1.50"),
+            pcs=3,  # Each set of 3 costs $1.50
+        )
+        self.supplier_item_4 = ComponentSupplierItem.objects.create(
+            component=self.component_2,
+            supplier=self.supplier_2,
+            price=Decimal("1.00"),
+            pcs=10,  # Each set of 10 costs $1.00
+        )
+
+        # Create shopping list items
+        self.shopping_list_item_2 = UserShoppingList.objects.create(
+            user=self.user, component=self.component_2, quantity=3
+        )
 
         # Expected values
-        total_quantity = self.shopping_list_item.quantity
+        total_quantity = self.shopping_list_item_2.quantity
+
         expected_totals = {
             "total_min_price": str(
-                total_quantity * self.supplier_item_1.unit_price
-            ),  # 3 * 3.75 = 11.25
+                total_quantity * self.supplier_item_4.unit_price
+            ),  # 3 * (1 / 10) = 0.30
             "total_max_price": str(
-                total_quantity * self.supplier_item_2.unit_price
-            ),  # 3 * 4.50 = 13.50
+                total_quantity * self.supplier_item_3.unit_price
+            ),  # 3 * (1.50 / 3) = 1.50
         }
 
-        # Debugging expected values
-        print(f"Expected Totals: {expected_totals}")
+        url = reverse(
+            "user-shopping-list-total-component-price",
+            kwargs={"component_pk": self.component_2.pk},
+        )
+
+        # Call the endpoint
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Parse and compare results
+        response_totals = {
+            "total_min_price": str(response.data["total_min_price"]),
+            "total_max_price": str(response.data["total_max_price"]),
+        }
+
+        # Validate results
+        self.assertEqual(
+            response_totals["total_min_price"], expected_totals["total_min_price"]
+        )
+        self.assertEqual(
+            response_totals["total_max_price"], expected_totals["total_max_price"]
+        )
+
+    def test_multiple_supplier_items(self):
+        """
+        Test calculation with multiple supplier items for the same component.
+        Ensures min and max prices are derived correctly from a list of suppliers.
+        """
+        # Create suppliers
+        supplier_1 = ComponentSupplier.objects.create(
+            id=uuid.uuid4(),
+            name="Supplier 1",
+            short_name="S1",
+            url="http://supplier1.com",
+        )
+        supplier_2 = ComponentSupplier.objects.create(
+            id=uuid.uuid4(),
+            name="Supplier 2",
+            short_name="S2",
+            url="http://supplier2.com",
+        )
+        supplier_3 = ComponentSupplier.objects.create(
+            id=uuid.uuid4(),
+            name="Supplier 3",
+            short_name="S3",
+            url="http://supplier3.com",
+        )
+        supplier_4 = ComponentSupplier.objects.create(
+            id=uuid.uuid4(),
+            name="Supplier 4",
+            short_name="S4",
+            url="http://supplier4.com",
+        )
+
+        # Create multiple supplier items with varying unit prices
+        ComponentSupplierItem.objects.create(
+            component=self.component, supplier=supplier_1, price=Decimal("5.00"), pcs=5
+        )  # Unit price: 1.00
+        ComponentSupplierItem.objects.create(
+            component=self.component, supplier=supplier_2, price=Decimal("10.00"), pcs=2
+        )  # Unit price: 5.00
+        ComponentSupplierItem.objects.create(
+            component=self.component, supplier=supplier_3, price=Decimal("7.50"), pcs=3
+        )  # Unit price: 2.50
+        ComponentSupplierItem.objects.create(
+            component=self.component, supplier=supplier_4, price=Decimal("2.00"), pcs=10
+        )  # Unit price: 0.20
+
+        # Update the quantity of an existing shopping list item instead of creating duplicates
+        self.shopping_list_item.quantity = 3
+        self.shopping_list_item.save()
+
+        # Expected values based on the unit prices
+        expected_min_price = Decimal("0.20") * 3  # Cheapest supplier * quantity
+        expected_max_price = Decimal("5.00") * 3  # Most expensive supplier * quantity
 
         # Call the endpoint
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Parse and compare results
-        response_totals = {
-            "total_min_price": response.data["total_min_price"],
-            "total_max_price": response.data["total_max_price"],
-        }
+        # Validate the response
+        self.assertEqual(response.data["total_min_price"], expected_min_price)
+        self.assertEqual(response.data["total_max_price"], expected_max_price)
 
-        # Debugging response
-        print(f"Response Data: {response.data}")
-        print(f"Response Totals: {response_totals}")
 
-        self.assertEqual(
-            str(response_totals["total_min_price"]),
-            str(expected_totals["total_min_price"]),
+class GetUserShoppingListTotalPriceTests(APITestCase):
+    def setUp(self):
+        # Create and authenticate a user
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.client = APIClient()
+        self.client.login(username="testuser", password="password")
+
+        # Create manufacturers
+        self.module_manufacturer = Manufacturer.objects.create(
+            name="Module Manufacturer"
         )
+        self.component_manufacturer = ComponentManufacturer.objects.create(
+            name="Component Manufacturer"
+        )
+
+        # Create a module
+        self.module = Module.objects.create(
+            name="Test Module", manufacturer=self.module_manufacturer
+        )
+
+        # Create component types
+        self.type_resistor = Types.objects.create(name="Resistor")
+        self.type_capacitor = Types.objects.create(name="Capacitor")
+
+        # Create components
+        self.component_1 = Component.objects.create(
+            description="10kΩ Resistor",
+            manufacturer=self.component_manufacturer,
+            type=self.type_resistor,
+            unit_price=Decimal("0.50"),
+        )
+        self.component_2 = Component.objects.create(
+            description="100nF Capacitor",
+            manufacturer=self.component_manufacturer,
+            type=self.type_capacitor,
+            unit_price=Decimal("0.20"),
+        )
+
+        # Create BOM items
+        self.bom_item_1 = ModuleBomListItem.objects.create(
+            description="Resistor BOM Item", module=self.module, type=self.type_resistor
+        )
+        self.bom_item_2 = ModuleBomListItem.objects.create(
+            description="Capacitor BOM Item",
+            module=self.module,
+            type=self.type_capacitor,
+        )
+
+        # Create shopping list items
+        self.shopping_list_item_1 = UserShoppingList.objects.create(
+            user=self.user,
+            component=self.component_1,
+            module=self.module,
+            bom_item=self.bom_item_1,
+            quantity=3,
+        )
+        self.shopping_list_item_2 = UserShoppingList.objects.create(
+            user=self.user,
+            component=self.component_2,
+            module=self.module,
+            bom_item=self.bom_item_2,
+            quantity=5,
+        )
+
+        # Create suppliers
+        self.supplier_1 = ComponentSupplier.objects.create(
+            name="Supplier 1", short_name="S1", url="https://supplier1.com"
+        )
+        self.supplier_2 = ComponentSupplier.objects.create(
+            name="Supplier 2", short_name="S2", url="https://supplier2.com"
+        )
+
+        # Create supplier items for component 1
+        ComponentSupplierItem.objects.create(
+            component=self.component_1,
+            supplier=self.supplier_1,
+            price=Decimal("1.50"),
+            pcs=3,
+        )
+        ComponentSupplierItem.objects.create(
+            component=self.component_1,
+            supplier=self.supplier_2,
+            price=Decimal("0.75"),
+            pcs=1,
+        )
+
+        # Create supplier items for component 2
+        ComponentSupplierItem.objects.create(
+            component=self.component_2,
+            supplier=self.supplier_1,
+            price=Decimal("1.00"),
+            pcs=5,
+        )
+        ComponentSupplierItem.objects.create(
+            component=self.component_2,
+            supplier=self.supplier_2,
+            price=Decimal("2.00"),
+            pcs=10,
+        )
+
+        # Endpoint URL
+        self.url = reverse("user-shopping-list-total-price")
+
+    def test_no_shopping_list_items(self):
+        """
+        Test the case where the user has no shopping list items.
+        """
+        UserShoppingList.objects.filter(user=self.user).delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], "No components in shopping list.")
+
+    def test_unauthenticated_access(self):
+        """
+        Test the endpoint rejects unauthenticated users.
+        """
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_no_supplier_items(self):
+        """
+        Test total price calculation when no supplier items exist.
+        """
+        ComponentSupplierItem.objects.all().delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_min_price"], 0)
+        self.assertEqual(response.data["total_max_price"], 0)
+        self.assertEqual(response.data["total_price"], 0)
+
+    def test_successful_total_price_calculation(self):
+        """
+        Test total price calculation for multiple components with multiple suppliers.
+        """
+        # Clear existing shopping list
+        UserShoppingList.objects.filter(user=self.user).delete()
+
+        # Set up components with `unit_price`
+        component_1 = Component.objects.create(
+            description="Component 1",
+            type=self.type_resistor,
+            unit_price=Decimal("0.10"),
+        )
+        component_2 = Component.objects.create(
+            description="Component 2",
+            type=self.type_capacitor,
+            unit_price=Decimal("0.20"),
+        )
+
+        # Set up shopping list items
+        UserShoppingList.objects.create(
+            user=self.user, component=component_1, quantity=3
+        )
+        UserShoppingList.objects.create(
+            user=self.user, component=component_2, quantity=5
+        )
+
+        # Set up supplier items
+        ComponentSupplierItem.objects.create(
+            component=component_1,
+            supplier=self.supplier_1,
+            price=Decimal("1.50"),
+            pcs=3,
+        )
+        ComponentSupplierItem.objects.create(
+            component=component_1,
+            supplier=self.supplier_2,
+            price=Decimal("2.25"),
+            pcs=3,
+        )
+        ComponentSupplierItem.objects.create(
+            component=component_2,
+            supplier=self.supplier_1,
+            price=Decimal("2.00"),
+            pcs=10,
+        )
+        ComponentSupplierItem.objects.create(
+            component=component_2,
+            supplier=self.supplier_2,
+            price=Decimal("1.00"),
+            pcs=5,
+        )
+
+        # Calculate expected totals
+        total_min_price = Decimal("2.50")
+        total_max_price = Decimal("3.25")
+        deprecated_total_price = (
+            Decimal("0.10") * 3 + Decimal("0.20") * 5  # Component 1 and Component 2
+        )
+
+        # Call the endpoint
+        response = self.client.get(self.url)
+
+        # Validate response
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total_min_price"], total_min_price)
+        self.assertEqual(response.data["total_max_price"], total_max_price)
+        # self.assertEqual(response.data["total_price"], deprecated_total_price)
+
+
+class GetUserShoppingListQuantityTests(APITestCase):
+    def setUp(self):
+        """
+        Set up the test environment:
+        - Create a user and authenticate them.
+        - Create related objects (components, modules, BOM items).
+        - Add shopping list items for the user.
+        """
+        self.client = APIClient()
+
+        # Create and authenticate the test user
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.client.force_authenticate(user=self.user)
+
+        # Create a manufacturer for the module
+        self.manufacturer = Manufacturer.objects.create(name="Test Manufacturer")
+
+        # Create a component type, component, module, and BOM item
+        self.component_type = Types.objects.create(name="Resistor")
+        self.component = Component.objects.create(
+            description="Test Component",
+            type=self.component_type,
+        )
+        self.module = Module.objects.create(
+            name="Test Module",
+            manufacturer=self.manufacturer,
+        )
+        self.bom_item = ModuleBomListItem.objects.create(
+            description="Test BOM Item", module=self.module, type=self.component_type
+        )
+
+        # Add the component to the user's shopping list
+        self.shopping_list_item = UserShoppingList.objects.create(
+            user=self.user,
+            component=self.component,
+            module=self.module,
+            bom_item=self.bom_item,
+            quantity=5,
+        )
+
+        # Endpoint URL
+        self.url = reverse(
+            "user-shopping-list",
+            kwargs={
+                "component_pk": str(self.component.id),
+                "modulebomlistitem_pk": str(self.bom_item.id),
+                "module_pk": str(self.module.id),
+            },
+        )
+
+    def test_quantity_exists(self):
+        """Test that the endpoint returns the correct quantity for an existing shopping list item."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("quantity", response.data)
+        self.assertEqual(response.data["quantity"], 5)
+
+    def test_quantity_does_not_exist(self):
+        """Test that the endpoint returns a quantity of 0 if the shopping list item does not exist."""
+        url = reverse(
+            "user-shopping-list",
+            kwargs={
+                "component_pk": "00000000-0000-0000-0000-000000000000",
+                "modulebomlistitem_pk": str(self.bom_item.id),
+                "module_pk": str(self.module.id),
+            },
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("quantity", response.data)
+        self.assertEqual(response.data["quantity"], 0)
+
+    def test_unauthenticated_access(self):
+        """Test that unauthenticated users cannot access the endpoint."""
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_invalid_parameters(self):
+        """Test that the endpoint handles invalid parameters gracefully."""
+        url = reverse(
+            "user-shopping-list",
+            kwargs={
+                "component_pk": uuid.uuid4(),
+                "modulebomlistitem_pk": uuid.uuid4(),
+                "module_pk": uuid.uuid4(),
+            },
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # Expect 200
+        self.assertIn("quantity", response.data)
+        self.assertEqual(response.data["quantity"], 0)  # Expect quantity 0

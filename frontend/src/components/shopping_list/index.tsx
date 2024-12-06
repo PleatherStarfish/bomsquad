@@ -144,11 +144,10 @@ const ShoppingList: React.FC = () => {
               return (
                 <ListSlice
                   aggregatedComponents={
-                    userShoppingListData.aggregatedComponents
+                    userShoppingListData.aggregatedComponents as AggregatedComponent[]
                   }
                   allModulesData={userShoppingListData.groupedByModule as GroupedByModule[]}
                   componentsAreLoading={userShoppingListIsLoading}
-                  componentsInModule={value.data}
                   index={index}
                   key={value.name}
                   moduleId={moduleId}

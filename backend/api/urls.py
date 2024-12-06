@@ -159,7 +159,7 @@ urlpatterns = [
     path(
         "shopping-list/<uuid:component_pk>/total-price/",
         get_user_shopping_list_total_component_price,
-        name="user-shopping-list-total-price",
+        name="user-shopping-list-total-component-price",
     ),
     path(
         "shopping-list/total-quantity/",

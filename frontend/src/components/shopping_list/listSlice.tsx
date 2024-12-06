@@ -34,7 +34,7 @@ interface ListSliceProps {
   slug?: string;
   moduleId?: string;
   allModulesData: GroupedByModule[];
-  componentsInModule: Record<string, AggregatedComponent[]>;
+  componentsInModule?: Record<string, AggregatedComponent[]>;
   aggregatedComponents: AggregatedComponent[];
   componentsAreLoading: boolean;
   hideInteraction?: boolean;
@@ -53,7 +53,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
   slug,
   moduleId,
   allModulesData,
-  componentsInModule,
+  componentsInModule = [],
   aggregatedComponents,
   componentsAreLoading,
   hideInteraction = false,
@@ -225,7 +225,6 @@ const ListSlice: React.FC<ListSliceProps> = ({
             ) : (
               <Quantity
                 componentId={row.component.id}
-                componentsInModule={componentsInModule}
                 hideInteraction={hideInteraction}
                 pencilComponent={
                   row.component.id !== quantityIdToEdit && (

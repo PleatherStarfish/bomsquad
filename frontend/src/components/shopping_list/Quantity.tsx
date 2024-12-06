@@ -7,14 +7,14 @@ interface Component {
 
 interface QuantityProps {
   componentId: string;
-  componentsInModule: Record<string, Component[]>;
+  componentsInModule?: Record<string, Component[]>;
   pencilComponent?: React.ReactNode;
   hideInteraction?: boolean;
 }
 
 const Quantity: React.FC<QuantityProps> = ({
   componentId,
-  componentsInModule,
+  componentsInModule = [],
   pencilComponent,
   hideInteraction,
 }) => {

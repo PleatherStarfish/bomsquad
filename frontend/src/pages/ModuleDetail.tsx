@@ -46,9 +46,9 @@ const ModuleDetail: React.FC = () => {
 
   return (
     <div className="space-y-16">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-6 bg-gradient-to-r from-slate-50 to-gray-100 rounded-lg">
+      <div className="grid grid-cols-1 gap-8 p-6 rounded-lg md:grid-cols-5 bg-gradient-to-r from-slate-50 to-gray-100">
         {/* Left Side: Image */}
-        <div className="flex justify-center md:col-span-2 py-12">
+        <div className="flex justify-center py-12 md:col-span-2">
           {module.large_image_webp && (
             <picture>
               <source srcSet={`${module.large_image_webp}`} type="image/webp" />
@@ -63,8 +63,8 @@ const ModuleDetail: React.FC = () => {
         </div>
 
         {/* Right Side: Details */}
-        <div className="relative md:col-span-3 p-12">
-          <div className="absolute top-0 right-0 mr-4">
+        <div className="relative p-12 md:col-span-3">
+          {user && <div className="absolute top-0 right-0 mr-4">
             <div className="flex space-x-3">
               <AddModuleButtons moduleId={module.id} queryName="built" />
               <AddModuleButtons
@@ -72,7 +72,7 @@ const ModuleDetail: React.FC = () => {
                 queryName="want-to-build"
               />
             </div>
-          </div>
+          </div>}
           <div>
             <h1 className="py-4 text-3xl font-semibold font-display">
               {module.name}
@@ -113,10 +113,10 @@ const ModuleDetail: React.FC = () => {
           </div>
           <div>
             <h2 className="py-4 text-xl font-semibold sr-only">Description</h2>
-            <p className="card-text pt-8 pb-4">{module.description}</p>
+            <p className="pt-8 pb-4 card-text">{module.description}</p>
             <div role="list">
               <a href={module.manufacturer_page_link} role="listitem">
-                <div className="group flex justify-between w-full border-b border-gray-200 py-3">
+                <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Manufacturer page
                   </div>
@@ -124,7 +124,7 @@ const ModuleDetail: React.FC = () => {
                 </div>
               </a>
               <a href={module.bom_link} role="listitem">
-                <div className="group flex justify-between w-full border-b border-gray-200 py-3">
+                <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Bill of materials
                   </div>
@@ -132,7 +132,7 @@ const ModuleDetail: React.FC = () => {
                 </div>
               </a>
               <a href={module.manual_link} role="listitem">
-                <div className="group flex justify-between w-full border-b border-gray-200 py-3">
+                <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     User manual
                   </div>
@@ -140,7 +140,7 @@ const ModuleDetail: React.FC = () => {
                 </div>
               </a>
               <a href={module.modulargrid_link} role="listitem">
-                <div className="group flex justify-between w-full border-b border-gray-200 py-3">
+                <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Modulargrid link
                   </div>

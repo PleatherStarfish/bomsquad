@@ -19,6 +19,7 @@ from shopping_list.serializers import (
     UserShoppingListSavedSerializer,
     UserShoppingListSerializer,
 )
+from decimal import Decimal, ROUND_HALF_UP
 from uuid import UUID
 from rest_framework.views import APIView
 from django.db import transaction
@@ -426,6 +427,7 @@ class ArchivedShoppingListsView(APIView):
             )
 
 
+# tests
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_shopping_list_quantity(
@@ -491,8 +493,9 @@ def get_user_anonymous_shopping_list_quantity(request, component_pk):
             return Response({"quantity": 0}, status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
+# tests
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def get_user_shopping_list_total_price(request):
     """
     This GET endpoint calculates:
@@ -510,48 +513,75 @@ def get_user_shopping_list_total_price(request):
             status=status.HTTP_404_NOT_FOUND,
         )
 
+    # Aggregate quantities for each component in the shopping list
+    component_quantities = shopping_list_items.values("component").annotate(
+        total_quantity=Sum("quantity")
+    )
+
     # Get all supplier items for the components in the shopping list
     supplier_items = ComponentSupplierItem.objects.filter(
-        component__in=shopping_list_items.values_list("component", flat=True)
-    ).annotate(
-        min_price=F("unit_price") * F("pcs"),
-        max_price=F("unit_price") * F("pcs"),
+        component__in=component_quantities.values_list("component", flat=True)
     )
 
-    # Aggregate min and max prices for each component
+    if not supplier_items.exists():
+        return Response(
+            {
+                "total_min_price": Decimal("0.00"),
+                "total_max_price": Decimal("0.00"),
+                "total_price": Decimal("0.00"),
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    # Aggregate min and max unit prices for each component
     supplier_prices = supplier_items.values("component").annotate(
-        min_price=Min("min_price"), max_price=Max("max_price")
+        min_price=Min("unit_price"),
+        max_price=Max("unit_price"),
     )
 
-    # Calculate total min and max prices for the shopping cart
-    total_min_price = sum(
-        price["min_price"]
-        * shopping_list_items.get(component=price["component"]).quantity
-        for price in supplier_prices
-        if price["min_price"]
-    )
-    total_max_price = sum(
-        price["max_price"]
-        * shopping_list_items.get(component=price["component"]).quantity
-        for price in supplier_prices
-        if price["max_price"]
-    )
+    # Build a dictionary for quick lookup
+    supplier_price_map = {price["component"]: price for price in supplier_prices}
+
+    # Calculate total min and max prices
+    total_min_price = Decimal("0.00")
+    total_max_price = Decimal("0.00")
+
+    for comp in component_quantities:
+        component_id = comp["component"]
+        total_quantity = comp["total_quantity"]
+
+        # Fetch prices
+        min_price = supplier_price_map.get(component_id, {}).get(
+            "min_price", Decimal("0.00")
+        )
+        max_price = supplier_price_map.get(component_id, {}).get(
+            "max_price", Decimal("0.00")
+        )
+
+        # Calculate totals
+        total_min_price += Decimal(min_price) * total_quantity
+        total_max_price += Decimal(max_price) * total_quantity
 
     # Deprecated price calculation using `unit_price` from the `Component`
     deprecated_total_price = shopping_list_items.aggregate(
         total_price=Sum(F("quantity") * F("component__unit_price"))
-    )["total_price"]
+    )["total_price"] or Decimal("0.00")
 
-    return Response(
-        {
-            "total_min_price": total_min_price,
-            "total_max_price": total_max_price,
-            "total_price": deprecated_total_price,  # Deprecated
-        },
-        status=status.HTTP_200_OK,
-    )
+    # Return the response
+    response_data = {
+        "total_min_price": total_min_price.quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        ),
+        "total_max_price": total_max_price.quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        ),
+        "total_price": deprecated_total_price or Decimal("0.00"),  # Deprecated
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
+# tests
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_shopping_list_total_component_price(request, component_pk):
@@ -561,12 +591,10 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     - total_max_price: The most expensive total cost for the specific component.
     - total_price (deprecated): The total cost using the `unit_price` field of the `Component`.
     """
-    # Fetch the component by primary key
     try:
+        # Fetch the component by primary key
         component = Component.objects.get(pk=component_pk)
-        print(f"Fetched component: {component}")
     except Component.DoesNotExist:
-        print(f"Component with PK {component_pk} not found.")
         return Response(
             {"detail": "Component not found."}, status=status.HTTP_404_NOT_FOUND
         )
@@ -575,66 +603,66 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     shopping_list_items = UserShoppingList.objects.filter(
         user=request.user, component=component
     )
-    print(f"Shopping list items count: {shopping_list_items.count()}")
 
     if not shopping_list_items.exists():
-        print(f"No shopping list items found for component {component.pk}")
         return Response(
             {"detail": "No shopping list items found for the specified component."},
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    # Get all supplier items for this component
+    # Get supplier items for the component
     supplier_items = ComponentSupplierItem.objects.filter(component=component)
-    print(f"Supplier items count: {supplier_items.count()}")
 
-    total_min_price = 0
-    total_max_price = 0
-
-    if supplier_items.exists():
-        for item in supplier_items:
-            print(
-                f"Supplier Item: Price={item.price}, PCS={item.pcs}, Unit Price={item.unit_price}"
-            )
-
-        # Aggregate supplier prices based on unit price
-        supplier_prices = supplier_items.aggregate(
-            total_min_price=Min("unit_price"),  # Use unit price directly
-            total_max_price=Max("unit_price"),
+    if not supplier_items.exists():
+        return Response(
+            {
+                "total_min_price": Decimal("0.00"),
+                "total_max_price": Decimal("0.00"),
+                "total_price": Decimal("0.00"),
+            },
+            status=status.HTTP_200_OK,
         )
-        print(f"Adjusted Supplier Prices: {supplier_prices}")
 
-        total_min_price = supplier_prices["total_min_price"] or 0
-        total_max_price = supplier_prices["total_max_price"] or 0
-
-        # Apply quantity multiplier only if needed
-        total_quantity = (
-            shopping_list_items.aggregate(total_quantity=Sum("quantity")).get(
-                "total_quantity"
-            )
-            or 0
-        )
-        print(f"Total Quantity: {total_quantity}")
-
-        total_min_price *= total_quantity
-        total_max_price *= total_quantity
-
-    # Deprecated price calculation using `unit_price` from the `Component`
-    deprecated_total_price = shopping_list_items.aggregate(
-        total_price=Sum(F("quantity") * F("component__unit_price"))
-    )["total_price"]
-    print(f"Deprecated total price calculation: {deprecated_total_price}")
-
-    return Response(
-        {
-            "total_min_price": total_min_price,
-            "total_max_price": total_max_price,
-            "total_price": deprecated_total_price,  # Deprecated
-        },
-        status=status.HTTP_200_OK,
+    # Calculate min and max unit prices
+    supplier_prices = supplier_items.aggregate(
+        min_unit_price=Min("unit_price"),
+        max_unit_price=Max("unit_price"),
     )
 
+    min_unit_price = supplier_prices["min_unit_price"] or Decimal("0.00")
+    max_unit_price = supplier_prices["max_unit_price"] or Decimal("0.00")
 
+    # Fetch total quantity
+    total_quantity = shopping_list_items.aggregate(total_quantity=Sum("quantity")).get(
+        "total_quantity", 0
+    )
+
+    # Calculate total prices
+    total_min_price = (min_unit_price * Decimal(total_quantity)).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    total_max_price = (max_unit_price * Decimal(total_quantity)).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+
+    # Deprecated price calculation using the component's unit_price
+    deprecated_total_price = shopping_list_items.aggregate(
+        total_price=Sum(F("quantity") * F("component__unit_price"))
+    )["total_price"] or Decimal("0.00")
+
+    # Construct response
+    response_data = {
+        "total_min_price": total_min_price,
+        "total_max_price": total_max_price,
+        "total_price": deprecated_total_price.quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        ),
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+# tests
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def get_user_shopping_list_total_quantity(request):
@@ -832,6 +860,7 @@ def archive_shopping_list(request):
     )
 
 
+# tests
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_all_unique_component_ids(request):
