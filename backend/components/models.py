@@ -6,6 +6,7 @@ from core.models import BaseModel
 from django.urls import reverse
 from django.db.models import F
 from mptt.models import MPTTModel, TreeForeignKey
+from django_editorjs_fields import EditorJsTextField
 
 
 import uuid
@@ -179,6 +180,10 @@ class Component(BaseModel):
     )
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
+    editor_content = EditorJsTextField(
+        null=True,
+        blank=True,
+    )
     link = models.URLField(blank=True, help_text="Deprecated")
     submitted_by = models.ForeignKey(
         "accounts.CustomUser",

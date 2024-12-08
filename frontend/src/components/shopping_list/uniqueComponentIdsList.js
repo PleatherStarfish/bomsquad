@@ -45,8 +45,6 @@ const UniqueComponentIdsList = ({locationArrays, setLocationArrays}) => {
   const { uniqueComponentIds, isLoading, isError } =
     useGetAllUniqueComponentIds();
 
-  console.log(uniqueComponentIds)
-
   if (isLoading) {
     return <div className="text-center animate-pulse">Loading...</div>;
   }

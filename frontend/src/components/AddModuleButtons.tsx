@@ -18,8 +18,6 @@ const AddModuleButtons: React.FC<AddModuleButtonsProps> = ({ moduleId, queryName
     refetch: refetchModuleStatus,
   } = useModuleStatus(moduleId);
 
-  console.log(moduleStatus)
-
   const hideBuilt = queryName === "built";
   const hideWtb = queryName === "want-to-build";
 

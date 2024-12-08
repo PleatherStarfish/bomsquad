@@ -11,7 +11,6 @@ export const Types = Object.freeze({
 const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames = "", hideLoadingTag = false }) => {
   const [quantity, setQuantity] = React.useState();
   const { data, isLoading, error } = useHook(...Object.values(hookArgs));
-  console.log(quantity)
 
   useEffect(() => {
     setQuantity(data);

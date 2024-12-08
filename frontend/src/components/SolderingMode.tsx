@@ -97,8 +97,6 @@ const SolderingMode: React.FC<SolderingModeProps> = ({
       ? dataSearched.filter((x: InventoryRow) => x && x.id)
       : inventoryData;
   
-  console.log("dataForTable", dataForTable)
-
   const darkModeStyles = `
     .rdt_TableHeadRow { background-color: #212529; color: white; border-color: white; }
     .rdt_TableRow { background-color: #212529; color: white; }

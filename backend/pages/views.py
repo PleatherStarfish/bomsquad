@@ -64,6 +64,7 @@ def component_detail(request, component_id):
             "supplier_item_no": item.supplier_item_no,
             "link": item.link,
             "unit_price": item.link,
+            "editor_content": component.editor_content,
         }
         for item in supplier_items
     ]

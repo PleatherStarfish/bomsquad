@@ -129,7 +129,6 @@ const Inventory = () => {
                 console.error("Failed to add or update component:", error);
               },
               onSuccess: () => {
-                console.log("Component added or updated successfully.");
                 setSelectedComponent(null); // Reset selection
                 setUpdatedQuantityToSubmit(undefined); // Reset quantity
               },

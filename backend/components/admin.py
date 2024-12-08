@@ -52,6 +52,7 @@ class ComponentAdmin(BaseAdmin):
                     "notes",
                     "link",
                     "allow_comments",
+                    "editor_content",
                 )
             },
         ),

@@ -66,14 +66,7 @@ const ShoppingList: React.FC = () => {
       }
     });
 
-    navigator.clipboard
-      .writeText(copyString)
-      .then(() => {
-        console.log("Mouser data copied to clipboard.");
-      })
-      .catch((err) => {
-        console.error("Could not copy text: ", err);
-      });
+    navigator.clipboard.writeText(copyString)
   };
 
   const LoadingOverlay: React.FC = () => (
@@ -144,7 +137,7 @@ const ShoppingList: React.FC = () => {
               return (
                 <ListSlice
                   aggregatedComponents={
-                    userShoppingListData.aggregatedComponents as AggregatedComponent[]
+                    userShoppingListData.aggregatedComponents
                   }
                   allModulesData={userShoppingListData.groupedByModule as GroupedByModule[]}
                   componentsAreLoading={userShoppingListIsLoading}

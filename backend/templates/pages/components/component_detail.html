@@ -2,6 +2,7 @@
 {% load static %}
 {% load comments %}
 {% load comments_xtd %}
+{% load editorjs %}
 
 {% block title %}{{ component.supplier }} {{ component.supplier_item_no }} | DIY Modular Synth & Eurorack Components{% endblock title %}
 
@@ -24,58 +25,101 @@
         </tr>
       </thead>
       <tbody>
+        {% if component.manufacturer %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Manufacturer</td>
           <td class="px-4 py-2">{{ component.manufacturer }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.manufacturer_part_no %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Manufacturer Part No</td>
           <td class="px-4 py-2">{{ component.manufacturer_part_no }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.get_mounting_style_display %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Mounting Style</td>
           <td class="px-4 py-2">{{ component.get_mounting_style_display }}</td>
         </tr>
+        {% endif %}
+    
+        {% if category and category.full_path %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Category</td>
           <td class="px-4 py-2">{{ category.full_path }}</td>
         </tr>
+        {% endif %}
+    
+        {% if size and size.full_path %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Size Standard</td>
           <td class="px-4 py-2">{{ size.full_path }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.ohms %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Ohms</td>
           <td class="px-4 py-2">{{ component.ohms }} {{ component.ohms_unit }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.farads %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Farads</td>
           <td class="px-4 py-2">{{ component.farads }} {{ component.farads_unit }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.voltage_rating %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Voltage Rating</td>
           <td class="px-4 py-2">{{ component.voltage_rating }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.tolerance %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Tolerance</td>
           <td class="px-4 py-2">{{ component.tolerance }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.discontinued %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Discontinued</td>
           <td class="px-4 py-2">{{ component.discontinued }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.notes %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Notes</td>
           <td class="px-4 py-2">{{ component.notes }}</td>
         </tr>
+        {% endif %}
+    
+        {% if component.link %}
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Link</td>
           <td class="px-4 py-2">
             <a href="{{ component.link }}" class="text-blue-500 hover:underline">More Info</a>
           </td>
         </tr>
+        {% endif %}
       </tbody>
     </table>
+    
+  </div>
+  <div class="container py-6 mx-auto">
+  {% if component.editor_content %}
+    <div class="pb-6 editor-content">
+      {{ component.editor_content | editorjs }}
+    </div>
+  {% endif %}
   </div>
   <div class="container py-6 mx-auto">
     <div class="container py-6 mx-auto">

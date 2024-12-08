@@ -46,12 +46,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
   control,
   onSubmit,
 }) => {
-  console.log("type", type)
-  console.log("manufacturer", manufacturer)
-  console.log("supplier", supplier)
-  console.log("mounting_style", mounting_style)
-  console.log("farads", farads)
-  console.log("ohms", ohms)
 
   const currentType: string = useWatch({
     control,
@@ -90,7 +84,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col gap-6 -mx-2 w-full">
+      <div className="flex flex-col w-full gap-6 -mx-2">
         {/* Search Input */}
         <div className="w-full px-2">
           <label
@@ -109,7 +103,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
           />
         </div>
         {/* Dropdown Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full px-2">
+        <div className="grid w-full grid-cols-1 gap-4 px-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {renderDropdown("Type", "type", mapToOptions(type), control)}
           {renderDropdown(
             "Manufacturer",

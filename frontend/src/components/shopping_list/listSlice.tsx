@@ -1,6 +1,7 @@
 import {
   AggregatedComponent,
   GroupedByModule,
+  UserShoppingList
 } from "../../types/shoppingList";
 import {
   ArrowPathIcon,
@@ -35,7 +36,7 @@ interface ListSliceProps {
   moduleId?: string;
   allModulesData: GroupedByModule[];
   componentsInModule?: Record<string, AggregatedComponent[]>;
-  aggregatedComponents: AggregatedComponent[];
+  aggregatedComponents: UserShoppingList[];
   componentsAreLoading: boolean;
   hideInteraction?: boolean;
   backgroundColor?: string;
@@ -108,7 +109,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
     setUpdatedQuantityToSubmit(undefined);
   };
 
-  const labelColumns: TableColumn<AggregatedComponent>[] = [
+  const labelColumns: TableColumn<UserShoppingList>[] = [
     {
       cell: (row) => (
         <div
