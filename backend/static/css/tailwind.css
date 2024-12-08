@@ -15,14 +15,14 @@
         left: 0;
         object-fit: cover;
         position: absolute;
-        top: -30px;
+        top: -200px;
         width: 200%;
       }
       
       @media (min-width: 1040px) {
         #parallax-image {
           position: absolute;
-          top: -50px; /* Larger offset for large screens */
+          top: -200px; /* Larger offset for large screens */
           left: 0;
           width: 100%; /* Standard width on larger screens */
           height: auto; /* Maintain aspect ratio */

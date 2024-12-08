@@ -18,7 +18,7 @@
   <div class="w-full max-w-md">
     <h2 class="mb-6 text-2xl font-bold text-center">Sign up</h2>
 
-    <p class="mb-4 text-center">Already have an account? Please <a class="text-blue-500 hover:text-blue-700" href="{% url 'account_login' %}">sign in</a>.</p>
+    <p class="mb-4 text-center">Already have an account? Please <a class="text-blue-500 hover:text-blue-700" href="{% url 'account_login' %}">login</a>.</p>
     <form method="post" class="p-6 border border-gray-300 rounded-lg">
       {% csrf_token %}
       {{ form|crispy }}

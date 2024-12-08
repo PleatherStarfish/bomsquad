@@ -16,6 +16,7 @@ import Settings from "./components/UserSettings";
 import ShoppingList from "./components/shopping_list/index";
 import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
+import ResistorCalculator from "./pages/ResistorCalculator"
 
 const App: React.FC = () => {
 
@@ -40,6 +41,7 @@ const App: React.FC = () => {
             element={<SavedLists />}
             path={`/user/:username/shopping-list/saved-lists`}
           />
+          <Route element={<ResistorCalculator />} path="/tools/resistor-calculator" />
           <Route element={<UserPage />} path="/user/:username">
             <Route
               element={

@@ -14,7 +14,7 @@ import React, { useEffect, useState } from "react";
 
 import AddOneModal from "./addOneModal";
 import Button from "../../ui/Button";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import ListPriceSum from "./ListPriceSum"
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";

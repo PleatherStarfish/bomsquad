@@ -9,7 +9,7 @@ import DataTable from "react-data-table-component";
 import EditableLocation from "./inventory/EditableLocation";
 import EditableQuantity from "./inventory/EditableQuantity";
 import { Fragment } from "react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import Modal from "../ui/Modal";
 import _ from "lodash";
 import cx from "classnames";

@@ -1,5 +1,6 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
 import React, {useState} from "react";
+import { Helmet } from "react-helmet-async";
 
 import HeaderWithButton from "../ui/HeaderWithButton"
 import AddModuleButtons from "../components/AddModuleButtons";
@@ -46,6 +47,46 @@ const ModuleDetail: React.FC = () => {
 
   return (
     <div className="space-y-16">
+      <Helmet>
+      <title>
+        Build Your Own {module.name} by {module.manufacturer.name} | DIY Guitar Pedals, Modular Synth Kits
+      </title>
+        <meta
+          content={`Learn more about ${module.name}, a DIY project by ${module.manufacturer.name}. Manage your inventory, explore schematics, and build your modular synth or guitar pedal today.`}
+          name="description"
+        />
+        <meta content="DIY modular synth kits, easy DIY guitar pedals, build modular synth, modular synth schematics, {module.name}, {module.manufacturer.name}, {module.category}" name="keywords" />
+        <link href={`https://bom-squad.com/module/${module.slug}`} rel="canonical" />
+        <script type="application/ld+json">
+          {`
+          {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "${module.name}",
+            "brand": {
+              "@type": "Brand",
+              "name": "${module.manufacturer.name}"
+            },
+            "description": "${module.description}",
+            "image": "${module.large_image_webp || module.large_image_jpeg}",
+            "url": "https://bom-squad.com/modules/${module.slug}",
+            "category": "${module.category}",
+            "additionalProperty": [
+              {
+                "@type": "PropertyValue",
+                "name": "Rack Unit",
+                "value": "${module.rack_unit || "N/A"}"
+              },
+              {
+                "@type": "PropertyValue",
+                "name": "HP Size",
+                "value": "${module.hp || "N/A"}"
+              }
+            ]
+          }
+          `}
+        </script>
+      </Helmet>
       <div className="grid grid-cols-1 gap-8 p-6 rounded-lg md:grid-cols-5 bg-gradient-to-r from-slate-50 to-gray-100">
         {/* Left Side: Image */}
         <div className="flex justify-center py-12 md:col-span-2">

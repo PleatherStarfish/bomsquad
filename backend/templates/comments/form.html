@@ -59,5 +59,5 @@
   </div>
 </form>
 {% else %}
-<p class="text-center">You must be logged in to post a comment.</p>
+<p class="text-center">Please <a class="text-blue-500 hover:text-blue-700" href="{% url 'account_login' %}">login</a> or <a href="{% url 'account_signup' %}" class="text-blue-500 hover:text-blue-700" >sign up</a > to post a comment.</p>
 {% endif %}

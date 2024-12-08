@@ -2,9 +2,19 @@
 {% load static %}
 {% load comments %}
 {% load comments_xtd %}
-{% block title %}{{ component.supplier }} {{ component.supplier_item_no }}{% endblock title %}
+
+{% block title %}{{ component.supplier }} {{ component.supplier_item_no }} | DIY Modular Synth & Eurorack Components{% endblock title %}
+
+{% block meta_description %}
+  Learn more about {{ component.manufacturer_part_no }} from {{ component.manufacturer }}. Perfect for DIY modular synth projects, Eurorack builds, and guitar pedals. Check technical specs, pricing, and compatibility with DIY audio hardware.
+{% endblock meta_description %}
+
+{% block keywords %}
+  {{ component.description }}, {{ component.manufacturer }}, DIY modular synth, DIY Eurorack, guitar pedals, {{ component.supplier }}, audio hardware, component specs, modular synth kits, DIY synth schematics
+{% endblock keywords %}
+
 {% block content %}
-  <div class="container p-6 mx-auto">
+  <div class="container py-6 mx-auto">
     <h1 class="pt-6 pb-10 text-4xl font-bold">{{ component.description }}</h1>
     <table class="min-w-full bg-white border-collapse">
       <thead>
@@ -25,14 +35,6 @@
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Mounting Style</td>
           <td class="px-4 py-2">{{ component.get_mounting_style_display }}</td>
-        </tr>
-        <tr class="border-b">
-          <td class="px-4 py-2 font-bold">Supplier</td>
-          <td class="px-4 py-2">{{ component.supplier }}</td>
-        </tr>
-        <tr class="border-b">
-          <td class="px-4 py-2 font-bold">Supplier Item No</td>
-          <td class="px-4 py-2">{{ component.supplier_item_no }}</td>
         </tr>
         <tr class="border-b">
           <td class="px-4 py-2 font-bold">Category</td>
@@ -59,10 +61,6 @@
           <td class="px-4 py-2">{{ component.tolerance }}</td>
         </tr>
         <tr class="border-b">
-          <td class="px-4 py-2 font-bold">Price</td>
-          <td class="px-4 py-2">{{ component.price }}</td>
-        </tr>
-        <tr class="border-b">
           <td class="px-4 py-2 font-bold">Discontinued</td>
           <td class="px-4 py-2">{{ component.discontinued }}</td>
         </tr>
@@ -79,7 +77,32 @@
       </tbody>
     </table>
   </div>
-  <div class="container py-12 mx-auto">
+  <div class="container py-6 mx-auto">
+    <div class="container py-6 mx-auto">
+      <h2 class="pt-6 pb-4 text-2xl font-bold">Suppliers for {{ component.description }}</h2>
+      <table class="min-w-full bg-white border-collapse">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier</th>
+            <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier Item Number</th>
+            <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for supplier in suppliers %}
+          <tr class="border-b">
+            <td class="px-4 py-2">{{ supplier.supplier }}</td>
+            <td class="px-4 py-2">{{ supplier.supplier_item_no }}</td>
+            <td class="px-4 py-2">
+              <a href="{{ supplier.link }}" class="text-blue-500 hover:underline" target="_blank">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>    
+  </div>
+  <div class="container py-6 mx-auto">
     <h2 class="pt-6 pb-10 text-2xl font-bold">Projects using {{ component.description }}</h2>
     <table class="min-w-full bg-white border-collapse">
       <thead>

@@ -13,20 +13,15 @@
     </script>
     <meta charset="utf-8" />
     <meta name="robots" content="index, follow" />
-    <meta
-      name="keywords"
-      content="eurorack, diy, synthesizer, modular, music, hardware, analog synthesizer, modular synth, electronic music, synth building, sound design, music production, audio gear, circuit design"
-    />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta
       name="viewport"
       content="width=device-width,minimum-scale=1,initial-scale=1"
     />
-    <title>{% block title %}Bom Squad{% endblock title %}</title>
-    <meta
-      name="description"
-      content="An inventory and search tool for DIY audio projects and components"
-    />
+    <meta name="description" content="{% block meta_description %}Build DIY guitar pedals, modular synth kits, and Eurorack projects with BOM Squad. Access schematics, inventory tools, and community reviews to streamline your builds.{% endblock meta_description %}" />
+    <meta name="keywords" content="{% block keywords %}diy guitar pedals, diy modular synth, diy eurorack, diy modular synth schematics, diy modular synth kit{% endblock keywords %}" />
+    
+    <title>{% block title %}BOM Squad | DIY Synthesizer Project Tool{% endblock title %}</title>
     <meta
       name="author"
       content="https://github.com/PleatherStarfish/bomsquad"
@@ -36,11 +31,8 @@
       type="image/x-icon"
       href="{% static 'images/logo.png' %}"
     />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-
-    {% comment %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.0/dist/cookieconsent.css" />
-    {% endcomment %}
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,7 +146,7 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
-      {% if path != '/user' and path != '/abou' and path != '/acco' and path != '/faq' and path != '/tos' %}
+      {% if path != '/user' and path != '/abou' and path != '/acco' and path != '/faq' and path != '/tos' and path != '/tool' %}
         <div id="banner" class="hidden {% if path != '/proj' and path != '/comp' %}mb-8{% endif %}">
           <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-lg bg-[#d4e4ea]" role="alert">
             <div class="flex flex-col w-full">
@@ -379,10 +371,8 @@
             loadGoogleAnalytics();
             loadMixpanel();
             mixpanel.opt_in_tracking();
-            console.log("Cookies allowed: Analytics enabled.");
           } else {
             mixpanel.opt_out_tracking();
-            console.warn("Cookies denied: Analytics disabled.");
           }
         }
       
@@ -408,18 +398,38 @@
         }
       });
       
-      function loadGoogleAnalytics() {
-        const script = document.createElement("script");
-        script.src = "https://www.googletagmanager.com/gtag/js?id=G-KXVV479GJX";
-        script.async = true;
-        document.head.appendChild(script);
-      
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          dataLayer.push(arguments);
+      function loadGoogleAnalytics(analyticsId = "G-KXVV479GJX") {
+        // Check if the script is already loaded
+        if (document.querySelector(`script[src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"]`)) {
+          console.warn("Google Analytics script is already loaded.");
+          return;
         }
-        gtag("js", new Date());
-        gtag("config", "G-KXVV479GJX");
+      
+        // Create the script element for Google Analytics
+        const script = document.createElement("script");
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsId}`;
+        script.async = true;
+      
+        // Append the script to the document head
+        script.onload = () => {
+          console.log("Google Analytics script loaded successfully.");
+      
+          // Initialize the dataLayer if not already defined
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+      
+          // Configure Google Analytics
+          gtag("js", new Date());
+          gtag("config", analyticsId);
+        };
+      
+        script.onerror = () => {
+          console.error("Failed to load Google Analytics script.");
+        };
+      
+        document.head.appendChild(script);
       }
       
       // Function to load Mixpanel dynamically
