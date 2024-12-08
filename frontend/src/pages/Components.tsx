@@ -25,6 +25,7 @@ import useGetUserCurrency from "../services/useGetUserCurrency";
 import { useSearchParams } from "react-router-dom";
 import useUserInventoryQuantity from "../services/useGetUserInventoryQuantity";
 import AddComponentForm from "../components/user_submissions/AddComponentForm";
+import { Helmet } from "react-helmet-async";
 import cv from "classnames";
 
 const customStyles = {
@@ -39,6 +40,10 @@ const customStyles = {
     },
   },
 };
+
+const pageTitle = "Browse Components for DIY Synth Projects | BOM Squad";
+const pageDescription = "Explore a vast library of components for DIY synth projects. Filter by type, manufacturer, supplier, and more. Add components to your inventory and shopping list.";
+const pageKeywords = "DIY synth components, modular synth parts, guitar pedal components, build your own synth";
 
 const Components: React.FC = () => {
   const [notification, setNotification] = useState<{
@@ -415,6 +420,11 @@ const Components: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta content={pageDescription} name="description" />
+        <meta content={pageKeywords} name="keywords" />
+      </Helmet>
       <div className="mb-8">
         <div className="w-full py-12">
           <div className="p-10 bg-gray-100 rounded-lg" id="dataElem">
@@ -491,13 +501,13 @@ const Components: React.FC = () => {
         customButtons={
           <div className="flex justify-end space-x-4">
             <button
-              className="mt-4 px-4 py-2 text-sm font-medium text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-4 py-2 mt-4 text-sm font-medium text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
               onClick={() => setFullPageModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brandgreen-600 border border-transparent rounded-md shadow-sm hover:bg-brandgreen-700"
+              className="px-4 py-2 mt-4 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-brandgreen-600 hover:bg-brandgreen-700"
               onClick={handleFormSubmit}
             >
               <p className={cv({ "animate-pulse": isSubmitting })}>

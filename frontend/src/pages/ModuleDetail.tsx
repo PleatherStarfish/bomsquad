@@ -97,6 +97,7 @@ const ModuleDetail: React.FC = () => {
               <img
                 alt={module.name}
                 className="max-h-[30rem] object-contain"
+                loading="lazy"
                 src={`${module.large_image_jpeg}`}
               />
             </picture>
