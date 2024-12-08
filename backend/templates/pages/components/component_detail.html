@@ -16,7 +16,7 @@
 
 {% block content %}
   <div class="container py-6 mx-auto">
-    <h1 class="pt-6 pb-10 text-4xl font-bold">{{ component.description }}</h1>
+    <h1 class="pt-6 pb-10 text-4xl font-bold font-display">{{ component.description }}</h1>
     <table class="min-w-full bg-white border-collapse">
       <thead>
         <tr>
@@ -112,23 +112,90 @@
         {% endif %}
       </tbody>
     </table>
-    
   </div>
-  <div class="container py-6 mx-auto">
-  {% if component.editor_content %}
-    <div class="pb-6 editor-content">
-      {{ component.editor_content | editorjs }}
-    </div>
-  {% endif %}
+
+  <div class="container pt-6 mx-auto">
+    {% if component.editor_content %}
+      <div class="pb-6 editor-content">
+        {{ component.editor_content | editorjs }}
+      </div>
+    {% elif component.type.name == "Resistor" %}
+      <div class="pb-6">
+        <h2 class="pb-4 text-2xl font-bold">Understanding Resistors</h2>
+        <p>
+          A resistor is a fundamental component in electronics, widely used to limit the flow of electric current and manage voltage in a circuit. This resistor has a resistance of <strong>{{ component.ohms }} {{ component.ohms_unit }}</strong>, 
+          {% if component.tolerance %} with a tolerance of <strong>{{ component.tolerance }}</strong>{% endif %}, 
+          which indicates how closely the actual resistance value aligns with the nominal value. 
+          {% if component.voltage_rating %}It has a voltage rating of <strong>{{ component.voltage_rating }}</strong>, defining the maximum voltage it can safely handle.{% endif %}
+          {% if component.size %} Packaged in the <strong>{{ component.size.full_path }}</strong> size, this resistor is {% if component.size.name == "0805" %}a surface-mount type suited for compact PCBs{% else %}a {% if "through-hole" in component.size.full_path|lower %}through-hole{% else %}custom{% endif %} resistor, ideal for prototyping and ease of soldering{% endif %}.{% endif %}
+          Below are its equivalent resistance values in other units:
+        </p>
+        <ul style="list-style-type: disc" class="pl-6">
+          {% if component.ohms_unit == "Ω" %}
+            <li>{{ component.ohms|floatformat:2 }} ohms (Ω)</li>
+            <li>{{ component.ohms|add:0.0|floatformat:2 }} / 1000 kilohms (kΩ)</li>
+            <li>{{ component.ohms|add:0.0|floatformat:2 }} / 1000000 megohms (MΩ)</li>
+          {% elif component.ohms_unit == "kΩ" %}
+            <li>{{ component.ohms|floatformat:2 }} kilohms (kΩ)</li>
+            <li>{{ component.ohms|add:0.0 }} * 1000 ohms (Ω)</li>
+          {% elif component.ohms_unit == "MΩ" %}
+            <li>{{ component.ohms|floatformat:2 }} megohms (MΩ)</li>
+            <li>{{ component.ohms|add:0.0 }} * 1000000 ohms (Ω)</li>
+          {% endif %}
+        </ul>
+        <p>
+          {% if component.size and component.size.name == "0805" %}
+          Its compact size makes it ideal for modern PCB designs with limited space requirements.
+          {% else %}
+          Its robust build supports flexible configurations and prototyping setups.
+          {% endif %}
+          In audio electronics, resistors are indispensable for tasks like setting bias voltages, dividing signal levels, and stabilizing current flow. This makes them essential in applications ranging from synthesizers to Eurorack modules, where precision and reliability are paramount.
+        </p>
+      </div>
+    {% elif component.type.name == "Capacitor" %}
+      <div class="pb-6">
+        <h2 class="pb-4 text-2xl font-bold">Understanding Capacitors</h2>
+        <p>
+          A capacitor is a versatile electronic component that stores and releases electrical energy, making it vital in applications like signal filtering and power management. This capacitor has a capacitance of <strong>{{ component.farads }} {{ component.farads_unit }}</strong>, 
+          {% if component.tolerance %}with a tolerance of <strong>{{ component.tolerance }}</strong>{% endif %}, 
+          {% if component.voltage_rating %}and a voltage rating of <strong>{{ component.voltage_rating }}</strong>, ensuring safe operation within these limits.{% endif %}
+          Below are equivalent capacitance values in different units:
+        </p>
+        <ul style="list-style-type: disc" class="pl-6">
+          {% if component.farads_unit == "pF" %}
+            <li>{{ component.farads|floatformat:2 }} picofarads (pF)</li>
+            <li>{{ component.farads|add:0.0 }} / 1000 nanofarads (nF)</li>
+            <li>{{ component.farads|add:0.0 }} / 1000000 microfarads (μF)</li>
+          {% elif component.farads_unit == "nF" %}
+            <li>{{ component.farads|floatformat:2 }} nanofarads (nF)</li>
+            <li>{{ component.farads|add:0.0 }} * 1000 picofarads (pF)</li>
+          {% elif component.farads_unit == "μF" %}
+            <li>{{ component.farads|floatformat:2 }} microfarads (μF)</li>
+            <li>{{ component.farads|add:0.0 }} * 1000000 picofarads (pF)</li>
+          {% endif %}
+        </ul>       
+        <p>
+          Capacitors come in various types, such as <strong>ceramic capacitors</strong>, which are cost-effective and ideal for high-frequency applications, <strong>electrolytic capacitors</strong>, known for their high capacitance values for power smoothing, and <strong>film capacitors</strong>, prized for their reliability and precision in audio applications. 
+          {% if component.size %}Packaged in the <strong>{{ component.size.full_path }}</strong> size, it {% if component.size.name == "0805" %}is a surface-mount capacitor perfect for compact PCBs{% else %}fits a variety of configurations, including modular synth circuits and audio processing units{% endif %}.{% endif %}
+        </p>
+        <p>
+          Capacitors are essential in synthesizers and Eurorack modules, providing functions like coupling signals, filtering noise, and stabilizing power supplies. Their versatility and reliability make them a cornerstone of high-quality DIY audio projects.
+        </p>
+      </div>
+    {% else %}
+      <p>No additional content is available for this component.</p>
+    {% endif %}
   </div>
-  <div class="container py-6 mx-auto">
+  
+  <div class="container pt-6 mx-auto">
     <div class="container py-6 mx-auto">
-      <h2 class="pt-6 pb-4 text-2xl font-bold">Suppliers for {{ component.description }}</h2>
+      <h2 class="pt-6 pb-10 text-2xl font-bold font-display">Suppliers for {{ component.description }}</h2>
       <table class="min-w-full bg-white border-collapse">
         <thead>
           <tr>
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier</th>
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier Item Number</th>
+            <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Estimated Price</th>
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Link</th>
           </tr>
         </thead>
@@ -137,6 +204,7 @@
           <tr class="border-b">
             <td class="px-4 py-2">{{ supplier.supplier }}</td>
             <td class="px-4 py-2">{{ supplier.supplier_item_no }}</td>
+            <td class="px-4 py-2">{{ supplier.unit_price }}</td>
             <td class="px-4 py-2">
               <a href="{{ supplier.link }}" class="text-blue-500 hover:underline" target="_blank">View</a>
             </td>
@@ -147,7 +215,7 @@
     </div>    
   </div>
   <div class="container py-6 mx-auto">
-    <h2 class="pt-6 pb-10 text-2xl font-bold">Projects using {{ component.description }}</h2>
+    <h2 class="pt-6 pb-10 text-2xl font-bold font-display">Projects using {{ component.description }}</h2>
     <table class="min-w-full bg-white border-collapse">
       <thead>
         <tr>
