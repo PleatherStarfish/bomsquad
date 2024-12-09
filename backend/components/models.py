@@ -115,11 +115,9 @@ class Component(BaseModel):
         related_name="components",
         help_text="Size standard for the component.",
     )
-    ohms = models.DecimalField(
+    ohms = models.FloatField(
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="If the component type involves resistance, this value MUST be set.",
     )
     ohms_unit = models.CharField(
@@ -128,11 +126,9 @@ class Component(BaseModel):
         blank=True,
         help_text="If the component type involves resistance, this value MUST be set.",
     )
-    farads = models.DecimalField(
+    farads = models.FloatField(
         blank=True,
         null=True,
-        decimal_places=1,
-        max_digits=6,
         help_text="If the component type involves capacitance, this value MUST be set.",
     )
     farads_unit = models.CharField(
