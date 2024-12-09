@@ -199,7 +199,7 @@ const ModuleDetail: React.FC = () => {
       <div>
         <div className="pb-5">
           <HeaderWithButton
-            buttonText="Quick BOM Export"
+            buttonText={`Get Cart for ${module.name}`}
             onButtonClick={() => handleModalOpenClose(true)}
             title="Components"
           />

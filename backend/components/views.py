@@ -21,7 +21,7 @@ from django.db import transaction
 
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Q
+from django.db.models import Q, FloatField, Value
 from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -83,20 +83,33 @@ class ComponentView(APIView):
         filters = {key: value for key, value in filters.items() if value is not None}
 
         # Start with a base queryset
-        components = Component.objects.select_related("manufacturer", "supplier").all()
+        components = (
+            Component.objects.select_related("manufacturer", "type")
+            .prefetch_related("supplier_items", "supplier_items__supplier")
+            .all()
+        )
 
         # Apply TrigramSimilarity search if present
         if search_query:
-            components = (
-                components.annotate(
-                    similarity=TrigramSimilarity("description", search_query)
-                    + TrigramSimilarity("manufacturer__name", search_query)
-                    + TrigramSimilarity("supplier__name", search_query)
-                    + TrigramSimilarity("type__name", search_query)
-                )
-                .filter(similarity__gt=0.1)
-                .order_by("-similarity")
-            )
+            trigram_components = components.annotate(
+                similarity=TrigramSimilarity("description", search_query)
+                + TrigramSimilarity("manufacturer__name", search_query)
+                + TrigramSimilarity("manufacturer_part_no", search_query)
+                + TrigramSimilarity("supplier_items__supplier__name", search_query)
+                + TrigramSimilarity("supplier_items__supplier_item_no", search_query)
+                + TrigramSimilarity("type__name", search_query)
+            ).filter(similarity__gt=0.4)
+
+            ilike_components = components.filter(
+                Q(description__icontains=search_query)
+                | Q(manufacturer__name__icontains=search_query)
+                | Q(manufacturer_part_no__icontains=search_query)
+                | Q(supplier_items__supplier__name__icontains=search_query)
+                | Q(supplier_items__supplier_item_no__icontains=search_query)
+                | Q(type__name__icontains=search_query)
+            ).annotate(similarity=Value(0.0, output_field=FloatField()))
+
+            components = (trigram_components | ilike_components).distinct()
 
         # Dynamically apply filters
         try:
@@ -133,9 +146,6 @@ class ComponentView(APIView):
             components = components.filter(supplier__pk=UUID(filters["supplier"]))
         if "type" in filters:
             components = components.filter(type__name__icontains=filters["type"])
-
-        # Sort by description after applying all filters
-        components = components.order_by("description")
 
         # Create a paginator instance
         paginator = Paginator(components, 30)
