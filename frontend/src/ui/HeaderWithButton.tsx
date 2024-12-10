@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import { useInView } from "react-intersection-observer";
 import { useSpring, animated } from "@react-spring/web";
 import { ArrowDownOnSquareIcon } from "@heroicons/react/24/outline";
-
+import cv from "classnames"
 
 interface HeaderWithButtonProps {
   title: string;
@@ -60,13 +60,15 @@ const HeaderWithButton: React.FC<HeaderWithButtonProps> = ({
         <div className="w-full border-t border-gray-300" />
       </div>
 
-      <div className="relative flex items-center justify-between">
-        <h1 className="pr-3 text-3xl font-semibold text-gray-900 bg-white font-display">
-          {title}
-        </h1>
-        <div className={isNear ? "animate-bounce" : ""} ref={buttonRef}>
+      <div className="relative flex flex-wrap items-center justify-between gap-y-4 md:flex-nowrap">
+        <div className="w-full md:w-auto">
+          <h1 className="pr-3 text-3xl font-semibold text-center text-gray-900 bg-white font-display">
+            {title}
+          </h1>
+        </div>
+        <div className={cv("flex justify-center w-full md:w-auto", {"animate-bounce": isNear})} ref={buttonRef}>
           <animated.button
-            className="inline-flex items-center gap-x-1.5 rounded-full bg-[#588a6d] px-3 py-1.5 text-md font-semibold shadow-md text-white hover:text-white hover:bg-[#588a6d] transition-all duration-500"
+            className={cv("justify-center md:justify-start text-gray-600 hover:bg-gray-600 ring-gray-600 inline-flex items-center gap-x-1.5 rounded-md md:rounded-full bg-white px-3 py-1.5 text-md ring-1 ring-inset font-semibold shadow-sm hover:text-white transition-all duration-500 w-full mt-10 md:mt-0 md:w-auto", {"text-pink-600 hover:bg-pink-600 ring-pink-600": isNear})}
             onClick={onButtonClick}
             ref={ref}
             style={styles}
