@@ -235,14 +235,20 @@ class Component(BaseModel):
         elif self.farads and self.farads_unit:
             description = f"{self.farads}{self.farads_unit} Capacitor"
 
+        if self.type:
+            description += f" {self.type.name}"
+
+        if self.category:
+            description += f" {self.category.name}"
+
+        if self.size:
+            description += f" {self.size.name}"
+
         # Include mounting style
         if self.mounting_style:
             description += (
                 f" {'(through hole)' if self.mounting_style == 'th' else '(SMT)'}"
             )
-
-        elif self.type:
-            description = f"{self.type.name}"
 
         # Include wattage if available
         if self.wattage:
