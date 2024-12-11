@@ -7,6 +7,8 @@ from inventory.models import UserInventory
 from unittest.mock import patch
 
 
+# Url: api/components/create/
+# Frontend: useCreateComponent
 class CreateComponentTests(APITestCase):
     def setUp(self):
         self.user = CustomUser.objects.create_user(

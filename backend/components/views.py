@@ -109,7 +109,7 @@ class ComponentView(APIView):
                 | Q(type__name__icontains=search_query)
             ).annotate(similarity=Value(0.0, output_field=FloatField()))
 
-            components = (trigram_components | ilike_components).distinct()
+            components = (trigram_components | ilike_components).distinct("id")
 
         # Dynamically apply filters
         try:
@@ -258,6 +258,7 @@ def get_component_dropdowns(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
+# tests
 @login_required
 @api_view(["POST"])
 def create_component(request):
