@@ -268,6 +268,69 @@ def create_component(request):
     # Ensure voltage_rating has a default value
     component_data["voltage_rating"] = component_data.get("voltage_rating") or ""
 
+    # Validate quantity upfront
+    if quantity is not None:
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                return Response(
+                    {
+                        "fieldErrors": {
+                            "quantity": "Quantity must be greater than zero."
+                        },
+                        "message": "Invalid quantity value.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except ValueError:
+            return Response(
+                {
+                    "fieldErrors": {"quantity": "Quantity must be an integer."},
+                    "message": "Invalid quantity value.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    # Validate supplier items before saving component
+    supplier_item_errors = []
+    seen_supplier_items = set()
+    for supplier_item_data in supplier_items_data:
+        supplier = supplier_item_data.get("supplier")
+        supplier_item_no = supplier_item_data.get("supplier_item_no")
+        price = supplier_item_data.get("price")
+        pcs = supplier_item_data.get("pcs")
+
+        # Validate required fields
+        if not supplier or not supplier_item_no or price is None or pcs is None:
+            supplier_item_errors.append(
+                {
+                    "supplier_item_no": f"Missing required fields for supplier item with supplier '{supplier}' and item number '{supplier_item_no}'."
+                }
+            )
+            continue
+
+        # Check for duplicates in the current request
+        supplier_item_key = (supplier, supplier_item_no)
+        if supplier_item_key in seen_supplier_items:
+            supplier_item_errors.append(
+                {
+                    "supplier_item_no": f"Duplicate supplier item number '{supplier_item_no}' for supplier '{supplier}' in the request."
+                }
+            )
+            continue
+
+        seen_supplier_items.add(supplier_item_key)
+
+    # If supplier items are invalid, return error response before saving the component
+    if supplier_item_errors:
+        return Response(
+            {
+                "fieldErrors": {"supplier_item_errors": supplier_item_errors},
+                "message": "Failed to submit supplier items.",
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     try:
         with transaction.atomic():
             # Validate and save the component
@@ -292,17 +355,29 @@ def create_component(request):
             # Track supplier item errors
             supplier_item_errors = []
             seen_supplier_items = set()
+            validated_supplier_items = []
 
-            # Validate and process supplier items
+            # Validate supplier items
             for supplier_item_data in supplier_items_data:
-                # Prepare supplier item data
+                # Extract supplier item fields
                 item_data = supplier_item_data.copy()
                 supplier = item_data.get("supplier")
                 supplier_item_no = item_data.get("supplier_item_no")
+                price = item_data.get("price")
+                pcs = item_data.get("pcs")
+
+                # Validate required fields
+                if not supplier or not supplier_item_no or price is None or pcs is None:
+                    supplier_item_errors.append(
+                        {
+                            "supplier_item_no": f"Missing required fields for supplier item with supplier '{supplier}' and item number '{supplier_item_no}'."
+                        }
+                    )
+                    continue
 
                 supplier_item_key = (supplier, supplier_item_no)
 
-                # Check for duplicates in the current request
+                # Check for duplicates in the request
                 if supplier_item_key in seen_supplier_items:
                     supplier_item_errors.append(
                         {
@@ -319,12 +394,10 @@ def create_component(request):
                 ).first()
 
                 if existing_supplier_item:
-                    # Attach existing supplier item to the new component
-                    existing_supplier_item.component = component
-                    existing_supplier_item.save()
+                    # Add the existing item to the list for linking later
+                    validated_supplier_items.append(existing_supplier_item)
                 else:
-                    # Create a new supplier item
-                    item_data["pcs"] = item_data.get("pcs") or 1
+                    # Prepare data for creating a new supplier item
                     item_data["component"] = component.id
                     item_data["submitted_by"] = request.user.id
                     item_data["user_submitted_status"] = "pending"
@@ -332,7 +405,11 @@ def create_component(request):
                     supplier_item_serializer = CreateComponentSupplierItemSerializer(
                         data=item_data
                     )
-                    if not supplier_item_serializer.is_valid():
+                    if supplier_item_serializer.is_valid():
+                        validated_supplier_items.append(
+                            supplier_item_serializer.validated_data
+                        )
+                    else:
                         supplier_item_errors.append(
                             {
                                 "supplier_item_no": supplier_item_serializer.errors.get(
@@ -340,10 +417,8 @@ def create_component(request):
                                 )
                             }
                         )
-                    else:
-                        supplier_item_serializer.save()
 
-            # Handle supplier item errors
+            # If there are supplier item errors, do not proceed
             if supplier_item_errors:
                 return Response(
                     {
@@ -353,25 +428,23 @@ def create_component(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            # Save validated supplier items
+            for item in validated_supplier_items:
+                if isinstance(item, ComponentSupplierItem):
+                    # Link existing item to the new component
+                    item.component = component
+                    item.save()
+                else:
+                    # Create a new supplier item
+                    ComponentSupplierItem.objects.create(**item)
+
             # If quantity is provided, add the component to the user's inventory
             if quantity is not None:
-                try:
-                    quantity = int(quantity)  # Ensure quantity is an integer
-                    if quantity < 0:
-                        raise ValueError("Quantity must be non-negative.")
-                    UserInventory.objects.create(
-                        user=request.user,
-                        component=component,
-                        quantity=quantity,
-                    )
-                except ValueError as ve:
-                    return Response(
-                        {
-                            "fieldErrors": {"quantity": str(ve)},
-                            "message": "Invalid quantity value.",
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                UserInventory.objects.create(
+                    user=request.user,
+                    component=component,
+                    quantity=quantity,
+                )
 
     except Exception as e:
         return Response(
