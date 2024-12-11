@@ -2,24 +2,42 @@ import { Component } from "../types/component";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-// Define the function to fetch components by IDs
-export const getComponentsByIds = async (componentPks: string[]): Promise<Component[]> => {
+// Helper function to chunk an array
+const chunkArray = <T>(array: T[], size: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};
+
+// Function to fetch components in chunks
+export const getComponentsByIds = async (componentPks: string[], chunkSize = 20): Promise<Component[]> => {
   try {
-    const response = await axios.get(`/api/components/${componentPks}/`);
-    return response.data as Component[];
+    // Split the input array into chunks
+    const chunks = chunkArray(componentPks, chunkSize);
+
+    // Fetch each chunk and wait for all requests to complete
+    const responses = await Promise.all(
+      chunks.map(chunk => axios.get(`/api/components/${chunk}/`))
+    );
+
+    // Combine all responses into a single array
+    const combinedData: Component[] = responses.flatMap(response => response.data as Component[]);
+    return combinedData;
   } catch (error: any) {
     throw new Error(error.response?.data?.error || "An unexpected error occurred.");
   }
 };
 
-// Define the custom hook to use this data
-const useGetComponentsByIds = (componentPks: string[]) => {
-  const { 
-    data: componentsData, 
-    isLoading: componentsAreLoading, 
-    isError: componentsAreError 
+// Custom hook to use the fetched data
+const useGetComponentsByIds = (componentPks: string[], chunkSize = 50) => {
+  const {
+    data: componentsData,
+    isLoading: componentsAreLoading,
+    isError: componentsAreError
   } = useQuery<Component[], Error>({
-    queryFn: () => getComponentsByIds(componentPks),
+    queryFn: () => getComponentsByIds(componentPks, chunkSize),
     queryKey: ["getComponentsByIds", componentPks],
   });
 
