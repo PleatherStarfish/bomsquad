@@ -109,11 +109,22 @@ class ComponentView(APIView):
                 | Q(type__name__icontains=search_query)
             ).annotate(similarity=Value(0.0, output_field=FloatField()))
 
-            components = (
-                (trigram_components | ilike_components)
-                .order_by("-similarity", "id")
-                .distinct("id")
-            )
+            # Combine the QuerySets
+            components = (trigram_components | ilike_components).distinct()
+
+            # Sort components by similarity in descending order
+            components = components.order_by("-similarity")
+
+            # Deduplicate components in Python, keeping only the highest similarity for each ID
+            unique_components = {}
+            for component in components:
+                if component.id not in unique_components:
+                    unique_components[component.id] = component
+
+            # Convert the deduplicated dictionary back into a list
+            deduplicated_components = list(unique_components.values())
+
+            component = deduplicated_components
 
         # Dynamically apply filters
         try:
