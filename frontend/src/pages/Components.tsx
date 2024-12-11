@@ -2,7 +2,7 @@ import "tippy.js/dist/tippy.css";
 
 import DataTable, { TableColumn } from "react-data-table-component";
 import Quantity, { Types } from "../components/bom_list/quantity";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 
 import AddComponentModal from "../components/bom_list/addComponentModal";
@@ -93,6 +93,17 @@ const Components: React.FC = () => {
     page: Number(searchParams.get("page") || currentPage),
     search: searchParams.get("search") || "",
   });
+
+  const deduplicatedResults = useMemo(() => {
+    if (!componentsData?.results) return [];
+    const uniqueComponents = new Map();
+    componentsData.results.forEach((component) => {
+      if (!uniqueComponents.has(component.id)) {
+        uniqueComponents.set(component.id, component);
+      }
+    });
+    return Array.from(uniqueComponents.values());
+  }, [componentsData?.results]);
 
   const { data: currencyData } = useGetUserCurrency();
   const { user } = useAuthenticatedUser();
@@ -480,7 +491,7 @@ const Components: React.FC = () => {
                 columns={columns}
                 conditionalRowStyles={conditionalRowStyles}
                 customStyles={customStyles}
-                data={componentsData?.results || []}
+                data={deduplicatedResults}
                 progressPending={componentsAreLoading}
                 responsive
               />
