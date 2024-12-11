@@ -44,7 +44,16 @@ const useGetComponents = ({
       const response = await axios.get<ComponentData>("/api/components/", {
         params: { page, search, ...filters, order },
       });
-      return response.data;
+
+      // Deduplicate results by `id`
+      const deduplicatedResults = Array.from(
+        new Map(response.data.results.map((comp) => [comp.id, comp])).values()
+      );
+
+      return {
+        ...response.data,
+        results: deduplicatedResults,
+      };
     },
     queryKey: [
       "getComponents",
