@@ -109,7 +109,11 @@ class ComponentView(APIView):
                 | Q(type__name__icontains=search_query)
             ).annotate(similarity=Value(0.0, output_field=FloatField()))
 
-            components = (trigram_components | ilike_components).distinct("id")
+            components = (
+                (trigram_components | ilike_components)
+                .order_by("-similarity", "id")
+                .distinct("id")
+            )
 
         # Dynamically apply filters
         try:
