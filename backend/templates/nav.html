@@ -72,36 +72,80 @@
             </li>
 
             <!-- Resources Dropdown -->
-            <li class="relative group">
+            <li class="relative group/resources">
               <button
-                class="h-full px-2 text-white menu-button-hover nav-link"
+                class="flex items-center h-full gap-2 px-2 text-white menu-button-hover nav-link hover-dropdown-menu"
                 aria-expanded="false"
                 type="button"
               >
-                Resources
-              </button>
-              <div class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg hover-dropdown-menu">
-                <ul
-                  class="mt-2"
+                <span>Resources</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  fill="currentColor"
+                  class="transition-transform duration-200 group-hover/resources:rotate-180 bi bi-caret-down-fill dropdown-caret"
+                  viewBox="0 0 14 14"
                 >
+                  <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                </svg>
+              </button>
+              <div
+                class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg group-hover/resources:block"
+              >
+                <ul class="mt-2">
                   <li>
-                    <a href="{% url 'about' %}" class="block py-3 px-9 hover:bg-[#2c3237]">
+                    <a
+                      href="{% url 'about' %}"
+                      class="block py-3 px-9 hover:bg-[#2c3237]"
+                    >
                       About
                     </a>
                   </li>
                   <li>
-                    <a href="/community/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                    <a
+                      href="/community/"
+                      class="block py-3 px-9 hover:bg-[#2c3237]"
+                    >
                       Community
                     </a>
                   </li>
-                  <li>
-                    <a href="/tools/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                  <li class="relative group/tools">
+                    <button
+                      class="flex items-center w-full py-3 px-9 text-left hover:bg-[#2c3237]"
+                      type="button"
+                    >
                       Tools
-                    </a>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        fill="currentColor"
+                        class="ml-2 transition-transform duration-200 bi bi-caret-right-fill dropdown-caret"
+                        viewBox="0 0 14 14"
+                      >
+                        <path
+                          d="M5.86 1.051 11.543 7 5.86 12.949A.5.5 0 0 1 5 12.5V1.5a.5.5 0 0 1 .86-.449z"
+                        />
+                      </svg>
+                    </button>
+                    <!-- Submenu -->
+                    <ul
+                      class="absolute left-full top-0 hidden bg-[#2c3237] text-white rounded shadow-lg group-hover/tools:block ml-1"
+                    >
+                      <li>
+                        <a
+                          href="/tools/resistor-calculator/"
+                          class="block py-3 px-9 hover:bg-[#3a3f44]"
+                        >
+                          Resistor for LED Calculator
+                        </a>
+                      </li>
+                    </ul>
                   </li>
                 </ul>
               </div>
-            </li>
+            </li>            
           </ul>
           {% else %}
           <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[200px] h-16">
@@ -134,15 +178,25 @@
             </li>
 
             <!-- Resources Dropdown -->
-            <li class="relative group">
+            <li class="relative group/resources">
               <button
-                class="h-full px-2 text-white menu-button-hover nav-link"
+                class="flex items-center h-full gap-2 px-2 text-white align-middle nav-link"
                 aria-expanded="false"
                 type="button"
               >
-                Resources
+                <span>Resources</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  fill="currentColor"
+                  class="transition-transform duration-200 group-hover/resources:rotate-180 bi bi-caret-down-fill dropdown-caret"
+                  viewBox="0 0 14 14"
+                >
+                  <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                </svg>
               </button>
-              <div class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg hover-dropdown-menu">
+              <div class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg group-hover/resources:block">
                 <ul>
                   <li>
                     <a href="{% url 'about' %}" class="block py-3 px-9 hover:bg-[#2c3237]">
@@ -154,10 +208,36 @@
                       Community
                     </a>
                   </li>
-                  <li>
-                    <a href="/tools/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                  <li class="relative group/tools">
+                    <button
+                      class="flex items-center w-full py-3 px-9 text-left hover:bg-[#2c3237] hover-dropdown-menu"
+                      type="button"
+                    >
                       Tools
-                    </a>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        fill="currentColor"
+                        class="ml-2 transition-transform duration-200 bi bi-caret-right-fill dropdown-caret"
+                        viewBox="0 0 14 14"
+                      >
+                        <path d="M5.86 1.051 11.543 7 5.86 12.949A.5.5 0 0 1 5 12.5V1.5a.5.5 0 0 1 .86-.449z" />
+                      </svg>
+                    </button>
+                    <!-- Submenu -->
+                    <ul
+                      class="absolute left-full top-0 hidden bg-[#2c3237] text-white rounded shadow-lg group-hover/tools:block ml-1"
+                    >
+                      <li>
+                        <a
+                          href="/tools/resistor-calculator/"
+                          class="block py-3 px-6 hover:bg-[#3a3f44]"
+                        >
+                          Resistor for LED Calculator
+                        </a>
+                      </li>
+                    </ul>
                   </li>
                 </ul>
               </div>

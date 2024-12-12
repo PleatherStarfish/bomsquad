@@ -1,13 +1,13 @@
 {% load static custom_tags %}
 
 <a href="{% url 'home' %}" class="md:hidden">
-        <img
-                class="absolute top-2.5 left-[-20px]"
-                height="70px"
-                width="70px"
-                src="{% static 'images/logo_mini.png' %}"
-                alt="Bom Squad Logo"
-        />
+    <img
+        class="absolute top-2.5 left-[-20px]"
+        height="70px"
+        width="70px"
+        src="{% static 'images/logo_mini.png' %}"
+        alt="Bom Squad Logo"
+    />
 </a>
 
 <button
@@ -78,13 +78,6 @@
           </li>
           <li>
             <a
-              href="{% url 'about' %}"
-              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
-              >About</a
-            >
-          </li>
-          <li>
-            <a
               href="/projects/"
               class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
               >Projects</a
@@ -97,12 +90,53 @@
               >Components</a
             >
           </li>
-          <li>
-            <a
-              href="/community/"
-              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
-              >Community</a
+          <li class="relative">
+            <button
+              class="flex items-center w-full px-3 py-2 text-5xl font-medium text-left text-white hover:text-gray-300"
+              type="button"
+              id="resources-menu-button"
             >
+              Resources
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-6 h-6 ml-2 transition-transform duration-200 bi bi-caret-down-fill dropdown-caret"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a.5.5 0 0 1-.753.659L7.247 11.14z"
+                />
+              </svg>
+            </button>
+            <ul
+              id="resources-menu-panel"
+              class="hidden max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#2c3237] text-white rounded shadow-lg"
+            >
+              <li>
+                <a
+                  href="/about/"
+                  class="block px-6 py-2 text-4xl hover:bg-[#3a3f44]"
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/community/"
+                  class="block px-6 py-2 text-4xl hover:bg-[#3a3f44]"
+                >
+                  Community
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/tools/"
+                  class="block px-6 py-2 text-4xl hover:bg-[#3a3f44]"
+                >
+                  Tools
+                </a>
+              </li>
+            </ul>
           </li>
           {% if user.is_authenticated %} 
               {% dropdown_items user 'suppress_change_password' as dropdown_items %}
