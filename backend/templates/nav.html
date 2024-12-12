@@ -39,46 +39,128 @@
       <div
         class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start"
       >
-        <div class="hidden md:block">
+        <div class="hidden h-16 md:block">
           {% with request.path|slice:":5" as path %} 
           {% if path == '/user' %}
-          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[60px]">
+          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[60px] h-16">
             <li>
-              <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
-                ><i class="bi bi-house"></i></a
+              <button
+                onclick="window.location.href='{% url 'home' %}'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
               >
+                <i class="bi bi-house"></i>
+              </button>
             </li>
             <li>
-              <a href="{% url 'about' %}" class="px-2 nav-link">About</a>
+              <button
+                onclick="window.location.href='/projects/'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
+              >
+                <span>Projects</span>
+              </button>
             </li>
             <li>
-              <a href="/projects/" class="px-2 nav-link">Projects</a>
+              <button
+                onclick="window.location.href='/components/'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
+              >
+                <span>Components</span>
+              </button>
             </li>
-            <li>
-              <a href="/components/" class="px-2 nav-link">Components</a>
-            </li>
-            <li>
-              <a href="/community/" class="px-2 nav-link">Community</a>
+
+            <!-- Resources Dropdown -->
+            <li class="relative group">
+              <button
+                class="h-full px-2 text-white menu-button-hover nav-link"
+                aria-expanded="false"
+                type="button"
+              >
+                Resources
+              </button>
+              <div class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg hover-dropdown-menu">
+                <ul
+                  class="mt-2"
+                >
+                  <li>
+                    <a href="{% url 'about' %}" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      About
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/community/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      Community
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/tools/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      Tools
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
           {% else %}
-          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[200px]">
+          <ul class="flex space-x-3 text-white hover:text-gray-200 ml-[200px] h-16">
             <li>
-              <a href="{% url 'home' %}" class="px-2 nav-link text-secondary"
-                ><i class="bi bi-house"></i></a
+              <button
+                onclick="window.location.href='{% url 'home' %}'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
               >
+                <i class="bi bi-house"></i>
+              </button>
             </li>
             <li>
-              <a href="{% url 'about' %}" class="px-2 nav-link">About</a>
+              <button
+                onclick="window.location.href='/projects/'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
+              >
+                <span>Projects</span>
+              </button>
             </li>
             <li>
-              <a href="/projects/" class="px-2 nav-link">Projects</a>
+              <button
+                onclick="window.location.href='/components/'"
+                class="flex flex-col justify-center h-full px-2 nav-link text-secondary"
+                type="button"
+              >
+                <span>Components</span>
+              </button>
             </li>
-            <li>
-              <a href="/components/" class="px-2 nav-link">Components</a>
-            </li>
-            <li>
-              <a href="/community/" class="px-2 nav-link">Community</a>
+
+            <!-- Resources Dropdown -->
+            <li class="relative group">
+              <button
+                class="h-full px-2 text-white menu-button-hover nav-link"
+                aria-expanded="false"
+                type="button"
+              >
+                Resources
+              </button>
+              <div class="absolute left-0 hidden mt-0 text-white bg-[#212529] rounded-b shadow-lg hover-dropdown-menu">
+                <ul>
+                  <li>
+                    <a href="{% url 'about' %}" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      About
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/community/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      Community
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/tools/" class="block py-3 px-9 hover:bg-[#2c3237]">
+                      Tools
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
           {% endif %} 
@@ -95,7 +177,7 @@
                 {% dropdown_items user as dropdown_items %}
                 {% include "components/dropdown_menu.html" with button_text=user.email dropdown_items=dropdown_items %}                
             </div>
-        {% else %}
+          {% else %}
             <div class="flex items-center space-x-2">
                 <div class="flex items-center pr-4 space-x-4 border-r border-gray-100">
                     <a href="https://ko-fi.com/bomsquad">
@@ -131,7 +213,7 @@
                   >Sign up</a
                 >
             </div>
-        {% endif %}
+          {% endif %}
         </div>
       </div>
       {% include "components/mobile_hamburger_menu.html" %}

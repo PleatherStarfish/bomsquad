@@ -32,12 +32,16 @@ export interface UserNotes {
 }
 
 // UserShoppingList.ts
-export interface UserShoppingList extends BaseModel {
-  module?: Module | null;
-  bomItem?: BomItem | null;
+export interface UserShoppingList {
+  id: string;
+  module_name: string;
+  module: Module;
   component: Component;
-  user: CustomUser;
+  datetime_updated: string;
+  datetime_created: string;
   quantity: number;
+  bom_item: string;
+  user: number;
 }
 
 // UserShoppingListSaved.ts

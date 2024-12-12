@@ -16,7 +16,7 @@ import Notification from "../../ui/Notification";
 import useAddComponentToInventory from "../../services/useAddComponentToInventory";
 import useArchiveShoppingListMutation from "../../services/useArchiveUserSavedShoppingList";
 import useGetUserShoppingList from "../../services/useGetUserShoppingList";
-import { GroupedByModule } from "../../types/shoppingList";
+import { UserShoppingList } from "../../types/shoppingList";
 
 const ShoppingList: React.FC = () => {
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
@@ -134,13 +134,15 @@ const ShoppingList: React.FC = () => {
             ].map((value, index) => {
               const moduleSlug = Object.values(value.data)?.[0]?.[0]?.module?.slug;
               const moduleId = Object.values(value.data)?.[0]?.[0]?.module?.id;
+              const componentsInModule = Array.isArray(value.data) ? {} : (value.data as Record<string, UserShoppingList[]>);
               return (
                 <ListSlice
                   aggregatedComponents={
-                    userShoppingListData.aggregatedComponents
+                    userShoppingListData?.aggregatedComponents
                   }
-                  allModulesData={userShoppingListData.groupedByModule as GroupedByModule[]}
+                  allModulesData={userShoppingListData.groupedByModule}
                   componentsAreLoading={userShoppingListIsLoading}
+                  componentsInModule={componentsInModule}
                   index={index}
                   key={value.name}
                   moduleId={moduleId}

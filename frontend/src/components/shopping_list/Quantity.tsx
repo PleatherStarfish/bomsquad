@@ -1,15 +1,12 @@
 import React from "react";
 import { get } from "lodash";
-
-interface Component {
-  quantity: number;
-}
+import { AggregatedComponent } from "../../types/shoppingList"
 
 interface QuantityProps {
   componentId: string;
-  componentsInModule?: Record<string, Component[]>;
-  pencilComponent?: React.ReactNode;
+  componentsInModule?: Record<string, AggregatedComponent[]> | undefined;
   hideInteraction?: boolean;
+  pencilComponent?: React.ReactNode;
 }
 
 const Quantity: React.FC<QuantityProps> = ({

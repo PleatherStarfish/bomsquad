@@ -79,6 +79,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(components_options);
   const { data: currencyData } = useGetUserCurrency();
+  console.log(componentsData)
 
   // Ah yes, another bizarre useEffect hack to get around the quirks of react-data-table-component...
   useEffect(() => {

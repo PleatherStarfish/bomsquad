@@ -1,33 +1,31 @@
 import {
-  AggregatedComponent,
   GroupedByModule,
   UserShoppingList
 } from "../../types/shoppingList";
+import { AggregatedComponent } from "../../types/shoppingList"
 import {
   ArrowPathIcon,
-  LinkIcon,
   PencilSquareIcon,
   PlusIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
-import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useState } from "react";
+import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
 
 import AddOneModal from "./addOneModal";
 import Button from "../../ui/Button";
-import { Helmet } from "react-helmet-async";
-import ListPriceSum from "./ListPriceSum"
+import DataTable, { TableColumn } from "react-data-table-component";
+import { Helmet } from "react-helmet";
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
-import Quantity from "./Quantity";
-import TotalPriceForComponent from "./TotalPriceForComponent"
-import TotalQuantity from "./TotalQuantity";
-import convertUnitPrice from "../../utils/convertUnitPrice"
 import cx from "classnames";
-import { get } from "lodash";
-import useDeleteModuleFromShoppingList from "../../services/useDeleteModuleFromShoppingList";
-import useGetUserCurrency from "../../services/useGetUserCurrency"
+import { get, find } from "lodash";
+import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
+import TotalPriceForComponent from "./TotalPriceForComponent"
+import Quantity from "./Quantity"
+import TotalQuantity from "./TotalQuantity"
+import ListPriceSum from "./ListPriceSum"
 
 interface ListSliceProps {
   name: string;
@@ -35,7 +33,7 @@ interface ListSliceProps {
   slug?: string;
   moduleId?: string;
   allModulesData: GroupedByModule[];
-  componentsInModule?: Record<string, AggregatedComponent[]>;
+  componentsInModule: Record<string, UserShoppingList[]> | [];
   aggregatedComponents: UserShoppingList[];
   componentsAreLoading: boolean;
   hideInteraction?: boolean;
@@ -43,10 +41,12 @@ interface ListSliceProps {
   displayTotals?: boolean;
 }
 
-const getBaseUrl = () => {
-  const { protocol, hostname, port } = window.location;
-  return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
-};
+type AggregatedRow = UserShoppingList & { placeholder: true };
+
+type GetColumnsBasedOnIndex = (
+  index: number,
+  allModulesData: { length: number }
+) => TableColumn<AggregatedRow>[];
 
 const ListSlice: React.FC<ListSliceProps> = ({
   name,
@@ -54,7 +54,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
   slug,
   moduleId,
   allModulesData,
-  componentsInModule = [],
+  componentsInModule,
   aggregatedComponents,
   componentsAreLoading,
   hideInteraction = false,
@@ -62,113 +62,144 @@ const ListSlice: React.FC<ListSliceProps> = ({
   displayTotals = true
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState<string | undefined>();
-  const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState<number | undefined>();
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState<{
-    moduleId?: string;
-    moduleName: string;
-  } | null>(null);
-  const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<AggregatedComponent | null>(null);
+const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState<number | undefined>();
+const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState<{
+  moduleId?: string;
+  moduleName: string;
+} | undefined>();
+const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<UserShoppingList | null>(null);
   
   const updateShoppingListMutate = useUpdateShoppingList();
-  const deleteMutation = useDeleteModuleFromShoppingList();
-  const { data: currencyData } = useGetUserCurrency();
+  const deleteMutation = useDeleteShoppingListItem();
 
   const bgStyles = `
-  .rdt_TableHeadRow { background-color: ${backgroundColor}; }
-  .rdt_TableRow { background-color: ${backgroundColor}; }
-  .rdt_Pagination { background-color: ${backgroundColor}; }
-`;
+    .rdt_TableHeadRow { background-color: ${backgroundColor}; }
+    .rdt_TableRow { background-color: ${backgroundColor}; }
+    .rdt_Pagination { background-color: ${backgroundColor}; }
+  `;
 
   useEffect(() => {
     if (deleteMutation.isSuccess) {
       setDeleteModalOpen(false);
-      setDeleteModalModuleDetails(null);
+      setDeleteModalModuleDetails(undefined);
     } else if (deleteMutation.isError) {
       setDeleteModalOpen(false);
     }
   }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
-  const handleQuantityChange = (value: number) => {
-    setUpdatedQuantityToSubmit(value);
+  const handleQuantityChange = (value: number | null) => {
+    if (value !== null) {
+      setUpdatedQuantityToSubmit(value);
+    }
   };
 
   const handleSubmitQuantity = (componentId: string, moduleId?: string) => {
     const quantity = updatedQuantityToSubmit;
-    const moduleBomListItem = get(
-      allModulesData.find((module) => module.moduleId === moduleId),
-      `data.${componentId}[0].bom_item`
-    );
+    const moduleData = find(allModulesData, { moduleId });
+  
+    if (!moduleData || !moduleData.data[componentId]) {
+      console.error(`Module data or component data not found for componentId: ${componentId}`);
+      return;
+    }
+  
+    const modulebomlistitem = moduleData.data[componentId][0]?.bom_item;
+    console.log(moduleData.data[componentId][0])
+  
     const data = {
-      module_pk: moduleId,
-      modulebomlistitem_pk: moduleBomListItem,
+      module_pk: moduleId ?? undefined,
+      modulebomlistitem_pk: modulebomlistitem,
       quantity,
     };
+  
     updateShoppingListMutate({ componentPk: componentId, ...data });
     setQuantityIdToEdit(undefined);
     setUpdatedQuantityToSubmit(undefined);
   };
 
-  const labelColumns: TableColumn<UserShoppingList>[] = [
+  const labelColumns: TableColumn<AggregatedRow>[] = [
     {
       cell: (row) => (
-        <div
-          className={cx("h-[47px] overflow-scroll", {
+        <span
+          className={cx({
             "text-black": index !== 0,
             "text-gray-300": index === 0,
           })}
         >
-          <a className="text-blue-500 hover:text-blue-700" href={`${getBaseUrl()}/components/${row.component.id}`}>{row.component.description}</a>
-        </div>
+          {row.component.description}
+        </span>
       ),
       name: <div className="font-bold text-gray-400">Description</div>,
       sortable: false,
       wrap: false,
     },
     {
-      cell: (row) =>
-        (row.component.supplier_items || []).length > 0 ? (
-          <ul className="pl-5 list-disc h-[47px] overflow-scroll">
-            {row.component.supplier_items?.map((item) => (
-              <li key={item.id}>
-                <b>{item.supplier?.short_name}: </b>
-                {item.supplier_item_no ? (
-                  <a
-                    className="text-blue-500 hover:text-blue-700"
-                    href={item.link}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {item.supplier_item_no}
-                  </a>
-                ) : (
-                  <a
-                    className="flex items-center text-blue-500 hover:text-blue-700"
-                    href={item.link}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    <LinkIcon className="inline-block w-4 h-4" />
-                  </a>
-                )}
-                {item.unit_price && (
-                  <span className="text-xs text-gray-600">
-                    {" "}
-                    ({convertUnitPrice(item.unit_price, currencyData)})
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          "No supplier items"
-        ),
-      name: "Suppliers",
+      cell: (row) => (
+        <span
+          className={cx({
+            "text-black": index !== 0,
+            "text-gray-300": index === 0,
+          })}
+        >
+          {row.component?.supplier?.short_name}
+        </span>
+      ),
+      name: <div className="font-bold text-gray-400">Supplier</div>,
       sortable: false,
+      wrap: false,
+    },
+    {
+      cell: (row) => (
+        <a
+          className={cx({
+            "text-blue-400 hover:text-blue-600": index === 0,
+            "text-blue-500 hover:text-blue-700": index !== 0,
+          })}
+          href={row.component.link}
+        >
+          {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
+        </a>
+      ),
+      name: <div className="font-bold text-gray-400">Supp. Item #</div>,
+      sortable: false,
+      wrap: false,
+    },
+    {
+      cell: (row) => {
+        return (
+          <span className="text-gray-300">{`${getCurrencySymbol(
+            row.component.price?.currency
+          )}${roundToCurrency(
+            row.component.unit_price,
+            row.component.price?.currency
+          )}`}</span>
+        );
+      },
+      name: <div className="font-bold text-gray-400">Price</div>,
     }
   ];
 
-  const qtyColumns = [
+  const normalizedComponentsInModule: Record<string, AggregatedComponent[]> | undefined =
+  componentsInModule && !Array.isArray(componentsInModule)
+    ? Object.fromEntries(
+        Object.entries(componentsInModule).map(([key, value]) => [
+          key,
+          value.map((item) => ({
+            bom_item: item.bom_item,
+            component: item.component, 
+            datetime_created: item.datetime_created,
+            datetime_updated: item.datetime_updated,
+            id: item.id,
+            module: item.module?.name || null,
+            module_name: item.module_name,
+            quantity: item.quantity,
+            user: item.user,
+          })),
+        ])
+      )
+    : undefined;
+
+  const qtyColumns: TableColumn<AggregatedRow>[] = [
     {
       cell: (row) => {
         const compsForModuleThatMatchRow = get(
@@ -226,6 +257,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
             ) : (
               <Quantity
                 componentId={row.component.id}
+                componentsInModule={normalizedComponentsInModule}
                 hideInteraction={hideInteraction}
                 pencilComponent={
                   row.component.id !== quantityIdToEdit && (
@@ -298,10 +330,9 @@ const ListSlice: React.FC<ListSliceProps> = ({
     },
   ];
 
-  const totalColumn = [
+  const totalColumn: TableColumn<AggregatedRow>[] = [
     {
-      name: <div className="text-bold">TOTAL QUANTITY</div>,
-      selector: (row) => {
+      cell: (row) => {
         return !row?.placeholder ? (
           <TotalQuantity
             componentId={row?.component?.id}
@@ -311,6 +342,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
           <span className="text-lg font-bold">TOTAL:</span>
         );
       },
+      name: <div className="text-bold">TOTAL QUANTITY</div>,
       sortable: false,
       style: { backgroundColor: "#f0f9ff" },
       width: "100px",
@@ -323,6 +355,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
         return !row?.placeholder ? (
           <TotalPriceForComponent
             componentId={row?.component?.id}
+            currency={row?.component?.price_currency}
           />
         ) : (
           <ListPriceSum currency="USD" />
@@ -331,14 +364,14 @@ const ListSlice: React.FC<ListSliceProps> = ({
       name: <div className="text-bold">TOTAL PRICE</div>,
       sortable: false,
       style: { backgroundColor: "#f0f9ff" },
-      width: "140px",
+      width: "100px",
     },
   ];
 
-  const stateColumn = [
+  const stateColumn: TableColumn<AggregatedRow>[] = [
     {
       cell: (row) => {
-        return (!row?.placeholder ? <Button Icon={PlusIcon} iconOnly onClick={() => setAddOneToInventoryModalOpen(row?.component)} size="xs" tooltipText={"Add to inventory"} variant="primary" /> : undefined);
+        return (!row?.placeholder ? <Button Icon={PlusIcon} iconOnly onClick={() => setAddOneToInventoryModalOpen(row)} size="xs" tooltipText={"Add to inventory"} variant="primary" /> : undefined);
       },
       name: <></>,
       sortable: false,
@@ -346,24 +379,24 @@ const ListSlice: React.FC<ListSliceProps> = ({
     },
   ];
 
-  const getColumnsBasedOnIndex = (index, allModulesData) => {
+  const getColumnsBasedOnIndex: GetColumnsBasedOnIndex = (index, allModulesData) => {
     switch (index) {
       case 0:
-        return labelColumns;
-        
+        return labelColumns as TableColumn<AggregatedRow>[];
+  
       case allModulesData.length + 1:
-        return totalColumn;
-        
+        return totalColumn as TableColumn<AggregatedRow>[];
+  
       case allModulesData.length + 2:
-        return priceColumn;
-
-        case allModulesData.length + 3:
-          return stateColumn;
-        
+        return priceColumn as TableColumn<AggregatedRow>[];
+  
+      case allModulesData.length + 3:
+        return stateColumn as TableColumn<AggregatedRow>[];
+  
       default:
-        return qtyColumns;
+        return qtyColumns as TableColumn<AggregatedRow>[];
     }
-  }
+  };
 
   const getColumnsBasedOnIndexHideTotals = (index) => {
     switch (index) {
@@ -389,7 +422,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
   } else if (quantityIdToEdit) {
       widthClass = "w-[200px]";
   } else {
-      widthClass = "w-[140px]";
+      widthClass = "w-[100px]";
   }
 
   return (
@@ -402,11 +435,12 @@ const ListSlice: React.FC<ListSliceProps> = ({
       >
         <div className={cx({ "border-r border-gray-300": index === 0 })} id={(index == allModulesData.length + 3) ? "shopping-list-slice-state-table" : undefined}>
           <DataTable
-            columns={
-              displayTotals
-                ? (getColumnsBasedOnIndex(index, allModulesData) as TableColumn<AggregatedComponent | { placeholder: boolean }>[] )
-                : (getColumnsBasedOnIndexHideTotals(index) as TableColumn<AggregatedComponent | { placeholder: boolean }>[] )
+            // @ts-ignore
+            columns={displayTotals 
+              ? getColumnsBasedOnIndex(index, allModulesData) 
+              : getColumnsBasedOnIndexHideTotals(index)
             }
+            compact
             conditionalRowStyles={index == allModulesData.length + 3 ? tableRowsNoLines : undefined}
             data={
               !(index > allModulesData.length)

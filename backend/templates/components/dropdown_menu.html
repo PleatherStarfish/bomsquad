@@ -10,7 +10,7 @@
       />
     </a>
   </div>
-  <div class="relative pr-2 border-r border-gray-100">
+  <div class="relative pr-2">
     <select
       id="currency-selector"
       class="px-3 py-2 text-white bg-[#212529] transition-all border-0 w-[75px] outline-none"
@@ -24,7 +24,7 @@
     </span>
   </div>
   <button
-    class="block pl-2 ml-4 text-white menu-button text-decoration-none focus:outline-none"
+    class="block pl-2 ml-4 text-white menu-button-click text-decoration-none focus:outline-none"
     aria-label="User menu"
     aria-haspopup="true"
     aria-expanded="false"
@@ -32,17 +32,16 @@
     {{ button_text }}
   </button>
   <div
-    class="absolute right-0 z-30 hidden w-48 py-2 mt-2 rounded-md shadow-md top-full bg-gray-50"
+    class="absolute right-0 z-30 hidden w-52 py-2 mt-2 rounded-md shadow-md top-full bg-[#212529]"
   >
-    <ul class="text-sm text-gray-700">
+    <ul class="text-white">
       {% for item in dropdown_items %}
       <li>
-        <a class="block px-4 py-2 hover:bg-gray-100" href="{{ item.url }}"
+        <a class="block px-4 py-2 hover:hover:bg-[#2c3237]" href="{{ item.url }}"
           >{{ item.name }}</a
         >
       </li>
       {% if not forloop.last %}
-      <hr class="dropdown-divider" />
       {% endif %} {% endfor %}
     </ul>
   </div>
