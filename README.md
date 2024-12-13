@@ -2,7 +2,7 @@
 
 # BOM Squad: An Inventory & Component Aggregator for DIY Audio Hardware Builders
 
-Welcome to **BOM Squad**, a tool designed to simplify the process of building DIY audio hardware. BOM Squad helps users explore project, manage their component inventory, and streamline the sourcing and assembly process.
+Welcome to **BOM Squad**, a tool designed to make building cool synthesizers and other audio gear less intimidating. Along the way we can help you manage your component inventory and streamline the sourcing and assembly process.
 
 ## Live Site
 
