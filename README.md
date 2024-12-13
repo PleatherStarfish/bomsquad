@@ -20,7 +20,7 @@ Access the latest live version of BOM Squad, complete with ongoing updates, at [
 ## Tech Stack
 
 -   **Backend**: Django, PostgreSQL, Docker
--   **Frontend**: React bundled via Webpack, integrated within the Django project
+-   **Frontend**: React, TypeScript, Webpack, React Query, React Hook Form
 -   **Deployment**: Configured for DigitalOcean with Nginx, AWS S3 for static/media file storage
 -   **Continuous Integration**: GitHub Actions for CI/CD
 
