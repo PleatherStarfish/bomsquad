@@ -1,4 +1,4 @@
-![logo_md_alpha](https://github.com/user-attachments/assets/e6a9be1a-cbba-4c33-b689-d10e00f9abf6)
+![logo_md_alpha](https://github.com/user-attachments/assets/4976258a-5f92-4dbe-8411-601bab062279)
 
 
 # BOM Tech: An Inventory & Component Aggregator for DIY Audio Hardware Builders
