@@ -501,7 +501,6 @@ def get_user_shopping_list_total_price(request):
     This GET endpoint calculates:
     - total_min_price: The cheapest total cost for the shopping cart.
     - total_max_price: The most expensive total cost for the shopping cart.
-    - total_price (deprecated): The total cost using the `unit_price` field of `Component`.
     """
 
     # Get all shopping list items for the user
@@ -528,15 +527,14 @@ def get_user_shopping_list_total_price(request):
             {
                 "total_min_price": Decimal("0.00"),
                 "total_max_price": Decimal("0.00"),
-                "total_price": Decimal("0.00"),
             },
             status=status.HTTP_200_OK,
         )
 
-    # Aggregate min and max unit prices for each component
+    # Aggregate min and max prices for each component
     supplier_prices = supplier_items.values("component").annotate(
-        min_price=Min("unit_price"),
-        max_price=Max("unit_price"),
+        min_price=Min("price"),  # Adjust field name if necessary
+        max_price=Max("price"),  # Adjust field name if necessary
     )
 
     # Build a dictionary for quick lookup
@@ -562,11 +560,6 @@ def get_user_shopping_list_total_price(request):
         total_min_price += Decimal(min_price) * total_quantity
         total_max_price += Decimal(max_price) * total_quantity
 
-    # Deprecated price calculation using `unit_price` from the `Component`
-    deprecated_total_price = shopping_list_items.aggregate(
-        total_price=Sum(F("quantity") * F("component__unit_price"))
-    )["total_price"] or Decimal("0.00")
-
     # Return the response
     response_data = {
         "total_min_price": total_min_price.quantize(
@@ -575,7 +568,6 @@ def get_user_shopping_list_total_price(request):
         "total_max_price": total_max_price.quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         ),
-        "total_price": deprecated_total_price or Decimal("0.00"),  # Deprecated
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
@@ -589,7 +581,6 @@ def get_user_shopping_list_total_component_price(request, component_pk):
     This GET endpoint calculates:
     - total_min_price: The cheapest total cost for a specific component in the shopping list.
     - total_max_price: The most expensive total cost for the specific component.
-    - total_price (deprecated): The total cost using the `unit_price` field of the `Component`.
     """
     try:
         # Fetch the component by primary key
@@ -618,15 +609,14 @@ def get_user_shopping_list_total_component_price(request, component_pk):
             {
                 "total_min_price": Decimal("0.00"),
                 "total_max_price": Decimal("0.00"),
-                "total_price": Decimal("0.00"),
             },
             status=status.HTTP_200_OK,
         )
 
-    # Calculate min and max unit prices
+    # Calculate min and max unit prices from supplier items
     supplier_prices = supplier_items.aggregate(
-        min_unit_price=Min("unit_price"),
-        max_unit_price=Max("unit_price"),
+        min_unit_price=Min("price"),  # Adjust field as necessary
+        max_unit_price=Max("price"),  # Adjust field as necessary
     )
 
     min_unit_price = supplier_prices["min_unit_price"] or Decimal("0.00")
@@ -645,18 +635,10 @@ def get_user_shopping_list_total_component_price(request, component_pk):
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
 
-    # Deprecated price calculation using the component's unit_price
-    deprecated_total_price = shopping_list_items.aggregate(
-        total_price=Sum(F("quantity") * F("component__unit_price"))
-    )["total_price"] or Decimal("0.00")
-
     # Construct response
     response_data = {
         "total_min_price": total_min_price,
         "total_max_price": total_max_price,
-        "total_price": deprecated_total_price.quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        ),
     }
 
     return Response(response_data, status=status.HTTP_200_OK)

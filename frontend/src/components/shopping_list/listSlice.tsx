@@ -2,6 +2,7 @@ import {
   GroupedByModule,
   UserShoppingList
 } from "../../types/shoppingList";
+import { LinkIcon } from "@heroicons/react/24/outline";
 import { AggregatedComponent } from "../../types/shoppingList"
 import {
   ArrowPathIcon,
@@ -10,7 +11,7 @@ import {
   XMarkIcon
 } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
-import getCurrencySymbol, { roundToCurrency } from "../../utils/currencies";
+import { roundToCurrency } from "../../utils/currencies";
 
 import AddOneModal from "./addOneModal";
 import Button from "../../ui/Button";
@@ -26,6 +27,7 @@ import TotalPriceForComponent from "./TotalPriceForComponent"
 import Quantity from "./Quantity"
 import TotalQuantity from "./TotalQuantity"
 import ListPriceSum from "./ListPriceSum"
+import useGetUserCurrency from "../../services/useGetUserCurrency";
 
 interface ListSliceProps {
   name: string;
@@ -39,6 +41,8 @@ interface ListSliceProps {
   hideInteraction?: boolean;
   backgroundColor?: string;
   displayTotals?: boolean;
+  rowHeights: Record<string, number>
+  rowRefs: any
 }
 
 type AggregatedRow = UserShoppingList & { placeholder: true };
@@ -59,19 +63,32 @@ const ListSlice: React.FC<ListSliceProps> = ({
   componentsAreLoading,
   hideInteraction = false,
   backgroundColor = "bg-white",
-  displayTotals = true
+  displayTotals = true,
+  rowHeights,
+  rowRefs,
 }) => {
   const [quantityIdToEdit, setQuantityIdToEdit] = useState<string | undefined>();
-const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState<number | undefined>();
-const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState<{
-  moduleId?: string;
-  moduleName: string;
-} | undefined>();
-const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<UserShoppingList | null>(null);
+  const [updatedQuantityToSubmit, setUpdatedQuantityToSubmit] = useState<number | undefined>();
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [deleteModalModuleDetails, setDeleteModalModuleDetails] = useState<{
+    moduleId?: string;
+    moduleName: string;
+  } | undefined>();
+  const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<UserShoppingList | null>(null);
   
   const updateShoppingListMutate = useUpdateShoppingList();
   const deleteMutation = useDeleteShoppingListItem();
+  const { data: currencyData } = useGetUserCurrency();
+
+  const convertUnitPrice = (unitPrice: number | null): string => {
+    if (!currencyData || unitPrice === null || unitPrice === undefined)
+      return "N/A";
+    const converted = unitPrice * currencyData.exchange_rate;
+    return `${currencyData.currency_symbol}${roundToCurrency(
+      converted,
+      currencyData.default_currency
+    )}`;
+  };
 
   const bgStyles = `
     .rdt_TableHeadRow { background-color: ${backgroundColor}; }
@@ -87,6 +104,10 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
       setDeleteModalOpen(false);
     }
   }, [deleteMutation.isSuccess, deleteMutation.isError]);
+
+  const getRowStyle = (componentId: string): React.CSSProperties => {
+    return rowHeights[componentId] ? { height: `${rowHeights[componentId]}px` } : {};
+  };
 
   const handleQuantityChange = (value: number | null) => {
     if (value !== null) {
@@ -141,42 +162,57 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
             "text-gray-300": index === 0,
           })}
         >
-          {row.component?.supplier?.short_name}
+          {row.component?.qualities}
         </span>
       ),
-      name: <div className="font-bold text-gray-400">Supplier</div>,
+      name: <div className="font-bold text-gray-400">Qualities</div>,
       sortable: false,
       wrap: false,
     },
     {
       cell: (row) => (
-        <a
-          className={cx({
-            "text-blue-400 hover:text-blue-600": index === 0,
-            "text-blue-500 hover:text-blue-700": index !== 0,
-          })}
-          href={row.component.link}
-        >
-          {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
-        </a>
+        <div className="h-full" data-row-id={row.component.id} ref={(el) => (rowRefs.current[row.component.id] = el)}>
+          {(row.component.supplier_items || []).length > 0 ? (
+            <ul className="pl-5 list-disc">
+              {row.component.supplier_items?.map((item) => (
+                <li key={item.id}>
+                  <b>{item.supplier?.short_name}: </b>
+                  {item.supplier_item_no ? (
+                    <a
+                      className="text-blue-500 hover:text-blue-700"
+                      href={item.link}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {item.supplier_item_no}
+                    </a>
+                  ) : (
+                    <a
+                      className="text-blue-500 hover:text-blue-700"
+                      href={item.link}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      <LinkIcon className="inline-block w-4 h-4" />
+                    </a>
+                  )}
+                  {item.unit_price && (
+                    <span className="text-xs text-gray-600">
+                      {" "}
+                      ({convertUnitPrice(item.unit_price)})
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            "No supplier items"
+          )}
+        </div>
       ),
-      name: <div className="font-bold text-gray-400">Supp. Item #</div>,
+      name: "Suppliers",
       sortable: false,
-      wrap: false,
     },
-    {
-      cell: (row) => {
-        return (
-          <span className="text-gray-300">{`${getCurrencySymbol(
-            row.component.price?.currency
-          )}${roundToCurrency(
-            row.component.unit_price,
-            row.component.price?.currency
-          )}`}</span>
-        );
-      },
-      name: <div className="font-bold text-gray-400">Price</div>,
-    }
   ];
 
   const normalizedComponentsInModule: Record<string, AggregatedComponent[]> | undefined =
@@ -212,68 +248,70 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
           0
         );
         return (
-          <div className="flex content-center justify-between w-full">
-            {row.component.id === quantityIdToEdit ? (
-              <div>
-                <form
-                  className="flex content-center w-full gap-1"
-                  onSubmit={(e) => e.preventDefault()}
-                >
-                  <NumericInput
-                    className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
-                    onChange={(e) => handleQuantityChange(e)}
-                    type="number"
-                    value={updatedQuantityToSubmit ?? totalQuantity}
-                  />
-                  <div className="flex justify-around gap-1">
-                    <Button
-                      classNames="h-full"
-                      Icon={XMarkIcon}
-                      iconOnly
-                      onClick={() => {
-                        setQuantityIdToEdit(undefined);
-                        setUpdatedQuantityToSubmit(undefined);
-                      }}
-                      size="xs"
-                      variant="muted"
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      classNames="h-full"
-                      Icon={ArrowPathIcon}
-                      iconOnly
-                      onClick={() => {
-                        handleSubmitQuantity(row.component.id, moduleId);
-                      }}
-                      size="xs"
-                      variant="primary"
-                    >
-                      Update
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <Quantity
-                componentId={row.component.id}
-                componentsInModule={normalizedComponentsInModule}
-                hideInteraction={hideInteraction}
-                pencilComponent={
-                  row.component.id !== quantityIdToEdit && (
-                    <div
-                      onClick={() => {
-                        setQuantityIdToEdit(row.component.id);
-                        setUpdatedQuantityToSubmit(totalQuantity);
-                      }}
-                      role="button"
-                    >
-                      <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
+          <div className="flex flex-col justify-center h-full" style={getRowStyle(row.component.id)}>
+            <div className="flex content-center justify-between w-full">
+              {row.component.id === quantityIdToEdit ? (
+                <div>
+                  <form
+                    className="flex content-center w-full gap-1"
+                    onSubmit={(e) => e.preventDefault()}
+                  >
+                    <NumericInput
+                      className="block w-16 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brandgreen-600 sm:text-sm sm:leading-6"
+                      onChange={(e) => handleQuantityChange(e)}
+                      type="number"
+                      value={updatedQuantityToSubmit ?? totalQuantity}
+                    />
+                    <div className="flex justify-around gap-1">
+                      <Button
+                        classNames="h-full"
+                        Icon={XMarkIcon}
+                        iconOnly
+                        onClick={() => {
+                          setQuantityIdToEdit(undefined);
+                          setUpdatedQuantityToSubmit(undefined);
+                        }}
+                        size="xs"
+                        variant="muted"
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        classNames="h-full"
+                        Icon={ArrowPathIcon}
+                        iconOnly
+                        onClick={() => {
+                          handleSubmitQuantity(row.component.id, moduleId);
+                        }}
+                        size="xs"
+                        variant="primary"
+                      >
+                        Update
+                      </Button>
                     </div>
-                  )
-                }
-              />
-            )}
+                  </form>
+                </div>
+              ) : (
+                <Quantity
+                  componentId={row.component.id}
+                  componentsInModule={normalizedComponentsInModule}
+                  hideInteraction={hideInteraction}
+                  pencilComponent={
+                    row.component.id !== quantityIdToEdit && (
+                      <div
+                        onClick={() => {
+                          setQuantityIdToEdit(row.component.id);
+                          setUpdatedQuantityToSubmit(totalQuantity);
+                        }}
+                        role="button"
+                      >
+                        <PencilSquareIcon className="w-4 h-4 stroke-slate-300 hover:stroke-pink-500" />
+                      </div>
+                    )
+                  }
+                />
+              )}
+            </div>
           </div>
         );
       },
@@ -334,12 +372,16 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
     {
       cell: (row) => {
         return !row?.placeholder ? (
-          <TotalQuantity
-            componentId={row?.component?.id}
-            // setIdToTotalQuantityLookup={setIdToTotalQuantityLookup}
-          />
+          <div className="flex flex-col justify-center h-full" style={getRowStyle(row?.component?.id)}>
+            <TotalQuantity
+              componentId={row?.component?.id}
+              // setIdToTotalQuantityLookup={setIdToTotalQuantityLookup}
+            />
+          </div>
         ) : (
-          <span className="text-lg font-bold">TOTAL:</span>
+          <div className="flex flex-col justify-center h-full" style={getRowStyle(row?.component?.id)}>
+            <span className="text-lg font-bold">TOTAL:</span>
+          </div>
         );
       },
       name: <div className="text-bold">TOTAL QUANTITY</div>,
@@ -353,12 +395,16 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
     {
       cell: (row) => {
         return !row?.placeholder ? (
-          <TotalPriceForComponent
-            componentId={row?.component?.id}
-            currency={row?.component?.price_currency}
-          />
+          <div className="flex flex-col justify-center h-full" style={getRowStyle(row?.component?.id)}>
+            <TotalPriceForComponent
+              componentId={row?.component?.id}
+              currency={row?.component?.price_currency}
+            />
+          </div>
         ) : (
-          <ListPriceSum currency="USD" />
+          <div className="flex flex-col justify-center h-full" style={getRowStyle(row?.component?.id)}>
+            <ListPriceSum currency="USD" />
+          </div>
         );
       },
       name: <div className="text-bold">TOTAL PRICE</div>,
@@ -371,7 +417,11 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
   const stateColumn: TableColumn<AggregatedRow>[] = [
     {
       cell: (row) => {
-        return (!row?.placeholder ? <Button Icon={PlusIcon} iconOnly onClick={() => setAddOneToInventoryModalOpen(row)} size="xs" tooltipText={"Add to inventory"} variant="primary" /> : undefined);
+        return (
+          row?.component?.id ? <div className="flex flex-col justify-center h-full" style={getRowStyle(row.component.id)}>
+            {!row?.placeholder ? <Button Icon={PlusIcon} iconOnly onClick={() => setAddOneToInventoryModalOpen(row)} size="sm" tooltipText={"Add to inventory"} variant="primary" /> : <></>}
+          </div> : undefined
+        );
       },
       name: <></>,
       sortable: false,
@@ -447,6 +497,7 @@ const [addOneToInventoryModalOpen, setAddOneToInventoryModalOpen] = useState<Use
                 ? aggregatedComponents
                 : [...aggregatedComponents, { placeholder: true }]
             }
+            key={JSON.stringify(rowHeights)}
             noHeader
             progressComponent={
               <div className="flex justify-center w-full p-6 bg-sky-50">

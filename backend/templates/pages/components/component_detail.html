@@ -102,11 +102,11 @@
         </tr>
         {% endif %}
     
-        {% if component.link %}
+        {% if component.octopart_url %}
         <tr class="border-b">
-          <td class="px-4 py-2 font-bold">Link</td>
+          <td class="px-4 py-2 font-bold">Octopart Link</td>
           <td class="px-4 py-2">
-            <a href="{{ component.link }}" class="text-blue-500 hover:underline">More Info</a>
+            <a href="{{ component.octopart_url }}" class="text-blue-500 hover:underline">More Info</a>
           </td>
         </tr>
         {% endif %}

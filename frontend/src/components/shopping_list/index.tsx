@@ -3,7 +3,7 @@ import {
   FolderPlusIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 
@@ -28,6 +28,8 @@ const ShoppingList: React.FC = () => {
   const [saveListClicked, setSaveListClicked] = useState<boolean>(false);
   const [mouserToolModalOpen, setMouserToolModalOpen] = useState<boolean>(false);
   const [notes, setNotes] = useState<string>("");
+  const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const {
     userShoppingListData,
@@ -57,6 +59,54 @@ const ShoppingList: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [saveListClicked]);
+
+  const calculateFullHeight = (element: HTMLElement): number => {
+      if (!element.offsetParent) {
+        console.warn("Element is not visible:", element);
+        return 0; // Return 0 for hidden or non-rendered elements
+      }
+      const rect = element.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(element);
+    
+      const marginTop = parseFloat(computedStyle.marginTop) || 0;
+      const marginBottom = parseFloat(computedStyle.marginBottom) || 0;
+      const borderTop = parseFloat(computedStyle.borderTopWidth) || 0;
+      const borderBottom = parseFloat(computedStyle.borderBottomWidth) || 0;
+    
+      return rect.height + marginTop + marginBottom + borderTop + borderBottom;
+    };
+  
+    useEffect(() => {
+      const resizeObserver = new ResizeObserver((entries) => {
+        const newHeights: Record<string, number> = {};
+      
+        entries.forEach((entry) => {
+          const rowId = entry.target.getAttribute("data-row-id");
+          if (rowId && entry.target instanceof HTMLElement) {
+            const height = calculateFullHeight(entry.target);
+            if (height > 0) {
+              newHeights[rowId] = height; // Only include valid heights
+            }
+          }
+        });
+      
+        if (Object.keys(newHeights).length > 0) {
+          setRowHeights((prev) => ({ ...prev, ...newHeights }));
+        }
+      });
+    
+      const observeRows = () => {
+        Object.entries(rowRefs.current).forEach(([_, ref]) => {
+          if (ref) resizeObserver.observe(ref);
+        });
+      };
+    
+      // Delay to ensure elements are rendered
+      requestAnimationFrame(observeRows);
+    
+      return () => resizeObserver.disconnect();
+    
+    }, [userShoppingListData?.aggregatedComponents, rowRefs, calculateFullHeight]);
 
   const copyMouserDataToClipboard = () => {
     let copyString = "";
@@ -147,6 +197,8 @@ const ShoppingList: React.FC = () => {
                   key={value.name}
                   moduleId={moduleId}
                   name={value.name}
+                  rowHeights={rowHeights}
+                  rowRefs={rowRefs}
                   slug={moduleSlug}
                 />
               );

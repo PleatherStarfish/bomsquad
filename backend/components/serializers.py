@@ -64,17 +64,12 @@ class NestedSizeStandardSerializer(serializers.ModelSerializer):
 
 class ComponentSerializer(serializers.ModelSerializer):
     manufacturer = ManufacturerSerializer()
-    supplier = SupplierSerializer()
     type = TypeSerializer()
     category = NestedCategorySerializer()
     size = NestedSizeStandardSerializer()
-    unit_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, read_only=True
-    )
     supplier_items = ComponentSupplierItemSerializer(many=True, read_only=True)
-
-    # Add a custom field for combined qualities
     qualities = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
 
     class Meta:
         model = Component
@@ -84,14 +79,9 @@ class ComponentSerializer(serializers.ModelSerializer):
             "manufacturer",
             "manufacturer_part_no",
             "mounting_style",
-            "supplier",
-            "supplier_item_no",
             "type",
             "category",
             "size",
-            "price",
-            "pcs",
-            "unit_price",
             "discontinued",
             "notes",
             "link",
@@ -116,6 +106,12 @@ class ComponentSerializer(serializers.ModelSerializer):
             f"Tolerance: {obj.tolerance}" if obj.tolerance else None,
         ]
         return ", ".join(filter(None, qualities)) or "N/A"
+
+    def get_link(self, obj):
+        """
+        Return the Octopart URL if available.
+        """
+        return obj.octopart_url
 
 
 class AddComponentDropdownOptionsSerializer:
@@ -170,7 +166,6 @@ CURRENCIES = [
 
 
 class CreateComponentSerializer(serializers.ModelSerializer):
-    pcs = serializers.IntegerField(required=False, default=1)
 
     class Meta:
         model = Component

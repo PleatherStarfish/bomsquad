@@ -147,7 +147,9 @@ class ComponentView(APIView):
                 manufacturer__pk=UUID(filters["manufacturer"])
             )
         if "supplier" in filters:
-            components = components.filter(supplier__pk=UUID(filters["supplier"]))
+            components = components.filter(
+                supplier_items__supplier__pk=UUID(filters["supplier"])
+            )
         if "type" in filters:
             components = components.filter(type__name__icontains=filters["type"])
 

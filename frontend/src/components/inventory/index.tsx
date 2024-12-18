@@ -328,9 +328,15 @@ const Inventory = () => {
 
   const columns: TableColumn<InventoryRow>[] = [
     {
+      cell: (row) => {
+        return (
+          <div>
+            <a className="text-blue-500 hover:text-blue-700" href={`/components/${row.component.id}`}>{row.component.description}</a>
+          </div>
+        )
+    },
       grow: 1,
       name: "Name",
-      selector: (row) => row.component.description,
       sortable: true,
       wrap: true,
     },
@@ -349,23 +355,8 @@ const Inventory = () => {
       wrap: true,
     },
     {
-      name: <div>Supplier</div>,
-      selector: (row) => row.component.supplier?.name || "",
-      sortable: true,
-      wrap: true,
-    },
-    {
-      cell: (row) => {
-        return (
-          <a
-            className="text-blue-500 hover:text-blue-700"
-            href={row.component.link}
-          >
-            {row.component?.supplier_item_no ? row.component?.supplier_item_no : "[ none ]"}
-          </a>
-        );
-      },
-      name: <div>Supp. Item #</div>,
+      name: <div>Qualities</div>,
+      selector: (row) => row.component.qualities || "",
       sortable: true,
       wrap: true,
     },

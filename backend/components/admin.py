@@ -92,8 +92,6 @@ class ComponentAdmin(BaseAdmin):
     list_display = (
         "description",
         "mounting_style",
-        "supplier",
-        "supplier_item_no",
         "size",
         "category",
         "submitted_by",
@@ -103,7 +101,6 @@ class ComponentAdmin(BaseAdmin):
     # Add filters for relevant fields
     list_filter = (
         "mounting_style",
-        "supplier",
         "type",
         "discontinued",
         "user_submitted_status",

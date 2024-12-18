@@ -41,6 +41,7 @@ class FAQView(StaticPageDetailView):
 def component_detail(request, component_id):
     # Fetch the component
     component = get_object_or_404(Component, id=component_id)
+    print(component.octopart_url)
 
     # Fetch related modules
     module_items = ModuleBomListItem.objects.filter(components_options=component)
