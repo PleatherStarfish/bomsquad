@@ -104,7 +104,7 @@ class ComponentAdmin(BaseAdmin):
     search_fields = (
         "description",
         "manufacturer__name",
-        "supplier__name",
+        "supplier_items__supplier_item_no",
         "type__name",
         "manufacturer_part_no",
     )
