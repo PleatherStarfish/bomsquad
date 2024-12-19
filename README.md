@@ -3,13 +3,13 @@
 </p>
 
 
-# BOM Tech: An Inventory & Component Aggregator for DIY Audio Hardware Builders
+# BOM Squad: An Inventory & Component Aggregator for DIY Audio Hardware Builders
 
-Welcome to **BOM Tech**, a tool designed to make building cool synthesizers (and other audio hardware) less intimidating. Along the way we can help you manage your component inventory and streamline the sourcing and assembly process.
+Welcome to **BOM Squad**, a tool designed to make building cool synthesizers (and other audio hardware) less intimidating. Along the way we can help you manage your component inventory and streamline the sourcing and assembly process.
 
 ## Live Site
 
-Access the latest live version of BOM Tech, complete with ongoing updates, at [https://bom-squad.com/](https://bom-squad.com/). This version includes the newest features, bug fixes, and improvements. Explore modules, track your inventory, and connect with the DIY audio community through the live site.
+Access the latest live version of BOM Squad, complete with ongoing updates, at [https://bom-squad.com/](https://bom-squad.com/). This version includes the newest features, bug fixes, and improvements. Explore modules, track your inventory, and connect with the DIY audio community through the live site.
 
 ## Features
 
@@ -28,7 +28,7 @@ Access the latest live version of BOM Tech, complete with ongoing updates, at [h
 -   **Continuous Integration**: GitHub Actions for CI/CD
 
 ## TypeScript Integration 
-BOM Tech is transitioning to TypeScript to enhance code reliability, improve developer experience, and add static type-checking to the frontend codebase. The migration will be gradual: 
+BOM Squad is transitioning to TypeScript to enhance code reliability, improve developer experience, and add static type-checking to the frontend codebase. The migration will be gradual: 
 1. **Initial Refactor**: Key components and utility functions will be refactored to TypeScript over the next year. 
 2. **Component-Based Migration**: Each React component will be updated to TypeScript as modifications are made.
 3. **Documentation and Types**: Custom types and interfaces will be documented to facilitate future contributions. As TypeScript is introduced, contributors are encouraged to use TypeScript for any new components or features.
@@ -120,7 +120,7 @@ To ensure the codebase remains stable, we encourage running tests regularly.
 
 ## Contributing
 
-BOM Tech is open to contributions! Here’s how you can get involved:
+BOM Squad is open to contributions! Here’s how you can get involved:
 
 1.  **Fork the repository** and create a branch for your feature or bug fix.
 2.  **Commit your changes** with clear and concise messages.
@@ -128,7 +128,7 @@ BOM Tech is open to contributions! Here’s how you can get involved:
 
 ## Supporting the Project
 
-If BOM Tech has been helpful to you, consider supporting development costs via [Ko-fi](https://ko-fi.com/bomsquad/) to help maintain server and hosting expenses.
+If BOM Squad has been helpful to you, consider supporting development costs via [Ko-fi](https://ko-fi.com/bomsquad/) to help maintain server and hosting expenses.
 
 ## License
 
