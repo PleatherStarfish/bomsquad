@@ -15,9 +15,10 @@ def get_latest_exchange_rates(base_currency="USD"):
             "OPENEXCHANGERATES_APP_ID is not set in the environment"
         )
 
-    url = f"https://openexchangerates.org/api/latest.json"
-    params = {"app_id": api_key, "base": base_currency}
-    response = requests.get(url, params=params)
+    url = f"https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}"
+    print(url)
+    response = requests.get(url)
+    print(response)
     if response.status_code != 200:
         raise OpenExchangeRatesError(
             f"Error fetching exchange rates: {response.json().get('error', 'Unknown error')}"

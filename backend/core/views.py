@@ -12,6 +12,7 @@ from core.openexchangerates import get_latest_exchange_rates
 
 
 def get_exchange_rate(target_currency: str) -> float:
+    print("TEST")
     """
     Retrieve the exchange rate for the given target currency against USD.
 
@@ -30,26 +31,31 @@ def get_exchange_rate(target_currency: str) -> float:
     """
     target_currency = target_currency.upper()
 
-    try:
-        # Attempt to retrieve the exchange rate from the database
-        exchange_rate = ExchangeRate.objects.get(
-            base_currency="USD",
-            target_currency=target_currency,
-        )
-        # Check if the cached rate is fresh
-        if exchange_rate.last_updated > now() - timedelta(hours=24):
-            return exchange_rate.rate
-    except ExchangeRate.DoesNotExist:
-        exchange_rate = None
+    # Validate input
+    if not target_currency or len(target_currency) != 3:
+        raise ValueError(f"Invalid target currency: {target_currency}")
 
-    # Fetch the latest rate from the API
-    rates = get_latest_exchange_rates(base_currency="USD")
-    rate = rates.get("rates", {}).get(target_currency)
+    # Try to retrieve from the database
+    exchange_rate = ExchangeRate.objects.filter(
+        base_currency="USD", target_currency=target_currency
+    ).first()
+    print(exchange_rate)
+
+    if exchange_rate and exchange_rate.last_updated > now() - timedelta(hours=24):
+        # Return the cached rate if it's fresh
+        return exchange_rate.rate
+
+    # Fetch the latest rates from the API
+    try:
+        rates = get_latest_exchange_rates(base_currency="USD")
+        rate = rates.get("rates", {}).get(target_currency)
+    except Exception as e:
+        raise ValueError(f"Failed to fetch exchange rates: {e}")
 
     if rate is None:
         raise ValueError(f"Exchange rate not available for USD to {target_currency}")
 
-    # Update or create the exchange rate record in the database
+    # Update or create the exchange rate record
     if exchange_rate:
         exchange_rate.rate = rate
         exchange_rate.last_updated = now()

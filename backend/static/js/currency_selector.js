@@ -5,6 +5,9 @@ function updateCurrency(newCurrency) {
   const isAuthenticated = currencyContainer.data("is-authenticated") === "true";
   const csrfToken = currencyContainer.data("csrf-token");
   const userCurrencyUrl = currencyContainer.data("url-user-currency");
+  console.log("Fetching URL:", userCurrencyUrl);
+  console.log("CSRF Token:", csrfToken);
+  console.log("Currency to update:", newCurrency);
 
   // Update user's default currency on the server if authenticated
   if (isAuthenticated) {

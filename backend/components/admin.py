@@ -40,17 +40,11 @@ class ComponentAdmin(BaseAdmin):
                     "manufacturer",
                     "manufacturer_part_no",
                     "mounting_style",
-                    "supplier",
-                    "supplier_item_no",
-                    "supplier_has_no_item_no",
                     "type",
                     "size",
                     "category",
-                    "price",
-                    "pcs",
                     "discontinued",
                     "notes",
-                    "link",
                     "allow_comments",
                     "editor_content",
                 )
@@ -113,7 +107,6 @@ class ComponentAdmin(BaseAdmin):
         "supplier__name",
         "type__name",
         "manufacturer_part_no",
-        "supplier_item_no",
     )
 
     ordering = ("-datetime_updated",)
@@ -125,7 +118,7 @@ class ComponentAdmin(BaseAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        return queryset.prefetch_related("supplier", "type", "submitted_by")
+        return queryset.prefetch_related("type", "submitted_by")
 
 
 class TypesAdmin(BaseAdmin):

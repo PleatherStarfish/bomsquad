@@ -26,6 +26,7 @@ const ModuleDetail: React.FC = () => {
   const { slug } = useParams<Params>();
   const { user } = useAuthenticatedUser();
   const { module, moduleIsLoading, moduleIsError } = useModule(slug);
+  console.log(module)
 
   const handleModalOpenClose = (state: boolean) => setIsModalOpen(state);
 
@@ -34,8 +35,6 @@ const ModuleDetail: React.FC = () => {
       <div className="text-center text-gray-500 animate-pulse">Loading...</div>
     );
   if (moduleIsError) return <div>Error!</div>;
-
-  const manufacturerDetailUrl = `/manufacturer/${module.manufacturer.slug}/`;
 
   const hpColorScale = chroma
     .scale(["#a4d3b5", "#558a6b", "#2d5d46"])
@@ -119,9 +118,9 @@ const ModuleDetail: React.FC = () => {
             <h1 className="py-4 text-3xl font-semibold font-display">
               {module.name}
             </h1>
-            <a
-              className="text-gray-500 hover:text-gray-300"
-              href={manufacturerDetailUrl}
+            {"by "}<a
+              className="text-gray-500 hover:text-gray-700"
+              href={`/manufacturer/${module.manufacturer_slug}/`}
             >
               {module.manufacturer.name}
             </a>

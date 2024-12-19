@@ -14,7 +14,7 @@ from modules.models import (
 class ManufacturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentManufacturer
-        fields = ["name"]
+        fields = ["name", "slug"]
 
 
 class ModuleManufacturerSerializer(serializers.ModelSerializer):
