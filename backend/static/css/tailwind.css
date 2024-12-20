@@ -18,6 +18,10 @@
         top: -200px;
         width: 180%;
       }
+
+      .widget__actor {
+        color: #ebe6ef !important;
+      }
       
       @media (min-width: 1040px) {
         #parallax-image {

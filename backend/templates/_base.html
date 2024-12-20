@@ -51,7 +51,7 @@
      crossorigin="anonymous"></script>
      <link
         rel="preload"
-        rel="stylesheet"
+        as="style"
         href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
       />
       <!-- Include Choices.js JavaScript from CDN -->
@@ -128,9 +128,105 @@
     <script src="{% static 'js/mobile_menu.js' %}" defer></script>
     <script src="{% static 'js/logo_shrink.js' %}" defer></script>
     <script src="{% static 'js/hide_toast_notifications.js' %}" defer></script>
-    <script src="{% static 'js/currency_selector.js' %}" defer></script>
     <script src="{% static 'js/banner.js' %}" defer></script> 
     <script src="{% static 'js/mobile_dropdown_toggle.js' %}" defer></script> 
+
+    <script>
+      function updateCurrency(newCurrency) {
+        localStorage.setItem("currency", newCurrency);
+    
+        const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+        
+        // Update user's default currency on the server if authenticated
+        if (isAuthenticated) {
+          fetch("{% url 'user_currency' %}", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token|escapejs }}", // Include CSRF token safely
+            },
+            body: JSON.stringify({ default_currency: newCurrency }),
+          })
+            .then((response) => {
+              console.log("Response status:", response.status); // Debug response status
+              if (response.ok || response.status === 403) {
+                console.log("Reloading page...");
+                window.location.replace(window.location.href); // Force reload
+              } else {
+                console.error("Error updating currency:", response.statusText);
+              }
+            })
+            .catch((error) => {
+              console.error("Network error:", error);
+              window.location.replace(window.location.href); // Reload on error
+            });
+        } else {
+          console.log("User not authenticated, reloading...");
+          window.location.replace(window.location.href); // Reload for unauthenticated users
+        }
+      }
+    
+      $(document).ready(function () {
+        const currencies = [
+          { code: "USD", symbol: "$", name: "US Dollar" },
+          { code: "EUR", symbol: "€", name: "Euro" },
+          { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+          { code: "GBP", symbol: "£", name: "British Pound" },
+          { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+          { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+          { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
+          { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
+          { code: "HKD", symbol: "HK$", name: "Hong Kong Dollar" },
+          { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
+          { code: "SEK", symbol: "kr", name: "Swedish Krona" },
+          { code: "KRW", symbol: "₩", name: "South Korean Won" },
+          { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+          { code: "NOK", symbol: "kr", name: "Norwegian Krone" },
+          { code: "INR", symbol: "₹", name: "Indian Rupee" },
+        ];
+    
+        const currencySelector = $("#currency-selector");
+    
+        function getDefaultCurrency() {
+          const userDefaultCurrency = "{{ request.user.default_currency|escapejs|default:'' }}";
+          const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+          if (isAuthenticated && userDefaultCurrency) {
+            return userDefaultCurrency;
+          }
+          return localStorage.getItem("currency") || "USD";
+        }
+    
+        function populateWithSymbols() {
+          currencySelector.empty();
+          currencies.forEach((currency) => {
+            const option = $("<option>")
+              .val(currency.code)
+              .text(currency.symbol);
+            currencySelector.append(option);
+          });
+          currencySelector.val(getDefaultCurrency());
+        }
+    
+        function populateWithFullNames() {
+          currencySelector.empty();
+          currencies.forEach((currency) => {
+            const option = $("<option>")
+              .val(currency.code)
+              .text(`${currency.name} (${currency.code})`);
+            currencySelector.append(option);
+          });
+          currencySelector.val(getDefaultCurrency());
+        }
+    
+        currencySelector.on("focus", populateWithFullNames);
+        currencySelector.on("blur", populateWithSymbols);
+        populateWithSymbols();
+    
+        currencySelector.on("change", function () {
+          updateCurrency(this.value);
+        });
+      });
+    </script>    
     
     {% block javascript %}{% endblock javascript %}
   </body>

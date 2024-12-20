@@ -12,7 +12,7 @@ from core.openexchangerates import get_latest_exchange_rates
 
 
 def get_exchange_rate(target_currency: str) -> float:
-    print("TEST")
+    print(target_currency)
     """
     Retrieve the exchange rate for the given target currency against USD.
 
@@ -35,11 +35,14 @@ def get_exchange_rate(target_currency: str) -> float:
     if not target_currency or len(target_currency) != 3:
         raise ValueError(f"Invalid target currency: {target_currency}")
 
+    # If the target currency is USD, the exchange rate is always 1.0
+    if target_currency == "USD":
+        return 1.0
+
     # Try to retrieve from the database
     exchange_rate = ExchangeRate.objects.filter(
         base_currency="USD", target_currency=target_currency
     ).first()
-    print(exchange_rate)
 
     if exchange_rate and exchange_rate.last_updated > now() - timedelta(hours=24):
         # Return the cached rate if it's fresh
@@ -55,12 +58,14 @@ def get_exchange_rate(target_currency: str) -> float:
     if rate is None:
         raise ValueError(f"Exchange rate not available for USD to {target_currency}")
 
-    # Update or create the exchange rate record
+    # Update the record if it exists, or create a new one
     if exchange_rate:
+        print("UPDATE")
         exchange_rate.rate = rate
         exchange_rate.last_updated = now()
         exchange_rate.save()
     else:
+        print("CREATE")
         ExchangeRate.objects.create(
             base_currency="USD",
             target_currency=target_currency,

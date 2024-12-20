@@ -211,7 +211,11 @@ const ModuleDetail: React.FC = () => {
             </a>{" "}
             to compare the BOM against your personal inventory.
           </span>)}
+          <div>
+            <p className="text-gray-500">Click any row in the BOM to see a list of components that fulfill that component requirement.</p>
+          </div>
         </div>
+        
         <div className="pb-6">
           <BomList
             bomUnderConstruction={!!module.bom_under_construction}

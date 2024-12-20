@@ -122,7 +122,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
         output[supplier] = items
           .map((item) => `${item?.itemNumber}|${item?.quantity}`)
           .join("\n");
-      } else if (["DigiKey", "TME"].includes(supplier)) {
+      } else if (["DigiKey", "TME", "Tayda"].includes(supplier)) {
         output[supplier] = items
           .map((item) => `${item?.itemNumber},${item?.quantity}`)
           .join("\n");
@@ -164,7 +164,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
         <>
           {/* Supplier and Components Table */}
           <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse border border-gray-200">
+            <table className="min-w-full border border-collapse border-gray-200">
               <thead>
                 <tr>
                   <th className="px-4 py-2 text-left border border-gray-200">
@@ -239,7 +239,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                         <LinkIcon className="inline-block w-3 h-3" />
                                       </a>
                                     )}
-                                    <span className="text-2xs text-gray-600">
+                                    <span className="text-gray-600 text-2xs">
                                       {item?.price
                                         ? `($${item?.price})`
                                         : ""}
@@ -261,11 +261,11 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
           <div id="supplier-import-tool">
             {Object.entries(formattedOutput).map(([supplier, output]) => (
               <div className="p-4" key={supplier}>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">
+                <h3 className="mb-2 text-lg font-semibold text-left text-gray-800">
                   {supplier}
                 </h3>
                 {supplier === "Mouser" && (
-                  <p className="text-sm text-gray-600 mb-4 text-left">
+                  <p className="mb-4 text-sm text-left text-gray-600">
                     To generate a Mouser cart, copy the text below, and paste it
                     into the{" "}
                     <a
@@ -280,7 +280,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                   </p>
                 )}
                 {supplier === "DigiKey" && (
-                  <p className="text-sm text-gray-600 mb-4 text-left">
+                  <p className="mb-4 text-sm text-left text-gray-600">
                     To generate a DigiKey cart, copy the text below, and paste
                     it into the{" "}
                     <a
@@ -295,7 +295,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                   </p>
                 )}
                 {supplier === "TME" && (
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="mb-4 text-sm text-gray-600">
                     To generate a TME cart, copy the text below, and paste it
                     into the{" "}
                     <a
@@ -311,9 +311,25 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                     space. Each product must be listed on a separate line.
                   </p>
                 )}
-                <div className="relative hover:bg-stone-200 bg-stone-100 cursor-copy p-4 rounded w-full text-left">
+                {supplier === "Tayda" && (
+                  <p className="mb-4 text-sm text-gray-600">
+                    To generate a Tayda cart, copy the text below, and paste it
+                    into the{" "}
+                    <a
+                      className="text-blue-500 hover:underline"
+                      href="https://www.taydaelectronics.com/quick-order/"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Tayda Quick Order tool
+                    </a>
+                    . Ensure each line contains a product’s symbol followed by
+                    its quantity, separated by a comma. Each product must be listed on a separate line.
+                  </p>
+                )}
+                <div className="relative w-full p-4 text-left rounded hover:bg-stone-200 bg-stone-100 cursor-copy">
                   <pre
-                    className="whitespace-pre-wrap text-sm text-gray-800"
+                    className="text-sm text-gray-800 whitespace-pre-wrap"
                     onClick={() => {
                       navigator.clipboard.writeText(output).then(() => {
                         alert("Copied to clipboard!");
@@ -323,7 +339,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                     {output}
                   </pre>
                   <ClipboardDocumentListIcon
-                    className="absolute top-2 right-2 w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800"
+                    className="absolute w-6 h-6 text-gray-600 cursor-pointer top-2 right-2 hover:text-gray-800"
                     onClick={() => {
                       navigator.clipboard.writeText(output).then(() => {
                         alert("Copied to clipboard!");
