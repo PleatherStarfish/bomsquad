@@ -55,7 +55,7 @@ def force_https_and_remove_trailing_slash(url):
     # Force HTTPS
     scheme = "https"
     # Remove trailing slash
-    path = parsed_url.path.rstrip("/")
+    path = parsed_url.path
     # Rebuild the URL
     updated_url = urlunparse(
         (
