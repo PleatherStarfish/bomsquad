@@ -1,4 +1,6 @@
 {% load static %}
+{% load custom_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -31,7 +33,7 @@
       type="image/x-icon"
       href="{% static 'images/logo.png' %}"
     />
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri|force_https_and_remove_trailing_slash }}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">

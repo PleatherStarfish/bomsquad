@@ -345,7 +345,7 @@ class UserCurrencyView(APIView):
 
         if user.is_authenticated:
             try:
-                exchange_rate = get_exchange_rate(default_currency)
+                exchange_rate = get_exchange_rate("USD", default_currency)
                 currency_name = dict(CustomUser.CURRENCIES).get(
                     default_currency, "Unknown Currency"
                 )
@@ -364,9 +364,7 @@ class UserCurrencyView(APIView):
         """
         Update the user's default currency and fetch the new exchange rate.
         """
-        print("PATCH")
         new_currency = request.data.get("default_currency")
-        print(new_currency)
 
         # Validate the currency
         if not any(new_currency == code for code, _ in CustomUser.CURRENCIES):
@@ -377,8 +375,7 @@ class UserCurrencyView(APIView):
 
         try:
             # Retrieve the exchange rate using the provided utility function
-            exchange_rate_to_usd = get_exchange_rate(new_currency)
-            print(exchange_rate_to_usd)
+            exchange_rate_to_usd = get_exchange_rate("USD", new_currency)
         except ValueError as e:
             return Response(
                 {"error": str(e)},

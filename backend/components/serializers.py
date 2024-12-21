@@ -13,13 +13,13 @@ from components.models import (
     ComponentManufacturer,
 )
 from rest_framework import serializers
+from core.views import get_exchange_rate
 
 
 class ComponentSupplierItemSerializer(serializers.ModelSerializer):
     supplier = SupplierSerializer()
-    unit_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, read_only=True
-    )
+    price = serializers.SerializerMethodField()
+    unit_price = serializers.SerializerMethodField()
 
     class Meta:
         model = ComponentSupplierItem
@@ -32,6 +32,61 @@ class ComponentSupplierItemSerializer(serializers.ModelSerializer):
             "pcs",
             "link",
         ]
+
+    def get_price(self, obj):
+        """
+        Normalize the price to the user's currency as a decimal.
+        """
+        if obj.price is None:
+            return None
+
+        target_currency = self.get_target_currency()
+        stored_currency = obj.price.currency.code
+        amount = obj.price.amount
+
+        return self.normalize_currency(amount, stored_currency, target_currency)
+
+    def get_unit_price(self, obj):
+        """
+        Normalize the unit price to the user's currency as a decimal.
+        """
+        if obj.unit_price is None:
+            return None
+
+        target_currency = self.get_target_currency()
+        stored_currency = obj.price.currency.code  # Use the price's currency
+        amount = obj.unit_price
+
+        return self.normalize_currency(amount, stored_currency, target_currency)
+
+    def get_target_currency(self):
+        """
+        Determine the target currency based on the user's preferences or request parameters.
+        """
+        request = self.context.get("request")
+        if not request:
+            return "USD"  # Default currency if no request context is available
+
+        if request.user.is_authenticated:
+            return getattr(request.user, "default_currency", "USD")
+        return request.query_params.get("currency", "USD")
+
+    def normalize_currency(self, amount, stored_currency, target_currency):
+        """
+        Normalize an amount from the stored currency to the target currency.
+        """
+        if stored_currency == target_currency:
+            # No conversion needed
+            return round(float(amount), 2)
+
+        try:
+            # Convert directly from the stored currency to the target currency
+            exchange_rate = get_exchange_rate(stored_currency, target_currency)
+            normalized_amount = float(amount) * float(exchange_rate)
+
+            return round(normalized_amount, 2)
+        except Exception as e:
+            raise serializers.ValidationError(f"Error normalizing currency: {e}")
 
 
 class NestedCategorySerializer(serializers.ModelSerializer):

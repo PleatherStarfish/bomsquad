@@ -1,5 +1,6 @@
 from django import template
 from django.urls import reverse
+from urllib.parse import urlparse, urlunparse
 import math
 
 register = template.Library()
@@ -43,6 +44,30 @@ def get_display_name(value, mounting_style_options):
         if option["value"] == value:
             return option["name"]
     return value
+
+
+@register.filter
+def force_https_and_remove_trailing_slash(url):
+    """
+    Ensures the URL uses HTTPS and removes the trailing slash if it exists.
+    """
+    parsed_url = urlparse(url)
+    # Force HTTPS
+    scheme = "https"
+    # Remove trailing slash
+    path = parsed_url.path.rstrip("/")
+    # Rebuild the URL
+    updated_url = urlunparse(
+        (
+            scheme,
+            parsed_url.netloc,
+            path,
+            parsed_url.params,
+            parsed_url.query,
+            parsed_url.fragment,
+        )
+    )
+    return updated_url
 
 
 units = {"farad": ["F", "mF", "µF", "nF", "pF"], "ohm": ["Ω", "kΩ", "MΩ"]}

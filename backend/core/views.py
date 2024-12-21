@@ -8,66 +8,88 @@ from django.db import connection
 from datetime import timedelta
 from django.utils.timezone import now
 from accounts.models import ExchangeRate
-from core.openexchangerates import get_latest_exchange_rates
+from sentry_sdk import capture_exception
+from core.openexchangerates import _get_latest_exchange_rates
+
+CURRENCIES = [
+    ("USD", "US Dollar"),
+    ("EUR", "Euro"),
+    ("JPY", "Japanese Yen"),
+    ("GBP", "British Pound"),
+    ("AUD", "Australian Dollar"),
+    ("CAD", "Canadian Dollar"),
+    ("CHF", "Swiss Franc"),
+    ("CNY", "Chinese Yuan"),
+    ("HKD", "Hong Kong Dollar"),
+    ("NZD", "New Zealand Dollar"),
+    ("SEK", "Swedish Krona"),
+    ("KRW", "South Korean Won"),
+    ("SGD", "Singapore Dollar"),
+    ("NOK", "Norwegian Krone"),
+    ("INR", "Indian Rupee"),
+]
 
 
-def get_exchange_rate(target_currency: str) -> float:
-    print(target_currency)
+def get_exchange_rate(base_currency: str, target_currency: str) -> float:
     """
-    Retrieve the exchange rate for the given target currency against USD.
+    Retrieve the exchange rate from the given base currency to the target currency.
 
     If the rate exists in the database and is fresh (updated within the last 24 hours),
     it will return the cached value. Otherwise, it fetches the latest rate from the
     Open Exchange Rates API, updates the database, and returns the rate.
 
     Args:
+        base_currency (str): The base currency code (e.g., "USD", "EUR").
         target_currency (str): The target currency code (e.g., "EUR", "GBP").
 
     Returns:
-        float: The exchange rate for USD to the target currency.
+        float: The exchange rate for base_currency to target_currency.
 
     Raises:
-        ValueError: If the exchange rate is not available for the given currency.
+        ValueError: If the exchange rate is not available for the given currencies.
     """
+    base_currency = base_currency.upper()
     target_currency = target_currency.upper()
 
-    # Validate input
-    if not target_currency or len(target_currency) != 3:
+    # Validate input against the predefined currency list
+    valid_currencies = {code for code, _ in CURRENCIES}
+    if base_currency not in valid_currencies:
+        raise ValueError(f"Invalid base currency: {base_currency}")
+    if target_currency not in valid_currencies:
         raise ValueError(f"Invalid target currency: {target_currency}")
 
-    # If the target currency is USD, the exchange rate is always 1.0
-    if target_currency == "USD":
+    # If base and target currencies are the same, the exchange rate is always 1.0
+    if base_currency == target_currency:
         return 1.0
 
     # Try to retrieve from the database
     exchange_rate = ExchangeRate.objects.filter(
-        base_currency="USD", target_currency=target_currency
+        base_currency=base_currency, target_currency=target_currency
     ).first()
 
     if exchange_rate and exchange_rate.last_updated > now() - timedelta(hours=24):
         # Return the cached rate if it's fresh
         return exchange_rate.rate
 
-    # Fetch the latest rates from the API
+    # Fetch the latest rate from the API
     try:
-        rates = get_latest_exchange_rates(base_currency="USD")
-        rate = rates.get("rates", {}).get(target_currency)
+        rate = _get_latest_exchange_rates(base_currency, target_currency)
+        if rate is None:
+            raise ValueError(
+                f"Exchange rate not available for {base_currency} to {target_currency}"
+            )
     except Exception as e:
+        capture_exception(e)
         raise ValueError(f"Failed to fetch exchange rates: {e}")
 
-    if rate is None:
-        raise ValueError(f"Exchange rate not available for USD to {target_currency}")
-
     # Update the record if it exists, or create a new one
-    if exchange_rate:
-        print("UPDATE")
+    if exchange_rate and rate:
         exchange_rate.rate = rate
         exchange_rate.last_updated = now()
         exchange_rate.save()
     else:
-        print("CREATE")
         ExchangeRate.objects.create(
-            base_currency="USD",
+            base_currency=base_currency,
             target_currency=target_currency,
             rate=rate,
         )

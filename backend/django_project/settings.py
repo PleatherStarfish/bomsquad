@@ -422,3 +422,41 @@ LOGGING = {
 }
 
 MAINTENANCE_MODE_TEMPLATE = "503.html"
+
+# List of allowed currencies
+CURRENCIES = [
+    ("USD", "US Dollar"),
+    ("EUR", "Euro"),
+    ("JPY", "Japanese Yen"),
+    ("GBP", "British Pound"),
+    ("AUD", "Australian Dollar"),
+    ("CAD", "Canadian Dollar"),
+    ("CHF", "Swiss Franc"),
+    ("CNY", "Chinese Yuan"),
+    ("HKD", "Hong Kong Dollar"),
+    ("NZD", "New Zealand Dollar"),
+    ("SEK", "Swedish Krona"),
+    ("KRW", "South Korean Won"),
+    ("SGD", "Singapore Dollar"),
+    ("NOK", "Norwegian Krone"),
+    ("INR", "Indian Rupee"),
+]
+
+# Customized currency choices for use in forms, admin, etc.
+CURRENCY_CHOICES = [
+    ("USD", "US Dollar ($)"),
+    ("EUR", "Euro (€)"),
+    ("JPY", "Japanese Yen (¥)"),
+    ("GBP", "British Pound (£)"),
+    ("AUD", "Australian Dollar (A$)"),
+    ("CAD", "Canadian Dollar (C$)"),
+    ("CHF", "Swiss Franc (Fr.)"),
+    ("CNY", "Chinese Yuan (¥)"),
+    ("HKD", "Hong Kong Dollar (HK$)"),
+    ("NZD", "New Zealand Dollar (NZ$)"),
+    ("SEK", "Swedish Krona (kr)"),
+    ("KRW", "South Korean Won (₩)"),
+    ("SGD", "Singapore Dollar (S$)"),
+    ("NOK", "Norwegian Krone (kr)"),
+    ("INR", "Indian Rupee (₹)"),
+]
