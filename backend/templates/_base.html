@@ -99,20 +99,50 @@
       <div
         class="{% if path == '/user' %}w-screen grow{% else %}mb-12 mt-36 py-8 px-4 md:px-24 lg:px-48 grow{% endif %}"
       >
-      {% if path != '/' and path != '/user' and path != '/abou' and path != '/acco' and path != '/faq' and path != '/tos' and path != '/tool' %}
-        <div id="banner" class="hidden {% if path != '/proj' and path != '/comp' %}mb-8{% endif %}">
-          <div id="banner" class="flex flex-col w-full gap-4 p-8 rounded-lg bg-[#d4e4ea]" role="alert">
-            <div class="flex flex-col w-full">
-                <span class="mb-6 text-5xl text-gray-500 font-display">Not seeing your project here?</span>
-                <span class="text-gray-500">BOM Squad is an <a class="text-blue-500 hover:text-blue-700" href="https://github.com/PleatherStarfish/bomsquad">open-source</a> tool built and maintained by hobbyists. Subscribe and support the project on <a class="text-blue-500 hover:text-blue-700" href='https://ko-fi.com/bomsquad'>Ko-fi</a> (a Patreon-type social funding platform) and you get to choose the next project/BOM we add, usually within 48 hours!</span>
-            </div>
-            <div class="flex justify-end w-full gap-2 mt-2 sm:mt-0 sm:w-auto">
-              <button id="banner-hide-button" class="w-min flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-400 hover:bg-slate-500 sm:px-3 sm:py-1.5 sm:text-sm">
-                Hide
-              </button>
-              <a href="https://ko-fi.com/bomsquad" target="_blank" rel="noopener noreferrer" class="w-min flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 sm:px-3 sm:py-1.5 sm:text-sm ml-2 whitespace-nowrap">
-                Support BOM Squad
-              </a>
+        {% if path != '/' and path != '/user' and path != '/abou' and path != '/acco' and path != '/faq' and path != '/tos' and path != '/tool' %}
+        <div id="banner-modal" class="relative z-40 hidden" aria-labelledby="banner-title" role="dialog" aria-modal="true">
+          <!-- Modal backdrop -->
+          <div class="fixed inset-0 transition-opacity bg-gray-500/75" aria-hidden="true"></div>
+        
+          <!-- Modal content -->
+          <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto]">
+            <div class="relative flex flex-col w-full gap-4 p-8 px-6 pt-5 pb-6 mx-6 overflow-hidden transition-all transform rounded-lg md:p-12 bg-gray-50 sm:w-full md:max-w-2xl lg:max-w-3xl md:mx-0">
+              <div>
+                <!-- Modal Header -->
+                <h3 class="mb-6 text-5xl text-gray-500 font-display" id="banner-title">Not seeing your project here?</h3>
+                <!-- Modal Content -->
+                <div class="mt-2 text-gray-500 text-md">
+                  BOM Squad is an <a class="text-blue-500 hover:text-blue-700" href="https://github.com/PleatherStarfish/bomsquad" target="_blank">open-source</a> tool built and maintained by hobbyists. Subscribe and support the project on <a class="text-blue-500 hover:text-blue-700" href="https://ko-fi.com/bomsquad" target="_blank">Ko-fi</a> (a Patreon-type social funding platform), and you get to choose which project we add next! (Usually within 48 hours.)
+                </div>
+              </div>
+              <!-- Modal Actions -->
+              <div class="flex flex-col w-full gap-4 mt-5 sm:mt-4 md:flex-row md:justify-end md:items-center">
+                <!-- Button 1 -->
+                <button
+                  id="banner-hide-button"
+                  type="button"
+                  class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-white bg-gray-400 rounded-md shadow-sm hover:bg-gray-500 sm:w-auto h-[41px] whitespace-nowrap"
+                >
+                  Sorry, I can't support right now
+                </button>
+                <!-- Button 2 -->
+                <button
+                  type="button"
+                  onclick="window.open('https://ko-fi.com/bomsquad', '_blank')"
+                  class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-white bg-[#13c3ff] rounded-md shadow-sm hover:bg-sky-600 md:ml-2 sm:w-auto h-[41px] whitespace-nowrap"
+                >
+                  <iframe
+                    src="https://giphy.com/embed/kgKFcQk6oa1WIdHNSl"
+                    width="25"
+                    height="25"
+                    class="mr-2"
+                    frameborder="0"
+                    allowfullscreen
+                  ></iframe>
+                  Support BOM Squad
+                </button>
+              </div>
+              
             </div>
           </div>
         </div>
