@@ -314,7 +314,7 @@ class Component(BaseModel):
                     "Farad value and unit must not be set for potentiometers."
                 )
 
-        if not self.pk or not self.supplier_items.exists():
+        if not self.supplier_items.exists():
             raise ValidationError(
                 "A component must have at least one associated ComponentSupplierItem."
             )
