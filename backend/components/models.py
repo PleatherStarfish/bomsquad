@@ -314,10 +314,10 @@ class Component(BaseModel):
                     "Farad value and unit must not be set for potentiometers."
                 )
 
-        if not self.supplier_items.exists():
-            raise ValidationError(
-                "A component must have at least one associated ComponentSupplierItem."
-            )
+        # if not self.supplier_items.exists():
+        #     raise ValidationError(
+        #         "A component must have at least one associated ComponentSupplierItem."
+        #     )
 
         current_user = kwargs.pop("current_user", None)
 
