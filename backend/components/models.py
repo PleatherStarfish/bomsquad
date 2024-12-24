@@ -261,22 +261,29 @@ class Component(BaseModel):
     def __str__(self):
         type_name = self.type.name if self.type else "Unknown Type"
 
-        # Get all related supplier names
-        related_suppliers = self.supplier_items.values_list("supplier__name", flat=True)
-        suppliers = (
-            ", ".join(related_suppliers) if related_suppliers else "No Suppliers"
+        # Merge supplier names with their corresponding item numbers
+        supplier_items = [
+            f"{supplier} ({item_no})"
+            for supplier, item_no in self.supplier_items.values_list(
+                "supplier__name", "supplier_item_no"
+            )
+        ]
+        supplier_items_str = (
+            ", ".join(supplier_items)
+            if supplier_items
+            else "No Suppliers or Item Numbers"
         )
 
         mounting_style = self.mounting_style or "No Mounting Style"
 
         if type_name == "Potentiometers":
-            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} (Suppliers: {suppliers})"
+            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} (Suppliers: {supplier_items_str})"
         elif type_name == "Resistors":
-            return f"{self.ohms or 'No Ohms'} | {mounting_style} | {self.ohms_unit or 'No Unit'} | {type_name} (Suppliers: {suppliers})"
+            return f"{self.ohms or 'No Ohms'} | {mounting_style} | {self.ohms_unit or 'No Unit'} | {type_name} (Suppliers: {supplier_items_str})"
         elif type_name == "Capacitors":
-            return f"{self.farads or 'No Farads'} | {mounting_style} | {self.farads_unit or 'No Unit'} | {type_name} (Suppliers: {suppliers})"
+            return f"{self.farads or 'No Farads'} | {mounting_style} | {self.farads_unit or 'No Unit'} | {type_name} (Suppliers: {supplier_items_str})"
         else:
-            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} (Suppliers: {suppliers})"
+            return f"{self.description or 'No Description'} | {mounting_style} | {type_name} (Suppliers: {supplier_items_str})"
 
     def clean(self, *args, **kwargs):
         if self.type.name == "Resistor":
