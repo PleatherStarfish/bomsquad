@@ -156,38 +156,38 @@ const ModuleDetail: React.FC = () => {
             <h2 className="py-4 text-xl font-semibold sr-only">Description</h2>
             <p className="pt-8 pb-4 card-text">{module.description}</p>
             <div role="list">
-              <a href={module.manufacturer_page_link} role="listitem">
+              {module.manufacturer_page_link && <a href={module.manufacturer_page_link} role="listitem">
                 <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Manufacturer page
                   </div>
                   <LinkIcon className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-gray-500" />
                 </div>
-              </a>
-              <a href={module.bom_link} role="listitem">
+              </a>}
+              {module.bom_link && <a href={module.bom_link} role="listitem">
                 <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Bill of materials
                   </div>
                   <LinkIcon className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-gray-500" />
                 </div>
-              </a>
-              <a href={module.manual_link} role="listitem">
+              </a>}
+              {module.manual_link && <a href={module.manual_link} role="listitem">
                 <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     User manual
                   </div>
                   <LinkIcon className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-gray-500" />
                 </div>
-              </a>
-              <a href={module.modulargrid_link} role="listitem">
+              </a>}
+              {module.modulargrid_link && <a href={module.modulargrid_link} role="listitem">
                 <div className="flex justify-between w-full py-3 border-b border-gray-200 group">
                   <div className="text-gray-400 group-hover:text-gray-500">
                     Modulargrid link
                   </div>
                   <LinkIcon className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:text-gray-500" />
                 </div>
-              </a>
+              </a>}
             </div>
           </div>
           {/* <div className="flex justify-between mt-6">
