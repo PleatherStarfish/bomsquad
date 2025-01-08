@@ -8,6 +8,7 @@ from .models import (
     ModuleBomListComponentForItemRating,
     PcbVersion,
     Substitution,
+    SuggestedComponentForBomListItem,
 )
 from core.admin import BaseAdmin
 
@@ -152,6 +153,10 @@ class SubstitutionAdmin(BaseAdmin):
         return lookup in allowed_lookups or super().lookup_allowed(lookup, value)
 
 
+class SuggestedComponentForBomListItemAdmin(BaseAdmin):
+    model = SuggestedComponentForBomListItem
+
+
 # Register your models here.
 admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(Module, ModuleAdmin)
@@ -163,3 +168,6 @@ admin.site.register(
 )
 admin.site.register(PcbVersion, PcbVersionAdmin)
 admin.site.register(Substitution, SubstitutionAdmin)
+admin.site.register(
+    SuggestedComponentForBomListItem, SuggestedComponentForBomListItemAdmin
+)

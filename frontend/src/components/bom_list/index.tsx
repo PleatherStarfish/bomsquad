@@ -57,6 +57,7 @@ const BomList: React.FC<BomListProps> = ({
   bomUnderConstruction,
   handleExportButtonClick,
   exportModalOpen,
+  handleLoading,
 }) => {
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
   const [uniquePCBVersions, setUniquePCBVersions] = useState<string[]>([]);
@@ -81,6 +82,10 @@ const BomList: React.FC<BomListProps> = ({
   }));
 
   const hasOptionalColumn = () => moduleBomData.some((item) => item.optional);
+
+  useEffect(() => {
+    handleLoading(moduleBomIsLoading);
+  }, [moduleBomData]);
 
   useEffect(() => {
     setUniquePCBVersions(getUniqueSortedPCBVersionNames(moduleBomData));

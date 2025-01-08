@@ -1,10 +1,11 @@
 import { ConeStriped, Shuffle } from "react-bootstrap-icons";
 import React, { ReactNode } from "react";
 
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import { InformationCircleIcon, SquaresPlusIcon } from "@heroicons/react/20/solid";
 import cx from "classnames";
 
 export const AlertVariant = {
+  addComponent: "bg-transparent text-sky-500 hover:bg-sky-200 hover:text-blue-700 rounded-lg",
   info: "bg-blue-50 text-blue-700",
   muted: "bg-gray-100 text-gray-500",
   sky: "bg-sky-200 text-blue-900",
@@ -19,6 +20,11 @@ export const AlertVariantPadding = {
 } as const;
 
 export const AlertVariantIcon = {
+  addComponent: (
+    <div className="flex-shrink-0">
+      <SquaresPlusIcon aria-hidden="true" className="w-5 h-5 text-sky-500 group-hover:text-blue-700" />
+    </div>
+  ),
   info: (
     <div className="flex-shrink-0">
       <InformationCircleIcon aria-hidden="true" className="w-5 h-5 text-blue-400" />
@@ -61,14 +67,35 @@ const Alert: React.FC<AlertProps> = ({
   expand = true,
   children,
 }) => {
+  const isAddComponentVariant = variant === "addComponent";
+
   return (
     <div
-      className={cx("rounded w-full", AlertVariant[variant], AlertVariantPadding[padding])}
+      className={cx(
+        "rounded w-full",
+        AlertVariant[variant],
+        AlertVariantPadding[padding],
+        { group: isAddComponentVariant } // Add group only for addComponent
+      )}
       role="alert"
     >
       <div className={cx("flex w-full", AlertAlignment[align])}>
-        {icon && AlertVariantIcon[variant]}
-        <div className={cx({ "flex-1": expand, "ml-3": icon })}>
+        {icon && (
+          <div
+            className={cx({
+              "flex-shrink-0 text-sky-500 group-hover:text-blue-700": isAddComponentVariant,
+            })}
+          >
+            {AlertVariantIcon[variant]}
+          </div>
+        )}
+        <div
+          className={cx({
+            "flex-1": expand,
+            "ml-3": icon,
+            "group-hover:text-blue-700": isAddComponentVariant,
+          })}
+        >
           {children}
         </div>
       </div>

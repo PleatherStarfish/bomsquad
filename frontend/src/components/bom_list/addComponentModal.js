@@ -37,7 +37,7 @@ const AddComponentModal = ({
   const [locationArray, setlocationArray] = useState("");
   const [isLocationEditable, setIsLocationEditable] = useState(true);
 
-  const { user, userIsLoading, userIsError } = useAuthenticatedUser();
+  const { userIsLoading, userIsError } = useAuthenticatedUser();
 
   const addOrUpdateUserInventory = useAddOrUpdateUserInventory();
   const addOrUpdateUserShoppingList = useAddOrUpdateUserShoppingList();
@@ -65,45 +65,45 @@ const AddComponentModal = ({
       if (type === Types.INVENTORY) {
         await addOrUpdateUserInventory.mutateAsync({
           componentId,
-          quantity,
-          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
           editMode,
+          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
+          quantity,
         }, {
-          onSuccess: () => {
-            setOpen(false);
-          },
           onError: (error) => {
             console.error("Failed to update quantity", error);
             setError("Failed to update quantity: ", error)
+          },
+          onSuccess: () => {
+            setOpen(false);
           }
         });
       } else if (type === Types.SHOPPING) {
         await addOrUpdateUserShoppingList.mutateAsync({
           componentId,
           ...hookArgs,
-          quantity,
           editMode,
+          quantity,
         }, {
-          onSuccess: () => {
-            setOpen(false);
-          },
           onError: (error) => {
             console.error("Failed to update quantity", error);
             setError("Failed to update quantity: ", error)
+          },
+          onSuccess: () => {
+            setOpen(false);
           }
         });
       } else if (type === Types.SHOPPING_ANON) {
         await addOrUpdateUserAnonymousShoppingList.mutateAsync({
           componentId,
-          quantity,
           editMode,
+          quantity,
         }, {
-          onSuccess: () => {
-            setOpen(false);
-          },
           onError: (error) => {
             console.error("Failed to update quantity", error);
             setError("Failed to update quantity: ", error)
+          },
+          onSuccess: () => {
+            setOpen(false);
           }
         });
       }
@@ -153,7 +153,7 @@ const AddComponentModal = ({
 
   return (
     <>
-      <Transition.Root show={open && !showForOurSubscribersModal} as={Fragment}>
+      <Transition.Root as={Fragment} show={open && !showForOurSubscribersModal}>
         <Dialog as="div" className="relative" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
@@ -197,6 +197,12 @@ const AddComponentModal = ({
                             {type === "shopping_anon" ? "shopping list" : type}{" "}
                             already contains{" "}
                             <Quantity
+                              hookArgs={
+                                hookArgs
+                                  ? Object.values(hookArgs)
+                                  : [componentId]
+                              }
+                              replaceZero={false}
                               type={type}
                               useHook={
                                 type === Types.INVENTORY
@@ -205,12 +211,6 @@ const AddComponentModal = ({
                                   ? useGetUserShoppingListQuantity
                                   : useGetUserAnonymousShoppingListQuantity
                               }
-                              hookArgs={
-                                hookArgs
-                                  ? Object.values(hookArgs)
-                                  : [componentId]
-                              }
-                              replaceZero={false}
                             />
                             {editMode
                               ? `. Edit quantity to be ${quantity}?`
@@ -221,8 +221,8 @@ const AddComponentModal = ({
                         {editMode ? (
                           <div className="my-6">
                             <label
-                              htmlFor="quantityInput"
                               className="block mb-1 font-medium text-gray-700"
+                              htmlFor="quantityInput"
                             >
                               {`Edit ${
                                 type === Types.INVENTORY
@@ -234,19 +234,19 @@ const AddComponentModal = ({
                               <div>
                                 <div className="sm:w-2/5 md:w-1/5">
                                   <NumericInput
-                                    id="quantityInput"
-                                    type="number"
-                                    min={1}
-                                    value={quantity ?? 1}
-                                    onChange={(e) => setQuantity(e)}
                                     className="h-8 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"
+                                    id="quantityInput"
+                                    min={1}
+                                    onChange={(e) => setQuantity(e)}
+                                    type="number"
+                                    value={quantity ?? 1}
                                   />
                                 </div>
                               </div>
                               <div
-                                role="button"
                                 className="text-blue-500 hover:text-blue-700"
                                 onClick={() => setEditMode((prev) => !prev)}
+                                role="button"
                               >
                                 {`or add to ${
                                   type === Types.INVENTORY
@@ -259,8 +259,8 @@ const AddComponentModal = ({
                         ) : (
                           <div className="my-6">
                             <label
-                              htmlFor="quantityInput"
                               className="block mb-1 font-medium text-gray-700"
+                              htmlFor="quantityInput"
                             >
                               Quantity to add:
                             </label>
@@ -268,19 +268,19 @@ const AddComponentModal = ({
                               <div>
                                 <div className="sm:w-2/5 md:w-1/5">
                                   <NumericInput
-                                    id="quantityInput"
-                                    type="number"
-                                    min={1}
-                                    value={quantity ?? 1}
-                                    onChange={(e) => setQuantity(e)}
                                     className="h-8 pl-2 border border-gray-300 rounded-md focus:border-brandgreen-500 focus:ring-1 focus:ring-brandgreen-500"
+                                    id="quantityInput"
+                                    min={1}
+                                    onChange={(e) => setQuantity(e)}
+                                    type="number"
+                                    value={quantity ?? 1}
                                   />
                                 </div>
                               </div>
                               <div
-                                role="button"
                                 className="text-blue-500 hover:text-blue-700"
                                 onClick={() => setEditMode((prev) => !prev)}
+                                role="button"
                               >
                                 {`or edit ${
                                   type === Types.INVENTORY
@@ -301,11 +301,11 @@ const AddComponentModal = ({
                         your inventory. Separate locations with commas.
                       </p>
                       <SimpleEditableLocation
-                        locationArray={locationArray}
-                        submitLocationChange={setlocationArray}
                         isEditable={isLocationEditable}
+                        locationArray={locationArray}
                         setIsEditable={setIsLocationEditable}
                         showSeparateLocationsWithCommas={false}
+                        submitLocationChange={setlocationArray}
                       />
                     </div>
                   )}
@@ -332,7 +332,6 @@ const AddComponentModal = ({
                   )}
                   <div className="flex gap-2 mt-5 sm:mt-4 sm:flex-row-reverse flex-nowrap">
                     <Button
-                      variant="primary"
                       onClick={() => {
                         handleSubmitQuantity();
                         
@@ -347,10 +346,11 @@ const AddComponentModal = ({
                         //   setShowForOurSubscribersModal(true);
                         // }
                       }}
+                      variant="primary"
                     >
                       {editMode ? "Update" : "Add"}
                     </Button>
-                    <Button variant="muted" onClick={() => setOpen(false)}>
+                    <Button onClick={() => setOpen(false)} variant="muted">
                       Cancel
                     </Button>
                   </div>
@@ -362,11 +362,11 @@ const AddComponentModal = ({
         </Dialog>
       </Transition.Root>
       <ForOurSubscribersModal
+        message="Please become a subscriber to add more than 3 modules to your shopping list."
+        onClickCancel={() => setShowForOurSubscribersModal(false)}
+        onClickSupport={() => goToSupport()}
         open={showForOurSubscribersModal}
         title="Limit reached: three modules already in shopping list"
-        message="Please become a subscriber to add more than 3 modules to your shopping list."
-        onClickSupport={() => goToSupport()}
-        onClickCancel={() => setShowForOurSubscribersModal(false)}
       />
     </>
   );

@@ -23,12 +23,16 @@ const categoryColors: Record<string, string> = {
 
 const ModuleDetail: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { slug } = useParams<Params>();
   const { user } = useAuthenticatedUser();
   const { module, moduleIsLoading, moduleIsError } = useModule(slug);
   console.log(module)
 
   const handleModalOpenClose = (state: boolean) => setIsModalOpen(state);
+  const handleLoading = (state: boolean) => {
+    setLoading(state)
+  }
 
   if (moduleIsLoading)
     return (
@@ -196,7 +200,7 @@ const ModuleDetail: React.FC = () => {
         </div>
       </div>
       <div>
-        <div className="pb-5">
+        {!loading && <div className="pb-5">
           <HeaderWithButton
             buttonText={`Get Cart for ${module.name}`}
             onButtonClick={() => handleModalOpenClose(true)}
@@ -212,15 +216,16 @@ const ModuleDetail: React.FC = () => {
             to compare the BOM against your personal inventory.
           </span>)}
           <div>
-            <p className="text-gray-500">Click any row in the BOM to see a list of components that fulfill that component requirement.</p>
+            <p className="mt-6 text-gray-500">Click any row in the BOM to see a list of components that fulfill that component requirement.</p>
           </div>
-        </div>
+        </div>}
         
         <div className="pb-6">
           <BomList
             bomUnderConstruction={!!module.bom_under_construction}
             exportModalOpen={isModalOpen}
             handleExportButtonClick={handleModalOpenClose}
+            handleLoading={handleLoading}
             moduleId={module.id}
             moduleName={module.name}
           />

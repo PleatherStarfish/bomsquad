@@ -22,13 +22,13 @@ const formatNumber = (num) => {
 const generateConversions = (value, unit, unitType) => {
   const parsedValue = parseFloat(value);
   if (isNaN(parsedValue)) {
-    console.error(`Invalid value: ${value}`);
+    // console.error(`Invalid value: ${value}`);
     return `<li>Invalid value</li>`;
   }
 
   const baseValue = parsedValue * conversionFactors[unit];
   if (isNaN(baseValue)) {
-    console.error(`Invalid unit: ${unit}`);
+    // console.error(`Invalid unit: ${unit}`);
     return `<li>Invalid unit</li>`;
   }
 

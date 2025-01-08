@@ -1,18 +1,17 @@
 from django.urls import path
 from contact.views import contact, subscription
 from django.views.generic import TemplateView
+from contact.views import success, spam, error
 
 urlpatterns = [
     path("", contact, name="contact"),
     path("subscribe/", subscription, name="subscription"),
     path(
-        "success/",
-        TemplateView.as_view(template_name="contact/success.html"),
-        name="success",
+        "thanks_for_subscribing/",
+        TemplateView.as_view(template_name="contact/thanks_for_subscribing.html"),
+        name="thanks_for_subscribing",
     ),
-    path(
-        "error/",
-        TemplateView.as_view(template_name="contact/spam_keyword.html"),
-        name="spam",
-    ),
+    path("success/", success, name="success"),
+    path("spam/", spam, name="spam"),
+    path("error/", error, name="error"),
 ]

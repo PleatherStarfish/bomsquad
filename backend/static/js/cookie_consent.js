@@ -32,8 +32,25 @@ document.addEventListener("DOMContentLoaded", () => {
       loadGoogleAnalytics();
       loadMixpanel();
       mixpanel.opt_in_tracking();
+
+      // Update Google Consent Mode to 'granted'
+      gtag('consent', 'update', {
+        'ad_storage': 'granted',
+        'ad_user_data': 'granted',
+        'ad_personalization': 'granted',
+        'analytics_storage': 'granted'
+      });
     } else {
+      // Deny tracking for both Mixpanel and Google Analytics
       mixpanel.opt_out_tracking();
+
+      // Update Google Consent Mode to 'denied'
+      gtag('consent', 'update', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied'
+      });
     }
   }
 

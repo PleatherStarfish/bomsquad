@@ -1,3 +1,4 @@
+import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -5,7 +6,13 @@ from django.db.models import Prefetch, Q, Sum, Count, Exists, OuterRef, Avg, F
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.core.cache import cache
-from components.models import Component
+from components.models import (
+    Component,
+    ComponentManufacturer,
+    ComponentSupplier,
+    ComponentSupplierItem,
+    Types,
+)
 from itertools import zip_longest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
@@ -16,12 +23,14 @@ from django.contrib.postgres.search import (
     TrigramSimilarity,
 )
 from uuid import UUID
+from django.db import transaction
 
 from django.shortcuts import get_object_or_404, redirect, render
 from modules.models import (
     BuiltModules,
     Manufacturer,
     Module,
+    SuggestedComponentForBomListItem,
     WantToBuildModules,
     ModuleBomListItem,
     ModuleBomListComponentForItemRating,
@@ -33,7 +42,9 @@ from modules.serializers import (
     ModuleBomListItemSerializer,
     ModuleBomListComponentForItemRatingSerializer,
     ModuleManufacturerSerializer,
+    SuggestedComponentForBomListItemSerializer,
 )
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -41,6 +52,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import hashlib
+
+logger = logging.getLogger(__name__)
+
 
 CACHE_TIMEOUT = 60 * 60  # 1 hour (60 seconds * 60 minutes)
 
@@ -524,17 +538,20 @@ def components_autocomplete(request):
     query = request.GET.get("q", "").strip()
     results = []
 
-    if query:
-        # Define the SearchVector across multiple fields
+    if not query:
+        return JsonResponse({"results": results})
+
+    try:
+        # Define the SearchVector across multiple fields, including related fields
         search_vector = (
             SearchVector("description", weight="A")
-            + SearchVector("supplier__name", weight="B")
-            + SearchVector("supplier_item_no", weight="B")
+            + SearchVector("supplier_items__supplier__name", weight="B")
+            + SearchVector("supplier_items__supplier_item_no", weight="B")
             + SearchVector("manufacturer__name", weight="C")
             + SearchVector("manufacturer_part_no", weight="C")
         )
 
-        # Define the SearchQuery with websearch for natural language processing
+        # Define the SearchQuery for natural language processing
         search_query = SearchQuery(query, search_type="websearch")
 
         # Apply full-text search and trigram similarity
@@ -546,19 +563,36 @@ def components_autocomplete(request):
                     TrigramSimilarity("description", query)
                     + TrigramSimilarity("manufacturer__name", query)
                     + TrigramSimilarity("manufacturer_part_no", query)
-                    + TrigramSimilarity("supplier__name", query)
-                    + TrigramSimilarity("supplier_item_no", query)
+                    + TrigramSimilarity("supplier_items__supplier__name", query)
+                    + TrigramSimilarity("supplier_items__supplier_item_no", query)
                 ),
             )
-            .filter(
-                Q(search=search_query) | Q(similarity__gt=0.3)
-            )  # Filter with full-text or trigram similarity
-            .order_by("-rank", "-similarity")  # Order by relevance and similarity
-            .distinct()[:50]  # Ensure unique results and limit the results
+            .filter(Q(search=search_query) | Q(similarity__gt=0.1))
+            .order_by("-rank", "-similarity")
+            .distinct()[:50]
         )
 
         # Prepare the results for the response
-        results = [{"id": comp.id, "text": comp.description} for comp in components]
+        results = [
+            {
+                "id": comp.id,
+                "text": comp.description,
+                "suppliers": [
+                    {
+                        "name": item.supplier.name,
+                        "item_no": item.supplier_item_no,
+                    }
+                    for item in comp.supplier_items.all()
+                ],
+            }
+            for comp in components
+        ]
+
+    except Exception as e:
+        return JsonResponse(
+            {"error": "An error occurred during the search."},
+            status=500,
+        )
 
     return JsonResponse({"results": results})
 
@@ -718,3 +752,140 @@ def get_filter_options(request):
         },
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def suggested_component_for_bom_list_item_api_view(request, modulebomlistitem_pk):
+    """
+    Handle POST requests to suggest a component for a BOM list item.
+
+    Args:
+        request: The HTTP request containing component suggestion data.
+        modulebomlistitem_pk: The UUID of the ModuleBomListItem.
+
+    Returns:
+        Response: Success or error response.
+    """
+    try:
+        # Ensure the ModuleBomListItem exists
+        module_bom_list_item = ModuleBomListItem.objects.get(pk=modulebomlistitem_pk)
+        logger.info(f"Module BOM List Item retrieved: {module_bom_list_item}")
+    except ModuleBomListItem.DoesNotExist:
+        logger.warning(f"Module BOM List Item not found: {modulebomlistitem_pk}")
+        return Response(
+            {"error": "The specified Module BOM List Item does not exist."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    request_data = request.data.copy()
+    request_data["module_bom_list_item_id"] = str(modulebomlistitem_pk)
+
+    serializer = SuggestedComponentForBomListItemSerializer(
+        data=request_data, context={"request": request}
+    )
+
+    if not serializer.is_valid():
+        logger.warning(f"Validation errors: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        with transaction.atomic():
+            validated_data = serializer.validated_data
+            logger.info("Validated data processed successfully")
+
+            # Handle existing component
+            if "component_id" in validated_data:
+                component = Component.objects.get(id=validated_data["component_id"])
+                logger.info(f"Existing component retrieved: {component}")
+            else:
+                # Create new component
+                component_data = validated_data["component_data"]["component"]
+
+                # Check for an existing component by manufacturer
+                existing_component = Component.objects.filter(
+                    manufacturer_part_no=component_data["manufacturer_part_no"]
+                ).first()
+
+                if existing_component:
+                    logger.info(f"Existing component found: {existing_component}")
+                    component = existing_component
+                else:
+                    manufacturer = ComponentManufacturer.objects.get(
+                        id=component_data["manufacturer"]
+                    )
+                    component_type = Types.objects.get(id=component_data["type"])
+                    component = Component.objects.create(
+                        manufacturer=manufacturer,
+                        type=component_type,
+                        **{
+                            k: v
+                            for k, v in component_data.items()
+                            if k not in ["manufacturer", "type"]
+                        },
+                    )
+                    logger.info(f"New component created: {component}")
+
+                    # Create supplier items
+                    for supplier_item in validated_data["component_data"][
+                        "supplier_items"
+                    ]:
+                        supplier = ComponentSupplier.objects.get(
+                            id=supplier_item["supplier"]
+                        )
+                        ComponentSupplierItem.objects.create(
+                            component=component,
+                            supplier=supplier,
+                            supplier_item_no=supplier_item["supplier_item_no"],
+                            price=supplier_item["price"],
+                            link=supplier_item.get("link"),
+                        )
+                        logger.info(f"Supplier item created for component: {component}")
+
+            # Create the suggested component
+            suggested_component = SuggestedComponentForBomListItem.objects.create(
+                module_bom_list_item=module_bom_list_item,
+                suggested_component=component,
+                suggested_by=request.user if request.user.is_authenticated else None,
+            )
+            logger.info(
+                f"SuggestedComponentForBomListItem created: {suggested_component}"
+            )
+
+            return Response(
+                {
+                    "id": str(suggested_component.id),
+                    "module_bom_list_item": str(
+                        suggested_component.module_bom_list_item.id
+                    ),
+                    "suggested_component": str(
+                        suggested_component.suggested_component.id
+                    ),
+                    "status": suggested_component.status,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+    except ComponentManufacturer.DoesNotExist:
+        logger.error("Specified manufacturer does not exist")
+        return Response(
+            {"error": "The specified manufacturer does not exist."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Types.DoesNotExist:
+        logger.error("Specified component type does not exist")
+        return Response(
+            {"error": "The specified component type does not exist."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except ComponentSupplier.DoesNotExist:
+        logger.error("Specified supplier does not exist")
+        return Response(
+            {"error": "The specified supplier does not exist."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        logger.exception("Unexpected error occurred")
+        return Response(
+            {"error": "An unexpected error occurred."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

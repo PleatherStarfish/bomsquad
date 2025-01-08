@@ -3,10 +3,13 @@ import "tippy.js/dist/tippy.css";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
 import Quantity, { Types } from "./quantity";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getFaradConversions, getOhmConversions } from "../conversions";
-
+import FullPageModal from "../../ui/FullPageModal";
+import AddComponentForm from "../../components/user_submissions/AddComponentForm";
 import AddComponentModal from "./addComponentModal";
+import AsyncComponentSelect from "../components/AsyncComponentSelect";
+
 import Alert from "../../ui/Alert";
 import { BomItem } from "../../types/bomListItem";
 import Button from "../../ui/Button";
@@ -20,6 +23,7 @@ import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 import useGetUserCurrency from "../../services/useGetUserCurrency";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
+import useSuggestComponent from "../../services/useSuggestComponentForBomListItem";
 
 interface NestedTableProps {
   data: BomItem;
@@ -47,6 +51,34 @@ export const customStyles = {
   },
 };
 
+const transformSubmissionData = (data: any) => {
+  const extractValue = (field: any) =>
+    field && field.value ? field.value : field;
+
+  return {
+    component: {
+      farads: data.farads || null,
+      farads_unit: extractValue(data.farads_unit),
+      manufacturer: extractValue(data.manufacturer),
+      manufacturer_part_no: data.manufacturer_part_no,
+      mounting_style: extractValue(data.mounting_style),
+      ohms: extractValue(data.ohms),
+      ohms_unit: extractValue(data.ohms_unit),
+      tolerance: data.tolerance || null,
+      type: extractValue(data.type),
+      voltage_rating: data.voltage_rating || null,
+      wattage: data.wattage || null,
+    },
+    supplier_items: data.supplier_items.map((item: any) => ({
+      currency: item.currency || "USD",
+      link: item.link || "",
+      price: parseFloat(item.price || "0"),
+      supplier: extractValue(item.supplier),
+      supplier_item_no: item.supplier_item_no || "",
+    })),
+  };
+};
+
 const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const {
     bom_specifies_a_choice_of_values,
@@ -66,6 +98,70 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const [inventoryModalOpen, setInventoryModalOpen] = useState<
     string | undefined
   >();
+  const [fullPageModalOpen, setFullPageModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [selectedComponent, setSelectedComponent] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+
+  const { suggestComponent, isPending } = useSuggestComponent();
+
+  const handleComponentChange = (
+    selected: { label: string; value: string } | null
+  ) => {
+    setSelectedComponent(selected);
+  };
+
+  const handleFormSubmit = async () => {
+    if (isSubmitting || isPending) return;
+
+    setIsSubmitting(true);
+
+    try {
+      if (selectedComponent) {
+        // Submit existing component
+        await suggestComponent({
+          componentId: selectedComponent.value,
+          moduleBomListItemId: modulebomlistitem_pk,
+        });
+        alert("Component suggestion submitted successfully!");
+      } else if (formRef.current) {
+        // Submit new component
+        const formData = new FormData(formRef.current);
+
+        const data: any = {};
+        formData.forEach((value, key) => {
+          if (key.includes("supplier_items")) {
+            const [, index, field] = key.split(".");
+            if (!data.supplier_items) data.supplier_items = [];
+            if (!data.supplier_items[+index]) data.supplier_items[+index] = {};
+            data.supplier_items[+index][field] = value;
+          } else {
+            data[key] = value;
+          }
+        });
+
+        const transformedData = transformSubmissionData(data);
+
+        await suggestComponent({
+          componentData: transformedData,
+          moduleBomListItemId: modulebomlistitem_pk,
+        });
+        alert("New component suggestion submitted successfully!");
+      } else {
+        alert("No action taken. Please select a component or fill the form.");
+      }
+
+      setFullPageModalOpen(false);
+    } catch (error: any) {
+      alert(`Error submitting suggestion: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (components_options.length < 1) {
     return (
@@ -79,7 +175,6 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const { componentsData, componentsAreLoading, componentsAreError } =
     useGetComponentsByIds(components_options);
   const { data: currencyData } = useGetUserCurrency();
-  console.log(componentsData)
 
   // Ah yes, another bizarre useEffect hack to get around the quirks of react-data-table-component...
   useEffect(() => {
@@ -104,12 +199,18 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     {
       cell: (row: Component) => {
         return (
-          <RowWarning id={row.id} left="-31px" user_submitted_status={row.user_submitted_status ?? "approved"}>
+          <RowWarning
+            id={row.id}
+            left="-31px"
+            user_submitted_status={row.user_submitted_status ?? "approved"}
+          >
             <div className="ml-1.5">
               {row.discontinued ? (
                 <span>
                   <s>{row.description}</s>{" "}
-                  <span className="italic font-bold text-red-500">DISCONTINUED</span>
+                  <span className="italic font-bold text-red-500">
+                    DISCONTINUED
+                  </span>
                 </span>
               ) : (
                 <a
@@ -493,7 +594,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
           </p>
         </Alert>
       )}
-      <div id="table__wrapper" style={{overflowX: "visible"}}>
+      <div id="table__wrapper" style={{ overflowX: "visible" }}>
         <DataTable
           columns={columns}
           compact
@@ -511,6 +612,85 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
           progressPending={componentsAreLoading}
         />
       </div>
+      <div className="w-full">
+        <button className="w-full" onClick={() => setFullPageModalOpen(true)}>
+          <div className="flex justify-between w-full mt-6">
+            <Alert
+              align="center"
+              expand={false}
+              icon
+              padding="compact"
+              variant="addComponent"
+            >
+              Help improve the database! Suggest a component for this BOM item.
+            </Alert>
+          </div>
+        </button>
+      </div>
+      <FullPageModal
+        customButtons={
+          <div className="flex justify-end space-x-4">
+            <button
+              className="px-4 py-2 text-gray-900 bg-gray-200 rounded-md"
+              onClick={() => setFullPageModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className={`px-4 py-2 text-white rounded-md ${
+                isSubmitting ? "bg-gray-500" : "bg-brandgreen-600"
+              }`}
+              onClick={handleFormSubmit}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+        }
+        open={fullPageModalOpen}
+        setOpen={setFullPageModalOpen}
+        submitButtonText="Save"
+        subtitle={
+          <p>
+            Add a new component or select an existing one from the database. New
+            components are reviewed before being added.
+          </p>
+        }
+        title="Add a Component"
+      >
+        <div>
+          <div className="p-4 bg-gray-100 rounded-lg">
+            <h4 className="pb-3 mb-3 text-lg font-semibold">
+              Select a component from the database
+            </h4>
+            <div className="flex flex-wrap gap-6 align-middle">
+              <AsyncComponentSelect
+                onChange={handleComponentChange}
+                placeholder="Search components..."
+                value={selectedComponent}
+              />
+            </div>
+          </div>
+          <div className="relative flex items-center justify-center my-6">
+            <div className="flex-1 border-t border-gray-300" />
+            <span className="px-4 text-gray-500 bg-white">OR</span>
+            <div className="flex-1 border-t border-gray-300" />
+          </div>
+          <div className="p-4 bg-gray-100 rounded-lg">
+            <h4 className="text-lg font-semibold">
+              Add a component to the database
+            </h4>
+            <AddComponentForm
+              formRef={formRef}
+              handleSuccess={() => {
+                setFullPageModalOpen(false);
+                alert("Component added successfully!");
+              }}
+              isSubmitting={isSubmitting}
+              setIsSubmitting={setIsSubmitting}
+            />
+          </div>
+        </div>
+      </FullPageModal>
     </div>
   );
 };

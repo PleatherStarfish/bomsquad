@@ -72,6 +72,7 @@ export interface BomListProps {
   moduleName: string;
   handleExportButtonClick: (arg0: boolean) => void
   exportModalOpen: boolean
+  handleLoading: (arg0: boolean) => void
 }
 
 export interface WantToBuildModules {

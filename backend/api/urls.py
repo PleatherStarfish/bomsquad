@@ -22,6 +22,7 @@ from modules.views import (
     module_list_v2,
     get_filter_options,
     components_autocomplete,
+    suggested_component_for_bom_list_item_api_view,
 )
 
 # Module and components-related views
@@ -150,6 +151,11 @@ urlpatterns = [
         "shopping-list/<uuid:component_pk>/<uuid:modulebomlistitem_pk>/<uuid:module_pk>/component-quantity/",
         get_user_shopping_list_quantity,
         name="user-shopping-list",
+    ),
+    path(
+        "suggested-component/<uuid:modulebomlistitem_pk>/",
+        suggested_component_for_bom_list_item_api_view,
+        name="suggest-component-for-bom-list-item",
     ),
     path(
         "shopping-list/total-price/",

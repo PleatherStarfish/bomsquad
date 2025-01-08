@@ -7,7 +7,6 @@ const useGetUserInventoryTree = () => {
   const csrftoken = Cookies.get('csrftoken');
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['userInventoryTree'],
     queryFn: async () => {
       const response = await axios.get('/api/inventory/tree/', {
         headers: {
@@ -17,9 +16,10 @@ const useGetUserInventoryTree = () => {
       });
       return response.data.inventory_tree;
     },
+    queryKey: ['userInventoryTree'],
   });
 
-  return { data, isLoading, isError, error };
+  return { data, error, isError, isLoading };
 };
 
 export default useGetUserInventoryTree;

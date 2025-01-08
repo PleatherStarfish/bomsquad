@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}
+  Subscribe
+{% endblock title %}
+{% block content %}
+  <div class="px-3 py-3 mx-auto text-center">
+    <h1 class="text-2xl font-bold">Subscribe to Our Mailing List</h1>
+    {% if error %}
+      <p class="mt-2 text-red-500">{{ error }}</p>
+    {% endif %}
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="email" class="block text-lg font-medium">Email:</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-brandgreen-500"
+          required
+        >
+      </div>
+      <button
+        type="submit"
+        class="px-4 py-2 font-bold text-white rounded-md bg-brandgreen-500 hover:bg-brandgreen-700"
+      >
+        Subscribe
+      </button>
+    </form>
+  </div>
+{% endblock content %}

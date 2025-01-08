@@ -7,7 +7,7 @@ import cx from "classnames";
 
 interface FullPageModalProps extends Omit<ModalProps, "type"> {
   subsubtitle?: string;
-  subtitle?: React.JSX.Element;
+  subtitle?: React.JSX.Element | string;
   type?: keyof typeof Types;
   customButtons?: React.ReactNode;
 }
@@ -98,17 +98,17 @@ const FullPageModal: React.FC<FullPageModalProps> = ({
                   "flex flex-col max-h-[90vh]" // Ensure max height is constrained
                 )}
               >
-                <div className="flex-1 overflow-y-auto p-8" id="modal-content-container">
+                <div className="flex-1 p-8 overflow-y-auto" id="modal-content-container">
                   <Dialog.Title
                     as="h3"
-                    className="text-2xl text-left font-semibold leading-6 text-gray-900 py-4 font-display"
+                    className="py-4 text-2xl font-semibold leading-6 text-left text-gray-900 font-display"
                   >
                     {title}
                   </Dialog.Title>
-                  {subsubtitle && <div className="text-xs mb-4">
+                  {subsubtitle && <div className="mb-4 text-xs">
                     <small>{subsubtitle}</small>
                   </div>}
-                  <div className="text-sm mb-4">
+                  <div className="mb-4 text-sm">
                     {subtitle}
                   </div>
                   <div className="w-full mt-2">{children}</div>
