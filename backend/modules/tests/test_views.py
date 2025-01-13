@@ -14,6 +14,7 @@ from components.models import (
     Types,
 )
 from rest_framework.test import APITestCase
+from rest_framework import status
 from accounts.models import CustomUser
 from django.urls import reverse
 
@@ -68,6 +69,8 @@ class SuggestedComponentForBomListItemTests(APITestCase):
             description="Test Component",
             type=self.resistor_type,
             manufacturer=self.component_manufacturer,  # Assign correct manufacturer instance
+            manufacturer_part_no="TEST123",
+            mounting_style="th",
         )
 
         # Create a supplier for testing
@@ -364,6 +367,9 @@ class SuggestedComponentForBomListItemTests(APITestCase):
         database but not associated with the BOM list item, it is treated as if
         the user passed in `component_id`.
         """
+        # Clean up database to prevent duplicates
+        Component.objects.all().delete()
+
         # Create an existing component with a specific manufacturer
         existing_component = Component.objects.create(
             manufacturer=self.component_manufacturer,
@@ -373,8 +379,6 @@ class SuggestedComponentForBomListItemTests(APITestCase):
             mounting_style="th",
             tolerance="5%",
             voltage_rating="50V",
-            wattage="0.25W",
-            farads=100,
         )
 
         # Prepare component_data with matching existing component details
@@ -493,3 +497,114 @@ class SuggestedComponentForBomListItemTests(APITestCase):
             suggested_component=self.component,
         ).count()
         self.assertEqual(suggestion_count, 0)  # No suggestion created
+
+
+class SuggestedComponentsForBomListItemViewTests(APITestCase):
+    def setUp(self):
+        # Create test user
+        self.user = CustomUser.objects.create_user(
+            username="testuser", password="testpassword"
+        )
+        self.client.force_authenticate(user=self.user)
+
+        # Create a manufacturer for the module
+        self.manufacturer = Manufacturer.objects.create(name="Test Manufacturer")
+
+        # Create a module
+        self.module = Module.objects.create(
+            id=uuid4(),
+            name="Test Module",
+            manufacturer=self.manufacturer,
+            description="A test module",
+        )
+
+        # Create a component type and manufacturer
+        self.type_resistor = Types.objects.create(name="Resistor")
+        self.component_manufacturer = ComponentManufacturer.objects.create(
+            name="Test Component Manufacturer"
+        )
+
+        # Create a BOM List Item with a module
+        self.module_bom_list_item = ModuleBomListItem.objects.create(
+            id=uuid4(),
+            description="Test BOM Item",
+            module=self.module,  # Associate with the module
+            type=self.type_resistor,
+            quantity=1,
+        )
+
+        # Create components and suggestions
+        self.component_1 = Component.objects.create(
+            description="Component 1",
+            manufacturer=self.component_manufacturer,
+            type=self.type_resistor,
+            manufacturer_part_no="C123",
+        )
+        self.suggestion_1 = SuggestedComponentForBomListItem.objects.create(
+            module_bom_list_item=self.module_bom_list_item,
+            suggested_component=self.component_1,
+            suggested_by=self.user,
+        )
+
+        self.component_2 = Component.objects.create(
+            description="Component 2",
+            manufacturer=self.component_manufacturer,
+            type=self.type_resistor,
+            manufacturer_part_no="C456",
+        )
+        self.suggestion_2 = SuggestedComponentForBomListItem.objects.create(
+            module_bom_list_item=self.module_bom_list_item,
+            suggested_component=self.component_2,
+            suggested_by=self.user,
+        )
+
+        self.url = reverse(
+            "get-suggested-component-for-bom-list-item",
+            kwargs={"modulebomlistitem_pk": self.module_bom_list_item.pk},
+        )
+
+    def test_get_suggested_components_success(self):
+        """
+        Test that the GET endpoint returns suggested components for a valid BOM list item.
+        """
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        first_item = response.data[0]
+        self.assertIn("id", first_item)
+        self.assertIn("module_bom_list_item", first_item)
+        self.assertIn("suggested_component", first_item)
+        self.assertIn("status", first_item)
+
+        # Validate the suggested component structure
+        suggested_component = first_item["suggested_component"]
+        self.assertIn("id", suggested_component)
+        self.assertIn("description", suggested_component)
+        self.assertIn("manufacturer_part_no", suggested_component)
+        self.assertIn("type", suggested_component)
+        self.assertIn("mounting_style", suggested_component)
+        self.assertIn("supplier_items", suggested_component)
+
+    def test_get_suggested_components_unauthenticated(self):
+        # Logout to simulate unauthenticated access
+        self.client.logout()
+        url = f"/api/suggested-component/{self.module_bom_list_item.id}/"
+        response = self.client.get(url)
+
+        # Assert success response for unauthenticated user
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_suggested_components_404(self):
+        invalid_id = uuid4()
+        url = f"/api/suggested-component/{invalid_id}/"
+        response = self.client.get(url)
+
+        # Assert 404 response
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data["detail"],
+            "No suggestions found for the specified BOM list item.",
+        )

@@ -22,7 +22,8 @@ from modules.views import (
     module_list_v2,
     get_filter_options,
     components_autocomplete,
-    suggested_component_for_bom_list_item_api_view,
+    suggest_component_for_bom_list_item,
+    get_suggested_components_for_bom_list_item,
 )
 
 # Module and components-related views
@@ -154,7 +155,12 @@ urlpatterns = [
     ),
     path(
         "suggested-component/<uuid:modulebomlistitem_pk>/",
-        suggested_component_for_bom_list_item_api_view,
+        get_suggested_components_for_bom_list_item,
+        name="get-suggested-component-for-bom-list-item",
+    ),
+    path(
+        "suggested-component/<uuid:modulebomlistitem_pk>/add/",
+        suggest_component_for_bom_list_item,
         name="suggest-component-for-bom-list-item",
     ),
     path(

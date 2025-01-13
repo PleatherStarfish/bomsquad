@@ -106,61 +106,6 @@ class ComponentDataSerializer(serializers.Serializer):
     component = serializers.DictField(child=serializers.CharField(allow_null=True))
     supplier_items = SupplierItemSerializer(many=True, required=True)
 
-    def validate_component(self, value):
-        """
-        Dynamically validate fields based on the component type.
-        """
-        # Define required and optional fields for each type
-        type_specific_rules = {
-            "Resistor": {
-                "required": ["ohms", "ohms_unit"],
-                "prohibited": ["farads", "farads_unit"],
-            },
-            "Capacitor": {
-                "required": ["farads", "farads_unit"],
-                "prohibited": ["ohms", "ohms_unit"],
-            },
-            "Diode": {
-                "required": [],
-                "prohibited": ["ohms", "ohms_unit", "farads", "farads_unit"],
-            },
-            "Potentiometer": {
-                "required": ["ohms", "ohms_unit"],
-                "prohibited": ["farads", "farads_unit"],
-            },
-        }
-
-        # Retrieve the component type
-        component_type_id = value.get("type")
-        if not component_type_id:
-            raise serializers.ValidationError({"type": "This field is required."})
-
-        try:
-            component_type = Types.objects.get(id=component_type_id)
-        except Types.DoesNotExist:
-            raise serializers.ValidationError({"type": "Invalid component type."})
-
-        # Fetch validation rules for the given type
-        rules = type_specific_rules.get(component_type.name, {})
-        required_fields = rules.get("required", [])
-        prohibited_fields = rules.get("prohibited", [])
-
-        # Check required fields
-        for field in required_fields:
-            if not value.get(field):
-                raise serializers.ValidationError(
-                    {field: f"This field is required for {component_type.name}."}
-                )
-
-        # Check prohibited fields
-        for field in prohibited_fields:
-            if value.get(field):
-                raise serializers.ValidationError(
-                    {field: f"This field is not allowed for {component_type.name}."}
-                )
-
-        return value
-
 
 class SuggestedComponentForBomListItemSerializer(serializers.Serializer):
     module_bom_list_item_id = serializers.UUIDField(required=True)
@@ -256,3 +201,37 @@ class SuggestedComponentForBomListItemSerializer(serializers.Serializer):
                 )
 
         return value
+
+
+class SimplifiedSupplierItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComponentSupplierItem
+        fields = ["supplier_item_no", "price", "link"]
+
+
+class SimplifiedComponentSerializer(serializers.ModelSerializer):
+    supplier_items = SimplifiedSupplierItemSerializer(many=True)
+
+    class Meta:
+        model = Component
+        fields = [
+            "id",
+            "description",
+            "manufacturer_part_no",
+            "type",
+            "mounting_style",
+            "supplier_items",
+        ]
+
+
+class SuggestedComponentDetailSerializer(serializers.ModelSerializer):
+    suggested_component = SimplifiedComponentSerializer()
+
+    class Meta:
+        model = SuggestedComponentForBomListItem
+        fields = [
+            "id",
+            "module_bom_list_item",
+            "suggested_component",
+            "status",
+        ]

@@ -65,7 +65,7 @@ const useSuggestComponentForBomListItem = () => {
       console.log(bomItemId)
 
       const response = await axios.post(
-        `/api/suggested-component/${bomItemId}/`,
+        `/api/suggested-component/${bomItemId}/add/`,
         requestPayload,
         {
           headers: {

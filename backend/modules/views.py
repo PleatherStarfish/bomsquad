@@ -38,6 +38,7 @@ from modules.models import (
 from modules.serializers import (
     BuiltModuleSerializer,
     ModuleSerializer,
+    SuggestedComponentDetailSerializer,
     WantTooBuildModuleSerializer,
     ModuleBomListItemSerializer,
     ModuleBomListComponentForItemRatingSerializer,
@@ -754,9 +755,28 @@ def get_filter_options(request):
     )
 
 
+@api_view(["GET"])
+def get_suggested_components_for_bom_list_item(request, modulebomlistitem_pk):
+    """
+    Retrieve all suggested components for a given BOM List Item.
+    """
+    suggestions = SuggestedComponentForBomListItem.objects.filter(
+        module_bom_list_item_id=modulebomlistitem_pk
+    )
+
+    if not suggestions.exists():
+        return Response(
+            {"detail": "No suggestions found for the specified BOM list item."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = SuggestedComponentDetailSerializer(suggestions, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def suggested_component_for_bom_list_item_api_view(request, modulebomlistitem_pk):
+def suggest_component_for_bom_list_item(request, modulebomlistitem_pk):
     """
     Handle POST requests to suggest a component for a BOM list item.
 

@@ -24,6 +24,8 @@ import useGetUserCurrency from "../../services/useGetUserCurrency";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useSuggestComponent from "../../services/useSuggestComponentForBomListItem";
+import useGetSuggestedComponentsForBomListItem from "../../services/useGetSuggestedComponentsList";
+import UserSuggestedComponentsTable from "./userSuggestedComponentsTable";
 
 interface NestedTableProps {
   data: BomItem;
@@ -89,7 +91,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     moduleId: module_pk,
     moduleName,
     quantity,
-    description,
+    description: bomItemDescription,
   } = data;
 
   const [shoppingModalOpen, setShoppingModalOpen] = useState<
@@ -108,6 +110,9 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   } | null>(null);
 
   const { suggestComponent, isPending } = useSuggestComponent();
+
+  const { data: suggestedComponents } =
+  useGetSuggestedComponentsForBomListItem(modulebomlistitem_pk);
 
   const handleComponentChange = (
     selected: { label: string; value: string } | null
@@ -385,7 +390,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     {
       cell: (row) => (
         <UserRating
-          bomItemName={description}
+          bomItemName={bomItemDescription}
           componentId={row.id}
           initialRating={0}
           moduleBomListItemId={modulebomlistitem_pk}
@@ -426,7 +431,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                 <>
                   <span>
                     {`${moduleName} requires ${quantity} x
-                  ${description}. How many `}
+                  ${bomItemDescription}. How many `}
                   </span>
                   <span>
                     <a
@@ -496,7 +501,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
                 <>
                   <span>
                     {`${moduleName} requires ${quantity} x
-                    ${description}. How many `}
+                    ${bomItemDescription}. How many `}
                   </span>
                   <span>
                     <a
@@ -610,6 +615,16 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
             </div>
           }
           progressPending={componentsAreLoading}
+        />
+      </div>
+      <div>
+        <UserSuggestedComponentsTable
+          bomItemDescription={bomItemDescription}
+          data={suggestedComponents || []}
+          moduleBomListItemId={modulebomlistitem_pk}
+          moduleId={module_pk}
+          moduleName={moduleName}
+          userCurrency={currencyData}
         />
       </div>
       <div className="w-full">
