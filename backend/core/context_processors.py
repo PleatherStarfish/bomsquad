@@ -1,4 +1,5 @@
 import os
+from uuid import UUID
 from django.shortcuts import get_object_or_404
 import html
 
@@ -60,11 +61,9 @@ def meta_context(request):
     # Dynamic SEO for Component detail pages
     if current_path.startswith("/components/"):
         try:
-            # Clean the current path to handle trailing slashes
             current_path_cleaned = current_path.rstrip("/")
             component_id = current_path_cleaned.split("/")[-1]
-
-            # Retrieve the component object
+            UUID(component_id, version=4)
             component = get_object_or_404(Component, pk=component_id)
 
             # Find related ModuleBomListItems
@@ -73,23 +72,41 @@ def meta_context(request):
             )
 
             # Gather related modules and manufacturers
-            related_modules = module_bom_items.values_list(
-                "module__name", flat=True
-            ).distinct()
-            print(related_modules)
-            print(len(related_modules))
+            related_modules = list(
+                module_bom_items.values_list("module__name", flat=True).distinct()
+            )
 
-            # Format the list into a human-readable string
-            if len(related_modules) == 1:
-                human_readable_modules = related_modules[0]
-            elif len(related_modules) == 2:
-                human_readable_modules = " and ".join(related_modules)
+            if related_modules:
+                if len(related_modules) == 1:
+                    related_modules_str = related_modules[0]
+                else:
+                    related_modules_str = ", ".join(related_modules[:-1])
+                    related_modules_str += f", and {related_modules[-1]}"
             else:
-                human_readable_modules = (
-                    ", ".join(related_modules[:-1]) + ", and " + related_modules[-1]
-                )
+                related_modules_str = ""
 
-            print(human_readable_modules)
+            MAX_TITLE_LENGTH = 60  # Define your maximum title length
+
+            # Base title without modules
+            base_title = f"{component.description} | Perfect for DIY audio projects"
+
+            # Add related modules if they fit within the limit
+            if related_modules_str:
+                remaining_length = (
+                    MAX_TITLE_LENGTH - len(base_title) - len(" such as ") - 3
+                )  # Reserve space for "..." if truncated
+                if remaining_length > 0:
+                    # Truncate related modules list to fit within the limit
+                    truncated_modules = (
+                        (related_modules_str[:remaining_length] + "...")
+                        if len(related_modules_str) > remaining_length
+                        else related_modules_str
+                    )
+                    title = f"{base_title} such as {truncated_modules}"
+                else:
+                    title = base_title
+            else:
+                title = base_title
 
             related_manufacturers = module_bom_items.values_list(
                 "module__manufacturer__name", flat=True
@@ -106,16 +123,41 @@ def meta_context(request):
                 for item in related_supplier_items
             ]
 
+            MAX_DESCRIPTION_LENGTH = 160  # Maximum length for meta description
+
+            # Dynamic description based on related modules
+            if related_modules:
+                # Construct a human-readable list of modules
+                if len(related_modules) == 1:
+                    related_modules_str = related_modules[0]
+                else:
+                    related_modules_str = ", ".join(related_modules[:-1])
+                    related_modules_str += f", and {related_modules[-1]}"
+
+                description_base = (
+                    f"See how {component.manufacturer_part_no} from "
+                    f"{component.manufacturer.name if component.manufacturer else 'various manufacturers'} "
+                    f"is used in DIY modular synths and audio projects such as {related_modules_str}."
+                )
+            else:
+                related_modules_str = ""
+                description_base = (
+                    f"Learn about {component.manufacturer_part_no} from "
+                    f"{component.manufacturer.name if component.manufacturer else 'various manufacturers'}, "
+                    f"perfect for DIY modular synths and audio projects."
+                )
+
+            # Truncate description to fit within the maximum length
+            if len(description_base) > MAX_DESCRIPTION_LENGTH:
+                description = description_base[: MAX_DESCRIPTION_LENGTH - 3] + "..."
+            else:
+                description = description_base
+
             # Generate meta tags
             META_DEFAULTS.update(
                 {
-                    "title": (
-                        f"{component.description} | Used in {', '.join(human_readable_modules)} "
-                    ),
-                    "description": (
-                        f"Discover {component.description} from {component.manufacturer.name if component.manufacturer else 'various manufacturers'}, "
-                        f"used in {', '.join(related_modules)} projects. Perfect for DIY modular synths and audio builds."
-                    ),
+                    "title": title,
+                    "description": description,
                     "keywords": ", ".join(
                         filter(
                             None,
@@ -131,14 +173,9 @@ def meta_context(request):
                             ],
                         )
                     ),
-                    "image": component.octopart_url
-                    or "https://bomsquad.com/static/images/default-component.png",
                     "og:type": "article",
-                    "og:title": f"{component.description} | Used in {', '.join(related_modules)}",
-                    "og:description": (
-                        f"Explore {component.description} from {component.manufacturer.name if component.manufacturer else 'various manufacturers'}, "
-                        f"featured in {', '.join(related_modules)} projects. Supplier info: {', '.join(supplier_info)}"
-                    ),
+                    "og:title": title,
+                    "og:description": description,
                 }
             )
         except (ValueError, IndexError):

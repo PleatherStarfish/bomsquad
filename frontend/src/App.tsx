@@ -31,7 +31,7 @@ const App: React.FC = () => {
         <Routes>
           <Route element={<Projects />} path="/projects" />
           <Route element={<Components />} path="/components" />
-          <Route element={<ModuleDetail />} path="/module/:slug" />
+          <Route element={<ModuleDetail />} path="/projects/:slug" />
           <Route element={<Settings />} path={`/user/:username/settings`} />
           <Route
             element={<VersionHistory />}

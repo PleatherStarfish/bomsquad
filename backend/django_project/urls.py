@@ -16,7 +16,7 @@ from core.views import robots_txt
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import views as sitemap_views
 from core.sitemaps import (
-    ModuleSitemap,
+    ProjectSitemap,
     ManufacturerSitemap,
     ComponentSitemap,
     StaticViewSitemap,
@@ -29,7 +29,7 @@ import admin_honeypot
 admin.site.__class__ = OTPAdminSite
 
 sitemaps = {
-    "modules": ModuleSitemap,
+    "projects": ProjectSitemap,
     "manufacturers": ManufacturerSitemap,
     "components": ComponentSitemap,
     "static": StaticViewSitemap,
@@ -70,7 +70,7 @@ frontend_redirect_urls = [
     re_path(r"^maintenance-mode/", include("maintenance_mode.urls")),
     path(r"comments/", include("django_comments_xtd.urls")),
     path(
-        "module/<slug:slug>/",
+        "projects/<slug:slug>/",
         module_detail,
         name="module",
     ),

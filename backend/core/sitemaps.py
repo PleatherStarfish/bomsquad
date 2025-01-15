@@ -4,9 +4,9 @@ from modules.models import Module, Manufacturer
 from components.models import Component, Types
 
 
-class ModuleSitemap(Sitemap):
+class ProjectSitemap(Sitemap):
     changefreq = "weekly"
-    priority = 0.9
+    priority = 0.7
 
     def items(self):
         return Module.objects.filter(discontinued=False)
@@ -30,8 +30,8 @@ class ManufacturerSitemap(Sitemap):
 
 
 class ComponentSitemap(Sitemap):
-    changefreq = "weekly"
-    priority = 0.7
+    changefreq = "daily"
+    priority = 0.8
 
     def items(self):
         return Component.objects.filter(discontinued=False)
@@ -41,8 +41,8 @@ class ComponentSitemap(Sitemap):
 
 
 class StaticViewSitemap(Sitemap):
-    changefreq = "daily"
-    priority = 0.5
+    changefreq = "monthly"
+    priority = 0.4
 
     def items(self):
         return ["about", "disclaimer", "tos", "pp", "faq"]

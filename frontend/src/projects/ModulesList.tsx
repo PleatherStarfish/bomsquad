@@ -81,7 +81,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
             >
               <div className="flex justify-center w-full h-64 md:w-48 md:h-48">
                 {module.slug && (
-                  <Link reloadDocument to={`/module/${module.slug}`}>
+                  <Link reloadDocument to={`/projects/${module.slug}`}>
                     {module.thumb_image_webp && module.thumb_image_jpeg ? (
                       <picture>
                         <source
@@ -105,7 +105,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
               <div className="flex-1 p-4 md:px-4 md:py-5 sm:p-6">
                 <div className="flex flex-col flex-wrap justify-between w-full md:flex-row">
                   {module.slug && (
-                    <Link reloadDocument to={`/module/${module.slug}`}>
+                    <Link reloadDocument to={`/projects/${module.slug}`}>
                       <h2 className="text-xl font-medium text-center text-gray-900 md:text-left">
                         {module.name}
                       </h2>
