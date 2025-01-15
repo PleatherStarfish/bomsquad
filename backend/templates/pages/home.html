@@ -16,7 +16,7 @@
       <div style="opacity: 0.85" class="absolute inset-0 flex items-center justify-center h-screen bg-white"></div>
       <div class="absolute inset-0 flex items-center justify-center">
         <div class="max-w-[290px] sm:max-w-[400px] md:max-w-[600px]">
-          <h1 class="text-xl font-semibold text-center text-gray-900 md:text-5xl bold font-display"><span>The only BOM tool built by and for DIY </span><span id="audio-jiggle" style="display: inline-block; transform-origin: center; will-change: transform">audio</span><span> hardware geeks</span></h1>
+          <h2 class="text-xl font-semibold text-center text-gray-900 md:text-5xl bold font-display"><span>The only BOM tool built by and for DIY </span><span id="audio-jiggle" style="display: inline-block; transform-origin: center; will-change: transform">audio</span><span> hardware geeks</span></h2>
           <div class="mt-6">
             <p class="font-normal text-center text-gray-600 md:text-lg font-display">An interactive bill of materials (BOMs) that intelligently cross-reference with your inventory and shopping list</p>
           </div>
@@ -27,7 +27,7 @@
   <!-- Projects Section -->
   <div class="flex flex-col border-gray-300 border-x projects-section">
     <div class="flex flex-col justify-between">
-      <div class="w-full p-6 min-h-80 md:h-full">
+      <div style="padding: 1.5rem" class="w-full p-6 min-h-80 md:h-full">
         <h2 class="mb-4 text-2xl font-semibold text-left font-display">Recently Added</h2>
         <div class="w-full my-3">
           <p style="font-size: 16px" class="font-medium text-left text-gray-600 font-display">Projects recently added to the BOM Squad database. Support the project on <a class="text-blue-500" href="https://ko-fi.com/bomsquad">Ko-Fi</a> and choose what we add next!</p>
@@ -64,7 +64,7 @@
   </div>
 
   <a href="/projects/" class="block">
-    <div class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border left-info-box lg:min-h-36">
+    <div style="padding: 1.5rem" class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border left-info-box lg:min-h-36">
       <div class="flex justify-center">
         <div class="flex flex-col justify-center align-middle lg:min-h-36">
           <h4 class="text-4xl font-semibold text-center font-display">{{ project_count }}</h4>
@@ -75,7 +75,7 @@
   </a>
 
   <a href="/components/" class="block">
-    <div class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border-t middle-info-box lg:min-h-36">
+    <div style="padding: 1.5rem" class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border-t middle-info-box lg:min-h-36">
       <div class="flex justify-center">
         <div class="flex flex-col justify-center align-middle lg:min-h-36">
           <h4 class="text-4xl font-semibold text-center font-display">{{ component_count }}</h4>
@@ -95,11 +95,17 @@
     </div>
   </div>
 
+  <div class="flex flex-col justify-between w-full h-full space-y-12 border-b border-gray-200 border-x about-section">
+    <div style="padding: 1.5rem" class="flex flex-col items-center justify-between w-full h-full p-6 border-gray-200 lg:flex-row info1-section">
+      <h1 class="mb-2 text-2xl font-semibold text-center text-gray-800 font-display md:text-left">Easy DIY Synthesizer Projects</h1>
+    </div>
+  </div>
+
   <!-- Info Row 1 -->
   <div class="flex flex-col justify-between w-full h-full space-y-12 border-gray-200 border-x info1-section">
-    <div class="flex flex-col items-center justify-between w-full h-full p-6 border-gray-200 lg:flex-row info1-section">
+    <div style="padding: 1.5rem" class="flex flex-col items-center justify-between w-full h-full p-6 border-gray-200 lg:flex-row info1-section">
       <!-- Text Section -->
-      <div class="w-full mb-6 text-center lg:mb-0 lg:mr-6 lg:w-1/2 md:text-left">
+      <div class="w-full text-center lg:mb-0 lg:mr-6 lg:w-1/2 md:text-left">
         <h3 class="mb-2 text-2xl font-semibold text-center text-gray-800 font-display md:text-left">Subscribe for updates</h3>
         <p class="mb-4 text-sm text-center text-gray-600 font-display md:text-left">
           Stay updated with the latest BOM Squad projects and community news!
@@ -151,10 +157,10 @@
   </div>
 
   <!-- Footer Section -->
-  <div class="relative flex flex-col items-center justify-center w-full p-3 border border-gray-200 md:border-b md:border-l-0 md:border-r md:border-t-0 footer-section">
+  <div style="padding: 0.75rem" class="relative flex flex-col items-center justify-center w-full p-3 border border-gray-200 md:border-b md:border-l-0 md:border-r md:border-t-0 footer-section">
     <a href="https://github.com/PleatherStarfish/bomsquad" class="absolute inset-0 z-10"></a>
     <!-- Content Section -->
-    <div class="flex flex-col items-center w-full h-full p-4 space-y-3 text-center bg-[#cab9a3] rounded">
+    <div style="padding: 1rem" class="flex flex-col items-center w-full h-full p-4 space-y-3 text-center bg-[#cab9a3] rounded">
       <img src="{% static 'images/github.svg' %}" alt="GitHub logo" class="w-9 h-9 lg:w-11 lg:h-11">
       <p class="text-white">BOM Squad is free and open source! Contribute to the project on GitHub!</p>
     </div>

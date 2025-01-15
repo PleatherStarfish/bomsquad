@@ -31,6 +31,8 @@ const useAddOrUpdateUserInventory = (): UseMutationResult<
 
   const mutation = useMutation<AxiosResponse, unknown, MutationVariables>({
     mutationFn: ({ componentId, data }) => {
+      console.log("useAddOrUpdateUserInventory componentId", componentId);
+      console.log("useAddOrUpdateUserInventory data", data);
       const componentIdCleaned = removeAfterUnderscore(componentId);
       return axios.post(`/api/inventory/${componentIdCleaned}/create-or-update/`, data, {
         headers: {

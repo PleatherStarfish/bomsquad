@@ -12,6 +12,7 @@ export interface SuggestedComponent {
   suggested_component: {
     id: string;
     description: string;
+    link: string;
     manufacturer?: ComponentManufacturer | null;
     manufacturer_part_no?: string;
     mounting_style?: "smt" | "th";
@@ -29,6 +30,7 @@ export interface SuggestedComponent {
     user_submitted_status?: "approved" | "pending" | "rejected";
   };
   status: "approved" | "pending" | "rejected";
+  quantity: number;
 }
 
 // Define the service for fetching suggested components

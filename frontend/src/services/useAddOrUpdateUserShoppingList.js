@@ -10,6 +10,8 @@ const useAddOrUpdateUserShoppingList = () => {
 
   const mutation = useMutation({
     mutationFn: ({ componentId, ...data }) => {
+      console.log("useAddOrUpdateUserShoppingList componentId", componentId);
+      console.log("useAddOrUpdateUserShoppingList data", data);
       const cleanedModuleBomListItemPk = removeAfterUnderscore(data.modulebomlistitem_pk);
       const componentIdCleaned = removeAfterUnderscore(componentId);
       

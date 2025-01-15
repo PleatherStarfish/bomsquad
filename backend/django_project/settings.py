@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "mptt",
     "import_export",
     "storages",
+    "meta",
     # Local
     "accounts",
     "contact",
@@ -193,6 +194,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.mixpanel_token",
+                "core.context_processors.meta_context",
             ],
         },
     },

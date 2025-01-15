@@ -114,3 +114,15 @@ def farad_conversions(value, unit="µF"):
 @register.filter
 def ohm_conversions(value, unit="Ω"):
     return f"<ul>{generate_conversions(value, unit, 'ohm')}</ul>"
+
+
+@register.filter
+def get_nested_key(data, key):
+    """Retrieve nested keys from a dictionary."""
+    keys = key.split(":")
+    for k in keys:
+        if isinstance(data, dict):
+            data = data.get(k)
+        else:
+            return None
+    return data

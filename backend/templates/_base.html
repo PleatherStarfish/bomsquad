@@ -28,10 +28,17 @@
       name="viewport"
       content="width=device-width,minimum-scale=1,initial-scale=1"
     />
-    <meta name="description" content="{% block meta_description %}Build DIY guitar pedals, modular synth kits, and Eurorack projects with BOM Squad. Access schematics, inventory tools, and community reviews to streamline your builds.{% endblock meta_description %}" />
-    <meta name="keywords" content="{% block keywords %}diy guitar pedals, diy modular synth, diy eurorack, diy modular synth schematics, diy modular synth kit{% endblock keywords %}" />
+    <title>{{ meta.title }}</title>
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="keywords" content="{{ meta.keywords }}">  
+    {% if meta.use_og %}
+      <meta property="og:type" content="{{ meta|get_nested_key:'og:type'|default:'website' }}">
+      <meta property="og:title" content="{{ meta.title }}">
+      <meta property="og:description" content="{{ meta.description }}">
+      <meta property="og:image" content="{{ meta.image }}">
+      <meta property="og:url" content="{{ meta.url }}">
+    {% endif %}  
     
-    <title>{% block title %}BOM Squad | DIY Synthesizer Project Tool{% endblock title %}</title>
     <meta
       name="author"
       content="https://github.com/PleatherStarfish/bomsquad"
@@ -43,7 +50,6 @@
       href="{% static 'images/logo.png' %}"
     />
     <link rel="canonical" href="{{ request.build_absolute_uri|force_https_and_remove_trailing_slash }}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,6 +88,7 @@
       <script></script>
 
     {% block css %}{% endblock css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
   </head>
 
   <body class="min-h-screen">

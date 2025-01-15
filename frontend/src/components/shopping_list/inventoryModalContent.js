@@ -30,8 +30,8 @@ const InventoryModalContent = ({
         </p>
         <SimpleEditableLocation
           locationArray={locationArray}
-          submitLocationChange={setLocationArray}
           showSeparateLocationsWithCommas={false}
+          submitLocationChange={setLocationArray}
         />
         {savedLocationsData.length > 0 && (
         <div className="mt-4">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import Tippy from "@tippyjs/react";
 import { FlagIcon, LinkIcon } from "@heroicons/react/24/outline";
@@ -6,12 +6,13 @@ import { SuggestedComponent } from "../../services/useGetSuggestedComponentsList
 import { customStyles } from "./NestedTable";
 import { getFaradConversions, getOhmConversions } from "../conversions";
 import convertUnitPrice from "../../utils/convertUnitPrice";
-import Quantity from "./quantity";
+import Quantity, { Types } from "./quantity";
 import useUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 import UserRating from "./UserRating";
 import Button from "../../ui/Button";
 import Accordion from "../../ui/Accordion";
+import AddComponentModal from "./addComponentModal";
 
 interface UserSuggestedComponentsTableProps {
   data: SuggestedComponent[];
@@ -32,6 +33,10 @@ const UserSuggestedComponentsTable: React.FC<
   bomItemDescription,
   userCurrency,
 }) => {
+  console.log(moduleId)
+  const [inventoryModalOpen, setInventoryModalOpen] = useState<string | undefined>();
+  const [shoppingModalOpen, setShoppingModalOpen] = useState<string | undefined>();
+  
   const columns: TableColumn<SuggestedComponent>[] = [
     {
       cell: (row) => (
@@ -85,7 +90,7 @@ const UserSuggestedComponentsTable: React.FC<
             {(row.suggested_component.supplier_items ?? []).map(
               (item, index) => (
                 <li key={index}>
-                  <b>{item.supplier?.short_name || ""}: </b>
+                  <b>{item.supplier?.short_name || ""} </b>
                   {item.supplier_item_no ? (
                     <a
                       className="text-blue-500 hover:text-blue-700"
@@ -229,17 +234,112 @@ const UserSuggestedComponentsTable: React.FC<
       ),
       width: "70px",
     },
+    {
+      button: true,
+      cell: (row) => (
+        <>
+          <Button
+            onClick={() => setInventoryModalOpen(row.suggested_component.id)}
+            size="xs"
+            variant="primary"
+          >
+            + Inventory
+          </Button>
+          <AddComponentModal
+            componentId={row.suggested_component.id}
+            componentName={row.suggested_component.description}
+            // @ts-ignore
+            moduleId={moduleId}
+            open={inventoryModalOpen === row.suggested_component.id}
+            quantityRequired={row.quantity || 1}
+            setOpen={setInventoryModalOpen}
+            text={
+              <>
+                <span>
+                  {`${moduleName} requires ${
+                    row.quantity || 1
+                  } x ${bomItemDescription}. How many `}
+                </span>
+                <span>
+                  <a
+                    className="text-blue-500 hover:text-blue-700"
+                    href={row.suggested_component?.link}
+                  >
+                    {row.suggested_component.description}
+                  </a>
+                </span>
+                <span> would you like to add to your inventory?</span>
+              </>
+            }
+            title={`Add ${row.suggested_component.description} to Inventory?`}
+            type={Types.SHOPPING}
+          />
+        </>
+      ),
+      name: "",
+      sortable: false,
+      width: "95px",
+    },
+    {
+      button: true,
+      cell: (row) => (
+        <>
+          <Button
+            onClick={() => setShoppingModalOpen(row.suggested_component.id)}
+            size="xs"
+            variant="primary"
+          >
+            + Shopping List
+          </Button>
+          <AddComponentModal
+            componentId={row.suggested_component.id}
+            componentName={row.suggested_component.description}
+            // @ts-ignore
+            moduleId={moduleId}
+            open={shoppingModalOpen === row.suggested_component.id}
+            quantityRequired={row.quantity || 1}
+            setOpen={setShoppingModalOpen}
+            text={
+              <>
+                <span>
+                  {`${moduleName} requires ${
+                    row.quantity || 1
+                  } x ${bomItemDescription}. How many `}
+                </span>
+                <span>
+                  <a
+                    className="text-blue-500 hover:text-blue-700"
+                    href={row.suggested_component?.link}
+                  >
+                    {row.suggested_component.description}
+                  </a>
+                </span>
+                <span> would you like to add to your shopping list?</span>
+              </>
+            }
+            title={`Add ${row.suggested_component.description} to Shopping List?`}
+            type={Types.INVENTORY}
+          />
+        </>
+      ),
+      name: "",
+      sortable: false,
+      width: "115px",
+    },
   ];
 
   return (
     <div className="py-3">
       <Accordion
-        bgColor="bg-gray-100"
-        headerClasses="font-bold text-lg"
+        backgroundColor="bg-gray-100"
+        borderColor="border border-gray-300"
+        infoIcon
         innerPadding="p-4"
+        isOpenByDefault={false}
+        notice="User-submitted components are hidden by default until they are reviewed by our team."
         rounded
-        title="User Suggested Components"
-      >
+        title={`${data.length} user-submitted option${data.length !== 1 ? "s" : ""} is hidden.`}
+      > 
         <DataTable
           columns={columns}
           customStyles={customStyles}

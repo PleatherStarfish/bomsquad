@@ -1,69 +1,76 @@
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { ReactNode } from "react";
-
-import { useState } from "react";
-
+/* eslint-disable sort-keys */
+import React, { useState, ReactNode } from "react";
+import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/20/solid";
 import cx from "classnames";
-import React from "react";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 interface AccordionProps {
-  backgroundColor?: string; // Optional background color class
-  title: string; // Title displayed in the header
-  headerClasses?: string; // Additional classes for the header
-  borderColor?: string; // Border color class
-  bgColor?: string; // Background color for the content
-  rounded?: boolean; // Whether the header and content are rounded
-  innerPadding?: string; // Padding inside the content
-  children: ReactNode; // Content of the accordion
+  title: ReactNode | string;
+  children: ReactNode;
+  backgroundColor?: string;
+  borderColor?: string;
+  rounded?: boolean;
+  innerPadding?: string;
+  isOpenByDefault?: boolean;
+  notice?: string; // Optional notice for the info badge
+  infoIcon?: boolean; // Whether to show the info badge
 }
 
 const Accordion: React.FC<AccordionProps> = ({
-  backgroundColor = "",
   title,
-  headerClasses = "",
-  borderColor = "",
-  bgColor = "bg-white",
-  rounded = true,
-  innerPadding = "",
   children,
+  backgroundColor = "bg-gray-100",
+  borderColor = "border border-gray-300",
+  rounded = true,
+  innerPadding = "p-4",
+  isOpenByDefault = false,
+  notice,
+  infoIcon = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(isOpenByDefault);
 
   return (
-    <>
+    <div
+      className={cx(
+        "transition-all duration-300 overflow-hidden",
+        backgroundColor,
+        borderColor,
+        rounded && "rounded-md"
+      )}
+    >
       <button
         className={cx(
-          `flex items-center w-full py-2 space-x-1 font-medium text-left text-gray-900 px-4 focus:outline-none ${
-            isOpen ? "justify-between" : "justify-start"
-          }`,
-          rounded && "rounded",
-          borderColor && "border-b",
-          backgroundColor,
-          borderColor
+          "w-full flex justify-between items-center py-2 px-4 focus:outline-none",
+          backgroundColor
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <h4 className={cx("grow", headerClasses)}>{title}</h4>
-        <div className="flex flex-col justify-center h-full">
-          <ChevronDownIcon
-            className={`h-6 w-6 transform transition-transform duration-300 ${
-              isOpen ? "rotate-180" : "rotate-0"
-            }`}
-          />
+        <div className="flex items-center space-x-2">
+          <h4 className="font-medium text-gray-800">{title}</h4>
+          {infoIcon && notice && (
+            <Tippy content={<span className="text-sm">{notice}</span>}>
+              <InformationCircleIcon className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+            </Tippy>
+          )}
         </div>
+        <ChevronDownIcon
+          className={`h-5 w-5 transform transition-transform duration-300 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+        />
       </button>
       <div
         className={cx(
-          "transition-all duration-300 overflow-y-auto",
-          { "max-h-0": !isOpen, "max-h-48": isOpen },
-          rounded && "rounded",
-          bgColor,
+          "transition-all duration-300",
+          { "max-h-0": !isOpen, "max-h-[400px]": isOpen }, // Adjust max height as needed
           isOpen && innerPadding
         )}
+        style={{ overflowY: "hidden" }}
       >
-        {children}
+        {isOpen && children}
       </div>
-    </>
+    </div>
   );
 };
 

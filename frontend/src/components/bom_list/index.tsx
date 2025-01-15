@@ -21,7 +21,7 @@ import {
 import Alert from "../../ui/Alert";
 import CheckboxGridModal from "./checkboxGridModal";
 import FullPageModal from "../../ui/FullPageModal";
-import NestedTable from "./nestedTable";
+import NestedTable from "./NestedTable";
 import RadioGroup from "../../ui/RadioGroup";
 import Tippy from "@tippyjs/react";
 import { prefetchComponentsData } from "../../services/usePreloadComponentsData";

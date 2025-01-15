@@ -211,6 +211,7 @@ class SimplifiedSupplierItemSerializer(serializers.ModelSerializer):
 
 class SimplifiedComponentSerializer(serializers.ModelSerializer):
     supplier_items = SimplifiedSupplierItemSerializer(many=True)
+    type = TypeSerializer()
 
     class Meta:
         model = Component

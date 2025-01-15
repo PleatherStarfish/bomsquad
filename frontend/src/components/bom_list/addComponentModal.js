@@ -61,57 +61,96 @@ const AddComponentModal = ({
   // const is_premium = user?.is_premium;
 
   const handleSubmitQuantity = useCallback(async () => {
+    console.log("handleSubmitQuantity called");
+    console.log("Type:", type);
+    console.log("Component ID:", componentId);
+    console.log("Edit Mode:", editMode);
+    console.log("Location Array:", locationArray);
+    console.log("Quantity:", quantity);
+    console.log("Hook Args:", hookArgs);
+  
     try {
       if (type === Types.INVENTORY) {
-        await addOrUpdateUserInventory.mutateAsync({
-          componentId,
-          editMode,
-          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
-          quantity,
-        }, {
-          onError: (error) => {
-            console.error("Failed to update quantity", error);
-            setError("Failed to update quantity: ", error)
+        console.log("Submitting to Inventory...");
+        await addOrUpdateUserInventory.mutateAsync(
+          {
+            componentId,
+            editMode,
+            location: Array.isArray(locationArray) ? locationArray.join(",") : "",
+            quantity,
           },
-          onSuccess: () => {
-            setOpen(false);
+          {
+            onError: (error) => {
+              console.error("Failed to update inventory quantity", error);
+              setError(`Failed to update inventory: ${error.message}`);
+            },
+            onSuccess: () => {
+              console.log("Inventory updated successfully!");
+              setOpen(false);
+            },
           }
-        });
+        );
       } else if (type === Types.SHOPPING) {
-        await addOrUpdateUserShoppingList.mutateAsync({
-          componentId,
-          ...hookArgs,
-          editMode,
-          quantity,
-        }, {
-          onError: (error) => {
-            console.error("Failed to update quantity", error);
-            setError("Failed to update quantity: ", error)
+        console.log("Submitting to Shopping List...");
+        await addOrUpdateUserShoppingList.mutateAsync(
+          {
+            componentId,
+            ...hookArgs,
+            editMode,
+            quantity,
           },
-          onSuccess: () => {
-            setOpen(false);
+          {
+            onError: (error) => {
+              console.error("Failed to update shopping list quantity", error);
+              setError(`Failed to update shopping list: ${error.message}`);
+            },
+            onSuccess: () => {
+              console.log("Shopping list updated successfully!");
+              setOpen(false);
+            },
           }
-        });
+        );
       } else if (type === Types.SHOPPING_ANON) {
-        await addOrUpdateUserAnonymousShoppingList.mutateAsync({
-          componentId,
-          editMode,
-          quantity,
-        }, {
-          onError: (error) => {
-            console.error("Failed to update quantity", error);
-            setError("Failed to update quantity: ", error)
+        console.log("Submitting to Anonymous Shopping List...");
+        await addOrUpdateUserAnonymousShoppingList.mutateAsync(
+          {
+            componentId,
+            editMode,
+            quantity,
           },
-          onSuccess: () => {
-            setOpen(false);
+          {
+            onError: (error) => {
+              console.error("Failed to update anonymous shopping list quantity", error);
+              setError(`Failed to update anonymous shopping list: ${error.message}`);
+            },
+            onSuccess: () => {
+              console.log("Anonymous shopping list updated successfully!");
+              setOpen(false);
+            },
           }
-        });
+        );
+      } else {
+        console.warn("Unknown type:", type);
       }
     } catch (error) {
-      console.error("Failed to update quantity", error);
-      setError("Failed to update quantity: ", error)
+      console.error("Caught an exception while updating quantity", error);
+      setError(`Unexpected error: ${error.message}`);
+    } finally {
+      console.log("handleSubmitQuantity finished execution.");
     }
-  });
+  }, [
+    type,
+    componentId,
+    editMode,
+    locationArray,
+    quantity,
+    hookArgs,
+    addOrUpdateUserInventory,
+    addOrUpdateUserShoppingList,
+    addOrUpdateUserAnonymousShoppingList,
+    setOpen,
+  ]);
+  
 
   useEffect(() => {
     let newQuantity = parseInt(quantityRequired);

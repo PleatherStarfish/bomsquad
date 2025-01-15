@@ -105,6 +105,7 @@ def robots_txt(request):
         "Disallow: /api/",
         "Disallow: /contact/",
         "Disallow: /user/",
+        "Sitemap: https://bom-squad.com/sitemap.xml",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 

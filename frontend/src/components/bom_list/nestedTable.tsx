@@ -111,7 +111,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
 
   const { suggestComponent, isPending } = useSuggestComponent();
 
-  const { data: suggestedComponents } =
+  const { data: suggestedComponents, isLoading: suggestedComponentsLoading } =
   useGetSuggestedComponentsForBomListItem(modulebomlistitem_pk);
 
   const handleComponentChange = (
@@ -617,15 +617,18 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
           progressPending={componentsAreLoading}
         />
       </div>
-      <div>
-        <UserSuggestedComponentsTable
+      <div className="mt-6">
+        {suggestedComponentsLoading ? <div className="text-center text-gray-500 animate-pulse">Loading...</div> : <UserSuggestedComponentsTable
           bomItemDescription={bomItemDescription}
-          data={suggestedComponents || []}
+          data={suggestedComponents?.map((component) => ({
+            ...component,
+            quantity,
+          })) || []}
           moduleBomListItemId={modulebomlistitem_pk}
           moduleId={module_pk}
           moduleName={moduleName}
           userCurrency={currencyData}
-        />
+        />}
       </div>
       <div className="w-full">
         <button className="w-full" onClick={() => setFullPageModalOpen(true)}>

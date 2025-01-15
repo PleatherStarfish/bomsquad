@@ -152,7 +152,7 @@ const Filters: React.FC<FiltersProps> = ({
 
           <div className="px-2">
             <Accordion
-              bgColor="bg-gray-50"
+              backgroundColor="bg-gray-50"
               borderColor="border-gray-300"
               innerPadding="p-4"
               rounded={false}

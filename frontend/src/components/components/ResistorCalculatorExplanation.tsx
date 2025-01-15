@@ -3,7 +3,7 @@ import React from 'react';
 const ResistorCalculatorExplanation: React.FC = () => {
   return (
     <div className="max-w-4xl py-6 mx-auto mt-10 space-y-6 bg-white rounded-lg">
-      <h1 className="text-3xl font-semibold text-center font-display">Understanding LED Circuit Terms</h1>
+      <h2 className="text-3xl font-semibold text-center font-display">Understanding LED Circuit Terms</h2>
       <p className="text-gray-700">
         If you&apos;re new to working with LEDs and electronic components on websites like <strong>Mouser</strong> or <strong>DigiKey</strong>, terms like <strong>Supply Voltage</strong>, <strong>Forward Voltage</strong>, and <strong>Forward Current</strong> might seem confusing at first. Let’s break them down to help you understand how these concepts work together in an LED circuit.
       </p>
