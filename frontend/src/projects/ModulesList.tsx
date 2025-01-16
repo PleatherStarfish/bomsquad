@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Module } from "../types/modules";
 import React from "react";
 import chroma from "chroma-js";
-import { motion } from "framer-motion";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 
 interface ModulesListProps {
@@ -13,29 +12,7 @@ interface ModulesListProps {
   isLoading?: boolean;
 }
 
-const containerVariants = {
-  visible: {
-    transition: {
-      staggerChildren: 0.1, // Stagger each child by 0.2 seconds
-    },
-  },
-};
-
-const slideInFromRight = {
-  hidden: { opacity: 0, x: 200 },
-  visible: (index: number) => ({
-    opacity: 1,
-    transition: {
-      delay: index * 0.1, // Additional delay per item based on index
-      duration: 0.15,
-      ease: "easeInOut",
-    },
-    x: 0,
-  }),
-};
-
 const ModulesList: React.FC<ModulesListProps> = ({
-  shouldAnimate,
   modules,
   filtersApplied = false,
   isLoading = true,
@@ -65,20 +42,10 @@ const ModulesList: React.FC<ModulesListProps> = ({
 
   return (
     <>
-      <motion.div
-        animate={shouldAnimate ? "visible" : "hidden"}
-        className="grid grid-cols-1 gap-y-10 lg:gap-y-14"
-        initial="hidden"
-        variants={containerVariants}
-      >
+      <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">
         {modules.map((module, index) => (
           <>
-            <motion.div
-              className="flex flex-col items-center gap-4 overflow-hidden bg-white rounded-lg md:flex-row"
-              custom={index}
-              key={module.id}
-              variants={slideInFromRight}
-            >
+            <div className="flex flex-col items-center gap-4 overflow-hidden bg-white rounded-lg md:flex-row">
               <div className="flex justify-center w-full h-64 md:w-48 md:h-48">
                 {module.slug && (
                   <Link reloadDocument to={`/projects/${module.slug}`}>
@@ -178,10 +145,10 @@ const ModulesList: React.FC<ModulesListProps> = ({
                   {module.description}
                 </p>
               </div>
-            </motion.div>
+            </div>
           </>
         ))}
-      </motion.div>
+      </div>
     </>
   );
 };

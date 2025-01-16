@@ -106,9 +106,9 @@ INSTALLED_APPS = [
     "mptt",
     "import_export",
     "storages",
-    "meta",
     # Local
     "accounts",
+    "blog",
     "contact",
     "core",
     "pages",
