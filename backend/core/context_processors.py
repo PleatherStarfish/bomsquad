@@ -1,9 +1,10 @@
 import os
+import re
 from uuid import UUID
 from django.shortcuts import get_object_or_404
 import html
 
-from modules.models import ModuleBomListItem
+from modules.models import Module, ModuleBomListItem
 from components.models import Component, ComponentSupplierItem
 
 
@@ -57,6 +58,68 @@ def meta_context(request):
 
     # Check if the current path matches a specific override
     current_path = request.path
+
+    # Dynamic SEO for Project (Module) detail pages
+    if current_path.startswith("/projects/"):
+        try:
+            # Extract the slug directly from the URL
+            slug_match = re.match(r"^/projects/(?P<slug>[\w-]+)/?$", current_path)
+            if not slug_match:
+                raise ValueError("Invalid project slug format.")
+
+            slug = slug_match.group("slug")
+
+            # Retrieve the module
+            module = get_object_or_404(Module, slug=slug)
+
+            category = module.category or "audio"
+
+            # Generate the title
+            MAX_TITLE_LENGTH = 60
+            base_title = f"{module.name} by {module.manufacturer.name} | DIY {module.category} Project"
+            title = (
+                base_title[: MAX_TITLE_LENGTH - 3] + "..."
+                if len(base_title) > MAX_TITLE_LENGTH
+                else base_title
+            )
+
+            # Generate the description
+            MAX_DESCRIPTION_LENGTH = 160
+            description_base = (
+                f"Learn how to build {module.name} by {module.manufacturer.name}. "
+                f"Get tutorials and components for {category} projects for DIY audio enthusiasts."
+            )
+            description = (
+                description_base[: MAX_DESCRIPTION_LENGTH - 3] + "..."
+                if len(description_base) > MAX_DESCRIPTION_LENGTH
+                else description_base
+            )
+
+            # Update meta tags
+            META_DEFAULTS.update(
+                {
+                    "title": title,
+                    "description": description,
+                    "keywords": ", ".join(
+                        filter(
+                            None,
+                            [
+                                module.name,
+                                f"build {module.name} {module.manufacturer.name}",
+                                f"{category} DIY",
+                                module.manufacturer.name,
+                                "DIY synth",
+                            ],
+                        )
+                    ),
+                    "og:type": "article",
+                    "og:title": title,
+                    "og:description": description,
+                    "og:url": f"https://bom-squad.com/projects/{slug}/",
+                }
+            )
+        except (ValueError, Module.DoesNotExist):
+            return {"meta": META_DEFAULTS}
 
     # Dynamic SEO for Component detail pages
     if current_path.startswith("/components/"):
