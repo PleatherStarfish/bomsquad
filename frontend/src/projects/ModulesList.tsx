@@ -43,7 +43,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
   return (
     <>
       <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">
-        {modules.map((module, index) => (
+        {modules.map((module) => (
           <>
             <div className="flex flex-col items-center gap-4 overflow-hidden bg-white rounded-lg md:flex-row">
               <div className="flex justify-center w-full h-64 md:w-48 md:h-48">
