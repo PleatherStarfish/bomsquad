@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load comments %}
+{% load comments_xtd %}
+{% load editorjs %}
+
+{% block title %}{{ post.meta_title|default:post.title }}{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-12 mx-auto lg:px-8">
+    <!-- Blog Header -->
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 font-display">{{ post.title }}</h1>
+        <div class="mt-4 text-gray-600">
+            <span>Published on {{ post.datetime_created|date:"F j, Y" }}</span>
+            {% if post.categories.exists %}
+                <span> · Categories: 
+                    {% for category in post.categories.all %}
+                        <a href="{% url 'blog:blog_list' %}?category={{ category.slug }}" class="text-indigo-600 hover:underline">{{ category.name }}</a>
+                        {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Featured Image -->
+    {% if post.large_image_jpeg %}
+    <div class="mb-8">
+        <img 
+            src="{{ post.large_image_jpeg.url }}" 
+            alt="Featured image for {{ post.title }}" 
+            class="object-cover w-full rounded-lg shadow-md"
+        >
+    </div>
+    {% endif %}
+
+    <!-- Blog Content -->
+    <div class="prose lg:prose-lg max-w-none">
+        {{ post.content|editorjs }}
+    </div>
+
+    <!-- Comments Section -->
+    {% if post.allow_comments %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-gray-900">Comments</h2>
+        {% render_comment_list for post %}
+        <div class="mt-6">
+            {% render_comment_form for post %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back to Blog -->
+    <div class="mt-12">
+        <a href="{% url 'blog:blog_list' %}" class="inline-flex items-center px-4 py-2 text-white bg-indigo-600 rounded hover:bg-indigo-700">
+            ← Back to Blog
+        </a>
+    </div>
+</div>
+{% endblock %}

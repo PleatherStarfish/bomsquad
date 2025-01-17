@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
@@ -95,6 +96,24 @@ class BlogPost(BaseModel):
 
         super(BlogPost, self).save(*args, **kwargs)
 
+    def get_plain_text_excerpt(self, word_limit=30):
+        """
+        Extract plain text from the EditorJs content and truncate it to a specified word limit.
+        """
+        try:
+            content_data = json.loads(self.content)
+            text = " ".join(
+                block["data"]["text"]
+                for block in content_data.get("blocks", [])
+                if block["type"] == "paragraph"
+            )
+            words = text.split()
+            return " ".join(words[:word_limit]) + (
+                "..." if len(words) > word_limit else ""
+            )
+        except (json.JSONDecodeError, KeyError, TypeError):
+            return ""
+
     def process_image(self, image_field, size_type, max_dimension):
         img = Image.open(image_field)
 
@@ -141,6 +160,9 @@ class BlogPost(BaseModel):
                 ContentFile(output_jpeg.read()),
                 save=False,
             )
+
+    def get_absolute_url(self):
+        return reverse("blog:blog_detail", kwargs={"slug": self.slug})
 
     def __str__(self):
         return self.title

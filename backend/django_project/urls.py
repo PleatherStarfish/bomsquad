@@ -134,6 +134,7 @@ urlpatterns = [
     path("admin/", include("admin_honeypot.urls", namespace="admin_honeypot")),
     path("patchbay/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path("blog/", include("blog.urls")),
     path(
         "sitemap.xml/",
         cache_page(86400)(sitemap_views.index),

@@ -54,6 +54,84 @@ def meta_context(request):
             ),
             "og:url": "https://bom-squad.com/tools/resistor-calculator/",
         },
+        "/privacy-policy/": {
+            "title": "Privacy Policy | BOM Squad",
+            "description": (
+                "Read the BOM Squad Privacy Policy to learn how we handle your data, including information "
+                "about cookies, data sharing, and your rights as a user."
+            ),
+            "keywords": "privacy policy, BOM Squad privacy policy, data privacy, user rights, cookies policy",
+            "og:type": "website",
+            "og:title": "Privacy Policy | BOM Squad",
+            "og:description": (
+                "Learn about BOM Squad's privacy practices, including data handling, cookies, and user rights."
+            ),
+            "og:url": "https://bom-squad.com/privacy-policy/",
+        },
+        "/faq/": {
+            "title": "FAQ | BOM Squad",
+            "description": (
+                "Find answers to frequently asked questions about BOM Squad, including using BOM tools, managing "
+                "inventory, and building DIY guitar pedals and synth kits."
+            ),
+            "keywords": "FAQ, frequently asked questions, BOM Squad FAQ, DIY synth tools, DIY guitar pedal help",
+            "og:type": "website",
+            "og:title": "FAQ | BOM Squad",
+            "og:description": (
+                "Get answers to common questions about BOM Squad's features, tools, and DIY audio projects."
+            ),
+            "og:url": "https://bom-squad.com/faq/",
+        },
+        "/tos/": {
+            "title": "Terms of Service | BOM Squad",
+            "description": (
+                "Review the Terms of Service for BOM Squad, detailing the rules and guidelines for using our platform "
+                "and services, including user responsibilities and platform policies."
+            ),
+            "keywords": "terms of service, BOM Squad terms, user agreement, platform rules, user responsibilities",
+            "og:type": "website",
+            "og:title": "Terms of Service | BOM Squad",
+            "og:description": (
+                "Understand the rules and guidelines for using BOM Squad. Read our Terms of Service, which outline "
+                "user rights and platform policies."
+            ),
+            "og:url": "https://bom-squad.com/tos/",
+        },
+        "/components/": {
+            "title": "DIY Audio Components | Parts for Guitar Pedals and Synth Kits",
+            "description": (
+                "Discover high-quality components for DIY audio projects. From resistors and capacitors to rare ICs, "
+                "find everything you need to build guitar pedals, modular synths, and Eurorack modules."
+            ),
+            "keywords": (
+                "DIY audio components, guitar pedal parts, modular synth components, Eurorack parts, resistors, "
+                "capacitors, ICs, DIY synth kits, build your own synth"
+            ),
+            "og:type": "website",
+            "og:title": "DIY Audio Components | Parts for Guitar Pedals and Synth Kits",
+            "og:description": (
+                "Find premium components for your DIY audio projects. Perfect for guitar pedals, synth kits, "
+                "and modular Eurorack builds."
+            ),
+            "og:image": "https://bom-squad.com/static/images/components-banner.png",
+            "og:url": "https://bom-squad.com/components/",
+        },
+        "/about/": {
+            "title": "About BOM Squad | Easy DIY Synths and DIY Guitar Pedals",
+            "description": (
+                "Learn about BOM Squad, the ultimate platform for DIY audio enthusiasts. Discover how we help builders "
+                "streamline their projects with tools, resources, and community support."
+            ),
+            "keywords": "about BOM Squad, DIY audio tools, DIY synth builders, guitar pedal resources, DIY community",
+            "og:type": "website",
+            "og:title": "About BOM Squad | Empowering DIY Synth and Pedal Builders",
+            "og:description": (
+                "Explore the mission and vision behind BOM Squad. Discover how we're empowering the DIY audio "
+                "community with tools, resources, and support."
+            ),
+            "og:image": "https://bom-squad.com/static/images/about-banner.png",
+            "og:url": "https://bom-squad.com/about/",
+        },
     }
 
     # Check if the current path matches a specific override

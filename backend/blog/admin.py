@@ -9,6 +9,12 @@ class CategoryAdmin(MPTTModelAdmin):
 
 class BlogPostAdmin(admin.ModelAdmin):
     model = BlogPost
+    readonly_fields = (
+        "thumb_image_webp",
+        "thumb_image_jpeg",
+        "large_image_webp",
+        "large_image_jpeg",
+    )
 
 
 # Registering models with the admin

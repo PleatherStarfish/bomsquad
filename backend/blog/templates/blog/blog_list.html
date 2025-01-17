@@ -1,0 +1,103 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load comments %}
+{% load comments_xtd %}
+{% load editorjs %}
+
+{% block title %}BOM Squad Blog{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-12 mx-auto lg:px-8">
+    <!-- Blog Header -->
+    <div class="mb-16 text-center">
+        <div class="mb-6">
+            <h1 class="text-4xl font-bold tracking-tight text-gray-900 font-display">The Bomble Bee</h1>
+            <p class="mt-4 text-lg text-gray-600">Insights, tips, and stories for makers and builders.</p>
+        </div>
+        <hr/>
+    </div>
+
+    <!-- Blog Posts -->
+    {% if page_obj.object_list %}
+    <ul class="flex flex-col gap-6 mb-20 space-y-12">
+        {% for post in page_obj.object_list %}
+            <li class="flex flex-col items-start h-full gap-4 md:gap-6 lg:flex-row lg:items-center">
+                {% if post.thumb_image_jpeg %}
+                <div class="flex items-center justify-center h-[250px] lg:w-1/3">
+                    <div class="flex flex-col justify-center h-full">
+                        <img 
+                            src="{{ post.thumb_image_jpeg.url }}" 
+                            alt="Thumbnail for {{ post.title }}" 
+                            class="object-cover max-w-full max-h-full"
+                        >
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Post Details -->
+                <div class="flex-1 mt-6 lg:mt-0">
+                    <h2 class="text-2xl font-semibold text-gray-900 font-display">
+                        <a href="{{ post.get_absolute_url }}" class="hover:underline">{{ post.title }}</a>
+                    </h2>
+                    <div class="mt-3">
+                        <span class="mt-3 font-display">{{ post.datetime_created|date:"F j, Y" }}</span>
+                    </div>
+                    {% comment %} <div class="mt-2 text-sm text-gray-500">
+                        <span class="font-display">{{ post.datetime_created|date:"F j, Y" }}</span>
+                        {% if post.categories.exists %}
+                            <span> | Categories: 
+                                {% for category in post.categories.all %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium text-white bg-gray-300 rounded-full">{{ category.get_full_path }}</span>
+                                    {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div> {% endcomment %}
+                    <p class="mt-4 text-gray-700">{{ post.get_plain_text_excerpt }}</p>
+                    <a href="{{ post.get_absolute_url }}" class="inline-block mt-4 font-medium text-blue-600 hover:underline">
+                        Read More →
+                    </a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="mt-6 text-center text-gray-600">No blog posts available at the moment. Check back later!</p>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="flex justify-center mt-10">
+        <ul class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                    Previous
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li>
+                    <span class="px-3 py-1 text-white bg-blue-600 rounded">{{ num }}</span>
+                </li>
+                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                <li>
+                    <a href="?page={{ num }}" class="px-3 py-1 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                    Next
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
