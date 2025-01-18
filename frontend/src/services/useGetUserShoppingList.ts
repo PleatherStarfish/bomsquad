@@ -1,9 +1,14 @@
-import {GroupedByModule, UseUserShoppingListData} from "../types/shoppingList"
-
+import { GroupedByModule } from "../types/shoppingList";
 import { UserShoppingList } from "../types/shoppingList";
-import _ from "lodash";
-import axios from "axios";
+import { UseUserShoppingListData } from "../types/shoppingList";
+
 import { useQuery } from "@tanstack/react-query";
+
+import axios from "axios";
+import groupBy from "lodash/groupBy";
+import sortBy from "lodash/sortBy";
+import toPairs from "lodash/toPairs";
+import uniqBy from "lodash/uniqBy";
 
 const useUserShoppingList = () => {
   const {
@@ -14,21 +19,17 @@ const useUserShoppingList = () => {
     queryFn: async (): Promise<UseUserShoppingListData> => {
       const response = await axios.get<UserShoppingList[]>("/api/shopping-list/");
 
-      const groupedByModule: GroupedByModule[] = _(response.data)
-        .groupBy("module_name")
-        .toPairs()
-        .sortBy(([key]) => (key === "null" ? "" : key)) // Sort null keys to the end
-        .map(([key, value]) => ({
-          data: _.groupBy(value, "component.id"),
-          moduleId: value[0]?.module?.id,
-          name: key,
-        }))
-        .value();
+      // Group data by module name
+      const groupedByModule: GroupedByModule[] = sortBy(toPairs(groupBy(response.data, "module_name")), ([key]) =>
+        key === "null" ? "" : key
+      ).map(([key, value]) => ({
+        data: groupBy(value, "component.id"),
+        moduleId: value[0]?.module?.id,
+        name: key,
+      }));
 
-      const aggregatedComponents = _(response.data)
-        .uniqBy("component.id")
-        .sortBy("component.supplier?.short_name")
-        .value();
+      // Aggregate components and sort
+      const aggregatedComponents = sortBy(uniqBy(response.data, "component.id"), "component.supplier?.short_name");
 
       return { aggregatedComponents, groupedByModule };
     },
