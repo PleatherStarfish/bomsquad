@@ -1,6 +1,5 @@
 {% load static %}
 {% load custom_tags %}
-{% load matomo %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -90,6 +89,16 @@
 
     {% block css %}{% endblock css %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <!-- Matomo Tag Manager -->
+    <script>
+      var _mtm = window._mtm = window._mtm || [];
+      _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
+      (function() {
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src='https://cdn.matomo.cloud/bomsquad.matomo.cloud/container_ivskW7SP.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <!-- End Matomo Tag Manager -->
   </head>
 
   <body class="min-h-screen">
@@ -285,6 +294,5 @@
     </script>    
     
     {% block javascript %}{% endblock javascript %}
-    {% matomo %}
   </body>
 </html>
