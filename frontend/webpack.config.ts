@@ -1,9 +1,13 @@
-import { Configuration } from "webpack";
-import Dotenv from "dotenv-webpack";
-import TerserPlugin from "terser-webpack-plugin";
-import { exec } from "child_process";
-import path from "path";
-import webpack from "webpack";
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import { Configuration } from 'webpack';
+
+import { exec } from 'child_process';
+
+import Dotenv from 'dotenv-webpack';
+import path from 'path';
+import TerserPlugin from 'terser-webpack-plugin';
+import webpack from 'webpack';
+
 
 const config: Configuration = {
   entry: {
@@ -50,6 +54,7 @@ const config: Configuration = {
     path: path.resolve(__dirname, "./build"),
   },
   plugins: [
+    new BundleAnalyzerPlugin(),
     new Dotenv({
       path: "../.env",
     }),

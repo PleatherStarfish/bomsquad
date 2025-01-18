@@ -32,17 +32,22 @@ const App: React.FC = () => {
           <Route element={<Projects />} path="/projects" />
           <Route element={<Components />} path="/components" />
           <Route element={<ModuleDetail />} path="/projects/:slug" />
-          <Route element={<Settings />} path={`/user/:username/settings`} />
           <Route
             element={<VersionHistory />}
             path={`/user/:username/inventory/version-history`}
           />
-          <Route
-            element={<SavedLists />}
-            path={`/user/:username/shopping-list/saved-lists`}
-          />
           <Route element={<ResistorCalculator />} path="/tools/resistor-calculator" />
           <Route element={<UserPage />} path="/user/:username">
+            <Route element={<Settings />} path={`settings`} />
+            <Route
+              element={<VersionHistory />}
+              path={`inventory/version-history`}
+            />
+            <Route
+              element={<SavedLists />}
+              path={`shopping-list/saved-lists`}
+            />
+            <Route element={<Settings />} path={`settings`} />
             <Route
               element={
                 <ModulesList

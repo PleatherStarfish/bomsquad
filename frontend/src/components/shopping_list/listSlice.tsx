@@ -20,7 +20,8 @@ import { Helmet } from "react-helmet";
 import Modal from "../../ui/Modal";
 import NumericInput from "react-numeric-input";
 import cx from "classnames";
-import { get, find } from "lodash";
+import get from "lodash/get";
+import find from "lodash/find";
 import useDeleteShoppingListItem from "../../services/useDeleteModuleFromShoppingList";
 import useUpdateShoppingList from "../../services/useUpdateShoppingList";
 import TotalPriceForComponent from "./TotalPriceForComponent"
@@ -41,8 +42,8 @@ interface ListSliceProps {
   hideInteraction?: boolean;
   backgroundColor?: string;
   displayTotals?: boolean;
-  rowHeights: Record<string, number>
-  rowRefs: any
+  rowHeights?: Record<string, number>
+  rowRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>
 }
 
 type AggregatedRow = UserShoppingList & { placeholder: true };
@@ -105,8 +106,11 @@ const ListSlice: React.FC<ListSliceProps> = ({
     }
   }, [deleteMutation.isSuccess, deleteMutation.isError]);
 
-  const getRowStyle = (componentId: string): React.CSSProperties => {
-    return rowHeights[componentId] ? { height: `${rowHeights[componentId]}px` } : {};
+  const getRowStyle = (componentId: string | null | undefined): React.CSSProperties => {
+    if (!componentId) {
+      return {height: "auto"};
+    }
+    return { height: rowHeights?.[componentId] ? `${rowHeights?.[componentId]}px` : "auto" };
   };
 
   const handleQuantityChange = (value: number | null) => {
@@ -171,7 +175,7 @@ const ListSlice: React.FC<ListSliceProps> = ({
     },
     {
       cell: (row) => (
-        <div className="h-full" data-row-id={row.component.id} ref={(el) => (rowRefs.current[row.component.id] = el)}>
+        <div className="h-full" data-row-id={row.component.id} ref={(el) => rowRefs?.current && (rowRefs.current[row.component.id] = el)}>
           {(row.component.supplier_items || []).length > 0 ? (
             <ul className="pl-5 list-disc">
               {row.component.supplier_items?.map((item) => (

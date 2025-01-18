@@ -12,8 +12,8 @@ import Modal from "../../ui/Modal";
 import SearchInput from "./SearchInput";
 import { SignpostSplit } from "react-bootstrap-icons";
 import SolderingMode from "../SolderingMode";
-import _ from "lodash";
-import find  from "lodash/find";
+import isEqual from "lodash/isEqual";
+import find from "lodash/find";
 import useAuthenticatedUser from "../../services/useAuthenticatedUser";
 import useDeleteUserInventory from "../../services/useDeleteUserInventory";
 import useGetUserInventory from "../../services/useGetUserInventory";
@@ -193,7 +193,7 @@ const Inventory = () => {
 
   useEffect(() => {
     setDataSearched((prev) => {
-      if (!_.isEqual(prev, filteredData)) {
+      if (!isEqual(prev, filteredData)) {
         return filteredData;
       }
       return prev;

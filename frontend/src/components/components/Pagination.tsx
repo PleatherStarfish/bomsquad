@@ -1,6 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import React from "react";
-import _ from "lodash";
 import cx from "classnames";
 
 interface PaginationProps {
@@ -10,7 +9,7 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, navigate }) => {
-  const pageNumbers = _.range(1, totalPages + 1);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <nav

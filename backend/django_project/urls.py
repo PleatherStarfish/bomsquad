@@ -107,7 +107,7 @@ frontend_redirect_urls = [
     path(
         "user/<str:username>/shopping-list/saved-lists/",
         login_required(TemplateView.as_view(template_name="frontend.html")),
-        name="user-inventory-version-history",
+        name="user-inventory-saved-lists",
     ),
     path(
         "user/<str:username>/shopping-list/",

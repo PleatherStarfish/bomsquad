@@ -92,8 +92,8 @@ const Alert: React.FC<AlertProps> = ({
         <div
           className={cx({
             "flex-1": expand,
-            "ml-3": icon,
             "group-hover:text-blue-700": isAddComponentVariant,
+            "ml-3": icon,
           })}
         >
           {children}

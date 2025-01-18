@@ -1,5 +1,6 @@
 {% load static %}
 {% load custom_tags %}
+{% load matomo %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -284,5 +285,6 @@
     </script>    
     
     {% block javascript %}{% endblock javascript %}
+    {% matomo %}
   </body>
 </html>

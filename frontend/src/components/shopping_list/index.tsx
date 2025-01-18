@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import _ from "lodash";
+import debounce from "lodash/debounce";
 
 import AddAllModal from "./addAllModal";
 import Alert from "../../ui/Alert";
@@ -39,7 +39,7 @@ const ShoppingList: React.FC = () => {
 
   const archiveShoppingListMutation = useArchiveShoppingListMutation();
   const debouncedArchiveMutation = useCallback(
-    _.debounce((notes: string) => {
+    debounce((notes: string) => {
       archiveShoppingListMutation.mutate({ notes });
     }, 1000),
     [archiveShoppingListMutation]

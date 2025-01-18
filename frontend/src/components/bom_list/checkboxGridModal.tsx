@@ -5,7 +5,10 @@ import {
   UseFormReset,
 } from "react-hook-form";
 import React, { useMemo, useEffect } from "react";
-import { flatMap, groupBy, uniqBy, isEqual } from "lodash-es";
+import flatMap from "lodash/flatMap";
+import groupBy from "lodash/groupBy";
+import uniqBy from "lodash/uniqBy";
+import isEqual from "lodash/isEqual";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";

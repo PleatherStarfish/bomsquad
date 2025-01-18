@@ -1,5 +1,4 @@
 import React from "react";
-import _ from 'lodash';
 import cx from "classnames";
 
 const Tabs = ({
@@ -12,14 +11,14 @@ const Tabs = ({
   return (
     <div className="sm:my-4">
       <div className="sm:hidden">
-        <label htmlFor="tabs" className="sr-only">
+        <label className="sr-only" htmlFor="tabs">
           Select a tab
         </label>
         <select
-          id="tabs"
-          name="tabs"
           className="block w-full rounded-md"
           defaultValue={tabs.find((tab) => tab.current)?.name}
+          id="tabs"
+          name="tabs"
         >
           {tabs?.map((tab, index) => (
             <option key={index}>{tab?.name}</option>
@@ -27,17 +26,17 @@ const Tabs = ({
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav className="flex space-x-4" aria-label="Tabs">
+        <nav aria-label="Tabs" className="flex space-x-4">
           {tabs?.map((tab, index) => (
             <div
-              key={index}
+              aria-current={tab?.current ? "page" : undefined}
               className={cx(
                 tab?.current
                   ? `${activeTabColor} ${activeBorder ? "border border-black" : ""}`
                   : inactiveTabColor,
                 "cursor-pointer rounded-md px-3 py-2 text-sm font-medium"
               )}
-              aria-current={tab?.current ? "page" : undefined}
+              key={index}
               onClick={() => onClick(tab?.name)}
               type="button"
             >

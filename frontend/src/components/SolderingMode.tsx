@@ -11,16 +11,21 @@ import EditableQuantity from "./inventory/EditableQuantity";
 import { Fragment } from "react";
 import { Helmet } from "react-helmet-async";
 import Modal from "../ui/Modal";
-import _ from "lodash";
 import cx from "classnames";
-import { InventoryRow } from "../components/inventory/index"
+import { InventoryRow } from "../components/inventory/index";
 
 interface SolderingModeProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   inventoryData: InventoryRow[]; // Define this interface separately
   inventoryDataIsLoading: boolean;
-  handleClick: (row: InventoryRow, field: keyof InventoryRow, fieldIdToEdit: string | undefined, setFieldIdToEdit: React.Dispatch<React.SetStateAction<string | undefined>>, setUpdatedFieldToSubmit: React.Dispatch<React.SetStateAction<any>>) => void;
+  handleClick: (
+    row: InventoryRow,
+    field: keyof InventoryRow,
+    fieldIdToEdit: string | undefined,
+    setFieldIdToEdit: React.Dispatch<React.SetStateAction<string | undefined>>,
+    setUpdatedFieldToSubmit: React.Dispatch<React.SetStateAction<any>>
+  ) => void;
   locationsSort: (a: InventoryRow, b: InventoryRow) => number;
   quantityIdToEdit?: string;
   setQuantityIdToEdit: Dispatch<SetStateAction<string | undefined>>;
@@ -93,10 +98,10 @@ const SolderingMode: React.FC<SolderingModeProps> = ({
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
   const dataForTable: InventoryRow[] =
-    _.isArray(dataSearched) && !_.isEmpty(dataSearched)
+    Array.isArray(dataSearched) && dataSearched.length > 0
       ? dataSearched.filter((x: InventoryRow) => x && x.id)
       : inventoryData;
-  
+
   const darkModeStyles = `
     .rdt_TableHeadRow { background-color: #212529; color: white; border-color: white; }
     .rdt_TableRow { background-color: #212529; color: white; }
@@ -277,7 +282,9 @@ const SolderingMode: React.FC<SolderingModeProps> = ({
                           className="mb-8 block w-full rounded-md border-0 py-4 px-6 h-20 bg-white dark:bg-[#3a4141] text-gray-900 dark:ring-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#548a6a] dark:focus:ring-white focus:border-[#548a6a] dark:border-0 dark:focus:border-white text-3xl"
                           id="search"
                           name="search"
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setSearchTerm(e.target.value)
+                          }
                           placeholder="search"
                           type="text"
                           value={searchTerm}

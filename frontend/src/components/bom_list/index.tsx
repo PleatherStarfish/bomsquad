@@ -5,7 +5,8 @@ import { Cart, CheckLg, Folder2 } from "react-bootstrap-icons";
 import DataTable, { TableColumn } from "react-data-table-component";
 import React, { useEffect, useMemo, useState } from "react";
 import { animateScroll } from "react-scroll";
-import { flatMap, uniqBy } from "lodash-es";
+import uniqBy from "lodash/uniqBy";
+import flatMap from "lodash/flatMap";
 import { useForm } from "react-hook-form";
 import * as XLSX from "xlsx";
 // @ts-ignore

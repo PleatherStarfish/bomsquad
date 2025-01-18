@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.sites",
     # Third-party
+    "analytical",
     "maintenance_mode",
     "allauth",
     "allauth.account",
@@ -171,6 +172,9 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {"anon": "1000/hour", "user": "10000/hour"},
 }
+
+MATOMO_SITE_ID = 1
+MATOMO_DOMAIN_PATH = "matomo.bom-squad.com"
 
 LOGIN_REDIRECT_URL = "/patchbay/"
 ADMIN_HONEYPOT_EMAIL_ADMINS = True
