@@ -20,6 +20,7 @@ interface ModulesListProps {
 }
 
 interface AdPlaceholder {
+  id: number;
   type: "ad";
 }
 
@@ -88,17 +89,19 @@ const ModulesList: React.FC<ModulesListProps> = ({
 
   // Extend the modules list with ad placeholders
   const extendedList: ModuleOrAd[] = modules.flatMap((module, index) =>
-    (index + 1) % 5 === 0
-      ? [module, { type: "ad" }]
-      : [module], {type: "project"}
+    (index + 1) % 3 === 0
+      ? [module, { id: index, type: "ad" }]
+      : [module]
   );
+
+  console.log(extendedList);
 
   return (
     <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">
-      {extendedList.map((item, index) => {
+      {extendedList.map((item) => {
         if (isAdPlaceholder(item)) {
           return (
-            <div className="flex justify-center" key={`ad-${index}`}>
+            <div className="flex justify-center" key={item.id}>
               <AdUnit />
             </div>
           );
