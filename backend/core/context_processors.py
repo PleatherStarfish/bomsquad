@@ -60,6 +60,13 @@ def meta_context(request):
                 "Read the BOM Squad Privacy Policy to learn how we handle your data, including information "
                 "about cookies, data sharing, and your rights as a user."
             ),
+            "schema_markup": {
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": "Privacy Policy | BOM Squad",
+                "description": "Learn how BOM Squad handles data privacy and user rights.",
+                "url": "https://bom-squad.com/privacy-policy/",
+            },
             "keywords": "privacy policy, BOM Squad privacy policy, data privacy, user rights, cookies policy",
             "og:type": "website",
             "og:title": "Privacy Policy | BOM Squad",
@@ -122,6 +129,16 @@ def meta_context(request):
                 "Learn about BOM Squad, the ultimate platform for DIY audio enthusiasts. Discover how we help builders "
                 "streamline their projects with tools, resources, and community support."
             ),
+            "schema_markup": {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "BOM Squad",
+                "url": "https://bom-squad.com",
+                "logo": "https://bom-squad.com/static/images/logo.png",
+                "description": (
+                    "BOM Squad helps DIY audio enthusiasts streamline their projects with tools, resources, and community support."
+                ),
+            },
             "keywords": "about BOM Squad, DIY audio tools, DIY synth builders, guitar pedal resources, DIY community",
             "og:type": "website",
             "og:title": "About BOM Squad | Empowering DIY Synth and Pedal Builders",
@@ -173,6 +190,17 @@ def meta_context(request):
                 else description_base
             )
 
+            schema_markup = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": module.name,
+                "description": module.description or "DIY audio module project.",
+                "brand": module.manufacturer.name,
+                "url": f"https://bom-squad.com/projects/{slug}/",
+                "image": "https://bom-squad.com/static/images/logo.png",
+                "category": module.category or "Audio",
+            }
+
             # Update meta tags
             META_DEFAULTS.update(
                 {
@@ -190,6 +218,7 @@ def meta_context(request):
                             ],
                         )
                     ),
+                    "schema_markup": schema_markup,
                     "og:type": "article",
                     "og:title": title,
                     "og:description": description,
@@ -294,11 +323,28 @@ def meta_context(request):
             else:
                 description = description_base
 
+            # Schema for Component detail pages
+            schema_markup = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": component.description or "DIY Component",
+                "description": f"Perfect for DIY audio projects such as guitar pedals and modular synths.",
+                "brand": (
+                    component.manufacturer.name if component.manufacturer else "Various"
+                ),
+                "url": f"https://bom-squad.com{current_path}",
+                "image": "https://bom-squad.com/static/images/logo.png",
+                "category": "DIY Components",
+                "relatedModules": related_modules,  # Add related modules if any
+                "relatedManufacturers": related_manufacturers,  # Add related manufacturers
+            }
+
             # Generate meta tags
             META_DEFAULTS.update(
                 {
                     "title": title,
                     "description": description,
+                    "schema_markup": schema_markup,
                     "keywords": ", ".join(
                         filter(
                             None,

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { DateTime } from "luxon";
 import BackButton from "../ui/BackButton";
 import Button from "../ui/Button";
 import DeleteAccountButton from "./DeleteAccountButton";
@@ -34,11 +33,13 @@ const Settings: React.FC = () => {
     );
   }
 
-  const formattedDateJoined = DateTime.fromISO(user?.date_joined).toLocaleString({
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const formattedDateJoined = user?.date_joined
+  ? new Date(user.date_joined).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : null;
 
   return (
     <div className="px-4 py-8 mb-12 mt-36 md:px-24 lg:px-48">

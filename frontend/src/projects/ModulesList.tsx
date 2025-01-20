@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 
 // Extend the Window interface to include adsbygoogle
 declare global {
@@ -26,12 +26,14 @@ interface AdPlaceholder {
 
 type ModuleOrAd = AdPlaceholder | Module;
 
-const AdUnit: React.FC = () => {
-  useEffect(() => {
-    if (window.adsbygoogle && typeof window.adsbygoogle.push === "function") {
-      window.adsbygoogle.push({});
-    }
-  }, []);
+interface AdUnitProps {
+  loadAd: () => void;
+}
+
+const AdUnit: React.FC<AdUnitProps> = ({ loadAd }) => {
+  React.useEffect(() => {
+    loadAd();
+  }, [loadAd]);
 
   return (
     <div className="flex justify-center w-full h-64">
@@ -46,11 +48,12 @@ const AdUnit: React.FC = () => {
         data-ad-format="fluid"
         data-ad-layout-key="-cb-b+1t-6d+9m"
         data-ad-slot="6413550510"
-        style={{ display: 'block', width: '100%' }}
+        style={{ display: "block", width: "100%" }}
       />
     </div>
   );
 };
+
 
 // Type guard to check if the item is an AdPlaceholder
 const isAdPlaceholder = (item: ModuleOrAd): item is AdPlaceholder => {
@@ -66,6 +69,16 @@ const ModulesList: React.FC<ModulesListProps> = ({
     .scale(["#a4d3b5", "#558a6b", "#2d5d46"])
     .domain([1, 34]);
   const { user } = useAuthenticatedUser();
+
+  const loadAd = useCallback(() => {
+    if (window.adsbygoogle && typeof window.adsbygoogle.push === "function") {
+      try {
+        window.adsbygoogle.push({});
+      } catch (err) {
+        console.error("Ad error:", err);
+      }
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -102,7 +115,7 @@ const ModulesList: React.FC<ModulesListProps> = ({
         if (isAdPlaceholder(item)) {
           return (
             <div className="flex justify-center" key={item.id}>
-              <AdUnit />
+              <AdUnit loadAd={loadAd} />
             </div>
           );
         }

@@ -4,8 +4,16 @@
   <div>
     <a href="https://ko-fi.com/bomsquad">
       <img
+        class="hidden transition-opacity duration-200 kofi-button-blue xl:block hover:opacity-90"
         width="150px"
         src="{% static 'images/kofi_button_blue.png' %}"
+        alt="Support on Ko-fi"
+      />
+      <!-- Small screen image -->
+      <img
+        class="block transition-opacity duration-200 kofi-symbol xl:hidden hover:opacity-90"
+        width="25px"
+        src="{% static 'images/kofi_symbol.png' %}"
         alt="Support on Ko-fi"
       />
     </a>

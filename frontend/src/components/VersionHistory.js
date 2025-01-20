@@ -1,6 +1,5 @@
 import BackButton from "../ui/BackButton";
 import DataTable from "react-data-table-component";
-import { DateTime } from "luxon";
 import { JsonDiffComponent } from "json-diff-react";
 import Modal from "../ui/Modal";
 import React from "react";
@@ -126,7 +125,16 @@ const VersionHistory = () => {
       selector: (row) => {
         return (
           <span>
-            {new Date(row.timestamp).toLocaleString(DateTime.DATETIME_MED)}
+            {row.timestamp
+              ? new Date(row.timestamp).toLocaleString("en-US", {
+                  day: "numeric", 
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  month: "short",
+                  weekday: "short",
+                  year: "numeric",
+                })
+              : "N/A"}
           </span>
         );
       },

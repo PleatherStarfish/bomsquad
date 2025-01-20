@@ -6,7 +6,6 @@ import {
 } from "react-hook-form";
 import React, { useMemo, useEffect } from "react";
 import flatMap from "lodash/flatMap";
-import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import isEqual from "lodash/isEqual";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
@@ -27,6 +26,17 @@ interface CheckboxGridModalProps {
   setFormattedOutput: React.Dispatch<
     React.SetStateAction<Record<string, string>>
   >;
+  watch: (names?: string[] | string) => { [key: string]: boolean };
+}
+
+interface ItemType {
+  id: string;
+  supplier: string;
+  itemNumber: string;
+  link: string;
+  price: number;
+  quantity: number;
+  description: string;
 }
 
 const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
@@ -38,7 +48,13 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
   selectedPCBVersion,
   setHasSelection,
   setFormattedOutput,
+  watch,
 }) => {
+  const normalizeKey = (description: string) =>
+    description.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
+
+  console.log("Watched Form State:", watch());
+  
   // Filter BOM data by selected PCB version
   const filteredBomData = !selectedPCBVersion
     ? []
@@ -89,9 +105,9 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
               supplier: supplierItem.supplier?.short_name || "Unknown Supplier",
             }))
         );
-
+    
         return {
-          description: item.description,
+          description: normalizeKey(item.description), // Normalize description
           supplierItems: uniqBy(
             supplierItems,
             (supplierItem) => supplierItem?.id
@@ -106,21 +122,48 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
 
   // Function to generate and set formatted output
   const generateFormattedOutput = () => {
-    const formState = getValues();
-    const isSelected = Object.values(formState).some((value) => value === true);
-    setHasSelection(isSelected);
+    const formState = getValues() as unknown as Record<string, ItemType | null>;
 
-    const selectedSupplierItems = flatMap(groupedComponents, (component) =>
-      component.supplierItems.filter(
-        (item) =>
-          formState[`${component.description}-${item?.supplier}-${item?.id}`]
-      )
+  
+    // Check if any item is selected
+    const isSelected = Object.values(formState).some((value) => value !== null);
+    setHasSelection(isSelected);
+  
+    // Extract selected items from formState
+    const selectedSupplierItems: ItemType[] = Object.values(formState).filter(
+      (item): item is ItemType => item !== null
     );
 
-    const groupedBySupplier = groupBy(selectedSupplierItems, "supplier");
+    console.log("Selected Supplier Items:", selectedSupplierItems);
+  
+    const groupedBySupplier: Record<string, typeof selectedSupplierItems> = {};
 
+    selectedSupplierItems.forEach((item) => {
+      if (!item || typeof item !== "object") {
+        console.error("Invalid item encountered:", item);
+        return; // Skip invalid items
+      }
+
+      if (!item.supplier) {
+        console.warn("Item is missing 'supplier' field:", item);
+        return;
+      }
+
+      const supplier = item.supplier;
+      if (!groupedBySupplier[supplier]) {
+        groupedBySupplier[supplier] = []; // Initialize the group if it doesn't exist
+      }
+
+      groupedBySupplier[supplier].push(item); // Add the item to the appropriate group
+    });
+
+    // Log the grouped result
+    console.log("Grouped by Supplier (Manual):", groupedBySupplier);
+  
+    // Construct output for each supplier
     const output: Record<string, string> = {};
     Object.entries(groupedBySupplier).forEach(([supplier, items]) => {
+      console.log(`Processing Supplier: ${supplier}`, items);
       if (supplier === "Mouser") {
         output[supplier] = items
           .map((item) => `${item?.itemNumber}|${item?.quantity}`)
@@ -137,11 +180,15 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
           ),
         ].join("\n");
       }
+      console.log(`Output for Supplier ${supplier}:`, output[supplier]); // Debug supplier output
     });
-
-    // Only update if output has changed
+  
+    // Update the formatted output if it has changed
     if (!isEqual(formattedOutput, output)) {
+      console.log("Setting new formatted output:", output);
       setFormattedOutput(output);
+    } else {
+      console.log("Formatted Output remains unchanged.");
     }
   };
 
@@ -197,7 +244,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                       return (
                         <td
                           className="px-4 py-2 border border-gray-200"
-                          key={`${component.description}-${supplier}`}
+                          key={`${normalizeKey(component.description)}-${supplier}`}
                         >
                           <div className="flex flex-col gap-y-2">
                             {matchingSupplierItems.length > 0
@@ -208,7 +255,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                   >
                                     <Controller
                                       control={control}
-                                      name={`${component.description}-${supplier}-${item?.id}`}
+                                      name={`${normalizeKey(component.description)}-${supplier}-${item?.id}`}
                                       render={({ field }) => (
                                         // @ts-ignore
                                         <input
@@ -216,7 +263,16 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                           checked={field.value || false}
                                           className="w-4 h-4"
                                           onChange={(e) => {
-                                            field.onChange(e.target.checked);
+                                            if (e.target.checked) {
+                                              // Store the item data in the form state when checked
+                                              field.onChange({
+                                                ...item,
+                                                description: component.description,
+                                              });
+                                            } else {
+                                              // Remove the item data from the form state when unchecked
+                                              field.onChange(null);
+                                            }
                                             generateFormattedOutput();
                                           }}
                                           type="checkbox"

@@ -8,7 +8,8 @@ import { animateScroll } from "react-scroll";
 import uniqBy from "lodash/uniqBy";
 import flatMap from "lodash/flatMap";
 import { useForm } from "react-hook-form";
-import * as XLSX from "xlsx";
+import zipcelx from 'zipcelx';
+
 // @ts-ignore
 import { saveAs } from "file-saver";
 import {
@@ -66,7 +67,7 @@ const BomList: React.FC<BomListProps> = ({
   const [formattedOutput, setFormattedOutput] = useState<Record<string, string>>({});
   const [userSelection, setUserSelection] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const { control, getValues, reset } = useForm<{
+  const { control, getValues, reset, watch } = useForm<{
     [key: string]: boolean;
   }>();
 
@@ -164,26 +165,32 @@ const BomList: React.FC<BomListProps> = ({
   
   const exportAsXlsx = (formattedOutput: Record<string, string>) => {
     Object.entries(formattedOutput).forEach(([supplier, data]) => {
-      if (typeof data !== "string") {
+      if (typeof data !== 'string') {
         console.error(`Expected a string but got ${typeof data} for supplier: ${supplier}`);
         return; // Skip invalid entries
       }
   
       // Convert string data into rows
-      const delimiter = supplier === "Mouser" ? "|" : ",";
-      const rows = data.split("\n").map((row) => row.split(delimiter));
+      const delimiter = supplier === 'Mouser' ? '|' : ',';
+      const rows = data
+        .split('\n')
+        .map((row) =>
+          row.split(delimiter).map((value) => ({
+            type: isNaN(Number(value)) ? 'string' : 'number',
+            value: value.trim(),
+          }))
+        );
   
-      // Convert rows into a worksheet
-      const worksheet = XLSX.utils.aoa_to_sheet(rows);
+      // Define the zipcelx config
+      const config = {
+        filename: `${supplier}_export`,
+        sheet: {
+          data: rows,
+        },
+      };
   
-      // Create a workbook and append the worksheet
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, supplier);
-  
-      // Write the workbook to a Blob and save it
-      const xlsxData = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([xlsxData], { type: "application/octet-stream" });
-      saveAs(blob, `${supplier}_export.xlsx`);
+      // Generate and download the .xlsx file
+      zipcelx(config);
     });
   };
   
@@ -457,7 +464,7 @@ const BomList: React.FC<BomListProps> = ({
         title={`Quick Export the BOM for ${moduleName}`}
         type="info"
       >
-          <CheckboxGridModal bomData={moduleBom ?? []} control={control} formattedOutput={formattedOutput} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setFormattedOutput={setFormattedOutput} setHasSelection={setHasSelection} />
+          <CheckboxGridModal bomData={moduleBom ?? []} control={control} formattedOutput={formattedOutput} getValues={getValues} reset={reset} selectedPCBVersion={selectedTab} setFormattedOutput={setFormattedOutput} setHasSelection={setHasSelection} watch={watch} />
       </FullPageModal>
     </>
   );

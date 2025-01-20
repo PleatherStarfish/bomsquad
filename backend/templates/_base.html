@@ -38,6 +38,12 @@
       <meta property="og:image" content="{{ meta.image }}">
       <meta property="og:url" content="{{ meta.url }}">
     {% endif %}  
+
+    {% if meta.schema_markup %}
+    <script type="application/ld+json">
+      {{ meta.schema_markup|safe }}
+    </script>
+    {% endif %}
     
     <meta
       name="author"

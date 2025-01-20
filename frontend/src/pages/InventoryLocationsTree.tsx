@@ -1,8 +1,5 @@
-import "vis-network/styles/vis-network.css";
-
 import React, { useEffect, useRef, useState } from "react";
 import BackButton from "../ui/BackButton";
-import { Network } from "vis-network/standalone";
 import chroma from "chroma-js";
 import useGetUserInventoryTree from "../services/useGetUserInventoryTree";
 
@@ -28,10 +25,47 @@ interface GraphData {
   edges: GraphEdge[];
 }
 
+const VIS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/standalone/umd/vis-network.min.js";
+const VIS_CSS = "https://unpkg.com/vis-network/styles/vis-network.css";
+
+const loadScript = (src: string): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(script);
+  });
+
+
 const UserInventoryTree: React.FC = () => {
   const { data, isLoading, isError } = useGetUserInventoryTree();
   const networkContainerRef = useRef<HTMLDivElement | null>(null);
   const [graphData, setGraphData] = useState<GraphData>({ edges: [], nodes: [] });
+  const [isVisLoaded, setIsVisLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load vis-network script and CSS dynamically
+    const loadVisNetwork = async () => {
+      try {
+        // Load CSS
+        const link = document.createElement("link");
+        link.href = VIS_CSS;
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+
+        // Load JS
+        await loadScript(VIS_CDN);
+
+        setIsVisLoaded(true);
+      } catch (error) {
+        console.error("Error loading vis-network:", error);
+      }
+    };
+
+    loadVisNetwork();
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -123,7 +157,8 @@ const UserInventoryTree: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
-    if (networkContainerRef.current && graphData.nodes.length > 0) {
+    if (isVisLoaded && networkContainerRef.current && graphData.nodes.length > 0) {
+      const { Network } = (window as any).vis;
       const network = new Network(networkContainerRef.current, graphData, {
         edges: {
           color: "#848484",
@@ -149,7 +184,7 @@ const UserInventoryTree: React.FC = () => {
 
       network.fit({ animation: true });
     }
-  }, [graphData]);
+  }, [graphData, isVisLoaded]);
 
   if (isLoading) return <p>Loading inventory tree...</p>;
   if (isError) return <p>Error loading inventory tree.</p>;
