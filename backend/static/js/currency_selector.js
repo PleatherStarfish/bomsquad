@@ -1,10 +1,11 @@
 function updateCurrency(newCurrency) {
   localStorage.setItem("currency", newCurrency);
 
-  const currencyContainer = document.querySelector("#currency-container");
-  const isAuthenticated =
-    currencyContainer.dataset.isAuthenticated === "true";
-  const csrfToken = currencyContainer.dataset.csrfToken;
+  const currencyContainer = $("#currency-container");
+  const isAuthenticated = currencyContainer.data("is-authenticated") === "true";
+  const csrfToken = currencyContainer.data("csrf-token");
+  console.log(isAuthenticated)
+  console.log(csrfToken)
 
   // Update user's default currency on the server if authenticated
   if (isAuthenticated) {
@@ -19,20 +20,23 @@ function updateCurrency(newCurrency) {
       .then((response) => {
         console.log("Response status:", response.status); // Debug response status
         if (response.ok || response.status === 403) {
+          console.log("Reloading page...");
           window.location.replace(window.location.href); // Force reload
         } else {
           console.error("Error updating currency:", response.statusText);
         }
       })
       .catch((error) => {
+        console.error("Network error:", error);
         window.location.replace(window.location.href); // Reload on error
       });
   } else {
+    console.log("User not authenticated, reloading...");
     window.location.replace(window.location.href); // Reload for unauthenticated users
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+$(document).ready(function () {
   const currencies = [
     { code: "USD", symbol: "$", name: "US Dollar" },
     { code: "EUR", symbol: "€", name: "Euro" },
@@ -51,14 +55,13 @@ document.addEventListener("DOMContentLoaded", () => {
     { code: "INR", symbol: "₹", name: "Indian Rupee" },
   ];
 
-  const currencySelector = document.querySelector("#currency-selector");
-  const currencyContainer = document.querySelector("#currency-container");
-  const defaultCurrency =
-    currencyContainer.dataset.defaultCurrency || "USD";
+  const currencySelector = $("#currency-selector");
+  const currencyContainer = $("#currency-container");
+  const defaultCurrency = currencyContainer.data("default-currency") || "USD";
 
   function getDefaultCurrency() {
     const isAuthenticated =
-      currencyContainer.dataset.isAuthenticated === "true";
+      currencyContainer.data("is-authenticated") === "true";
     if (isAuthenticated && defaultCurrency) {
       return defaultCurrency;
     }
@@ -66,32 +69,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function populateWithSymbols() {
-    currencySelector.innerHTML = "";
+    currencySelector.empty();
     currencies.forEach((currency) => {
-      const option = document.createElement("option");
-      option.value = currency.code;
-      option.textContent = currency.symbol;
-      currencySelector.appendChild(option);
+      const option = $("<option>").val(currency.code).text(currency.symbol);
+      currencySelector.append(option);
     });
-    currencySelector.value = getDefaultCurrency();
+    currencySelector.val(getDefaultCurrency());
   }
 
   function populateWithFullNames() {
-    currencySelector.innerHTML = "";
+    currencySelector.empty();
     currencies.forEach((currency) => {
-      const option = document.createElement("option");
-      option.value = currency.code;
-      option.textContent = `${currency.name} (${currency.code})`;
-      currencySelector.appendChild(option);
+      const option = $("<option>")
+        .val(currency.code)
+        .text(`${currency.name} (${currency.code})`);
+      currencySelector.append(option);
     });
-    currencySelector.value = getDefaultCurrency();
+    currencySelector.val(getDefaultCurrency());
   }
 
-  currencySelector.addEventListener("focus", populateWithFullNames);
-  currencySelector.addEventListener("blur", populateWithSymbols);
+  currencySelector.on("focus", populateWithFullNames);
+  currencySelector.on("blur", populateWithSymbols);
   populateWithSymbols();
 
-  currencySelector.addEventListener("change", (event) => {
-    updateCurrency(event.target.value);
+  currencySelector.on("change", function () {
+    updateCurrency(this.value);
   });
 });

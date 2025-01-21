@@ -4,10 +4,10 @@ import { Configuration } from 'webpack';
 import { exec } from 'child_process';
 
 import Dotenv from 'dotenv-webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-
 
 const config: Configuration = {
   entry: {
@@ -31,7 +31,7 @@ const config: Configuration = {
       },
       {
         test: /\.(css|sass|scss)$/,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "style-loader", "css-loader"],
       },
     ],
   },
@@ -54,6 +54,10 @@ const config: Configuration = {
     path: path.resolve(__dirname, "./build"),
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      chunkFilename: '[id].css', 
+      filename: '[name].css', // Output CSS for dynamic chunks
+  }),
     new BundleAnalyzerPlugin(),
     new Dotenv({
       path: "../.env",
