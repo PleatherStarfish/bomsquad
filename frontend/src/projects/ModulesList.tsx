@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import LazyImage from "../utils/LazyImage";
 
 // Extend the Window interface to include adsbygoogle
 declare global {
@@ -138,9 +139,8 @@ const ModulesList: React.FC<ModulesListProps> = ({
                         srcSet={module.thumb_image_jpeg}
                         type="image/jpeg"
                       />
-                      <img
+                      <LazyImage
                         alt={module.name}
-                        className="object-contain w-full h-full"
                         src={module.thumb_image_jpeg}
                       />
                     </picture>
