@@ -116,8 +116,28 @@
                 </div>
             </div>
             <div class="flex items-center justify-center w-full">
-                <iframe style="width: 100%; aspect-ratio: 16/9;" src="https://www.youtube-nocookie.com/embed/ddtQrfLwvgs?si=ApisRqfA7PxR-v_9&modestbranding=1&rel=0&autoplay=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
+              <div class="youtube-placeholder" style="position: relative; width: 100%; aspect-ratio: 16/9; background: url('https://img.youtube.com/vi/ddtQrfLwvgs/hqdefault.jpg') center/cover no-repeat;">
+                <button 
+                    style="
+                        position: absolute; 
+                        top: 50%; 
+                        left: 50%; 
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 0, 0, 0.8); 
+                        color: white; 
+                        border: none; 
+                        border-radius: 50%; 
+                        width: 50px; 
+                        height: 50px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-size: 18px;"
+                    onclick="loadYoutubeIframe(this)">
+                    ▶
+                </button>
             </div>
+          </div>
         </div>
     </div>
   </div>
@@ -346,5 +366,21 @@
 }
 
   parallaxImage.addEventListener('mouseenter', triggerAnimation);
+</script>
+<script>
+  function loadYoutubeIframe(button) {
+      const container = button.parentElement;
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '100%';
+      iframe.style.aspectRatio = '16/9';
+      iframe.src = "https://www.youtube.com/embed/ddtQrfLwvgs?si=ApisRqfA7PxR-v_9";
+      iframe.title = "YouTube video player";
+      iframe.frameBorder = "0";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      container.innerHTML = '';
+      container.appendChild(iframe);
+  }
 </script>
 {% endblock javascript %}
