@@ -1,21 +1,30 @@
-cash(document).ready(function () {
-  const $resourcesButton = cash("#resources-menu-button");
-  const $resourcesPanel = cash("#resources-menu-panel");
+document.addEventListener("DOMContentLoaded", function () {
+  const resourcesButton = document.getElementById("resources-menu-button");
+  const resourcesPanel = document.getElementById("resources-menu-panel");
 
-  $resourcesButton.on("click", function () {
-    const isOpen = $resourcesPanel.hasClass("hidden");
+  resourcesButton.addEventListener("click", function () {
+    const isOpen = resourcesPanel.classList.contains("hidden");
 
     if (isOpen) {
-      $resourcesPanel.removeClass("hidden");
-      $resourcesPanel.css("max-height", `${$resourcesPanel[0].scrollHeight}px`);
-      $resourcesButton.find("svg").addClass("rotate-180");
+      resourcesPanel.classList.remove("hidden");
+      resourcesPanel.style.maxHeight = `${resourcesPanel.scrollHeight}px`;
+      const svg = resourcesButton.querySelector("svg");
+      if (svg) {
+        svg.classList.add("rotate-180");
+      }
     } else {
-      $resourcesPanel.css("max-height", "0");
-      $resourcesPanel.on("transitionend", function () {
-        $resourcesPanel.addClass("hidden");
-      }, { once: true });
-      $resourcesButton.find("svg").removeClass("rotate-180");
+      resourcesPanel.style.maxHeight = "0";
+      resourcesPanel.addEventListener(
+        "transitionend",
+        function () {
+          resourcesPanel.classList.add("hidden");
+        },
+        { once: true } // Ensures the event listener is only called once
+      );
+      const svg = resourcesButton.querySelector("svg");
+      if (svg) {
+        svg.classList.remove("rotate-180");
+      }
     }
   });
 });
-      

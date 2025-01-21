@@ -1,20 +1,23 @@
-$('#full-screen-menu-button').on('click', function() {
-  $('#full-screen-menu').removeClass('hidden').removeClass('-translate-y-full').addClass('translate-y-0');
+document.getElementById("full-screen-menu-button").addEventListener("click", function () {
+  const fullScreenMenu = document.getElementById("full-screen-menu");
+  fullScreenMenu.classList.remove("hidden", "-translate-y-full");
+  fullScreenMenu.classList.add("translate-y-0");
 });
 
-$('#close-full-screen-menu').on('click', function() {
-  $('#full-screen-menu').removeClass('translate-y-0').addClass('-translate-y-full');
+document.getElementById("close-full-screen-menu").addEventListener("click", function () {
+  const fullScreenMenu = document.getElementById("full-screen-menu");
+  fullScreenMenu.classList.remove("translate-y-0");
+  fullScreenMenu.classList.add("-translate-y-full");
 });
 
-// Add event listener for transitionend event
-$('#full-screen-menu').on('transitionend', function(e) {
-  
+// Add event listener for the transitionend event
+document.getElementById("full-screen-menu").addEventListener("transitionend", function (e) {
   // Check if the transition is for the 'transform' property
-  if (e.originalEvent.propertyName === 'transform') {
-    
+  if (e.propertyName === "transform") {
+    const fullScreenMenu = document.getElementById("full-screen-menu");
     // Check if the element has the '-translate-y-full' class
-    if ($('#full-screen-menu').hasClass('-translate-y-full')) {
-      $('#full-screen-menu').addClass('hidden');
+    if (fullScreenMenu.classList.contains("-translate-y-full")) {
+      fullScreenMenu.classList.add("hidden");
     }
   }
 });
