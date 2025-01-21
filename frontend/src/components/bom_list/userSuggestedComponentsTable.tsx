@@ -33,7 +33,6 @@ const UserSuggestedComponentsTable: React.FC<
   bomItemDescription,
   userCurrency,
 }) => {
-  console.log(moduleId)
   const [inventoryModalOpen, setInventoryModalOpen] = useState<string | undefined>();
   const [shoppingModalOpen, setShoppingModalOpen] = useState<string | undefined>();
   

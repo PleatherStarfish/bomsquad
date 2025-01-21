@@ -107,8 +107,6 @@ const ModulesList: React.FC<ModulesListProps> = ({
       : [module]
   );
 
-  console.log(extendedList);
-
   return (
     <div className="grid grid-cols-1 gap-y-10 lg:gap-y-14">
       {extendedList.map((item) => {

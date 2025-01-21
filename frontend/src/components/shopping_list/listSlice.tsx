@@ -129,7 +129,6 @@ const ListSlice: React.FC<ListSliceProps> = ({
     }
   
     const modulebomlistitem = moduleData.data[componentId][0]?.bom_item;
-    console.log(moduleData.data[componentId][0])
   
     const data = {
       module_pk: moduleId ?? undefined,

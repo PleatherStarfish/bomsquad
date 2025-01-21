@@ -62,7 +62,6 @@ const useSuggestComponentForBomListItem = () => {
       }
 
       const bomItemId = removeAfterUnderscore(moduleBomListItemId)
-      console.log(bomItemId)
 
       const response = await axios.post(
         `/api/suggested-component/${bomItemId}/add/`,

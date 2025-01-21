@@ -3,13 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 const fetchComponentAutocomplete = async (query) => {
-  console.log(query);
   axios.defaults.xsrfCookieName = 'csrftoken';
   axios.defaults.xsrfHeaderName = 'X-CSRFToken';
   const response = await axios.get('/api/component-autocomplete/', {
     params: { q: query },
   });
-  console.log(response.data.results);
   return response.data.results.map((item) => ({
     label: item.text,
     value: item.id,

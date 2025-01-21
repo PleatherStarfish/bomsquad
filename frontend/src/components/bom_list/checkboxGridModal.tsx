@@ -48,12 +48,9 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
   selectedPCBVersion,
   setHasSelection,
   setFormattedOutput,
-  watch,
 }) => {
   const normalizeKey = (description: string) =>
     description.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
-
-  console.log("Watched Form State:", watch());
   
   // Filter BOM data by selected PCB version
   const filteredBomData = !selectedPCBVersion
@@ -133,8 +130,6 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
     const selectedSupplierItems: ItemType[] = Object.values(formState).filter(
       (item): item is ItemType => item !== null
     );
-
-    console.log("Selected Supplier Items:", selectedSupplierItems);
   
     const groupedBySupplier: Record<string, typeof selectedSupplierItems> = {};
 
@@ -156,14 +151,10 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
 
       groupedBySupplier[supplier].push(item); // Add the item to the appropriate group
     });
-
-    // Log the grouped result
-    console.log("Grouped by Supplier (Manual):", groupedBySupplier);
   
     // Construct output for each supplier
     const output: Record<string, string> = {};
     Object.entries(groupedBySupplier).forEach(([supplier, items]) => {
-      console.log(`Processing Supplier: ${supplier}`, items);
       if (supplier === "Mouser") {
         output[supplier] = items
           .map((item) => `${item?.itemNumber}|${item?.quantity}`)
@@ -180,12 +171,10 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
           ),
         ].join("\n");
       }
-      console.log(`Output for Supplier ${supplier}:`, output[supplier]); // Debug supplier output
     });
   
     // Update the formatted output if it has changed
     if (!isEqual(formattedOutput, output)) {
-      console.log("Setting new formatted output:", output);
       setFormattedOutput(output);
     } else {
       console.log("Formatted Output remains unchanged.");
