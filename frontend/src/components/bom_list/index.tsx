@@ -83,8 +83,6 @@ const BomList: React.FC<BomListProps> = ({
     moduleName,
   }));
 
-  const hasOptionalColumn = () => moduleBomData.some((item) => item.optional);
-
   useEffect(() => {
     handleLoading(moduleBomIsLoading);
   }, [moduleBomData]);
@@ -309,6 +307,7 @@ const BomList: React.FC<BomListProps> = ({
     {
       maxWidth: "150px",
       name: <div>Designators</div>,
+      omit: moduleBomData.every((item) => !item.designators || item.designators.length === 0),
       selector: (row) => row.designators,
       sortable: true,
       wrap: true,
@@ -317,15 +316,15 @@ const BomList: React.FC<BomListProps> = ({
       cell: (row) => row.optional && <CheckLg className="w-5 h-5" />,
       maxWidth: "50px",
       name: <div>Optional</div>,
-      omit: !hasOptionalColumn,
+      omit: !moduleBomData.some((item) => item.optional),
       sortable: false,
     },
     {
       format: (row) => <div className="truncate">{row.notes}</div>,
       grow: 2,
       name: <div>Notes</div>,
+      omit: moduleBomData.some((item) => item.notes),
       selector: (row) => row.notes,
-      // Truncated display
       sortable: true,
       wrap: true,
     },

@@ -90,6 +90,13 @@
               >Components</a
             >
           </li>
+          <li>
+            <a
+              href="/blog/"
+              class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300"
+              >Blog</a
+            >
+          </li>
           <li class="relative">
             <button
               class="flex items-center w-full px-3 py-2 text-5xl font-medium text-left text-white hover:text-gray-300"
@@ -142,19 +149,19 @@
               {% dropdown_items user 'suppress_change_password' as dropdown_items %}
               {% for item in dropdown_items %}
                 <li>
-                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{{ item.url }}">
+                  <a class="block px-3 py-2 text-2xl font-medium text-white hover:text-gray-300" href="{{ item.url }}">
                         {{ item.name }}
                   </a>
                 </li>
               {% endfor %}
           {% else %}
                 <li>
-                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{% url 'account_login' %}">
+                  <a class="block px-3 py-2 text-2xl font-medium text-white hover:text-gray-300" href="{% url 'account_login' %}">
                         Login
                   </a>
                 </li>
                 <li>
-                  <a class="block px-3 py-2 text-5xl font-medium text-white hover:text-gray-300" href="{% url 'account_signup' %}">
+                  <a class="block px-3 py-2 text-2xl font-medium text-white hover:text-gray-300" href="{% url 'account_signup' %}">
                         Sign up
                   </a>
                 </li>
