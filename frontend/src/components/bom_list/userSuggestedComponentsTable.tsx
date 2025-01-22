@@ -337,7 +337,7 @@ const UserSuggestedComponentsTable: React.FC<
         isOpenByDefault={false}
         notice="User-submitted components are hidden by default until they are reviewed by our team."
         rounded
-        title={`${data.length} user-submitted option${data.length !== 1 ? "s" : ""} is hidden.`}
+        title={`${data.length} user-submitted option${data.length !== 1 ? "s" : ""} ${data.length !== 1 ? "is" : "are"} hidden.`}
       > 
         <DataTable
           columns={columns}

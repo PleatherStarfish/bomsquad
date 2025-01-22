@@ -111,8 +111,8 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
 
   const { suggestComponent, isPending } = useSuggestComponent();
 
-  const { data: suggestedComponents, isLoading: suggestedComponentsLoading } =
-  useGetSuggestedComponentsForBomListItem(modulebomlistitem_pk);
+  const { data: suggestedComponents } =
+    useGetSuggestedComponentsForBomListItem(modulebomlistitem_pk);
 
   const handleComponentChange = (
     selected: { label: string; value: string } | null
@@ -162,7 +162,11 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
 
       setFullPageModalOpen(false);
     } catch (error: any) {
-      alert(`Error submitting suggestion: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `Error submitting suggestion: ${
+          error.response?.data?.detail || error.message
+        }`
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -618,17 +622,21 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
         />
       </div>
       <div className="mt-6">
-        {suggestedComponentsLoading ? <div className="text-center text-gray-500 animate-pulse">Loading...</div> : <UserSuggestedComponentsTable
-          bomItemDescription={bomItemDescription}
-          data={suggestedComponents?.map((component) => ({
-            ...component,
-            quantity,
-          })) || []}
-          moduleBomListItemId={modulebomlistitem_pk}
-          moduleId={module_pk}
-          moduleName={moduleName}
-          userCurrency={currencyData}
-        />}
+        {suggestedComponents?.length ? (
+          <UserSuggestedComponentsTable
+            bomItemDescription={bomItemDescription}
+            data={
+              suggestedComponents?.map((component) => ({
+                ...component,
+                quantity,
+              })) || []
+            }
+            moduleBomListItemId={modulebomlistitem_pk}
+            moduleId={module_pk}
+            moduleName={moduleName}
+            userCurrency={currencyData}
+          />
+        ) : null}
       </div>
       <div className="w-full">
         <button className="w-full" onClick={() => setFullPageModalOpen(true)}>

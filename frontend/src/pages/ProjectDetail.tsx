@@ -8,6 +8,7 @@ import chroma from "chroma-js";
 import useAuthenticatedUser from "../services/useAuthenticatedUser";
 import useModule from "../services/useModule";
 import { useParams } from "react-router-dom";
+import LazyImage from "../utils/LazyImage";
 
 interface Params extends Record<string, string | undefined> {
   slug: string;
@@ -55,10 +56,9 @@ const ProjectDetail: React.FC = () => {
             <picture>
               <source srcSet={`${module.large_image_webp}`} type="image/webp" />
               <source srcSet={`${module.large_image_jpeg}`} type="image/jpeg" />
-              <img
+              <LazyImage
                 alt={module.name}
                 className="max-h-[30rem] object-contain"
-                loading="lazy"
                 src={`${module.large_image_jpeg}`}
               />
             </picture>
@@ -78,14 +78,15 @@ const ProjectDetail: React.FC = () => {
           </div>}
           <div>
             <h1 className="py-4 text-3xl font-semibold font-display">
-              {module.name}
+              {module.name}<br/><span className="text-lg">{" by "}
+              <a
+                className="text-gray-500 hover:text-gray-700"
+                href={`/manufacturer/${module.manufacturer_slug}/`}
+              >
+                {module.manufacturer.name}
+              </a>
+              </span>
             </h1>
-            {"by "}<a
-              className="text-gray-500 hover:text-gray-700"
-              href={`/manufacturer/${module.manufacturer_slug}/`}
-            >
-              {module.manufacturer.name}
-            </a>
           </div>
 
           {/* Color-coded Pills */}

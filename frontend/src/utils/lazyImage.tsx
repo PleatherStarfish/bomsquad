@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-const LazyImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+const LazyImage: React.FC<{ src: string; alt: string, className: string }> = ({ src, alt, className="object-contain w-full h-full" }) => {
   const [isVisible, setIsVisible] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -27,7 +27,7 @@ const LazyImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
   return (
     <img
       alt={alt}
-      className="object-contain w-full h-full"
+      className={className}
       loading="lazy"
       ref={imgRef}
       src={isVisible ? src : undefined}
