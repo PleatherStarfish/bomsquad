@@ -58,6 +58,7 @@ class BlogPost(BaseModel):
         null=True,
         blank=True,
     )
+    content_summary = models.CharField(max_length=1000, blank=True, null=True)
     featured_image = models.ImageField(upload_to="post_imgs", blank=True, null=True)
     thumb_image_webp = models.ImageField(
         upload_to="post_imgs_thumb_webp", blank=True, null=True
@@ -98,21 +99,26 @@ class BlogPost(BaseModel):
 
     def get_plain_text_excerpt(self, word_limit=30):
         """
-        Extract plain text from the EditorJs content and truncate it to a specified word limit.
+        Extract plain text from content_summary and truncate it to a specified word limit.
+        If content_summary is empty, fall back to content.
         """
-        try:
-            content_data = json.loads(self.content)
-            text = " ".join(
-                block["data"]["text"]
-                for block in content_data.get("blocks", [])
-                if block["type"] == "paragraph"
-            )
-            words = text.split()
-            return " ".join(words[:word_limit]) + (
-                "..." if len(words) > word_limit else ""
-            )
-        except (json.JSONDecodeError, KeyError, TypeError):
-            return ""
+        # Use content_summary if available
+        plain_text = self.content_summary or ""
+
+        # Fallback to extracting from content if content_summary is not provided
+        if not plain_text and self.content:
+            try:
+                content_data = json.loads(self.content)
+                blocks = content_data.get("blocks", [])
+                plain_text = " ".join(
+                    block.get("data", {}).get("text", "") for block in blocks
+                )
+            except (json.JSONDecodeError, AttributeError):
+                plain_text = ""
+
+        # Truncate to the specified word limit
+        words = plain_text.split()
+        return " ".join(words[:word_limit]) + ("..." if len(words) > word_limit else "")
 
     def process_image(self, image_field, size_type, max_dimension):
         img = Image.open(image_field)
