@@ -4,6 +4,7 @@ from uuid import UUID
 from django.shortcuts import get_object_or_404
 import html
 
+from blog.models import BlogPost
 from modules.models import Module, ModuleBomListItem
 from components.models import Component, ComponentSupplierItem
 
@@ -226,6 +227,64 @@ def meta_context(request):
                 }
             )
         except (ValueError, Module.DoesNotExist):
+            return {"meta": META_DEFAULTS}
+
+    # Blog post detail pages at /blog/<slug>/
+    if current_path.startswith("/blog/"):
+        try:
+            slug_match = re.match(r"^/blog/(?P<slug>[\w-]+)/?$", current_path)
+            if not slug_match:
+                raise ValueError("Invalid blog post slug format.")
+
+            slug = slug_match.group("slug")
+            blog_post = get_object_or_404(BlogPost, slug=slug)
+
+            # Generate dynamic meta tags
+            META_DEFAULTS.update(
+                {
+                    "title": blog_post.meta_title or blog_post.title,
+                    "description": blog_post.meta_description
+                    or blog_post.get_plain_text_excerpt(30),
+                    "keywords": blog_post.meta_keywords,
+                    "og:type": "article",
+                    "og:title": blog_post.meta_title or blog_post.title,
+                    "og:description": blog_post.meta_description
+                    or blog_post.get_plain_text_excerpt(30),
+                    "og:image": (
+                        blog_post.featured_image.url
+                        if blog_post.featured_image
+                        else META_DEFAULTS["image"]
+                    ),
+                    "og:url": f"https://bom-squad.com/blog/{slug}/",
+                    "schema_markup": {
+                        "@context": "https://schema.org",
+                        "@type": "BlogPosting",
+                        "headline": blog_post.title,
+                        "description": blog_post.meta_description
+                        or blog_post.get_plain_text_excerpt(30),
+                        "image": (
+                            blog_post.featured_image.url
+                            if blog_post.featured_image
+                            else META_DEFAULTS["image"]
+                        ),
+                        "author": {
+                            "@type": "Person",
+                            "name": "BOM Squad",
+                        },
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "BOM Squad",
+                            "logo": {
+                                "@type": "ImageObject",
+                                "url": "https://bom-squad.com/static/images/logo.png",
+                            },
+                        },
+                        "datePublished": blog_post.datetime_created.isoformat(),
+                        "dateModified": blog_post.datetime_updated.isoformat(),
+                    },
+                }
+            )
+        except (ValueError, BlogPost.DoesNotExist) as e:
             return {"meta": META_DEFAULTS}
 
     # Dynamic SEO for Component detail pages
