@@ -20,6 +20,7 @@ from core.sitemaps import (
     ManufacturerSitemap,
     ComponentSitemap,
     StaticViewSitemap,
+    BlogSitemap,
 )
 from django.views.decorators.cache import cache_page
 import admin_honeypot
@@ -33,6 +34,7 @@ sitemaps = {
     "manufacturers": ManufacturerSitemap,
     "components": ComponentSitemap,
     "static": StaticViewSitemap,
+    "blog": BlogSitemap,
 }
 
 

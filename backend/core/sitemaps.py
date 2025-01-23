@@ -1,5 +1,6 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from blog.models import BlogPost
 from modules.models import Module, Manufacturer
 from components.models import Component, Types
 
@@ -49,3 +50,17 @@ class StaticViewSitemap(Sitemap):
 
     def location(self, item):
         return reverse(item)
+
+
+class BlogSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.9
+
+    def items(self):
+        return BlogPost.objects.all()
+
+    def lastmod(self, obj):
+        return obj.datetime_updated
+
+    def location(self, obj):
+        return reverse("blog:blog_detail", args=[obj.slug])
