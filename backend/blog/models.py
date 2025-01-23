@@ -86,6 +86,7 @@ class BlogPost(BaseModel):
         max_length=255, blank=True, help_text="SEO meta keywords"
     )
     allow_comments = models.BooleanField("allow comments", default=True)
+    published = models.BooleanField("published", default=False)
 
     def save(self, *args, **kwargs):
         if not self.slug:

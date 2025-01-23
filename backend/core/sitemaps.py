@@ -57,7 +57,7 @@ class BlogSitemap(Sitemap):
     priority = 0.9
 
     def items(self):
-        return BlogPost.objects.all()
+        return BlogPost.objects.filter(published=True).order_by("-datetime_updated")
 
     def lastmod(self, obj):
         return obj.datetime_updated
