@@ -31,13 +31,11 @@
     <title>{{ meta.title }}</title>
     <meta name="description" content="{{ meta.description }}">
     <meta name="keywords" content="{{ meta.keywords }}">  
-    {% if meta.use_og %}
-      <meta property="og:type" content="{{ meta|get_nested_key:'og:type'|default:'website' }}">
-      <meta property="og:title" content="{{ meta.title }}">
-      <meta property="og:description" content="{{ meta.description }}">
-      <meta property="og:image" content="{{ meta.image }}">
-      <meta property="og:url" content="{{ meta.url }}">
-    {% endif %}  
+    <meta property="og:type" content="{{ meta.ogtype }}">
+    <meta property="og:title" content="{{ meta.ogtitle }}">
+    <meta property="og:description" content="{{ meta.ogdescription }}">
+    <meta property="og:image" content="{{ meta.ogimage }}">
+    <meta property="og:url" content="{{ meta.ogurl }}">
 
     {% if meta.schema_markup %}
     <script type="application/ld+json">

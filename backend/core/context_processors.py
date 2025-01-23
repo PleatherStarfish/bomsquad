@@ -27,15 +27,15 @@ def meta_context(request):
         "image": "https://bom-squad.com/static/images/logo.png",
         "url": "https://bom-squad.com",
         "use_og": True,
-        "og:type": "website",
-        "og:site_name": "BOM Squad",
-        "og:title": "Build Your Own Synth | DIY Guitar Pedal | DIY Synth",
-        "og:description": (
+        "ogtype": "website",
+        "ogsite_name": "BOM Squad",
+        "ogtitle": "Build Your Own Synth | DIY Guitar Pedal | DIY Synth",
+        "ogdescription": (
             "Build DIY guitar pedals, modular synth kits, and Eurorack projects with BOM Squad. "
             "Access schematics, inventory tools, and community reviews to streamline your builds."
         ),
-        "og:image": "https://bomsquad.com/static/images/logo.png",
-        "og:url": "https://bom-squad.com",
+        "ogimage": "https://bomsquad.com/static/images/logo.png",
+        "ogurl": "https://bom-squad.com",
     }
 
     # Define path-specific overrides
@@ -47,13 +47,13 @@ def meta_context(request):
                 "and Current to get precise results for your electronics projects."
             ),
             "keywords": "LED Resistor Calculator, resistor calculator, LED circuit, calculate resistor, electronics projects",
-            "og:type": "article",
-            "og:title": "LED Resistor Calculator | Calculate Resistor Values for LEDs",
-            "og:description": (
+            "ogtype": "article",
+            "ogtitle": "LED Resistor Calculator | Calculate Resistor Values for LEDs",
+            "ogdescription": (
                 "Easily calculate resistor values for LEDs. Input Supply Voltage, Forward Voltage, "
                 "and Current to get precise results for your electronics projects."
             ),
-            "og:url": "https://bom-squad.com/tools/resistor-calculator/",
+            "ogurl": "https://bom-squad.com/tools/resistor-calculator/",
         },
         "/privacy-policy/": {
             "title": "Privacy Policy | BOM Squad",
@@ -69,12 +69,12 @@ def meta_context(request):
                 "url": "https://bom-squad.com/privacy-policy/",
             },
             "keywords": "privacy policy, BOM Squad privacy policy, data privacy, user rights, cookies policy",
-            "og:type": "website",
-            "og:title": "Privacy Policy | BOM Squad",
-            "og:description": (
+            "ogtype": "website",
+            "ogtitle": "Privacy Policy | BOM Squad",
+            "ogdescription": (
                 "Learn about BOM Squad's privacy practices, including data handling, cookies, and user rights."
             ),
-            "og:url": "https://bom-squad.com/privacy-policy/",
+            "ogurl": "https://bom-squad.com/privacy-policy/",
         },
         "/faq/": {
             "title": "FAQ | BOM Squad",
@@ -83,12 +83,12 @@ def meta_context(request):
                 "inventory, and building DIY guitar pedals and synth kits."
             ),
             "keywords": "FAQ, frequently asked questions, BOM Squad FAQ, DIY synth tools, DIY guitar pedal help",
-            "og:type": "website",
-            "og:title": "FAQ | BOM Squad",
-            "og:description": (
+            "ogtype": "website",
+            "ogtitle": "FAQ | BOM Squad",
+            "ogdescription": (
                 "Get answers to common questions about BOM Squad's features, tools, and DIY audio projects."
             ),
-            "og:url": "https://bom-squad.com/faq/",
+            "ogurl": "https://bom-squad.com/faq/",
         },
         "/tos/": {
             "title": "Terms of Service | BOM Squad",
@@ -97,13 +97,13 @@ def meta_context(request):
                 "and services, including user responsibilities and platform policies."
             ),
             "keywords": "terms of service, BOM Squad terms, user agreement, platform rules, user responsibilities",
-            "og:type": "website",
-            "og:title": "Terms of Service | BOM Squad",
-            "og:description": (
+            "ogtype": "website",
+            "ogtitle": "Terms of Service | BOM Squad",
+            "ogdescription": (
                 "Understand the rules and guidelines for using BOM Squad. Read our Terms of Service, which outline "
                 "user rights and platform policies."
             ),
-            "og:url": "https://bom-squad.com/tos/",
+            "ogurl": "https://bom-squad.com/tos/",
         },
         "/components/": {
             "title": "DIY Audio Components | Parts for Guitar Pedals and Synth Kits",
@@ -115,14 +115,14 @@ def meta_context(request):
                 "DIY audio components, guitar pedal parts, modular synth components, Eurorack parts, resistors, "
                 "capacitors, ICs, DIY synth kits, build your own synth"
             ),
-            "og:type": "website",
-            "og:title": "DIY Audio Components | Parts for Guitar Pedals and Synth Kits",
-            "og:description": (
+            "ogtype": "website",
+            "ogtitle": "DIY Audio Components | Parts for Guitar Pedals and Synth Kits",
+            "ogdescription": (
                 "Find premium components for your DIY audio projects. Perfect for guitar pedals, synth kits, "
                 "and modular Eurorack builds."
             ),
-            "og:image": "https://bom-squad.com/static/images/components-banner.png",
-            "og:url": "https://bom-squad.com/components/",
+            "ogimage": "https://bom-squad.com/static/images/components-banner.png",
+            "ogurl": "https://bom-squad.com/components/",
         },
         "/about/": {
             "title": "About BOM Squad | Easy DIY Synths and DIY Guitar Pedals",
@@ -141,14 +141,14 @@ def meta_context(request):
                 ),
             },
             "keywords": "about BOM Squad, DIY audio tools, DIY synth builders, guitar pedal resources, DIY community",
-            "og:type": "website",
-            "og:title": "About BOM Squad | Empowering DIY Synth and Pedal Builders",
-            "og:description": (
+            "ogtype": "website",
+            "ogtitle": "About BOM Squad | Empowering DIY Synth and Pedal Builders",
+            "ogdescription": (
                 "Explore the mission and vision behind BOM Squad. Discover how we're empowering the DIY audio "
                 "community with tools, resources, and support."
             ),
-            "og:image": "https://bom-squad.com/static/images/about-banner.png",
-            "og:url": "https://bom-squad.com/about/",
+            "ogimage": "https://bom-squad.com/static/images/about-banner.png",
+            "ogurl": "https://bom-squad.com/about/",
         },
     }
 
@@ -220,10 +220,10 @@ def meta_context(request):
                         )
                     ),
                     "schema_markup": schema_markup,
-                    "og:type": "article",
-                    "og:title": title,
-                    "og:description": description,
-                    "og:url": f"https://bom-squad.com/projects/{slug}/",
+                    "ogtype": "article",
+                    "ogtitle": title,
+                    "ogdescription": description,
+                    "ogurl": f"https://bom-squad.com/projects/{slug}/",
                 }
             )
         except (ValueError, Module.DoesNotExist):
@@ -246,16 +246,16 @@ def meta_context(request):
                     "description": blog_post.meta_description
                     or blog_post.get_plain_text_excerpt(30),
                     "keywords": blog_post.meta_keywords,
-                    "og:type": "article",
-                    "og:title": blog_post.meta_title or blog_post.title,
-                    "og:description": blog_post.meta_description
+                    "ogtype": "article",
+                    "ogtitle": blog_post.meta_title or blog_post.title,
+                    "ogdescription": blog_post.meta_description
                     or blog_post.get_plain_text_excerpt(30),
-                    "og:image": (
+                    "ogimage": (
                         blog_post.featured_image.url
                         if blog_post.featured_image
                         else META_DEFAULTS["image"]
                     ),
-                    "og:url": f"https://bom-squad.com/blog/{slug}/",
+                    "ogurl": f"https://bom-squad.com/blog/{slug}/",
                     "schema_markup": {
                         "@context": "https://schema.org",
                         "@type": "BlogPosting",
@@ -419,9 +419,9 @@ def meta_context(request):
                             ],
                         )
                     ),
-                    "og:type": "article",
-                    "og:title": title,
-                    "og:description": description,
+                    "ogtype": "article",
+                    "ogtitle": title,
+                    "ogdescription": description,
                 }
             )
         except (ValueError, IndexError):
