@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 
 import Accordion from "../../ui/Accordion";
 import Button from "../../ui/Button";
@@ -60,27 +60,44 @@ const AddComponentModal = ({
 
   // const is_premium = user?.is_premium;
 
-  const handleSubmitQuantity = useCallback(async () => {
+  const handleSubmitQuantity = async () => {
+    console.log("handleSubmitQuantity called with type:", type);
   
     try {
       if (type === Types.INVENTORY) {
+        console.log("Updating user inventory with data:", {
+          componentId,
+          editMode,
+          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
+          quantity,
+        });
         await addOrUpdateUserInventory.mutateAsync(
           {
             componentId,
+            data: {
+              location: Array.isArray(locationArray) ? locationArray.join(",") : "",
+              quantity: quantity
+            },
             editMode,
-            location: Array.isArray(locationArray) ? locationArray.join(",") : "",
-            quantity,
           },
           {
             onError: (error) => {
+              console.error("Error updating inventory:", error);
               setError(`Failed to update inventory: ${error.message}`);
             },
             onSuccess: () => {
+              console.log("Inventory successfully updated.");
               setOpen(false);
             },
           }
         );
       } else if (type === Types.SHOPPING) {
+        console.log("Updating user shopping list with data:", {
+          componentId,
+          ...hookArgs,
+          editMode,
+          quantity,
+        });
         await addOrUpdateUserShoppingList.mutateAsync(
           {
             componentId,
@@ -90,14 +107,21 @@ const AddComponentModal = ({
           },
           {
             onError: (error) => {
+              console.error("Error updating shopping list:", error);
               setError(`Failed to update shopping list: ${error.message}`);
             },
             onSuccess: () => {
+              console.log("Shopping list successfully updated.");
               setOpen(false);
             },
           }
         );
       } else if (type === Types.SHOPPING_ANON) {
+        console.log("Updating anonymous shopping list with data:", {
+          componentId,
+          editMode,
+          quantity,
+        });
         await addOrUpdateUserAnonymousShoppingList.mutateAsync(
           {
             componentId,
@@ -106,33 +130,26 @@ const AddComponentModal = ({
           },
           {
             onError: (error) => {
+              console.error("Error updating anonymous shopping list:", error);
               setError(`Failed to update anonymous shopping list: ${error.message}`);
             },
             onSuccess: () => {
+              console.log("Anonymous shopping list successfully updated.");
               setOpen(false);
             },
           }
         );
       } else {
-        console.warn("Unknown type:", type);
+        console.warn("Unknown type encountered:", type);
       }
     } catch (error) {
+      console.error("Unexpected error in handleSubmitQuantity:", error);
       setError(`Unexpected error: ${error.message}`);
     } finally {
       console.log("handleSubmitQuantity finished execution.");
     }
-  }, [
-    type,
-    componentId,
-    editMode,
-    locationArray,
-    quantity,
-    hookArgs,
-    addOrUpdateUserInventory,
-    addOrUpdateUserShoppingList,
-    addOrUpdateUserAnonymousShoppingList,
-    setOpen,
-  ]);
+  };
+  
   
 
   useEffect(() => {

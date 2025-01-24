@@ -49,6 +49,7 @@ const useGetSuggestedComponentsForBomListItem = (moduleBomListItemId: string) =>
       return response.data;
     },
     queryKey: ["suggestedComponents", bomItemId],
+    retry: false,
   });
 
   return { data, error, isLoading };

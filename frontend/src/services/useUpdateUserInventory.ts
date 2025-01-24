@@ -1,6 +1,11 @@
-import { useMutation, useQueryClient, UseMutationResult } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { UseMutationResult } from "@tanstack/react-query";
+
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+
+import axios from "axios";
 import Cookies from "js-cookie";
-import axios, { AxiosError } from "axios";
 
 interface UpdateUserInventoryPayload {
   inventoryPk: string; // The primary key of the inventory item to update
@@ -16,6 +21,7 @@ const useUpdateUserInventory = (): {
 
   const { mutateAsync: updateUserInventoryMutate, error } = useMutation<void, AxiosError, UpdateUserInventoryPayload>({
     mutationFn: async ({ inventoryPk, ...data }: UpdateUserInventoryPayload) => {
+      console.log(data)
       return axios.patch(`/api/inventory/${inventoryPk}/update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken || "", // Include the csrftoken as a header in the request
