@@ -7,6 +7,7 @@ djlint==1.25.0
 django-analytical==3.1.0
 django-editorjs-fields==0.2.7
 django-comments-xtd==2.10.0
+django-htmlmin==0.11.0
 django-money==3.0.0
 djangorestframework==3.14.0
 django-cors-headers==3.14.0

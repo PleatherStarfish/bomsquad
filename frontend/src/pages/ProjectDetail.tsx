@@ -161,7 +161,7 @@ const ProjectDetail: React.FC = () => {
       <div>
         {!loading && <div className="pb-5">
           <HeaderWithButton
-            buttonText={`Get Virtual Kit for ${module.name}`}
+            buttonText={`Export Component List for ${module.name}`}
             onButtonClick={() => handleModalOpenClose(true)}
             title="Components"
           />
