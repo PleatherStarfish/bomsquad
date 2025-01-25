@@ -3,6 +3,7 @@ import { Configuration } from 'webpack';
 
 import { exec } from 'child_process';
 
+import CompressionPlugin from 'compression-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
@@ -54,6 +55,12 @@ const config: Configuration = {
     path: path.resolve(__dirname, "./build"),
   },
   plugins: [
+    new CompressionPlugin({
+      algorithm: "gzip", 
+      minRatio: 0.8,
+      test: /\.(js|css|html|svg)$/, 
+      threshold: 10240,
+    }),
     new MiniCssExtractPlugin({
       chunkFilename: '[id].css', 
       filename: '[name].css', // Output CSS for dynamic chunks

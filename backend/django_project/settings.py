@@ -135,6 +135,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "maintenance_mode.middleware.MaintenanceModeMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
     "django_otp.middleware.OTPMiddleware",
 ]
 
