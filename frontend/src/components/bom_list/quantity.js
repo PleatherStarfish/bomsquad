@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 
 import cx from 'classnames';
 
-export const Types = Object.freeze({
+export const Types = {
   INVENTORY: "inventory",
   SHOPPING: "shopping",
   SHOPPING_ANON: "shopping_anon",
-});
+};
 
 const Quantity = ({ useHook, hookArgs, replaceZero = true, classNames = "", hideLoadingTag = false }) => {
   const [quantity, setQuantity] = React.useState();

@@ -1,7 +1,7 @@
 import React from "react";
 import convertUnitPrice from "../../utils/convertUnitPrice";
 import useGetUserCurrency from "../../services/useGetUserCurrency";
-import useUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
+import useGetUserShoppingListComponentTotalPrice from "../../services/useGetUserShoppingListComponentTotalPrice";
 
 interface TotalPriceForComponentProps {
   componentId: string;
@@ -10,7 +10,7 @@ interface TotalPriceForComponentProps {
 
 const TotalPriceForComponent: React.FC<TotalPriceForComponentProps> = ({ componentId }) => {
   const { totalPriceData, totalPriceIsLoading, totalPriceIsError } =
-    useUserShoppingListComponentTotalPrice(componentId);
+  useGetUserShoppingListComponentTotalPrice(componentId);
   const { data: currencyData, isLoading: currencyIsLoading, isError: currencyIsError } =
     useGetUserCurrency();
 

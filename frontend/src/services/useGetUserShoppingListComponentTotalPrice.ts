@@ -1,10 +1,12 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query";
-
 import { ShoppingListTotalPriceResponse } from "../types/shoppingList";
+import { UseQueryResult } from "@tanstack/react-query";
+
+import { useQuery } from "@tanstack/react-query";
+
 import axios from "axios";
 import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
-const useUserShoppingListComponentTotalPrice = (
+const useGetUserShoppingListComponentTotalPrice = (
   componentId: string
 ): {
   totalPriceData: ShoppingListTotalPriceResponse | undefined;
@@ -40,4 +42,4 @@ const useUserShoppingListComponentTotalPrice = (
   return { refetch, totalPriceData, totalPriceIsError, totalPriceIsLoading };
 };
 
-export default useUserShoppingListComponentTotalPrice;
+export default useGetUserShoppingListComponentTotalPrice;

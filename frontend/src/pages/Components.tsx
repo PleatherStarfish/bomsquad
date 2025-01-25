@@ -368,12 +368,12 @@ const Components: React.FC = () => {
               + Inventory
             </Button>
             <AddComponentModal
-              componentId={row.id}
               componentName={
                 row.supplier_item_no
                   ? `${row.supplier?.short_name} ${row.supplier_item_no}`
                   : row.description
               }
+              componentPk={row.id}
               open={inventoryModalOpen === row.id}
               quantityRequired={1}
               setOpen={setInventoryModalOpen}
@@ -409,12 +409,11 @@ const Components: React.FC = () => {
               + Shopping List
             </Button>
             <AddComponentModal
-              componentId={row.id}
               componentName={`${row.supplier?.short_name} ${row.supplier_item_no}`}
+              componentPk={row.id}
               open={shoppingModalOpen === row.id}
               quantityRequired={1}
               setOpen={setShoppingModalOpen}
-              text=""
               title={`Add ${row.supplier?.short_name} ${row.supplier_item_no} to Shopping List?`}
               type={Types.SHOPPING_ANON}
             />

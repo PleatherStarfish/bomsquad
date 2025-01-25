@@ -1,5 +1,5 @@
-import { BomItem } from "./bomListItem"
-import { Component } from "./component"
+import { BomItem } from "./bomListItem";
+import { Component } from "./component";
 import { Module } from "./modules";
 
 // Define the API response type
@@ -74,7 +74,7 @@ export interface AggregatedComponent {
   user: number;
 }
 
-export interface UseUserShoppingListData {
+export interface UseGetUserShoppingListData {
   groupedByModule: GroupedByModule[];
   aggregatedComponents: UserShoppingList[];
 }

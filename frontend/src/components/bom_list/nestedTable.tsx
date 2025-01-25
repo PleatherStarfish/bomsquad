@@ -420,14 +420,13 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
               + Inventory
             </Button>
             <AddComponentModal
-              componentId={row.id}
               componentName={
                 row.supplier_item_no
                   ? `${row.supplier?.short_name} ${row.supplier_item_no}`
                   : row.description
               }
-              // @ts-ignore
-              moduleId={module_pk}
+              componentPk={row.id}
+              modulePk={module_pk}
               open={inventoryModalOpen === row.id}
               quantityRequired={quantity}
               setOpen={setInventoryModalOpen}
@@ -485,19 +484,14 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
               + Shopping List
             </Button>
             <AddComponentModal
-              componentId={row.id}
               componentName={
                 row.supplier_item_no
                   ? `${row.supplier?.short_name} ${row.supplier_item_no}`
                   : row.description
               }
-              // @ts-ignore
-              hookArgs={{
-                component_pk: row.id,
-                module_pk,
-                modulebomlistitem_pk,
-              }}
-              moduleId={module_pk}
+              componentPk={row.id}
+              modulebomlistitemPk={modulebomlistitem_pk}
+              modulePk={module_pk}
               open={shoppingModalOpen === row.id}
               quantityRequired={quantity}
               setOpen={setShoppingModalOpen}

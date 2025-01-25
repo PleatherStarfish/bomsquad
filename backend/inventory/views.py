@@ -113,6 +113,7 @@ class UserInventoryView(APIView):
 
     def patch(self, request, inventory_pk):
         user = request.user
+        print(request.data)
 
         # Process the location data from the request
         location = request.data.get("location", "")

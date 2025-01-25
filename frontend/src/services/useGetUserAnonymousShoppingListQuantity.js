@@ -17,11 +17,8 @@ const useGetUserAnonymousShoppingListQuantity = (componentPk) => {
   };
 
   const { data, isLoading, isError } = useQuery({
-    // Only run the query if componentPkCleaned is not null/undefined
-enabled: !!componentPkCleaned,
-    
-queryFn: fetchUserInventoryQuantity,
-    
+    enabled: !!componentPkCleaned,  
+    queryFn: fetchUserInventoryQuantity,
     queryKey: ["userAnonymousInventoryQuantity", componentPkCleaned]
   });
 

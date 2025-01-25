@@ -1,6 +1,6 @@
 import { GroupedByModule } from "../types/shoppingList";
+import { UseGetUserShoppingListData } from "../types/shoppingList";
 import { UserShoppingList } from "../types/shoppingList";
-import { UseUserShoppingListData } from "../types/shoppingList";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -10,13 +10,13 @@ import sortBy from "lodash/sortBy";
 import toPairs from "lodash/toPairs";
 import uniqBy from "lodash/uniqBy";
 
-const useUserShoppingList = () => {
+const useGetUserShoppingList = () => {
   const {
     data: userShoppingListData,
     isLoading: userShoppingListIsLoading,
     isError: userShoppingListIsError,
-  } = useQuery<UseUserShoppingListData>({
-    queryFn: async (): Promise<UseUserShoppingListData> => {
+  } = useQuery<UseGetUserShoppingListData>({
+    queryFn: async (): Promise<UseGetUserShoppingListData> => {
       const response = await axios.get<UserShoppingList[]>("/api/shopping-list/");
 
       // Group data by module name
@@ -43,4 +43,4 @@ const useUserShoppingList = () => {
   };
 };
 
-export default useUserShoppingList;
+export default useGetUserShoppingList;

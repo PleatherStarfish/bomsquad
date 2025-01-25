@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 
 import Components from "./pages/Components";
 import Inventory from "./components/inventory/index";
@@ -14,6 +14,11 @@ import UserPage from "./pages/UserPage";
 import VersionHistory from "./components/VersionHistory";
 import ResistorCalculator from "./pages/ResistorCalculator";
 import ErrorBoundary from "./utils/ErrorBoundary";
+
+const RedirectModuleToProject: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  return <Navigate replace to={`/projects/${slug}`} />;
+};
 
 const App: React.FC = () => {
   const RedirectToBackend: React.FC = () => {
@@ -49,6 +54,14 @@ const App: React.FC = () => {
             </ErrorBoundary>
           }
           path="/projects/:slug"
+        />
+        <Route
+          element={
+            <ErrorBoundary>
+              <RedirectModuleToProject />
+            </ErrorBoundary>
+          }
+          path="/module/:slug"
         />
         <Route
           element={

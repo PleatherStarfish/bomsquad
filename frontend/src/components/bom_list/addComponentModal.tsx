@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import Quantity, { Types } from "./quantity";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Dispatch, Fragment, useEffect, useState } from "react";
 
 import Accordion from "../../ui/Accordion";
 import Button from "../../ui/Button";
@@ -18,24 +18,47 @@ import useGetUserAnonymousShoppingListQuantity from "../../services/useGetUserAn
 import useGetUserInventoryQuantity from "../../services/useGetUserInventoryQuantity";
 import useGetUserShoppingListQuantity from "../../services/useGetUserShoppingListQuantity";
 
-const AddComponentModal = ({
+type TypesValues = typeof Types[keyof typeof Types];
+
+// Define the prop types for the component
+interface AddComponentModalProps {
+  open: boolean;
+  setOpen: Dispatch<React.SetStateAction<string | undefined>>; // Set row.id or undefined 
+  title: string;
+  text?: JSX.Element | string;
+  type: TypesValues;
+  componentPk: string;
+  modulePk?: string;
+  modulebomlistitemPk?: string;
+  quantityRequired: number;
+  componentName: string;
+}
+
+// Define the type for saved locations
+interface SavedLocationData {
+  locations: string[];
+  quantity: number;
+}
+
+const AddComponentModal: React.FC<AddComponentModalProps> = ({
   open,
   setOpen,
   title,
   text,
   type,
-  componentId,
-  hookArgs = undefined,
+  componentPk,
+  modulePk,
+  modulebomlistitemPk,
   quantityRequired,
   componentName,
 }) => {
-  const [error, setError] = useState();
+  const [error, setError] = useState<string | undefined>();
   const [showForOurSubscribersModal, setShowForOurSubscribersModal] =
     useState(false);
-  const [quantity, setQuantity] = useState();
+  const [quantity, setQuantity] = useState<number | undefined>();
   const [editMode, setEditMode] = useState(false);
-  const [locationArray, setlocationArray] = useState("");
-  const [isLocationEditable, setIsLocationEditable] = useState(true);
+  const [locationArray, setlocationArray] = useState<string>("");
+  // const [isLocationEditable, setIsLocationEditable] = useState(true);
 
   const { userIsLoading, userIsError } = useAuthenticatedUser();
 
@@ -45,65 +68,68 @@ const AddComponentModal = ({
     useAddOrUpdateUserAnonymousShoppingList();
 
   const { data: quantityInInventory } =
-    useGetUserInventoryQuantity(componentId);
+    useGetUserInventoryQuantity(componentPk);
 
   const { data: quantityShoppingListAnon } =
-    useGetUserAnonymousShoppingListQuantity(componentId);
+    useGetUserAnonymousShoppingListQuantity(componentPk);
 
-  const { data: quantityInShoppingList } =
-    hookArgs !== undefined
-      ? useGetUserShoppingListQuantity(...Object.values(hookArgs))
-      : { data: undefined };
+    const { data: quantityInShoppingList } = 
+    modulebomlistitemPk && modulePk
+      ? useGetUserShoppingListQuantity({
+          componentPk,
+          modulebomlistitemPk,
+          // eslint-disable-next-line sort-keys-fix/sort-keys-fix
+          modulePk,
+          type: "notAnonymous",
+        })
+      : useGetUserShoppingListQuantity({
+          componentPk,
+          type: "anonymous"
+        });
 
-  const { data: locations } = useGetInventoryLocations(componentId);
-  const locationsData = locations ?? [];
-
-  // const is_premium = user?.is_premium;
+  const { data: locations } = useGetInventoryLocations(componentPk);
+  const locationsData: SavedLocationData[] = locations ?? [];
 
   const handleSubmitQuantity = async () => {
     console.log("handleSubmitQuantity called with type:", type);
   
     try {
       if (type === Types.INVENTORY) {
-        console.log("Updating user inventory with data:", {
-          componentId,
-          editMode,
-          location: Array.isArray(locationArray) ? locationArray.join(",") : "",
-          quantity,
-        });
         await addOrUpdateUserInventory.mutateAsync(
           {
-            componentId,
-            data: {
-              location: Array.isArray(locationArray) ? locationArray.join(",") : "",
-              quantity: quantity
-            },
+            componentId: componentPk,
             editMode,
+            location: locationArray,
+            quantity: quantity ?? 0,
           },
           {
             onError: (error) => {
-              console.error("Error updating inventory:", error);
-              setError(`Failed to update inventory: ${error.message}`);
+              if (error instanceof Error) {
+                setError(`Failed to update inventory: ${error.message}`);
+              } else {
+                setError("Failed to update inventory: Unknown error");
+              }
             },
             onSuccess: () => {
               console.log("Inventory successfully updated.");
-              setOpen(false);
+              setOpen(undefined);
             },
           }
         );
       } else if (type === Types.SHOPPING) {
-        console.log("Updating user shopping list with data:", {
-          componentId,
-          ...hookArgs,
-          editMode,
-          quantity,
-        });
+        
+        if (!componentPk || !modulePk || !modulebomlistitemPk) {
+          console.error("Missing required parameters for updating shopping list.");
+          setError("Please ensure all required fields are filled.");
+          return;
+        }
+
         await addOrUpdateUserShoppingList.mutateAsync(
           {
-            componentId,
-            ...hookArgs,
-            editMode,
-            quantity,
+            componentId: componentPk,
+            module_pk: modulePk,
+            modulebomlistitem_pk: modulebomlistitemPk,
+            quantity: quantity ?? 0, // Default quantity to 0 if undefined
           },
           {
             onError: (error) => {
@@ -112,21 +138,21 @@ const AddComponentModal = ({
             },
             onSuccess: () => {
               console.log("Shopping list successfully updated.");
-              setOpen(false);
+              setOpen(undefined);
             },
           }
         );
       } else if (type === Types.SHOPPING_ANON) {
         console.log("Updating anonymous shopping list with data:", {
-          componentId,
+          componentId: componentPk,
           editMode,
           quantity,
         });
         await addOrUpdateUserAnonymousShoppingList.mutateAsync(
           {
-            componentId,
+            componentId: componentPk,
             editMode,
-            quantity,
+            quantity: quantity ?? 0,
           },
           {
             onError: (error) => {
@@ -135,7 +161,7 @@ const AddComponentModal = ({
             },
             onSuccess: () => {
               console.log("Anonymous shopping list successfully updated.");
-              setOpen(false);
+              setOpen(undefined);
             },
           }
         );
@@ -149,19 +175,17 @@ const AddComponentModal = ({
       console.log("handleSubmitQuantity finished execution.");
     }
   };
-  
-  
 
   useEffect(() => {
-    let newQuantity = parseInt(quantityRequired);
+    let newQuantity = quantityRequired;
 
     if (editMode) {
       if (type === Types.SHOPPING) {
-        newQuantity = parseInt(quantityInShoppingList);
+        newQuantity = quantityInShoppingList ?? 0;
       } else if (type === Types.SHOPPING_ANON) {
         newQuantity = parseInt(quantityShoppingListAnon);
       } else if (type === Types.INVENTORY) {
-        newQuantity = parseInt(quantityInInventory);
+        newQuantity = quantityInInventory ?? 0;
       }
     }
 
@@ -185,7 +209,7 @@ const AddComponentModal = ({
 
   const savedLocationsData = Array.isArray(locationsData)
     ? locationsData.map((item) => ({
-        locations: item.location || [],
+        locations: item.locations || [],
         quantity: item.quantity,
       }))
     : [];
@@ -193,7 +217,7 @@ const AddComponentModal = ({
   return (
     <>
       <Transition.Root as={Fragment} show={open && !showForOurSubscribersModal}>
-        <Dialog as="div" className="relative" onClose={setOpen}>
+        <Dialog as="div" className="relative" onClose={() => setOpen(undefined)}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -237,12 +261,11 @@ const AddComponentModal = ({
                             already contains{" "}
                             <Quantity
                               hookArgs={
-                                hookArgs
-                                  ? Object.values(hookArgs)
-                                  : [componentId]
+                                type === Types.SHOPPING
+                                  ? [componentPk, modulebomlistitemPk, modulePk]
+                                  : [componentPk]
                               }
                               replaceZero={false}
-                              type={type}
                               useHook={
                                 type === Types.INVENTORY
                                   ? useGetUserInventoryQuantity
@@ -340,9 +363,9 @@ const AddComponentModal = ({
                         your inventory. Separate locations with commas.
                       </p>
                       <SimpleEditableLocation
-                        isEditable={isLocationEditable}
+                        // isEditable={isLocationEditable}
                         locationArray={locationArray}
-                        setIsEditable={setIsLocationEditable}
+                        // setIsEditable={setIsLocationEditable}
                         showSeparateLocationsWithCommas={false}
                         submitLocationChange={setlocationArray}
                       />
@@ -361,7 +384,7 @@ const AddComponentModal = ({
                             data={savedLocationsData}
                             onRowClicked={(row) => {
                               setlocationArray(row.locations);
-                              setIsLocationEditable(false);
+                              // setIsLocationEditable(false);
                             }}
                             pointerEvents="pointer-events-none"
                           />
@@ -389,7 +412,7 @@ const AddComponentModal = ({
                     >
                       {editMode ? "Update" : "Add"}
                     </Button>
-                    <Button onClick={() => setOpen(false)} variant="muted">
+                    <Button onClick={() => setOpen(undefined)} variant="muted">
                       Cancel
                     </Button>
                   </div>

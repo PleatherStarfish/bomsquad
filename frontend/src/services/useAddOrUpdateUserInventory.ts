@@ -8,17 +8,12 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
-// Define the data structure for the mutation
-interface AddOrUpdateUserInventoryData {
-  quantity: number;
-  location?: string[] | string | null;
-  editMode?: boolean;
-}
-
-// Variables for mutation function
+// Define the variables for the mutation function
 interface MutationVariables {
-  componentId: string;
-  data: AddOrUpdateUserInventoryData;
+  componentId: string; 
+  quantity: number;
+  location?: string;
+  editMode?: boolean;
 }
 
 const useAddOrUpdateUserInventory = (): UseMutationResult<
@@ -29,25 +24,29 @@ const useAddOrUpdateUserInventory = (): UseMutationResult<
   const csrftoken = Cookies.get("csrftoken") || "";
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<AxiosResponse, unknown, MutationVariables>({
-    mutationFn: ({ componentId, data }) => {
-      console.log(componentId)
-      console.log(data)
+  return useMutation<AxiosResponse, unknown, MutationVariables>({
+    mutationFn: ({ componentId, quantity, location, editMode }) => {
+      console.log(componentId);
+      console.log(quantity, location, editMode);
+
       const componentIdCleaned = removeAfterUnderscore(componentId);
-      return axios.post(`/api/inventory/${componentIdCleaned}/create-or-update/`, data, {
-        headers: {
-          "X-CSRFToken": csrftoken,
-        },
-        withCredentials: true,
-      });
+      return axios.post(
+        `/api/inventory/${componentIdCleaned}/create-or-update/`,
+        { editMode, location, quantity },
+        {
+          headers: {
+            "X-CSRFToken": csrftoken, // CSRF protection header
+          },
+          withCredentials: true, // Include cookies for authentication
+        }
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["inventory"]});
-      queryClient.invalidateQueries({queryKey: ["authenticatedUserHistory"]});
+      // Invalidate and refetch relevant queries after mutation
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["authenticatedUserHistory"] });
     },
   });
-
-  return mutation;
 };
 
 export default useAddOrUpdateUserInventory;

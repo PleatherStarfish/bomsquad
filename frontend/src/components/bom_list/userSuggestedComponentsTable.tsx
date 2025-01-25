@@ -245,10 +245,9 @@ const UserSuggestedComponentsTable: React.FC<
             + Inventory
           </Button>
           <AddComponentModal
-            componentId={row.suggested_component.id}
             componentName={row.suggested_component.description}
-            // @ts-ignore
-            moduleId={moduleId}
+            componentPk={row.suggested_component.id}
+            modulePk={moduleId}
             open={inventoryModalOpen === row.suggested_component.id}
             quantityRequired={row.quantity || 1}
             setOpen={setInventoryModalOpen}
@@ -291,10 +290,9 @@ const UserSuggestedComponentsTable: React.FC<
             + Shopping List
           </Button>
           <AddComponentModal
-            componentId={row.suggested_component.id}
             componentName={row.suggested_component.description}
-            // @ts-ignore
-            moduleId={moduleId}
+            componentPk={row.suggested_component.id}
+            modulePk={moduleId}
             open={shoppingModalOpen === row.suggested_component.id}
             quantityRequired={row.quantity || 1}
             setOpen={setShoppingModalOpen}
