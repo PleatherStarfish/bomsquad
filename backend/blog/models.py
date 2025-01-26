@@ -94,7 +94,7 @@ class BlogPost(BaseModel):
 
         if self.featured_image:
             self.process_image(self.featured_image, "thumb", 300)
-            self.process_image(self.featured_image, "large", 1200)
+            self.process_image(self.featured_image, "large", 1800)
 
         super(BlogPost, self).save(*args, **kwargs)
 
@@ -121,16 +121,19 @@ class BlogPost(BaseModel):
         words = plain_text.split()
         return " ".join(words[:word_limit]) + ("..." if len(words) > word_limit else "")
 
-    def process_image(self, image_field, size_type, max_dimension):
+    def process_image(self, image_field, size_type, width):
         img = Image.open(image_field)
 
-        # Resize the image
-        if max(img.size) > max_dimension:
-            img.thumbnail((max_dimension, max_dimension), Image.ANTIALIAS)
+        # Calculate the proportional height to maintain aspect ratio
+        aspect_ratio = img.height / img.width
+        new_height = int(width * aspect_ratio)
 
-        # Save WEBP version
+        # Resize the image
+        img = img.resize((width, new_height), Image.ANTIALIAS)
+
+        # Save lossless WEBP version
         output_webp = BytesIO()
-        img.save(output_webp, format="WEBP", quality=75)
+        img.save(output_webp, format="WEBP", quality=100, lossless=True)
         output_webp.seek(0)
         if size_type == "thumb":
             self.thumb_image_webp.save(
@@ -153,7 +156,7 @@ class BlogPost(BaseModel):
 
         # Save JPEG version
         output_jpeg = BytesIO()
-        img.save(output_jpeg, format="JPEG", quality=75)
+        img.save(output_jpeg, format="JPEG", quality=95)  # High-quality JPEG
         output_jpeg.seek(0)
         if size_type == "thumb":
             self.thumb_image_jpeg.save(
