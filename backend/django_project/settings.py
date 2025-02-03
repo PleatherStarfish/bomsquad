@@ -6,23 +6,18 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from storages.backends.s3boto3 import S3Boto3Storage
 
-# =============================================================================
-# BASE SETTINGS
-# =============================================================================
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = os.environ.get("DEBUG") == "True"
 
-# Hosts/domain names that are valid for this site
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
-# Trusted origins for CSRF protection
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "http://0.0.0.0",
@@ -32,10 +27,14 @@ CSRF_TRUSTED_ORIGINS = [
     "https://dev.bom-squad.com",
 ]
 
-# =============================================================================
-# STATIC & MEDIA FILES
-# =============================================================================
+# Base settings
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG") == "True"
+ALLOWED_HOSTS = ["*"]
 
+
+# Static and media files configuration
 if DEBUG:
     STATIC_URL = "/static/"
     STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -44,12 +43,14 @@ if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 else:
-    # Production settings using AWS S3
+    # Production settings
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
     AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_S3_OBJECT_PARAMETERS = {
+        "CacheControl": "max-age=86400",
+    }
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "nyc3")
     AWS_DEFAULT_ACL = os.environ.get("AWS_DEFAULT_ACL")
     AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
@@ -70,27 +71,24 @@ else:
     STATICFILES_DIRS = [BASE_DIR / "static"]
     STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# =============================================================================
-# APPLICATION DEFINITION
-# =============================================================================
 
+# https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = [
-    # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.sites",
-    "django.contrib.sitemaps",
-    # Comments and related apps
     "django_comments_xtd",
     "django_comments",
-    # Third-party apps
     "django_editorjs_fields",
     "django_otp",
     "django_otp.plugins.otp_totp",
     "whitenoise.runserver_nostatic",
+    "core.staticfiles_config.StaticFilesConfig",
+    "django.contrib.sitemaps",
+    "django.contrib.sites",
+    # Third-party
     "analytical",
     "maintenance_mode",
     "allauth",
@@ -110,7 +108,7 @@ INSTALLED_APPS = [
     "mptt",
     "import_export",
     "storages",
-    # Local apps
+    # Local
     "accounts",
     "blog",
     "contact",
@@ -124,10 +122,7 @@ INSTALLED_APPS = [
     "comments",
 ]
 
-# =============================================================================
-# MIDDLEWARE (Order Sensitive)
-# =============================================================================
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
     "htmlmin.middleware.HtmlMinifyMiddleware",
@@ -146,10 +141,6 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
 ]
 
-# =============================================================================
-# CORS CONFIGURATION
-# =============================================================================
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -157,7 +148,14 @@ CORS_ALLOWED_ORIGINS = [
     "https://bom-squad.com",
     "https://dev.bom-squad.com",
 ]
-CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -171,10 +169,6 @@ CORS_ALLOW_HEADERS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-# =============================================================================
-# REST FRAMEWORK CONFIGURATION
-# =============================================================================
-
 REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
@@ -183,22 +177,19 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"anon": "1000/hour", "user": "10000/hour"},
 }
 
-# =============================================================================
-# MISCELLANEOUS SETTINGS
-# =============================================================================
-
 MATOMO_SITE_ID = 1
 MATOMO_DOMAIN_PATH = "matomo.bom-squad.com"
+
 LOGIN_REDIRECT_URL = "/patchbay/"
 ADMIN_HONEYPOT_EMAIL_ADMINS = True
 
-# =============================================================================
-# URLS & TEMPLATES
-# =============================================================================
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "django_project.wsgi.application"
 
+# https://docs.djangoproject.com/en/dev/ref/settings/#templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -217,10 +208,7 @@ TEMPLATES = [
     },
 ]
 
-# =============================================================================
-# DATABASE CONFIGURATION
-# =============================================================================
-
+# For Docker/PostgreSQL usage uncomment this and comment the DATABASES config above
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -232,44 +220,62 @@ DATABASES = {
     }
 }
 
-# =============================================================================
-# PASSWORD VALIDATION
-# =============================================================================
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
-
-# =============================================================================
-# THIRD-PARTY & APP-SPECIFIC SETTINGS
-# =============================================================================
 
 EDITORJS_VERSION = "latest"
 OPENEXCHANGERATES_APP_ID = os.getenv("OPENEXCHANGERATES_APP_ID")
 
-# =============================================================================
-# INTERNATIONALIZATION
-# =============================================================================
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+# https://docs.djangoproject.com/en/dev/topics/i18n/
+# https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = "UTC"
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-USE_I18N
 USE_I18N = True
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
 USE_L10N = True
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 
-# =============================================================================
-# COMMENTS CONFIGURATION
-# =============================================================================
+# https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#static-url
+# STATIC_URL = "/static/"
+
+# https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
+# STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# http://whitenoise.evans.io/en/stable/django.html#add-compression-and-caching-support
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 COMMENTS_APP = "django_comments_xtd"
 COMMENTS_XTD_CONFIRM_EMAIL = False
 COMMENTS_XTD_THREADED_EMAILS = False
+
 COMMENTS_XTD_MAX_THREAD_LEVEL = 1
+
 COMMENTS_XTD_APP_MODEL_OPTIONS = {
     "default": {
         "allow_flagging": False,
@@ -279,87 +285,75 @@ COMMENTS_XTD_APP_MODEL_OPTIONS = {
     }
 }
 
-# =============================================================================
-# DEFAULT AUTO FIELD
-# =============================================================================
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# =============================================================================
-# CRISPY FORMS
-# =============================================================================
-
+# django-crispy-forms
+# https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# =============================================================================
-# EMAIL CONFIGURATION
-# =============================================================================
-
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "core.email.SendgridEmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@bom-squad.com"
+
 CONTACT_EMAIL = os.environ.get("BOM_SQUAD_EMAIL_ADDRESS")
 ADMIN_EMAIL = os.environ.get("BOM_SQUAD_EMAIL_ADDRESS")
+
+
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+
 EMAIL_HOST = "smtp.sendgrid.net"
 EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# =============================================================================
-# DEBUG TOOLBAR & INTERNAL IPS
-# =============================================================================
-
+# django-debug-toolbar
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+# https://docs.djangoproject.com/en/dev/ref/settings/#internal-ips
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
 
-# =============================================================================
-# CUSTOM USER MODEL
-# =============================================================================
-
+# https://docs.djangoproject.com/en/dev/topics/auth/customizing/#substituting-a-custom-user-model
 AUTH_USER_MODEL = "accounts.CustomUser"
-
-# =============================================================================
-# SOCIAL ACCOUNT PROVIDERS
-# =============================================================================
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
         "OAUTH_PKCE_ENABLED": True,
     }
 }
 
-# =============================================================================
-# TEST SETTINGS
-# =============================================================================
-
 if "test" in sys.argv:
     STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
-
-# =============================================================================
-# RECAPTCHA CONFIGURATION
-# =============================================================================
 
 RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
 RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
 
-# =============================================================================
-# DJANGO-ALLAUTH CONFIGURATION
-# =============================================================================
-
+# django-allauth config
+# https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
+
 APPEND_SLASH = True
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
+
+# https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 
+# https://django-allauth.readthedocs.io/en/latest/installation.html?highlight=backends
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
-
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_USERNAME_REQUIRED = True
@@ -370,6 +364,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_MAX_EMAIL_ADDRESSES = 3
@@ -381,40 +376,27 @@ ACCOUNT_FORMS = {
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get("ACCOUNT_DEFAULT_HTTP_PROTOCOL")
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-# =============================================================================
-# TINYMCE CONFIGURATION
-# =============================================================================
-
 TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",
     "height": 500,
     "menubar": True,
-    "plugins": (
-        "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
-        "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
-        "code,help,wordcount"
-    ),
-    "toolbar": (
-        "undo redo | formatselect | bold italic backcolor | link | "
-        "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | "
-        "removeformat | help"
-    ),
+    "plugins": "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
+    "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+    "code,help,wordcount",
+    "toolbar": "undo redo | formatselect | "
+    "bold italic backcolor | link | alignleft aligncenter "
+    "alignright alignjustify | bullist numlist outdent indent | "
+    "removeformat | help",
 }
-
-# =============================================================================
-# SENTRY CONFIGURATION
-# =============================================================================
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
-    integrations=[DjangoIntegration()],
+    integrations=[
+        DjangoIntegration(),
+    ],
     traces_sample_rate=1.0,
     send_default_pii=False,
 )
-
-# =============================================================================
-# LOGGING CONFIGURATION
-# =============================================================================
 
 LOG_DIR = os.path.join(os.path.dirname(BASE_DIR), "log")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -427,7 +409,10 @@ LOGGING = {
             "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
         },
-        "simple": {"format": "{levelname} {message}", "style": "{"},
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
     },
     "handlers": {
         "file": {
@@ -438,20 +423,17 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {"handlers": ["file"], "level": "DEBUG", "propagate": True},
+        "django": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
     },
 }
 
-# =============================================================================
-# MAINTENANCE MODE
-# =============================================================================
-
 MAINTENANCE_MODE_TEMPLATE = "503.html"
 
-# =============================================================================
-# CURRENCY SETTINGS
-# =============================================================================
-
+# List of allowed currencies
 CURRENCIES = [
     ("USD", "US Dollar"),
     ("EUR", "Euro"),
@@ -470,6 +452,7 @@ CURRENCIES = [
     ("INR", "Indian Rupee"),
 ]
 
+# Customized currency choices for use in forms, admin, etc.
 CURRENCY_CHOICES = [
     ("USD", "US Dollar ($)"),
     ("EUR", "Euro (€)"),
