@@ -51,19 +51,16 @@
 
 <!-- Graphs and Paginated Data Tables for larger screens -->
 <div class="container hidden py-12 mx-auto lg:block">
-    <div class="p-4 mb-6 bg-gray-100 border rounded">
-        <h3 class="mb-2 text-xl font-bold">Component Usage by Module Count</h3>
-        <p class="text-base">
-            The <strong>Component Usage by Module Count</strong> metric represents how many modules include a given component.
-            It is calculated by counting the number of module BOM list items that feature that component, thereby providing a raw measure
-            of its prevalence across the manufacturer's designs. A higher count indicates that the component is widely used,
-            suggesting it is a core or standard part of many modules. In contrast, a lower count shows that the component appears in only a few modules,
-            implying a more specialized or less frequently used part. This metric is especially useful for comparing the commonality
-            of components across different manufacturers’ bill-of-materials profiles.
-        </p>
-    </div>
-
   <!-- Component Usage by Module Count Chart and Table -->
+  <div class="p-4 mb-6 bg-gray-100 border rounded">
+    <h3 class="mb-2 text-xl font-bold">Component Usage by Module Count</h3>
+    <p class="text-base">
+      The <strong>Component Usage by Module Count</strong> metric represents how many modules include a given component.
+      It is calculated by counting the number of module BOM list items that feature that component.
+      This raw count indicates the prevalence of the component across the manufacturer’s designs. When compared across manufacturers,
+      a higher count suggests a component is central to the design, whereas a lower count indicates it is used more selectively.
+    </p>
+  </div>
   <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
   <div id="buttonsContainerCount"></div>
   <canvas id="componentUsageCountChart" width="400" height="200"></canvas>
@@ -96,13 +93,13 @@
       It is derived by taking the <em>Total Quantity</em> of a given component used across all modules and dividing it by the
       <em>Total Number of Modules</em> produced by the manufacturer. This metric reflects the average usage per module.
       In effect, it combines how often a component is used (if many modules use 0 units, the average will be lower) with how many units
-      are used when it is included. For example, if a component is used in 80 out of 100 modules, and when used, an average of 100 units are
-      employed, then the weighted score is (80×100)/100 = 80. This helps highlight components that are not only prevalent but are also used in
-      large numbers when they appear.
+      are used when it is included. For example, if a component is used in 80 out of 100 modules and an average of 100 units are used
+      when it appears, the weighted score is (80×100)/100 = 80. This helps highlight components that are not only prevalent but are also used
+      in high quantities when they appear.
     </p>
   </div>
   
-  <!-- Total Quantity / Weighted Usage Score Chart and Table -->
+  <!-- Total Quantity & Weighted Usage Score Chart and Table -->
   <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity &amp; Weighted Usage Score</h2>
   <div id="buttonsContainerQuantity"></div>
   <canvas id="componentUsageQuantityChart" width="400" height="200"></canvas>
@@ -161,7 +158,7 @@
       }
     ];
     
-    // New dataset: Weighted Usage Score (for the weighted usage chart)
+    // New dataset: Weighted Usage Score for the second chart
     var datasetsWeightedUsage = [
       {
         label: '{{ manufacturer.name }} Weighted Usage Score',
@@ -183,6 +180,7 @@
     ];
     
     {% for other_manufacturer in other_manufacturers %}
+      // For Component Usage Count: assign same xAxisID ("x") so bars cluster by component
       datasetsCount.push({
         label: '{{ other_manufacturer.name }} Modules Including Component',
         data: [
@@ -198,10 +196,10 @@
             "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
           {% endfor %}
         ],
-        xAxisID: "x2"
+        xAxisID: "x"
       });
       
-      // Weighted usage for other manufacturers
+      // For Weighted Usage Score: assign same xAxisID ("x")
       datasetsWeightedUsage.push({
         label: '{{ other_manufacturer.name }} Weighted Usage Score',
         data: [
@@ -217,21 +215,24 @@
             "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
           {% endfor %}
         ],
-        xAxisID: "x2"
+        xAxisID: "x"
       });
     {% endfor %}
     
-    // Options for both charts – vertical grid lines disabled
+    // Chart options: disable vertical grid lines and disable stacking for grouping bars
     var optionsQuantity = {
       datasets: {
         bar: {
-          maxBarThickness: 7
+          maxBarThickness: 7,
+          // Optional: adjust spacing
+          barPercentage: 0.8,
+          categoryPercentage: 0.9
         }
       },
       scales: {
         x: {
           grid: { display: false },
-          stacked: true,
+          stacked: false, // Set to false to group bars side-by-side
           ticks: {
             maxRotation: 90,
             minRotation: 90,
@@ -241,22 +242,14 @@
             }
           }
         },
-        x2: {
-          display: false,
-          stacked: true,
-          offset: true,
-          ticks: {
-            maxRotation: 90,
-            minRotation: 90
-          }
-        },
         y: {
           autoSkip: true,
           stacked: false,
           ticks: {
             beginAtZero: true,
+            // Adjust max if necessary
             max: Math.max(datasetsCount.length + 10)
-          },
+          }
         }
       },
       plugins: {
@@ -309,7 +302,7 @@
       options: optionsQuantity
     });
     
-    // Use the weighted usage dataset for the second chart
+    // Second chart uses the weighted usage dataset only
     var componentUsageQuantityChart = new Chart(ctxQuantity, {
       type: 'bar',
       data: {
