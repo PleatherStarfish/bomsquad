@@ -17,11 +17,11 @@ const useAddUserNoteMutation = (moduleType) => {
       });
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['userNotes', `${moduleType}`]);
-    },
     onError: (error) => {
       console.error('Error adding user note:', error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['userNotes', `${moduleType}`]);
     }
   });
 };

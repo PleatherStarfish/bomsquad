@@ -8,17 +8,17 @@ const useAuthenticatedUserHistory = () => {
         withCredentials: true,
       });
       return response.data;
-    } catch (error) {
+    } catch {
       throw new Error("Failed to fetch authenticated user history");
     }
   };
 
   const { data: userHistory, isLoading: userHistoryIsLoading, isError: userHistoryIsError } = useQuery({
-    queryKey: ["authenticatedUserHistory"],
-    queryFn: fetchData
+    queryFn: fetchData,
+    queryKey: ["authenticatedUserHistory"]
   });
 
-  return { userHistory, userHistoryIsLoading, userHistoryIsError };
+  return { userHistory, userHistoryIsError, userHistoryIsLoading };
 };
 
 export default useAuthenticatedUserHistory;

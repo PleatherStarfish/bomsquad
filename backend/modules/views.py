@@ -94,7 +94,7 @@ def module_list(request):
     quantity_maxs = request.GET.getlist("quantity_max[]")
 
     # Initialize module list with a base queryset
-    module_list = Module.objects.order_by("name")
+    module_list = Module.objects.order_by("-datetime_updated")
 
     # Apply individual component group filters with AND relationship
     for i in range(len(component_ids)):
@@ -446,6 +446,9 @@ def manufacturer_detail(request, slug):
         # Generate color for the main manufacturer
         main_color, main_border_color = generate_color_from_name(manufacturer.name)
 
+        # Calculate the total number of modules for this manufacturer.
+        total_modules = Module.objects.filter(manufacturer=manufacturer).count()
+
         # Get the component usage data for the main manufacturer and sort by count
         component_usage_count = (
             ModuleBomListItem.objects.filter(module__manufacturer=manufacturer)
@@ -460,6 +463,16 @@ def manufacturer_detail(request, slug):
             .annotate(total_quantity=Sum("quantity"))
             .order_by("-total_quantity")
         )
+
+        # Add weighted_usage_score to each component usage entry.
+        # Note: This score represents average usage per module.
+        if total_modules > 0:
+            for item in component_usage_quantity:
+                item["weighted_usage_score"] = item["total_quantity"] / total_modules
+        else:
+            # Just in case there are no modules (to avoid division by zero)
+            for item in component_usage_quantity:
+                item["weighted_usage_score"] = 0
 
         # Create a sorted list of component IDs based on the main manufacturer's data
         sorted_component_ids = [
@@ -525,6 +538,7 @@ def manufacturer_detail(request, slug):
             "component_usage_count": list(component_usage_count),
             "component_usage_quantity": list(component_usage_quantity),
             "other_manufacturers": other_manufacturers_data,
+            "total_modules": total_modules,  # if you wish to include it
         }
 
         # Cache the context data

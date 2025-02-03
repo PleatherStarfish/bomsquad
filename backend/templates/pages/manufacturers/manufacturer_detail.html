@@ -7,308 +7,374 @@
 
 {% block content %}
 <div class="container p-6 mx-auto">
-    <h1 class="pt-6 pb-10 text-4xl font-bold">{{ manufacturer.name }}</h1>
-    <table class="min-w-full bg-white border-collapse">
-        <thead>
-            <tr>
-                <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Attribute</th>
-                <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-b">
-                <td class="px-4 py-2 font-bold">Name</td>
-                <td class="px-4 py-2">{{ manufacturer.name }}</td>
-            </tr>
-            <tr class="border-b">
-                <td class="px-4 py-2 font-bold">Link</td>
-                <td class="px-4 py-2">
-                    <a href="{{ manufacturer.link }}" class="text-blue-500 hover:underline">{{ manufacturer.link }}</a>
-                </td>
-            </tr>
-            <tr class="border-b">
-                <td class="px-4 py-2 font-bold">Notes</td>
-                <td class="px-4 py-2">{{ manufacturer.notes }}</td>
-            </tr>
-        </tbody>
-    </table>
+  <h1 class="pt-6 pb-10 text-4xl font-bold">{{ manufacturer.name }}</h1>
+  <table class="min-w-full bg-white border-collapse">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Attribute</th>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b">
+        <td class="px-4 py-2 font-bold">Name</td>
+        <td class="px-4 py-2">{{ manufacturer.name }}</td>
+      </tr>
+      <tr class="border-b">
+        <td class="px-4 py-2 font-bold">Link</td>
+        <td class="px-4 py-2">
+          <a href="{{ manufacturer.link }}" class="text-blue-500 hover:underline">{{ manufacturer.link }}</a>
+        </td>
+      </tr>
+      <tr class="border-b">
+        <td class="px-4 py-2 font-bold">Notes</td>
+        <td class="px-4 py-2">{{ manufacturer.notes }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- Warning message for small screens -->
 <div class="container block py-12 mx-auto lg:hidden">
-    <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
-    <p class="text-lg text-red-600">Please use a wide screen to see the graphs and detailed data.</p>
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
+  <p class="text-lg text-red-600">
+    Please use a wide screen to see the graphs and detailed data.
+  </p>
 </div>
 
-<!-- Warning message for small screens -->
 <div class="container block py-12 mx-auto lg:hidden">
-    <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity of Components Used</h2>
-    <p class="text-lg text-red-600">Please use a wide screen to see the graphs and detailed data.</p>
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity of Components Used</h2>
+  <p class="text-lg text-red-600">
+    Please use a wide screen to see the graphs and detailed data.
+  </p>
 </div>
 
-<!-- Graphs for larger screens -->
+<!-- Graphs and Paginated Data Tables for larger screens -->
 <div class="container hidden py-12 mx-auto lg:block">
-    <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
-    <div id="buttonsContainerCount"></div>
-    <canvas id="componentUsageCountChart" width="400" height="200"></canvas>
+    <div class="p-4 mb-6 bg-gray-100 border rounded">
+        <h3 class="mb-2 text-xl font-bold">Component Usage by Module Count</h3>
+        <p class="text-base">
+            The <strong>Component Usage by Module Count</strong> metric represents how many modules include a given component.
+            It is calculated by counting the number of module BOM list items that feature that component, thereby providing a raw measure
+            of its prevalence across the manufacturer's designs. A higher count indicates that the component is widely used,
+            suggesting it is a core or standard part of many modules. In contrast, a lower count shows that the component appears in only a few modules,
+            implying a more specialized or less frequently used part. This metric is especially useful for comparing the commonality
+            of components across different manufacturers’ bill-of-materials profiles.
+        </p>
+    </div>
+
+  <!-- Component Usage by Module Count Chart and Table -->
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
+  <div id="buttonsContainerCount"></div>
+  <canvas id="componentUsageCountChart" width="400" height="200"></canvas>
+  <!-- Data table for module count -->
+  <table id="countTable" class="min-w-full mt-6 bg-white border-collapse">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Component</th>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Module Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in component_usage_count %}
+      <tr class="border-b">
+        <td class="px-4 py-2">{{ item.components_options__description }}</td>
+        <td class="px-4 py-2">{{ item.count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div id="countTablePagination" class="mt-4"></div>
 </div>
 
 <div class="container hidden py-12 mx-auto lg:block">
-    <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity of Components Used</h2>
-    <div id="buttonsContainerQuantity"></div>
-    <canvas id="componentUsageQuantityChart" width="400" height="200"></canvas>
+  <!-- Explanatory Text for Weighted Usage Score -->
+  <div class="p-4 mb-6 bg-gray-100 border rounded">
+    <h2 class="mb-2 text-xl font-bold">Weighted Usage Score</h2>
+    <p class="text-base">
+      The <strong>Weighted Usage Score</strong> is designed to compare manufacturers’ bill-of-materials profiles in a normalized way.
+      It is derived by taking the <em>Total Quantity</em> of a given component used across all modules and dividing it by the
+      <em>Total Number of Modules</em> produced by the manufacturer. This metric reflects the average usage per module.
+      In effect, it combines how often a component is used (if many modules use 0 units, the average will be lower) with how many units
+      are used when it is included. For example, if a component is used in 80 out of 100 modules, and when used, an average of 100 units are
+      employed, then the weighted score is (80×100)/100 = 80. This helps highlight components that are not only prevalent but are also used in
+      large numbers when they appear.
+    </p>
+  </div>
+  
+  <!-- Total Quantity / Weighted Usage Score Chart and Table -->
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity &amp; Weighted Usage Score</h2>
+  <div id="buttonsContainerQuantity"></div>
+  <canvas id="componentUsageQuantityChart" width="400" height="200"></canvas>
+  <!-- Data table for total quantity and weighted usage score -->
+  <table id="quantityTable" class="min-w-full mt-6 bg-white border-collapse">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Component</th>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Total Quantity</th>
+        <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Weighted Usage Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in component_usage_quantity %}
+      <tr class="border-b">
+        <td class="px-4 py-2">{{ item.components_options__description }}</td>
+        <td class="px-4 py-2">{{ item.total_quantity }}</td>
+        <td class="px-4 py-2">{{ item.weighted_usage_score|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div id="quantityTablePagination" class="mt-4"></div>
 </div>
 
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var ctxCount = document.getElementById('componentUsageCountChart').getContext('2d');
-        var ctxQuantity = document.getElementById('componentUsageQuantityChart').getContext('2d');
-        
-        var labels = [
-            {% for item in component_usage_count %}
-                "{{ item.components_options__description }}"{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        var datasetsCount = [
-            {
-                label: '{{ manufacturer.name }} Modules Including Component',
-                data: [
-                    {% for item in component_usage_count %}
-                        {{ item.count }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                backgroundColor: '{{ main_color }}',
-                borderColor: '{{ main_border_color }}',
-                borderWidth: 1,
-                ids: [
-                    {% for item in component_usage_count %}
-                        "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                xAxisID: "x"
-            }
-        ];
-
-        var datasetsQuantity = [
-            {
-                label: '{{ manufacturer.name }} Total Quantity of Components Used',
-                data: [
-                    {% for item in component_usage_quantity %}
-                        {{ item.total_quantity }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                backgroundColor: '{{ main_color }}',
-                borderColor: '{{ main_border_color }}',
-                borderWidth: 1,
-                ids: [
-                    {% for item in component_usage_quantity %}
-                        "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                xAxisID: "x"
-            }
-        ];
-
-        {% for other_manufacturer in other_manufacturers %}
-        datasetsCount.push({
-            label: '{{ other_manufacturer.name }} Modules Including Component',
-            data: [
-                {% for item in other_manufacturer.component_usage_count %}
-                    {{ item.count }}{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ],
-            backgroundColor: '{{ other_manufacturer.color }}',
-            borderColor: '{{ other_manufacturer.border_color }}',
-            borderWidth: 1,
-            ids: [
-                {% for item in other_manufacturer.component_usage_count %}
-                    "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ],
-            xAxisID: "x2"
-        });
-
-        datasetsQuantity.push({
-            label: '{{ other_manufacturer.name }} Total Quantity of Components Used',
-            data: [
-                {% for item in other_manufacturer.component_usage_quantity %}
-                    {{ item.total_quantity }}{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ],
-            backgroundColor: '{{ other_manufacturer.color }}',
-            borderColor: '{{ other_manufacturer.border_color }}',
-            borderWidth: 1,
-            ids: [
-                {% for item in other_manufacturer.component_usage_quantity %}
-                    "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ],
-            xAxisID: "x2"
-        });
-        {% endfor %}
-
-        var optionsCount = {
-            scales: {
-                x: {
-                    stacked: true,
-                },
-                x2: {
-                    display: false,
-                    stacked: true,
-                    offset: true
-                },
-                y: {
-                    stacked: false,
-                    ticks: {
-                        beginAtZero: true,
-                        max: Math.max(datasetsCount.length + 2)
-                    },
-                }
-            },
-            plugins: {
-                customCursor: {
-                    id: 'customCursor',
-                    afterEvent: function(chart, args) {
-                        const event = args.event;
-                        const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
-                        if (points.length) {
-                            chart.canvas.style.cursor = 'pointer';
-                        } else {
-                            chart.canvas.style.cursor = 'default';
-                        }
-                    }
-                }
-            },
-            onClick: function(evt) {
-                const points = componentUsageCountChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                if (points.length) {
-                    const firstPoint = points[0];
-                    const componentId = componentUsageCountChart.data.datasets[firstPoint.datasetIndex].ids[firstPoint.index];
-                    const url = `/components/${componentId}/`;
-                    window.location.href = url;
-                }
-            }
-        };
-
-        var optionsQuantity = {
-            scales: {
-                x: {
-                    stacked: true,
-                },
-                x2: {
-                    display: false,
-                    stacked: true,
-                    offset: true
-                },
-                y: {
-                    stacked: false,
-                    ticks: {
-                        beginAtZero: true,
-                        max: Math.max(datasetsCount.length + 10)
-                    },
-                }
-            },
-            plugins: {
-                customCursor: {
-                    id: 'customCursor',
-                    afterEvent: function(chart, args) {
-                        const event = args.event;
-                        const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
-                        if (points.length) {
-                            chart.canvas.style.cursor = 'pointer';
-                        } else {
-                            chart.canvas.style.cursor = 'default';
-                        }
-                    }
-                }
-            },
-            onClick: function(evt) {
-                const points = componentUsageQuantityChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                if (points.length) {
-                    const firstPoint = points[0];
-                    const componentId = componentUsageQuantityChart.data.datasets[firstPoint.datasetIndex].ids[firstPoint.index];
-                    const url = `/components/${componentId}/`;
-                    window.location.href = url;
-                }
-            }
-        };
-
-        var componentUsageCountChart = new Chart(ctxCount, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasetsCount
-            },
-            options: optionsCount
-        });
-
-        var componentUsageQuantityChart = new Chart(ctxQuantity, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasetsQuantity
-            },
-            options: optionsQuantity
-        });
-
-        // Function to create buttons for toggling datasets
-        function createButtons(chart, containerId) {
-            const container = document.getElementById(containerId);
-            chart.data.datasets.forEach((dataset, index) => {
-                const button = document.createElement('button');
-                button.innerText = dataset.label;
-                button.style.backgroundColor = dataset.backgroundColor;
-                button.style.border = 'none';
-                button.style.marginRight = '10px';
-                button.style.marginTop = '20px';
-                button.style.marginBottom = '20px';
-                button.style.padding = '10px';
-                button.style.cursor = 'pointer';
-                if (dataset.label === '{{ manufacturer.name }} Modules Including Component' || dataset.label === '{{ manufacturer.name }} Total Quantity of Components Used') {
-                    button.classList.add('active'); // Main manufacturer button is active
-                    button.style.opacity = 1;
-                } else {
-                    button.classList.remove('active');
-                    button.style.opacity = 0.5;
-                    chart.getDatasetMeta(index).hidden = true; // Initially hide other manufacturers
-                }
-                
-                button.addEventListener('click', function() {
-                    const meta = chart.getDatasetMeta(index);
-                    meta.hidden = !meta.hidden;
-                    chart.update();
-                    
-                    if (meta.hidden) {
-                        button.classList.remove('active');
-                        button.style.opacity = 0.5;
-                    } else {
-                        button.classList.add('active');
-                        button.style.opacity = 1;
-                    }
-                });
-                container.appendChild(button);
-            });
+  document.addEventListener('DOMContentLoaded', function () {
+    var ctxCount = document.getElementById('componentUsageCountChart').getContext('2d');
+    var ctxQuantity = document.getElementById('componentUsageQuantityChart').getContext('2d');
+    
+    var labels = [
+      {% for item in component_usage_count %}
+        "{{ item.components_options__description }}"{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+    
+    var datasetsCount = [
+      {
+        label: '{{ manufacturer.name }} Modules Including Component',
+        data: [
+          {% for item in component_usage_count %}
+            {{ item.count }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: '{{ main_color }}',
+        borderColor: '{{ main_border_color }}',
+        borderWidth: 1,
+        ids: [
+          {% for item in component_usage_count %}
+            "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        xAxisID: "x"
+      }
+    ];
+    
+    // New dataset: Weighted Usage Score (for the weighted usage chart)
+    var datasetsWeightedUsage = [
+      {
+        label: '{{ manufacturer.name }} Weighted Usage Score',
+        data: [
+          {% for item in component_usage_quantity %}
+            {{ item.weighted_usage_score }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: '{{ main_color }}',
+        borderColor: '{{ main_border_color }}',
+        borderWidth: 1,
+        ids: [
+          {% for item in component_usage_quantity %}
+            "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        xAxisID: "x"
+      }
+    ];
+    
+    {% for other_manufacturer in other_manufacturers %}
+      datasetsCount.push({
+        label: '{{ other_manufacturer.name }} Modules Including Component',
+        data: [
+          {% for item in other_manufacturer.component_usage_count %}
+            {{ item.count }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: '{{ other_manufacturer.color }}',
+        borderColor: '{{ other_manufacturer.border_color }}',
+        borderWidth: 1,
+        ids: [
+          {% for item in other_manufacturer.component_usage_count %}
+            "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        xAxisID: "x2"
+      });
+      
+      // Weighted usage for other manufacturers
+      datasetsWeightedUsage.push({
+        label: '{{ other_manufacturer.name }} Weighted Usage Score',
+        data: [
+          {% for item in other_manufacturer.component_usage_quantity %}
+            {{ item.weighted_usage_score }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: '{{ other_manufacturer.color }}',
+        borderColor: '{{ other_manufacturer.border_color }}',
+        borderWidth: 1,
+        ids: [
+          {% for item in other_manufacturer.component_usage_quantity %}
+            "{{ item.components_options__id }}"{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        xAxisID: "x2"
+      });
+    {% endfor %}
+    
+    // Options for both charts – vertical grid lines disabled
+    var optionsQuantity = {
+      datasets: {
+        bar: {
+          maxBarThickness: 7
         }
-
-        // Create buttons for both charts
-        createButtons(componentUsageCountChart, 'buttonsContainerCount');
-        createButtons(componentUsageQuantityChart, 'buttonsContainerQuantity');
-
-        // Registering the click handler
-        document.getElementById('componentUsageCountChart').addEventListener('click', function(evt) {
-            componentUsageCountChart.options.onClick(evt);
-        });
-        document.getElementById('componentUsageQuantityChart').addEventListener('click', function(evt) {
-            componentUsageQuantityChart.options.onClick(evt);
-        });
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          stacked: true,
+          ticks: {
+            maxRotation: 90,
+            minRotation: 90,
+            callback: function(value) {
+              var label = this.getLabelForValue(value);
+              return label.length > 20 ? label.substring(0, 20) + '...' : label;
+            }
+          }
+        },
+        x2: {
+          display: false,
+          stacked: true,
+          offset: true,
+          ticks: {
+            maxRotation: 90,
+            minRotation: 90
+          }
+        },
+        y: {
+          autoSkip: true,
+          stacked: false,
+          ticks: {
+            beginAtZero: true,
+            max: Math.max(datasetsCount.length + 10)
+          },
+        }
+      },
+      plugins: {
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x'
+          },
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            mode: 'x'
+          }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          color: '#444',
+          formatter: function(value) {
+            return value;
+          }
+        },
+        customCursor: {
+          id: 'customCursor',
+          afterEvent: function(chart, args) {
+            const event = args.event;
+            const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+            chart.canvas.style.cursor = points.length ? 'pointer' : 'default';
+          }
+        }
+      },
+      onClick: function(evt) {
+        const points = componentUsageQuantityChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+        if (points.length) {
+          const firstPoint = points[0];
+          const componentId = componentUsageQuantityChart.data.datasets[firstPoint.datasetIndex].ids[firstPoint.index];
+          const url = `/components/${componentId}/`;
+          window.location.href = url;
+        }
+      }
+    };
+    
+    var componentUsageCountChart = new Chart(ctxCount, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: datasetsCount
+      },
+      options: optionsQuantity
     });
+    
+    // Use the weighted usage dataset for the second chart
+    var componentUsageQuantityChart = new Chart(ctxQuantity, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: datasetsWeightedUsage
+      },
+      options: optionsQuantity
+    });
+    
+    // Function to create buttons for toggling datasets
+    function createButtons(chart, containerId) {
+      const container = document.getElementById(containerId);
+      chart.data.datasets.forEach((dataset, index) => {
+        const button = document.createElement('button');
+        button.innerText = dataset.label;
+        button.style.backgroundColor = dataset.backgroundColor;
+        button.style.border = 'none';
+        button.style.marginRight = '10px';
+        button.style.marginTop = '20px';
+        button.style.marginBottom = '20px';
+        button.style.padding = '10px';
+        button.style.cursor = 'pointer';
+        if (dataset.label === '{{ manufacturer.name }} Modules Including Component' ||
+            dataset.label === '{{ manufacturer.name }} Weighted Usage Score') {
+          button.classList.add('active');
+          button.style.opacity = 1;
+        } else {
+          button.classList.remove('active');
+          button.style.opacity = 0.5;
+          chart.getDatasetMeta(index).hidden = true;
+        }
+        
+        button.addEventListener('click', function() {
+          const meta = chart.getDatasetMeta(index);
+          meta.hidden = !meta.hidden;
+          chart.update();
+          if (meta.hidden) {
+            button.classList.remove('active');
+            button.style.opacity = 0.5;
+          } else {
+            button.classList.add('active');
+            button.style.opacity = 1;
+          }
+        });
+        container.appendChild(button);
+      });
+    }
+    
+    // Create buttons for both charts
+    createButtons(componentUsageCountChart, 'buttonsContainerCount');
+    createButtons(componentUsageQuantityChart, 'buttonsContainerQuantity');
+    
+    // Register click handlers for chart navigation
+    document.getElementById('componentUsageCountChart').addEventListener('click', function(evt) {
+      componentUsageCountChart.options.onClick(evt);
+    });
+    document.getElementById('componentUsageQuantityChart').addEventListener('click', function(evt) {
+      componentUsageQuantityChart.options.onClick(evt);
+    });
+  });
 </script>
 {% endblock content %}
 
 {% block extra-js %}
+{% comment %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"
         integrity="sha512-QVs8Lo43F9lSuBykadDb0oSXDL/BbZ588urWVCRwSIoewQv/Ewg1f84mK3U790bZ0FfhFa1YSQUmIhG+pIRKeg=="
         crossorigin="anonymous"
@@ -317,27 +383,108 @@
         integrity="sha512-6a1107rTlA4gYpgHAqbwLAtxmWipBdJFcq8y5S/aTge3Bp+VAklABm2LO+Kg51vOWR9JMZq1Ovjl5tpluNpTeQ=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
+{% endcomment %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/2.0.1/remarkable.min.js"
         integrity="sha512-skYYbQHAuOTpeJTthhUH3flZohep8blA+qjZOY0VqmfXMDiYcWxu29F5UbxU4LxaIpGkRBk+3Qf8qaXfd9jngg=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
 <script>
-window.comments_props = {% get_commentbox_props for manufacturer %};
-window.comments_props_override = {
+  window.comments_props = {% get_commentbox_props for manufacturer %};
+  window.comments_props_override = {
     allow_comments: true,
     allow_feedback: true,
     show_feedback: true,
     allow_flagging: true,
     polling_interval: 5000  // In milliseconds.
-};
+  };
 </script>
 <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'django_comments_xtd/js/django-comments-xtd-2.10.0.js' %}"></script>
 <script>
-window.addEventListener('DOMContentLoaded', (_) => {
+  window.addEventListener('DOMContentLoaded', (_) => {
     const tooltipQs = '[data-bs-toggle="tooltip"]';
     const tooltipList = document.querySelectorAll(tooltipQs);
-    [...tooltipList].map(el => new bootstrap.Tooltip(el, {html: true}));
-});
+    [...tooltipList].map(el => new bootstrap.Tooltip(el, { html: true }));
+  });
+</script>
+<!-- Separate script tag for Table Pagination -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function paginateTable(tableId, paginationId, rowsPerPage) {
+      var table = document.getElementById(tableId);
+      if (!table) {
+        console.warn("Table not found:", tableId);
+        return;
+      }
+      var paginationContainer = document.getElementById(paginationId);
+      if (!paginationContainer) {
+        console.warn("Pagination container not found:", paginationId);
+        return;
+      }
+      // Convert the NodeList to an Array for reliable iteration
+      var rows = Array.from(table.querySelectorAll('tbody tr'));
+      var totalRows = rows.length;
+      var totalPages = Math.ceil(totalRows / rowsPerPage);
+      var currentPage = 1;
+      
+      function showPage(page) {
+        currentPage = page;
+        // Hide all rows first
+        rows.forEach(function (row) {
+          row.style.display = 'none';
+        });
+        // Calculate start and end indices
+        var start = (page - 1) * rowsPerPage;
+        var end = start + rowsPerPage;
+        for (var i = start; i < end && i < totalRows; i++) {
+          rows[i].style.display = ''; // Use default display value
+        }
+        updatePaginationControls();
+      }
+      
+      function updatePaginationControls() {
+        paginationContainer.innerHTML = '';
+        
+        // Create "Previous" button
+        var prev = document.createElement('button');
+        prev.textContent = 'Previous';
+        prev.disabled = (currentPage === 1);
+        prev.addEventListener('click', function () {
+          showPage(currentPage - 1);
+        });
+        paginationContainer.appendChild(prev);
+        
+        // Create numbered page buttons
+        for (var i = 1; i <= totalPages; i++) {
+          (function (page) {
+            var btn = document.createElement('button');
+            btn.textContent = page;
+            if (page === currentPage) {
+              btn.disabled = true;
+            }
+            btn.addEventListener('click', function () {
+              showPage(page);
+            });
+            paginationContainer.appendChild(btn);
+          })(i);
+        }
+        
+        // Create "Next" button
+        var next = document.createElement('button');
+        next.textContent = 'Next';
+        next.disabled = (currentPage === totalPages);
+        next.addEventListener('click', function () {
+          showPage(currentPage + 1);
+        });
+        paginationContainer.appendChild(next);
+      }
+      
+      console.log("Paginating table", tableId, "with", totalRows, "rows over", totalPages, "pages.");
+      showPage(1);
+    }
+    
+    paginateTable('countTable', 'countTablePagination', 10);
+    paginateTable('quantityTable', 'quantityTablePagination', 10);
+  });
 </script>
 {% endblock extra-js %}
