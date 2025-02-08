@@ -51,9 +51,17 @@
 
 <!-- Graphs and Paginated Data Tables for larger screens -->
 <div class="container hidden py-12 mx-auto lg:block">
-  <!-- Component Usage by Module Count Chart and Table -->
-  <div class="p-4 mb-6 bg-gray-100 border rounded">
-    <h3 class="mb-2 text-xl font-bold">Component Usage by Module Count</h3>
+
+  <!-- Button group for filtering by top N components -->
+  <div id="filterButtons" class="mb-6">
+    <button onclick="filterCharts(50)" class="px-4 py-2 mr-2 text-white bg-blue-500 rounded">Top 50</button>
+    <button onclick="filterCharts(100)" class="px-4 py-2 mr-2 text-white bg-blue-500 rounded">Top 100</button>
+    <button onclick="filterCharts(200)" class="px-4 py-2 mr-2 text-white bg-blue-500 rounded">Top 200</button>
+    <button onclick="filterCharts('all')" class="px-4 py-2 text-white bg-blue-500 rounded">All</button>
+  </div>
+
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
+  <div class="p-4 mb-6 bg-gray-100 rounded">
     <p class="text-base">
       The <strong>Component Usage by Module Count</strong> metric represents how many modules include a given component.
       It is calculated by counting the number of module BOM list items that feature that component.
@@ -61,7 +69,6 @@
       a higher count suggests a component is central to the design, whereas a lower count indicates it is used more selectively.
     </p>
   </div>
-  <h2 class="pt-6 pb-10 text-2xl font-bold">Component Usage by Module Count</h2>
   <div id="buttonsContainerCount"></div>
   <canvas id="componentUsageCountChart" width="400" height="200"></canvas>
   <!-- Data table for module count -->
@@ -85,9 +92,10 @@
 </div>
 
 <div class="container hidden py-12 mx-auto lg:block">
-  <!-- Explanatory Text for Weighted Usage Score -->
-  <div class="p-4 mb-6 bg-gray-100 border rounded">
-    <h2 class="mb-2 text-xl font-bold">Weighted Usage Score</h2>
+  
+  <!-- Total Quantity & Weighted Usage Score Chart and Table -->
+  <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity &amp; Weighted Usage Score</h2>
+  <div class="p-4 mb-6 bg-gray-100 rounded">
     <p class="text-base">
       The <strong>Weighted Usage Score</strong> is designed to compare manufacturers’ bill-of-materials profiles in a normalized way.
       It is derived by taking the <em>Total Quantity</em> of a given component used across all modules and dividing it by the
@@ -98,9 +106,6 @@
       in high quantities when they appear.
     </p>
   </div>
-  
-  <!-- Total Quantity & Weighted Usage Score Chart and Table -->
-  <h2 class="pt-6 pb-10 text-2xl font-bold">Total Quantity &amp; Weighted Usage Score</h2>
   <div id="buttonsContainerQuantity"></div>
   <canvas id="componentUsageQuantityChart" width="400" height="200"></canvas>
   <!-- Data table for total quantity and weighted usage score -->
@@ -129,15 +134,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Get canvas contexts
     var ctxCount = document.getElementById('componentUsageCountChart').getContext('2d');
     var ctxQuantity = document.getElementById('componentUsageQuantityChart').getContext('2d');
     
+    // Build labels from component_usage_count (assumed sorted)
     var labels = [
       {% for item in component_usage_count %}
         "{{ item.components_options__description }}"{% if not forloop.last %},{% endif %}
       {% endfor %}
     ];
     
+    // Build the datasets for the count chart
     var datasetsCount = [
       {
         label: '{{ manufacturer.name }} Modules Including Component',
@@ -158,7 +166,7 @@
       }
     ];
     
-    // New dataset: Weighted Usage Score for the second chart
+    // Build the datasets for the weighted usage chart
     var datasetsWeightedUsage = [
       {
         label: '{{ manufacturer.name }} Weighted Usage Score',
@@ -180,7 +188,7 @@
     ];
     
     {% for other_manufacturer in other_manufacturers %}
-      // For Component Usage Count: assign same xAxisID ("x") so bars cluster by component
+      // For count data: all datasets share xAxisID "x" so bars cluster by component.
       datasetsCount.push({
         label: '{{ other_manufacturer.name }} Modules Including Component',
         data: [
@@ -199,7 +207,7 @@
         xAxisID: "x"
       });
       
-      // For Weighted Usage Score: assign same xAxisID ("x")
+      // For weighted usage: share xAxisID "x"
       datasetsWeightedUsage.push({
         label: '{{ other_manufacturer.name }} Weighted Usage Score',
         data: [
@@ -219,12 +227,20 @@
       });
     {% endfor %}
     
-    // Chart options: disable vertical grid lines and disable stacking for grouping bars
+    // Store the full (unfiltered) data for filtering later
+    var allLabels = labels.slice();
+    var allDatasetsCount = datasetsCount.map(function(ds) {
+      return Object.assign({}, ds, { data: ds.data.slice() });
+    });
+    var allDatasetsWeightedUsage = datasetsWeightedUsage.map(function(ds) {
+      return Object.assign({}, ds, { data: ds.data.slice() });
+    });
+    
+    // Chart options: disable vertical grid lines and disable stacking so bars group side-by-side.
     var optionsQuantity = {
       datasets: {
         bar: {
           maxBarThickness: 7,
-          // Optional: adjust spacing
           barPercentage: 0.8,
           categoryPercentage: 0.9
         }
@@ -232,7 +248,7 @@
       scales: {
         x: {
           grid: { display: false },
-          stacked: false, // Set to false to group bars side-by-side
+          stacked: false,
           ticks: {
             maxRotation: 90,
             minRotation: 90,
@@ -247,7 +263,6 @@
           stacked: false,
           ticks: {
             beginAtZero: true,
-            // Adjust max if necessary
             max: Math.max(datasetsCount.length + 10)
           }
         }
@@ -302,7 +317,6 @@
       options: optionsQuantity
     });
     
-    // Second chart uses the weighted usage dataset only
     var componentUsageQuantityChart = new Chart(ctxQuantity, {
       type: 'bar',
       data: {
@@ -312,7 +326,7 @@
       options: optionsQuantity
     });
     
-    // Function to create buttons for toggling datasets
+    // Function to create buttons for toggling datasets (existing code)
     function createButtons(chart, containerId) {
       const container = document.getElementById(containerId);
       chart.data.datasets.forEach((dataset, index) => {
@@ -351,22 +365,58 @@
       });
     }
     
-    // Create buttons for both charts
     createButtons(componentUsageCountChart, 'buttonsContainerCount');
     createButtons(componentUsageQuantityChart, 'buttonsContainerQuantity');
     
-    // Register click handlers for chart navigation
     document.getElementById('componentUsageCountChart').addEventListener('click', function(evt) {
       componentUsageCountChart.options.onClick(evt);
     });
     document.getElementById('componentUsageQuantityChart').addEventListener('click', function(evt) {
       componentUsageQuantityChart.options.onClick(evt);
     });
+    
+    // Store the full original data for filtering.
+    var allLabels = labels.slice();
+    var allDatasetsCount = datasetsCount.map(function(ds) {
+      return Object.assign({}, ds, { data: ds.data.slice() });
+    });
+    var allDatasetsWeightedUsage = datasetsWeightedUsage.map(function(ds) {
+      return Object.assign({}, ds, { data: ds.data.slice() });
+    });
+
+    window.filterCharts = function(n) {
+        // If n is 'all', restore the full data; otherwise, slice the data arrays.
+        if (n === 'all') {
+          labels = allLabels.slice();
+          datasetsCount.forEach(function(ds, i) {
+            ds.data = allDatasetsCount[i].data.slice();
+          });
+          datasetsWeightedUsage.forEach(function(ds, i) {
+            ds.data = allDatasetsWeightedUsage[i].data.slice();
+          });
+        } else {
+          labels = allLabels.slice(0, n);
+          datasetsCount.forEach(function(ds, i) {
+            ds.data = allDatasetsCount[i].data.slice(0, n);
+          });
+          datasetsWeightedUsage.forEach(function(ds, i) {
+            ds.data = allDatasetsWeightedUsage[i].data.slice(0, n);
+          });
+        }
+        
+        // Update charts
+        componentUsageCountChart.data.labels = labels;
+        componentUsageCountChart.update();
+        componentUsageQuantityChart.data.labels = labels;
+        componentUsageQuantityChart.update();
+      };
+    
+    // (Now the filterButtons container from above calls filterCharts(n))
   });
 </script>
 {% endblock content %}
 
-{% block extra-js %}
+{% block javascript %}
 {% comment %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"
         integrity="sha512-QVs8Lo43F9lSuBykadDb0oSXDL/BbZ588urWVCRwSIoewQv/Ewg1f84mK3U790bZ0FfhFa1YSQUmIhG+pIRKeg=="
@@ -391,7 +441,7 @@
     polling_interval: 5000  // In milliseconds.
   };
 </script>
-<script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+{% comment %} <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script> {% endcomment %}
 <script src="{% static 'django_comments_xtd/js/django-comments-xtd-2.10.0.js' %}"></script>
 <script>
   window.addEventListener('DOMContentLoaded', (_) => {
@@ -400,84 +450,38 @@
     [...tooltipList].map(el => new bootstrap.Tooltip(el, { html: true }));
   });
 </script>
-<!-- Separate script tag for Table Pagination -->
+
+<!-- JavaScript for Pagination -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    function paginateTable(tableId, paginationId, rowsPerPage) {
-      var table = document.getElementById(tableId);
-      if (!table) {
-        console.warn("Table not found:", tableId);
-        return;
-      }
-      var paginationContainer = document.getElementById(paginationId);
-      if (!paginationContainer) {
-        console.warn("Pagination container not found:", paginationId);
-        return;
-      }
-      // Convert the NodeList to an Array for reliable iteration
-      var rows = Array.from(table.querySelectorAll('tbody tr'));
-      var totalRows = rows.length;
-      var totalPages = Math.ceil(totalRows / rowsPerPage);
-      var currentPage = 1;
-      
-      function showPage(page) {
-        currentPage = page;
-        // Hide all rows first
-        rows.forEach(function (row) {
-          row.style.display = 'none';
-        });
-        // Calculate start and end indices
-        var start = (page - 1) * rowsPerPage;
-        var end = start + rowsPerPage;
-        for (var i = start; i < end && i < totalRows; i++) {
-          rows[i].style.display = ''; // Use default display value
-        }
-        updatePaginationControls();
-      }
-      
-      function updatePaginationControls() {
-        paginationContainer.innerHTML = '';
-        
-        // Create "Previous" button
-        var prev = document.createElement('button');
-        prev.textContent = 'Previous';
-        prev.disabled = (currentPage === 1);
-        prev.addEventListener('click', function () {
-          showPage(currentPage - 1);
-        });
-        paginationContainer.appendChild(prev);
-        
-        // Create numbered page buttons
-        for (var i = 1; i <= totalPages; i++) {
-          (function (page) {
-            var btn = document.createElement('button');
-            btn.textContent = page;
-            if (page === currentPage) {
-              btn.disabled = true;
-            }
-            btn.addEventListener('click', function () {
-              showPage(page);
-            });
+    document.addEventListener('DOMContentLoaded', function () {
+      function paginateTable(tableId, paginationId, rowsPerPage) {
+        const table = document.getElementById(tableId);
+        const paginationContainer = document.getElementById(paginationId);
+        if (!table || !paginationContainer) return;
+  
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+        let currentPage = 1;
+  
+        function showPage(page) {
+          currentPage = page;
+          rows.forEach(row => row.style.display = 'none');
+          rows.slice((page - 1) * rowsPerPage, page * rowsPerPage).forEach(row => row.style.display = '');
+  
+          paginationContainer.innerHTML = '';
+          for (let i = 1; i <= totalPages; i++) {
+            let btn = document.createElement('button');
+            btn.textContent = i;
+            btn.classList.add('px-3', 'py-1', 'text-blue-500', 'hover:text-blue-700', 'transition-all');
+            if (currentPage === i) btn.classList.add('opacity-50');
+            btn.onclick = () => showPage(i);
             paginationContainer.appendChild(btn);
-          })(i);
+          }
         }
-        
-        // Create "Next" button
-        var next = document.createElement('button');
-        next.textContent = 'Next';
-        next.disabled = (currentPage === totalPages);
-        next.addEventListener('click', function () {
-          showPage(currentPage + 1);
-        });
-        paginationContainer.appendChild(next);
+        showPage(1);
       }
-      
-      console.log("Paginating table", tableId, "with", totalRows, "rows over", totalPages, "pages.");
-      showPage(1);
-    }
-    
-    paginateTable('countTable', 'countTablePagination', 10);
-    paginateTable('quantityTable', 'quantityTablePagination', 10);
-  });
-</script>
-{% endblock extra-js %}
+      paginateTable('countTable', 'countTablePagination', 10);
+      paginateTable('quantityTable', 'quantityTablePagination', 10);
+    });
+  </script>
+{% endblock javascript %}
