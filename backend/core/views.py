@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from blog.models import BlogPost
 from modules.models import Module, Manufacturer
 from django.views.decorators.cache import cache_page
 from django.urls import reverse
@@ -134,6 +135,25 @@ def homepage(request):
         for module in modules
     ]
 
+    # Fetch the top two published blog posts
+    blog_posts = BlogPost.objects.filter(published=True).order_by("-datetime_created")[
+        :2
+    ]
+
+    blog_data = [
+        {
+            "title": post.title,
+            "thumbnail": (
+                post.thumb_image_jpeg.url
+                if post.thumb_image_jpeg
+                else post.thumb_image_webp.url if post.thumb_image_webp else None
+            ),
+            "excerpt": post.get_plain_text_excerpt(),  # Use the method to generate an excerpt
+            "post_url": post.get_absolute_url(),
+        }
+        for post in blog_posts
+    ]
+
     # Calculate counts
     project_count = Module.objects.count()
     component_count = Component.objects.count()
@@ -147,6 +167,7 @@ def homepage(request):
         "project_count": project_count,
         "component_count": component_count_display,
         "manufacturer_count": manufacturer_count,
+        "blog_posts": blog_data,
     }
 
     return render(request, "pages/home.html", context)
