@@ -40,9 +40,14 @@ const config: Configuration = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
+        extractComments: false,
         terserOptions: {
           compress: {
             drop_console: true,
+          },
+          format: {
+            // Remove all comments, which will strip out sourceMappingURL comments
+            comments: false,
           },
         },
       }),
