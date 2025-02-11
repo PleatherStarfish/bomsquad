@@ -15,18 +15,22 @@ import { motion } from "framer-motion";
 import { BomItem } from "../../types/bomListItem";
 import useGetComponentsByIds from "../../services/useGetComponentsByIds";
 
+interface FormState {
+  [key: string]: ItemType | null;
+}
+
 interface CheckboxGridModalProps {
   bomData: BomItem[];
-  control: Control<{ [key: string]: boolean }, any>;
+  control: Control<FormState, any>;
   formattedOutput: Record<string, string>;
-  getValues: UseFormGetValues<{ [key: string]: boolean }>;
-  reset: UseFormReset<{ [key: string]: boolean }>;
+  getValues: UseFormGetValues<FormState>;
+  reset: UseFormReset<FormState>;
   selectedPCBVersion?: string;
   setHasSelection: (arg0: boolean) => void;
   setFormattedOutput: React.Dispatch<
     React.SetStateAction<Record<string, string>>
   >;
-  watch: (names?: string[] | string) => { [key: string]: boolean };
+  watch: (names?: string[] | string) => FormState;
 }
 
 interface ItemType {
@@ -51,7 +55,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
 }) => {
   const normalizeKey = (description: string) =>
     description.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
-  
+
   // Filter BOM data by selected PCB version
   const filteredBomData = !selectedPCBVersion
     ? []
@@ -102,7 +106,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
               supplier: supplierItem.supplier?.short_name || "Unknown Supplier",
             }))
         );
-    
+
         return {
           description: normalizeKey(item.description), // Normalize description
           supplierItems: uniqBy(
@@ -121,16 +125,15 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
   const generateFormattedOutput = () => {
     const formState = getValues() as unknown as Record<string, ItemType | null>;
 
-  
     // Check if any item is selected
     const isSelected = Object.values(formState).some((value) => value !== null);
     setHasSelection(isSelected);
-  
+
     // Extract selected items from formState
     const selectedSupplierItems: ItemType[] = Object.values(formState).filter(
       (item): item is ItemType => item !== null
     );
-  
+
     const groupedBySupplier: Record<string, typeof selectedSupplierItems> = {};
 
     selectedSupplierItems.forEach((item) => {
@@ -151,7 +154,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
 
       groupedBySupplier[supplier].push(item); // Add the item to the appropriate group
     });
-  
+
     // Construct output for each supplier
     const output: Record<string, string> = {};
     Object.entries(groupedBySupplier).forEach(([supplier, items]) => {
@@ -172,7 +175,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
         ].join("\n");
       }
     });
-  
+
     // Update the formatted output if it has changed
     if (!isEqual(formattedOutput, output)) {
       setFormattedOutput(output);
@@ -180,6 +183,87 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
       console.log("Formatted Output remains unchanged.");
     }
   };
+
+  // Updated handler to toggle check all / uncheck all for a column
+  const handleCheckAllColumn = (supplier: string, shouldCheck: boolean) => {
+    const currentValues = getValues();
+    const updatedValues: FormState = { ...currentValues };
+  
+    // Directly use shouldCheck: if true, check all; if false, uncheck all.
+    groupedComponents.forEach((component) => {
+      const matchingItems = component.supplierItems.filter(
+        (item) => item?.supplier === supplier
+      );
+      matchingItems.forEach((item) => {
+        const fieldName = `${normalizeKey(component.description)}-${supplier}-${item?.id}`;
+        if (shouldCheck) {
+          updatedValues[fieldName] = {
+            ...item,
+            description: component.description,
+            id: item?.id ?? "",
+            itemNumber: item?.itemNumber ?? "",
+            link: item?.link ?? "",
+            price: item?.price ?? 0,
+            quantity: item?.quantity ?? 0,
+            supplier: supplier ?? "",
+          };
+        } else {
+          updatedValues[fieldName] = null;
+        }
+      });
+    });
+  
+    reset(updatedValues);
+    generateFormattedOutput();
+  };
+  
+
+  // This component renders a checkbox in the supplier header that
+  // automatically sets itself as checked if every checkbox in that column is selected,
+  // unchecked if none are selected, and indeterminate if only some are.
+  const SupplierHeaderCheckbox: React.FC<{ supplier: any }> = ({ supplier }) => {
+    // Use getValues to retrieve the current form state.
+    // Note: getValues() is not reactive, so ensure that a parent update or other mechanism triggers a re-render when form state changes.
+    const formValues = getValues();
+  
+    let total = 0;
+    let checkedCount = 0;
+  
+    // Loop through grouped components and filter out undefined items.
+    groupedComponents.forEach((component) => {
+      const validItems = component.supplierItems.filter(
+        (item): item is ItemType => item !== undefined && item.supplier === supplier
+      );
+      validItems.forEach((item) => {
+        total++;
+        const fieldName = `${normalizeKey(component.description)}-${supplier}-${item.id}`;
+        if (formValues[fieldName]) {
+          checkedCount++;
+        }
+      });
+    });
+  
+    const isChecked = total > 0 && checkedCount === total;
+    const isIndeterminate = checkedCount > 0 && checkedCount < total;
+    const checkboxRef = React.useRef<HTMLInputElement>(null);
+  
+    React.useEffect(() => {
+      if (checkboxRef.current) {
+        checkboxRef.current.indeterminate = isIndeterminate;
+      }
+    }, [isIndeterminate]);
+  
+    return (
+      <input
+        checked={isChecked}
+        className="w-4 h-4"
+        onChange={(e) => handleCheckAllColumn(supplier, e.target.checked)}
+        ref={checkboxRef}
+        type="checkbox"
+      />
+    );
+  };
+  
 
   // Reset logic
   useEffect(() => {
@@ -214,7 +298,10 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                       className="px-4 py-2 text-left border border-gray-200"
                       key={supplier}
                     >
-                      {supplier}
+                      <div className="flex flex-col">
+                        <span>{supplier}</span>
+                        <SupplierHeaderCheckbox supplier={supplier} />
+                      </div>
                     </th>
                   ))}
                 </tr>
@@ -233,7 +320,9 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                       return (
                         <td
                           className="px-4 py-2 border border-gray-200"
-                          key={`${normalizeKey(component.description)}-${supplier}`}
+                          key={`${normalizeKey(
+                            component.description
+                          )}-${supplier}`}
                         >
                           <div className="flex flex-col gap-y-2">
                             {matchingSupplierItems.length > 0
@@ -244,19 +333,23 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                   >
                                     <Controller
                                       control={control}
-                                      name={`${normalizeKey(component.description)}-${supplier}-${item?.id}`}
+                                      defaultValue={null}
+                                      name={`${normalizeKey(
+                                        component.description
+                                      )}-${supplier}-${item?.id}`}
                                       render={({ field }) => (
                                         // @ts-ignore
                                         <input
                                           {...field}
-                                          checked={field.value || false}
+                                          checked={field.value !== null}
                                           className="w-4 h-4"
                                           onChange={(e) => {
                                             if (e.target.checked) {
                                               // Store the item data in the form state when checked
                                               field.onChange({
                                                 ...item,
-                                                description: component.description,
+                                                description:
+                                                  component.description,
                                               });
                                             } else {
                                               // Remove the item data from the form state when unchecked
@@ -288,9 +381,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                                       </a>
                                     )}
                                     <span className="text-gray-600 text-2xs">
-                                      {item?.price
-                                        ? `($${item?.price})`
-                                        : ""}
+                                      {item?.price ? `($${item?.price})` : ""}
                                     </span>
                                   </div>
                                 ))
@@ -372,7 +463,8 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                       Tayda Quick Order tool
                     </a>
                     . Ensure each line contains a product’s symbol followed by
-                    its quantity, separated by a comma. Each product must be listed on a separate line.
+                    its quantity, separated by a comma. Each product must be
+                    listed on a separate line.
                   </p>
                 )}
                 <div className="relative w-full p-4 text-left rounded hover:bg-stone-200 bg-stone-100 cursor-copy">

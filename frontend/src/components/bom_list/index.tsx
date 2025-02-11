@@ -30,6 +30,20 @@ import { prefetchComponentsData } from "../../services/usePreloadComponentsData"
 import useModuleBomListItems from "../../services/useModuleBomListItems";
 import { useQueryClient } from "@tanstack/react-query";
 
+interface ItemType {
+  id: string;
+  supplier: string;
+  itemNumber: string;
+  link: string;
+  price: number;
+  quantity: number;
+  description: string;
+}
+
+interface FormState {
+  [key: string]: ItemType | null;
+}
+
 export const customStyles = {
   headCells: {
     style: {
@@ -67,9 +81,7 @@ const BomList: React.FC<BomListProps> = ({
   const [formattedOutput, setFormattedOutput] = useState<Record<string, string>>({});
   const [userSelection, setUserSelection] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const { control, getValues, reset, watch } = useForm<{
-    [key: string]: boolean;
-  }>();
+  const { control, getValues, reset, watch } = useForm<FormState>();
 
   // Fetch module BOM data
   const { moduleBom, moduleBomIsLoading, moduleBomIsError } =
