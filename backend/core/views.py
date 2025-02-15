@@ -11,6 +11,8 @@ from django.utils.timezone import now
 from accounts.models import ExchangeRate
 from sentry_sdk import capture_exception
 from core.openexchangerates import _get_latest_exchange_rates
+from django.conf import settings
+
 
 CURRENCIES = [
     ("USD", "US Dollar"),
@@ -99,15 +101,23 @@ def get_exchange_rate(base_currency: str, target_currency: str) -> float:
 
 
 def robots_txt(request):
-    lines = [
-        "User-agent: *",
-        "Disallow: /admin/",
-        "Disallow: /accounts/",
-        "Disallow: /api/",
-        "Disallow: /contact/",
-        "Disallow: /user/",
-        "Sitemap: https://bom-squad.com/sitemap.xml",
-    ]
+    if settings.DEBUG:
+        # In development (DEBUG mode), disallow everything.
+        lines = [
+            "User-agent: *",
+            "Disallow: /",
+        ]
+    else:
+        # In production, only disallow specific paths.
+        lines = [
+            "User-agent: *",
+            "Disallow: /admin/",
+            "Disallow: /accounts/",
+            "Disallow: /api/",
+            "Disallow: /contact/",
+            "Disallow: /user/",
+            "Sitemap: https://bom-squad.com/sitemap.xml",
+        ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
