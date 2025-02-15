@@ -68,6 +68,21 @@ const CombinedCostComparison: React.FC<CombinedCostComparisonProps> = ({
     );
   if (!costStats || !currencyData) return <></>;
 
+  // Extract all the cost values
+  const costValues = [
+    costStats.cost_built,
+    costStats.cost_pcb_only,
+    costStats.cost_pcb_plus_front,
+    costStats.cost_kit,
+    costStats.cost_partial_kit
+  ];
+
+  // Filter out null or undefined values
+  const validCosts = costValues.filter(cost => cost !== null && cost !== undefined);
+
+  // Ensure there is more than one valid price before rendering
+  if (validCosts.length < 2) return <></>;
+
   const computedPartsCost = parseFloat(costStats.overall.median);
   const parseCost = (value: number | string | null): number | null =>
     value ? parseFloat(value.toString()) : null;
