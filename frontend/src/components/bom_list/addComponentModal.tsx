@@ -91,7 +91,6 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({
   const locationsData: SavedLocationData[] = locations ?? [];
 
   const handleSubmitQuantity = async () => {
-    console.log("handleSubmitQuantity called with type:", type);
   
     try {
       if (type === Types.INVENTORY) {
@@ -111,7 +110,6 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({
               }
             },
             onSuccess: () => {
-              console.log("Inventory successfully updated.");
               setOpen(undefined);
             },
           }
@@ -137,17 +135,11 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({
               setError(`Failed to update shopping list: ${error.message}`);
             },
             onSuccess: () => {
-              console.log("Shopping list successfully updated.");
               setOpen(undefined);
             },
           }
         );
       } else if (type === Types.SHOPPING_ANON) {
-        console.log("Updating anonymous shopping list with data:", {
-          componentId: componentPk,
-          editMode,
-          quantity,
-        });
         await addOrUpdateUserAnonymousShoppingList.mutateAsync(
           {
             componentId: componentPk,
@@ -160,7 +152,6 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({
               setError(`Failed to update anonymous shopping list: ${error.message}`);
             },
             onSuccess: () => {
-              console.log("Anonymous shopping list successfully updated.");
               setOpen(undefined);
             },
           }
@@ -171,8 +162,6 @@ const AddComponentModal: React.FC<AddComponentModalProps> = ({
     } catch (error) {
       console.error("Unexpected error in handleSubmitQuantity:", error);
       setError(`Unexpected error: ${error.message}`);
-    } finally {
-      console.log("handleSubmitQuantity finished execution.");
     }
   };
 

@@ -1,4 +1,7 @@
+from collections import defaultdict
+from decimal import Decimal
 import logging
+import statistics
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -37,6 +40,7 @@ from modules.models import (
 )
 from modules.serializers import (
     BuiltModuleSerializer,
+    ModuleCostStatsSerializer,
     ModuleSerializer,
     SuggestedComponentDetailSerializer,
     WantTooBuildModuleSerializer,
@@ -923,3 +927,86 @@ def suggest_component_for_bom_list_item(request, modulebomlistitem_pk):
             {"error": "An unexpected error occurred."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@api_view(["GET"])
+@cache_page(60 * 60 * 24)
+def module_cost_stats(request, module_id):
+    """
+    For a given module (specified by module_id), compute and return the low, high,
+    average, and median cost of its BOM components.
+
+    For each BOM list item:
+      - We collect cost options as: supplier_item.unit_price * bom_item.quantity.
+      - We compute the BOM's low, high, average, and median.
+    Finally, we sum the per-BOM values to produce overall module statistics.
+    """
+    # Retrieve the module or return a 404 if not found.
+    module = get_object_or_404(Module, id=module_id)
+
+    # Retrieve BOM list item id, quantity, and supplier's unit_price via the components_options relation.
+    qs = module.modulebomlistitem_set.filter(module=module).values(
+        "id", "quantity", "components_options__supplier_items__unit_price"
+    )
+
+    # Group cost options by BOM list item id.
+    bom_costs = defaultdict(list)
+    for row in qs:
+        unit_price = row.get("components_options__supplier_items__unit_price")
+        if unit_price is not None:
+            quantity = row.get("quantity", 1)
+            cost = unit_price * quantity
+            bom_costs[row["id"]].append(cost)
+
+    # Initialize overall totals using Decimal for precision.
+    overall_low = Decimal("0.00")
+    overall_high = Decimal("0.00")
+    overall_avg = Decimal("0.00")
+    overall_median = Decimal("0.00")
+    bom_breakdown = {}
+
+    # Compute per-BOM stats and sum them.
+    for bom_id, costs in bom_costs.items():
+        if costs:
+            bom_low = min(costs)
+            bom_high = max(costs)
+            bom_avg = sum(costs) / Decimal(len(costs))
+            bom_med = Decimal(statistics.median(costs))
+            bom_breakdown[str(bom_id)] = {
+                "low": bom_low,
+                "high": bom_high,
+                "average": bom_avg,
+                "median": bom_med,
+            }
+            overall_low += bom_low
+            overall_high += bom_high
+            overall_avg += bom_avg
+            overall_median += bom_med
+
+    data = {
+        "module_id": module.id,
+        "module_name": module.name,
+        "overall": {
+            "low": overall_low,
+            "high": overall_high,
+            "average": overall_avg,
+            "median": overall_median,
+        },
+        "cost_built": module.cost_built,
+        "cost_built_link": module.cost_built_link,
+        "cost_built_third_party": module.cost_built_third_party,
+        "cost_pcb_only": module.cost_pcb_only,
+        "cost_pcb_only_link": module.cost_pcb_only_link,
+        "cost_pcb_only_third_party": module.cost_pcb_only_third_party,
+        "cost_pcb_plus_front": module.cost_pcb_plus_front,
+        "cost_pcb_plus_front_link": module.cost_pcb_plus_front_link,
+        "cost_pcb_plus_front_third_party": module.cost_pcb_plus_front_third_party,
+        "cost_kit": module.cost_kit,
+        "cost_kit_link": module.cost_kit_link,
+        "cost_kit_third_party": module.cost_kit_third_party,
+        "cost_partial_kit": module.cost_partial_kit,
+        "cost_partial_kit_link": module.cost_partial_kit_link,
+        "cost_partial_kit_third_party": module.cost_partial_kit_third_party,
+    }
+    serializer = ModuleCostStatsSerializer(instance=data)
+    return Response(serializer.data)

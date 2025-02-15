@@ -179,8 +179,6 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
     // Update the formatted output if it has changed
     if (!isEqual(formattedOutput, output)) {
       setFormattedOutput(output);
-    } else {
-      console.log("Formatted Output remains unchanged.");
     }
   };
 

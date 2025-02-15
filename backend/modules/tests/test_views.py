@@ -608,3 +608,124 @@ class SuggestedComponentsForBomListItemViewTests(APITestCase):
             response.data["detail"],
             "No suggestions found for the specified BOM list item.",
         )
+
+
+class ModuleCostStatsTests(APITestCase):
+    def setUp(self):
+        # Create a module manufacturer.
+        self.module_manufacturer = Manufacturer.objects.create(
+            id=uuid4(), name="Module Manufacturer"
+        )
+        # Create a component manufacturer.
+        self.component_manufacturer = ComponentManufacturer.objects.create(
+            id=uuid4(), name="Component Manufacturer"
+        )
+        # Create a component type.
+        self.resistor_type = Types.objects.create(name="Resistor")
+
+        # Create a module.
+        self.module = Module.objects.create(
+            id=uuid4(),
+            name="Test Module",
+            manufacturer=self.module_manufacturer,
+            description="A test module",
+        )
+        # Initialize a counter for unique supplier_item_no values.
+        self.supplier_item_counter = 1
+
+    def create_bom_with_component(self, bom_quantity, supplier_prices):
+        """
+        Helper to create a BOM list item with one component that has one or more supplier items.
+          - bom_quantity: Quantity on the BOM item.
+          - supplier_prices: List of Decimal unit prices for supplier items.
+        Returns the BOM list item.
+        """
+        # Create a BOM list item with a specific UUID.
+        bom = ModuleBomListItem.objects.create(
+            id=uuid4(),
+            description="Test BOM Item",
+            module=self.module,
+            type=self.resistor_type,
+            quantity=bom_quantity,
+        )
+        # Create a component.
+        component = Component.objects.create(
+            id=uuid4(),
+            description="Test Component",
+            type=self.resistor_type,
+            manufacturer=self.component_manufacturer,
+            manufacturer_part_no="PART123",
+            mounting_style="th",
+        )
+        # Associate the component with the BOM list item.
+        bom.components_options.add(component)
+        # For each supplier price, create a supplier and supplier item.
+        for price in supplier_prices:
+            supplier = ComponentSupplier.objects.create(
+                id=uuid4(), name=f"Supplier {self.supplier_item_counter}"
+            )
+            # Use a counter to generate a unique supplier_item_no.
+            supplier_item_no = f"SUP{self.supplier_item_counter}"
+            self.supplier_item_counter += 1
+            ComponentSupplierItem.objects.create(
+                component=component,
+                supplier=supplier,
+                supplier_item_no=supplier_item_no,
+                price=price,  # Assumes price/pcs yields unit_price (with pcs == 1)
+                pcs=1,
+            )
+        return bom
+
+    def get_url(self):
+        # The URL is "api/module/cost-stats/<uuid:module_id>/"
+        return reverse("module-cost-stats", kwargs={"module_id": self.module.id})
+
+    def test_module_cost_stats_single_bom(self):
+        """
+        Create one BOM list item with a component that has two supplier items.
+        Example:
+          - BOM quantity = 2.
+          - Supplier prices: 1.00 and 2.00.
+        Expected cost options: 2*1.00 = 2.00 and 2*2.00 = 4.00.
+          -> low = 2.00, high = 4.00, average = 3.00, median = 3.00.
+        """
+        self.create_bom_with_component(
+            bom_quantity=2, supplier_prices=[Decimal("1.00"), Decimal("2.00")]
+        )
+        url = self.get_url()
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        overall = response.data.get("overall", {})
+        self.assertEqual(overall.get("low"), "2.00")
+        self.assertEqual(overall.get("high"), "4.00")
+        self.assertEqual(overall.get("average"), "3.00")
+        self.assertEqual(overall.get("median"), "3.00")
+
+    def test_module_cost_stats_multiple_bom(self):
+        """
+        Create two BOM list items.
+          BOM 1: quantity = 1 with a component having one supplier item at price 10.
+            -> cost = 10.
+          BOM 2: quantity = 3 with a component having two supplier items with prices 2 and 4.
+            -> cost options: 3*2 = 6 and 3*4 = 12; low = 6, high = 12, average = 9, median = 9.
+        Overall sums should be:
+          low: 10 + 6 = 16, high: 10 + 12 = 22, average: 10 + 9 = 19, median: 10 + 9 = 19.
+        """
+        # BOM 1
+        self.create_bom_with_component(
+            bom_quantity=1, supplier_prices=[Decimal("10.00")]
+        )
+        # BOM 2
+        self.create_bom_with_component(
+            bom_quantity=3, supplier_prices=[Decimal("2.00"), Decimal("4.00")]
+        )
+        url = self.get_url()
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        overall = response.data.get("overall", {})
+        self.assertEqual(overall.get("low"), "16.00")
+        self.assertEqual(overall.get("high"), "22.00")
+        self.assertEqual(overall.get("average"), "19.00")
+        self.assertEqual(overall.get("median"), "19.00")

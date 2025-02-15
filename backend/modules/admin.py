@@ -87,6 +87,33 @@ class ModuleAdmin(BaseAdmin):
             },
         ),
         (
+            "Cost Information",
+            {
+                "fields": (
+                    # Built cost group
+                    "cost_built",
+                    "cost_built_link",
+                    "cost_built_third_party",
+                    # PCB only cost group
+                    "cost_pcb_only",
+                    "cost_pcb_only_link",
+                    "cost_pcb_only_third_party",
+                    # PCB plus front cost group
+                    "cost_pcb_plus_front",
+                    "cost_pcb_plus_front_link",
+                    "cost_pcb_plus_front_third_party",
+                    # Kit cost group
+                    "cost_kit",
+                    "cost_kit_link",
+                    "cost_kit_third_party",
+                    # Partial kit cost group
+                    "cost_partial_kit",
+                    "cost_partial_kit_link",
+                    "cost_partial_kit_third_party",
+                )
+            },
+        ),
+        (
             "Other Info",
             {
                 "fields": (

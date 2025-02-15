@@ -16,6 +16,7 @@ from modules.views import (
     UserModulesView,
     ModuleDetailView,
     get_module_bom_list_items,
+    module_cost_stats,
     rate_component,
     get_average_rating,
     get_module_status,
@@ -208,6 +209,11 @@ urlpatterns = [
         "module/<uuid:module_pk>/bom-list-items/",
         get_module_bom_list_items,
         name="module-bom-list-items",
+    ),
+    path(
+        "module/cost-stats/<uuid:module_id>/",
+        module_cost_stats,
+        name="module-cost-stats",
     ),
     path(
         "shopping-list/inventory/add/",

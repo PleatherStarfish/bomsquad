@@ -16,6 +16,7 @@ from modules.models import (
     PcbVersion,
     ModuleBomListComponentForItemRating,
 )
+from djmoney.contrib.django_rest_framework.fields import MoneyField
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):
@@ -236,3 +237,72 @@ class SuggestedComponentDetailSerializer(serializers.ModelSerializer):
             "suggested_component",
             "status",
         ]
+
+
+class CostStatsSerializer(serializers.Serializer):
+    low = serializers.DecimalField(max_digits=10, decimal_places=2)
+    high = serializers.DecimalField(max_digits=10, decimal_places=2)
+    average = serializers.DecimalField(max_digits=10, decimal_places=2)
+    median = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+class ModuleCostStatsSerializer(serializers.Serializer):
+    module_id = serializers.UUIDField()
+    module_name = serializers.CharField()
+    overall = CostStatsSerializer()
+
+    cost_built = MoneyField(
+        max_digits=10,
+        decimal_places=2,
+        default_currency="USD",
+        required=False,
+        allow_null=True,
+    )
+    cost_built_link = serializers.URLField(required=False, allow_null=True)
+    cost_built_third_party = serializers.BooleanField(required=False, allow_null=True)
+
+    cost_pcb_only = MoneyField(
+        max_digits=10,
+        decimal_places=2,
+        default_currency="USD",
+        required=False,
+        allow_null=True,
+    )
+    cost_pcb_only_link = serializers.URLField(required=False, allow_null=True)
+    cost_pcb_only_third_party = serializers.BooleanField(
+        required=False, allow_null=True
+    )
+
+    cost_pcb_plus_front = MoneyField(
+        max_digits=10,
+        decimal_places=2,
+        default_currency="USD",
+        required=False,
+        allow_null=True,
+    )
+    cost_pcb_plus_front_link = serializers.URLField(required=False, allow_null=True)
+    cost_pcb_plus_front_third_party = serializers.BooleanField(
+        required=False, allow_null=True
+    )
+
+    cost_kit = MoneyField(
+        max_digits=10,
+        decimal_places=2,
+        default_currency="USD",
+        required=False,
+        allow_null=True,
+    )
+    cost_kit_link = serializers.URLField(required=False, allow_null=True)
+    cost_kit_third_party = serializers.BooleanField(required=False, allow_null=True)
+
+    cost_partial_kit = MoneyField(
+        max_digits=10,
+        decimal_places=2,
+        default_currency="USD",
+        required=False,
+        allow_null=True,
+    )
+    cost_partial_kit_link = serializers.URLField(required=False, allow_null=True)
+    cost_partial_kit_third_party = serializers.BooleanField(
+        required=False, allow_null=True
+    )

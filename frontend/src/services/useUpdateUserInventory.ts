@@ -21,7 +21,6 @@ const useUpdateUserInventory = (): {
 
   const { mutateAsync: updateUserInventoryMutate, error } = useMutation<void, AxiosError, UpdateUserInventoryPayload>({
     mutationFn: async ({ inventoryPk, ...data }: UpdateUserInventoryPayload) => {
-      console.log(data)
       return axios.patch(`/api/inventory/${inventoryPk}/update/`, data, {
         headers: {
           "X-CSRFToken": csrftoken || "", // Include the csrftoken as a header in the request

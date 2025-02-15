@@ -72,7 +72,6 @@ const useGetUserInventory = (): {
     const { data } = await axios.get<FetchInventoryResponse>("/api/inventory/", {
       withCredentials: true, // Include credentials (e.g., cookies) in the request
     });
-    console.log(data)
     return data;
   };
 

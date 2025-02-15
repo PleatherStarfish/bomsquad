@@ -26,8 +26,6 @@ const useAddOrUpdateUserInventory = (): UseMutationResult<
 
   return useMutation<AxiosResponse, unknown, MutationVariables>({
     mutationFn: ({ componentId, quantity, location, editMode }) => {
-      console.log(componentId);
-      console.log(quantity, location, editMode);
 
       const componentIdCleaned = removeAfterUnderscore(componentId);
       return axios.post(

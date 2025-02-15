@@ -1,3 +1,4 @@
+from djmoney.models.fields import MoneyField
 from django.db import models
 from django.template.defaultfilters import slugify
 from components.models import Component
@@ -155,6 +156,37 @@ class Module(BaseModel):
         null=True,
         help_text="Select the module category (e.g., Eurorack, Pedals, Serge).",
     )
+    # Cost fields with MoneyField
+    cost_built = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    cost_built_link = models.URLField(blank=True, null=True)
+    cost_built_third_party = models.BooleanField(default=False)
+
+    cost_pcb_only = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    cost_pcb_only_link = models.URLField(blank=True, null=True)
+    cost_pcb_only_third_party = models.BooleanField(default=False)
+
+    cost_pcb_plus_front = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    cost_pcb_plus_front_link = models.URLField(blank=True, null=True)
+    cost_pcb_plus_front_third_party = models.BooleanField(default=False)
+
+    cost_kit = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    cost_kit_link = models.URLField(blank=True, null=True)
+    cost_kit_third_party = models.BooleanField(default=False)
+
+    cost_partial_kit = MoneyField(
+        max_digits=10, decimal_places=2, default_currency="USD", blank=True, null=True
+    )
+    cost_partial_kit_link = models.URLField(blank=True, null=True)
+    cost_partial_kit_third_party = models.BooleanField(default=False)
+
     slug = models.SlugField(blank=True, unique=True)
     allow_comments = models.BooleanField("allow comments", default=True)
 

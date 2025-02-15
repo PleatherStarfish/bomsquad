@@ -9,6 +9,7 @@ import useAuthenticatedUser from "../services/useAuthenticatedUser";
 import useModule from "../services/useModule";
 import { useParams } from "react-router-dom";
 import LazyImage from "../utils/LazyImage";
+import PriceComparisonTiles from "../components/modules/PriceComparisonTiles";
 
 interface Params extends Record<string, string | undefined> {
   slug: string;
@@ -158,6 +159,7 @@ const ProjectDetail: React.FC = () => {
           </div> */}
         </div>
       </div>
+      <PriceComparisonTiles module={module} />
       <div>
         {!loading && <div className="pb-5">
           <HeaderWithButton
