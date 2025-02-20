@@ -1,6 +1,11 @@
-{% extends '_base.html' %} {% load static %} {% block title %} BOM Squad: A Tool
+{% extends '_base.html' %} 
+{% load static %} 
+
+{% block title %} BOM Squad: A Tool
 for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
-{% endblock title %} {% block content %}
+{% endblock title %} 
+
+{% block content %}
 <div class="p-0 homepage-grid">
   <!-- Header Section with Circuit Board Image Background -->
   <div
@@ -97,7 +102,7 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
     <ul class="flex flex-col justify-around h-full px-6 md:flex-row">
       {% for project in projects %}
       <li
-        class="flex flex-col items-center justify-around py-10 space-y-4 border-b md:space-y-0 md:justify-start md:flex-row md:border-0"
+        class="flex flex-col items-center justify-around py-10 space-y-4 md:space-y-0 md:justify-start md:flex-row md:border-0"
       >
         <div
           class="flex justify-center w-20 h-20 mr-4 overflow-hidden align-middle rounded lg:w-20 lg:h-20"
@@ -135,12 +140,17 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
     </ul>
   </div>
 
-  <a href="/projects/" class="block">
+  <a href="/projects/" class="block left-info-box">
     <div
       style="padding: 1.5rem"
-      class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border left-info-box lg:min-h-36"
+      class="relative flex flex-col justify-center w-full p-6 border-t border-b border-gray-200 border-x md:border h-52 lg:min-h-36 group"
     >
-      <div class="flex justify-center">
+      <div class="absolute z-30 top-3 right-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>        
+      </div>
+      <div class="flex justify-center left-info-box-text">
         <div class="flex flex-col justify-center align-middle lg:min-h-36">
           <h4 class="text-4xl font-semibold text-center font-display">
             {{ project_count }}
@@ -151,12 +161,17 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
     </div>
   </a>
 
-  <a href="/components/" class="block">
+  <a href="/components/" class="block middle-info-box">
     <div
       style="padding: 1.5rem"
-      class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border-t middle-info-box lg:min-h-36"
+      class="relative flex flex-col justify-center w-full p-6 border-b border-gray-200 border-x md:border-t md:border-x-0 h-52 md:h-full group"
     >
-      <div class="flex justify-center">
+      <div class="absolute z-30 top-3 right-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>        
+      </div>
+      <div class="flex justify-center middle-info-box-text">
         <div class="flex flex-col justify-center align-middle lg:min-h-36">
           <h4 class="text-4xl font-semibold text-center font-display">
             {{ component_count }}
@@ -168,7 +183,7 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
   </a>
 
   <div
-    class="flex flex-col justify-center w-full h-full p-6 border-b border-gray-200 border-x md:border right-info-box lg:min-h-36"
+    class="flex flex-col justify-center w-full p-6 border-b border-gray-200 border-x md:border-t right-info-box h-52 md:h-full"
   >
     <div class="flex justify-center">
       <div class="flex flex-col justify-center align-middle lg:min-h-36">
@@ -368,6 +383,50 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
       {% empty %}
         <p class="text-center text-gray-500">No recent blog posts available.</p>
       {% endfor %}
+    </div>
+  </div>
+
+  <div class="flex flex-col cheaper-box md:flex-row">
+    <div
+      style="padding: 1.5rem"
+      class="relative flex flex-col justify-center w-full p-6 overflow-hidden border-t border-b border-gray-200 border-x md:border-b-0 h-52 group"
+      role="button"
+    >
+      <div class="absolute z-30 top-3 right-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>        
+      </div>
+      <div class="flex justify-center slide-in-left">
+        <div class="flex flex-col justify-center align-middle lg:min-h-36">
+          <div class="text-center">Self-sourcing components is</div>
+          <div class="my-3 text-4xl font-semibold text-center font-display">
+            {{ diy_savings_stats.pcb_only_vs_assembled.median_savings }}%
+          </div>
+          <div class="text-center">cheaper than buying pre-assembled</div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      style="padding: 1.5rem"
+      class="relative flex flex-col justify-center w-full p-6 overflow-hidden border-gray-200 border-x md:border-t md:border-r md:border-x-0 h-52 group"
+      role="button"
+    >
+      <div class="absolute z-30 top-3 right-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>        
+      </div>
+      <div class="flex justify-center slide-in-right">
+        <div class="flex flex-col justify-center align-middle lg:min-h-36">
+          <div class="text-center">Self-sourcing components is</div>
+          <div class="my-3 text-4xl font-semibold text-center font-display">
+            {{ diy_savings_stats.pcb_plus_front_vs_kit.median_savings }}%
+          </div>
+          <div class="text-center">cheaper than building from a kit</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -712,4 +771,89 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
     container.appendChild(iframe);
   }
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const elementsLeft = document.querySelectorAll(".slide-in-left");
+    const elementsRight = document.querySelectorAll(".slide-in-right");
+
+    function handleScroll() {
+      const triggerHeight = window.innerHeight * 0.85; // Trigger when element is 85% in view
+
+      elementsLeft.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < triggerHeight) {
+          el.classList.add("show");
+        }
+      });
+
+      elementsRight.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < triggerHeight) {
+          el.classList.add("show");
+        }
+      });
+    }
+
+    // Run on scroll
+    window.addEventListener("scroll", handleScroll);
+
+    // Run on load in case elements are already in view
+    handleScroll();
+  });
+</script>
+
 {% endblock javascript %}
+
+{% block css %}
+<style>
+  .savings-section {
+    position: relative;
+    background-image: url("{% static 'images/electronics_diagram_background_square.jpeg' %}");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .savings-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+  }
+
+  .savings-content {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255);
+    border-radius: 8px;
+  }
+  /* Initial state for left and right elements */
+  .slide-in-left,
+  .slide-in-right {
+    opacity: 0;
+    transform: translateX(-500px);
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .slide-in-right {
+    transform: translateX(500px);
+  }
+
+  /* When in view, animate into position */
+  .show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Hover effect: Grow slightly */
+  .slide-in-left:hover,
+  .slide-in-right:hover,
+  .left-info-box-text:hover,
+  .middle-info-box-text:hover
+   {
+    transform: scale(1.05); /* Slight enlargement */
+    transition: transform 0.4s ease-out; /* Smooth transition */
+  }
+</style>
+{% endblock css %}
+

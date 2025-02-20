@@ -76,6 +76,24 @@ class ComponentAdmin(BaseAdmin):
             },
         ),
         (
+            "Potentiometer Specific Fields",
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "pot_taper",
+                    "pot_mounting_type",
+                    "pot_angle_type",
+                    "pot_gangs",
+                    "pot_shaft_type",
+                    "pot_shaft_material",
+                    "pot_split_shaft",
+                    "pot_shaft_diameter",
+                    "pot_shaft_length",
+                    "pot_base_width",
+                ),
+            },
+        ),
+        (
             "Ratings",
             {
                 "classes": ("collapse",),

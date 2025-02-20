@@ -1,3 +1,4 @@
+import re
 from djmoney.models.fields import MoneyField
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -143,6 +144,92 @@ class Component(BaseModel):
         blank=True,
         null=True,
     )
+
+    # Potentiometer-specific fields
+    POT_MOUNTING_TYPE_CHOICES = [
+        ("PCB Mount", "PCB Mount"),
+        ("Panel Mount", "Panel Mount"),
+        ("Solder Lug", "Solder Lug"),
+    ]
+
+    POT_SHAFT_TYPE_CHOICES = [
+        ("Smooth", "Smooth"),
+        ("Knurled", "Knurled"),
+        ("D-Shaft", "D-Shaft"),
+    ]
+
+    POT_SHAFT_MATERIAL_CHOICES = [
+        ("Plastic", "Plastic"),
+        ("Metal", "Metal"),
+    ]
+
+    POT_TAPER_CHOICES = [
+        ("Linear", "Linear (B)"),
+        ("Logarithmic", "Logarithmic (A)"),
+        ("Reverse Logarithmic", "Reverse Logarithmic (C)"),
+        ("Custom", "Custom (S, W, etc.)"),
+    ]
+
+    POT_ANGLE_CHOICES = [
+        ("Straight", "Straight"),
+        ("Right-Angle", "Right-Angle"),
+        ("Right-Angle-Long", "Right-Angle-Long"),
+    ]
+
+    pot_mounting_type = models.CharField(
+        max_length=20, choices=POT_MOUNTING_TYPE_CHOICES, blank=True, null=True
+    )
+
+    pot_shaft_type = models.CharField(
+        max_length=20, choices=POT_SHAFT_TYPE_CHOICES, blank=True, null=True
+    )
+
+    pot_split_shaft = models.BooleanField(
+        default=False,
+        help_text="Indicates whether the shaft is split (adjustable width).",
+    )
+
+    pot_shaft_diameter = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Shaft diameter (e.g., '6mm' or '1/4in.')",
+    )
+
+    pot_shaft_length = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Shaft length (e.g., '15mm' or '0.75in.')",
+    )
+
+    pot_shaft_material = models.CharField(
+        max_length=10,
+        choices=POT_SHAFT_MATERIAL_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Material of the shaft (Plastic or Metal).",
+    )
+
+    pot_taper = models.CharField(
+        max_length=25, choices=POT_TAPER_CHOICES, blank=True, null=True
+    )
+
+    pot_angle_type = models.CharField(
+        max_length=20, choices=POT_ANGLE_CHOICES, blank=True, null=True
+    )
+
+    pot_gangs = models.PositiveIntegerField(
+        default=1, help_text="Number of gangs (e.g., Single, Dual)"
+    )
+
+    pot_base_width = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Potentiometer base width (e.g., '9mm', '16mm', '24mm').",
+    )
+
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     editor_content = EditorJsTextField(
@@ -200,59 +287,141 @@ class Component(BaseModel):
 
     def generate_description(self):
         """
-        Generate a short and logical description for the Component,
-        including wattage, tolerance, and mounting style if set.
+        Generate a structured and logical description for the Component,
+        prioritizing key attributes while ensuring clarity.
         """
-        description = ""
+        description = []
 
-        # Prioritize value fields
-        if self.ohms and self.ohms_unit:
-            description = f"{self.ohms}{self.ohms_unit} Resistor"
+        # Potentiometer Standardized Representation (e.g., A100K, B500K)
+        standardized_resistance = None
+        if (
+            self.type.name == "Potentiometer"
+            and self.ohms is not None
+            and self.ohms_unit
+            and self.pot_taper
+        ):
+            # Map pot_taper to the correct letter
+            taper_mapping = {
+                "Linear": "B",
+                "Logarithmic": "A",
+                "Reverse Logarithmic": "C",
+                "Custom": "W",
+            }
+            taper_letter = taper_mapping.get(self.pot_taper, "B")
 
-        elif self.farads and self.farads_unit:
-            description = f"{self.farads}{self.farads_unit} Capacitor"
-
-        if self.type:
-            description += f" {self.type.name}"
-
-        if self.category:
-            description += f" {self.category.name}"
-
-        if self.size:
-            description += f" {self.size.name}"
-
-        # Include mounting style
-        if self.mounting_style:
-            description += (
-                f" {'(through hole)' if self.mounting_style == 'th' else '(SMT)'}"
-            )
-
-        # Include wattage if available
-        if self.wattage:
-            if not self.wattage.endswith("W"):
-                description += f", {self.wattage}W"
+            # Format resistance value with proper notation
+            if self.ohms_unit == "Ω":  # Ohms, usually uncommon in potentiometers
+                value_str = f"{int(self.ohms)}"
+            elif self.ohms_unit == "kΩ":  # Kilo-ohms
+                value_str = f"{int(self.ohms)}K"
+            elif self.ohms_unit == "MΩ":  # Mega-ohms
+                value_str = f"{int(self.ohms)}M"
             else:
-                description += f", {self.wattage}"
+                value_str = f"{int(self.ohms)}{self.ohms_unit}"  # Fallback case
 
-        # Include tolerance if available
-        if self.tolerance:
-            description += f", {self.tolerance} tolerance"
+            # Generate standardized potentiometer description (e.g., A100K, B10K, C1M)
+            standardized_resistance = f"{taper_letter}{value_str}"
+            description.append(standardized_resistance)
+
+        # Potentiometer-specific description
+
+        if self.type.name == "Potentiometer":
+            pot_core_details = []
+
+            # Shaft type
+            if self.pot_shaft_type:
+                pot_core_details.append(
+                    self.pot_shaft_type
+                )  # e.g., "Knurled", "D-Shaft"
+
+            # Shaft material (only mention if not Metal)
+            if self.pot_shaft_material and self.pot_shaft_material != "Metal":
+                pot_core_details.append(self.pot_shaft_material + " Shaft")
+            else:
+                pot_core_details.append("Shaft")  # Default to "Shaft" if metal
+
+            # Ensure "Straight" and similar values are correctly placed
+            if self.pot_angle_type:
+                if self.pot_angle_type == "Straight":
+                    pot_core_details.insert(0, "Straight")  # Place at the start
+                else:
+                    pot_core_details.append(self.pot_angle_type)  # e.g., "Right-Angle"
+
+            if self.pot_gangs and self.pot_gangs > 1:
+                pot_core_details.append(f"{self.pot_gangs}-gang")
+
+            # Ensure "with PCB Mount" is correctly placed
+            if self.pot_mounting_type:
+                pot_core_details.append(f"with {self.pot_mounting_type}")
+
+            if self.pot_split_shaft:
+                pot_core_details.append("Split Shaft")
+
+            if pot_core_details:
+                description.append(
+                    " ".join(pot_core_details)
+                )  # Use words instead of '|'
+
+            # Collect size-related details for parentheses
+            pot_size_details = []
+
+            if self.pot_shaft_diameter:
+                pot_size_details.append(f"{self.pot_shaft_diameter} diameter")
+
+            if self.pot_shaft_length:
+                pot_size_details.append(f"{self.pot_shaft_length} length")
+
+            if self.pot_base_width:
+                pot_size_details.append(f"{self.pot_base_width} base")
+
+            if pot_size_details:
+                description.append(
+                    f"({', '.join(pot_size_details)})"
+                )  # Size details in parentheses
+
+        # General Component Description (Resistors, Capacitors, etc.)
+        else:
+            if self.ohms and self.ohms_unit:
+                description.append(f"{self.ohms}{self.ohms_unit} Resistor")
+            elif self.farads and self.farads_unit:
+                description.append(f"{self.farads}{self.farads_unit} Capacitor")
+
+            if self.type:
+                description.append(self.type.name)
+
+            if self.category:
+                description.append(self.category.name)
+
+            if self.size:
+                description.append(self.size.name)
+
+            # Include mounting style
+            if self.mounting_style:
+                description.append(
+                    "(Through Hole)" if self.mounting_style == "th" else "(SMT)"
+                )
+
+            # Include wattage if available
+            if self.wattage:
+                description.append(
+                    f"{self.wattage}W" if "W" in self.wattage else f"{self.wattage}W"
+                )
+
+            # Include tolerance if available
+            if self.tolerance:
+                description.append(f"{self.tolerance} Tolerance")
 
         # Add manufacturer and part number if available
         if self.manufacturer and self.manufacturer_part_no:
-            description += (
-                f" by {self.manufacturer.name} (Part No: {self.manufacturer_part_no})"
+            description.append(
+                f"by {self.manufacturer.name} (Part No: {self.manufacturer_part_no})"
             )
-
-        # Add manufacturer if part number is unavailable
         elif self.manufacturer:
-            description += f" by {self.manufacturer.name}"
-
-        # Fallback to part number only if no other info is available
+            description.append(f"by {self.manufacturer.name}")
         elif self.manufacturer_part_no:
-            description += f" (Part No: {self.manufacturer_part_no})"
+            description.append(f"(Part No: {self.manufacturer_part_no})")
 
-        return description.strip()
+        return " ".join(description).strip()
 
     class Meta:
         verbose_name_plural = "Components"
@@ -286,6 +455,49 @@ class Component(BaseModel):
             return f"{self.description or 'No Description'} | {mounting_style} | {type_name} (Suppliers: {supplier_items_str})"
 
     def clean(self, *args, **kwargs):
+        if self.type.name == "Potentiometer":
+            if not self.ohms or not self.ohms_unit:
+                raise ValidationError("Potentiometers must have an Ohm value and unit.")
+
+            if not self.pot_taper:
+                raise ValidationError(
+                    "Potentiometers must have a taper (Linear, Log, etc.)."
+                )
+
+            if self.pot_base_width and not re.match(r"^\d+mm$", self.pot_base_width):
+                raise ValidationError(
+                    "Potentiometer base width must be a valid format (e.g., '9mm', '16mm')."
+                )
+
+            if self.pot_shaft_diameter and not re.match(
+                r"^\d+(\.\d+)?(mm|in\.)$", self.pot_shaft_diameter
+            ):
+                raise ValidationError(
+                    "Invalid shaft diameter format. Use '6mm' or '1/4in.'."
+                )
+
+            if self.pot_shaft_length and not re.match(
+                r"^\d+(\.\d+)?(mm|in\.)$", self.pot_shaft_length
+            ):
+                raise ValidationError(
+                    "Invalid shaft length format. Use '15mm' or '0.75in.'."
+                )
+
+            # Split Shaft must be false if Shaft Type is "Solid Shaft" or "D-Shaft"
+            if self.pot_split_shaft and self.pot_shaft_type in [
+                "Solid Shaft",
+                "D-Shaft",
+            ]:
+                raise ValidationError("Solid Shaft and D-Shaft cannot be split.")
+
+            if self.pot_shaft_material and self.pot_shaft_material not in [
+                "Plastic",
+                "Metal",
+            ]:
+                raise ValidationError(
+                    "Potentiometer shaft material must be either 'Plastic' or 'Metal'."
+                )
+
         if self.type.name == "Resistor":
             if not self.ohms or not self.ohms_unit:
                 raise ValidationError(

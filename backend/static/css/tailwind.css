@@ -102,13 +102,14 @@
     .homepage-grid {
         @apply grid p-6;
         grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: auto auto 1fr auto auto 1fr auto;
+        grid-template-rows: auto auto 1fr auto auto auto 1fr auto;
         grid-template-areas:
             "header header header"
             "projects projects projects"
             "left middle right"
             "about about about"
             "blog blog blog"
+            "cheaper cheaper cheaper"
             "info1 info1 info1"
             "info2 info2 footer";
     }
@@ -133,12 +134,20 @@
         grid-area: right;
     }
 
+    .cheaper-box {
+        grid-area: cheaper;
+    }
+
     .about-section {
         grid-area: about;
     }
 
     .blog-section {
         grid-area: blog;
+    }
+
+    .savings-section {
+        grid-area: savings;
     }
 
     .info1-section {
@@ -157,7 +166,7 @@
     @media (max-width: 640px) {
         .homepage-grid {
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto auto auto auto auto auto auto auto auto;
+            grid-template-rows: auto auto auto auto auto auto auto auto auto auto auto;
             grid-template-areas:
                 "header header"
                 "projects projects"
@@ -166,6 +175,7 @@
                 "right right"
                 "about about"
                 "blog blog"
+                "cheaper cheaper"
                 "info1 info1"
                 "info2 info2"
                 "footer footer";

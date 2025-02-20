@@ -308,7 +308,7 @@ const CheckboxGridModal: React.FC<CheckboxGridModalProps> = ({
                 {groupedComponents.map((component) => (
                   <tr key={component.description}>
                     <td className="px-4 py-2 border border-gray-200">
-                      {component.description}
+                      {component.description.replace(/_/g, " ")}
                     </td>
                     {suppliers.map((supplier) => {
                       const matchingSupplierItems =

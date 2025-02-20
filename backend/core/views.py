@@ -1,7 +1,9 @@
+from decimal import Decimal
+import statistics
 from django.http import HttpResponse
 from django.shortcuts import render
 from blog.models import BlogPost
-from modules.models import Module, Manufacturer
+from modules.models import Module, Manufacturer, ModuleBomListItem
 from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from components.models import Component
@@ -12,6 +14,7 @@ from accounts.models import ExchangeRate
 from sentry_sdk import capture_exception
 from core.openexchangerates import _get_latest_exchange_rates
 from django.conf import settings
+from django.db.models import Sum, Avg, F
 
 
 CURRENCIES = [
@@ -158,7 +161,7 @@ def homepage(request):
                 if post.thumb_image_jpeg
                 else post.thumb_image_webp.url if post.thumb_image_webp else None
             ),
-            "excerpt": post.get_plain_text_excerpt(),  # Use the method to generate an excerpt
+            "excerpt": post.get_plain_text_excerpt(),
             "post_url": post.get_absolute_url(),
         }
         for post in blog_posts
@@ -167,9 +170,89 @@ def homepage(request):
     # Calculate counts
     project_count = Module.objects.count()
     component_count = Component.objects.count()
-    manufacturer_count = Manufacturer.objects.count()
-
+    manufacturer_count = Module.objects.values("manufacturer").distinct().count()
     component_count_display = f"{(component_count // 5) * 5}+"
+
+    # Compute DIY vs Assembled/Kit Savings
+
+    modules_with_costs = Module.objects.filter(
+        cost_built__isnull=False, cost_built__gt=0
+    ).values("id", "cost_built", "cost_kit", "cost_pcb_only", "cost_pcb_plus_front")
+
+    cost_differences = {
+        "pcb_only_vs_assembled": [],
+        "pcb_plus_front_vs_assembled": [],
+        "pcb_only_vs_kit": [],
+        "pcb_plus_front_vs_kit": [],
+    }
+
+    for module in modules_with_costs:
+        module_id = module["id"]
+        cost_built = module["cost_built"] or Decimal("0")
+        cost_kit = module["cost_kit"] or Decimal("0")
+        cost_pcb_only = module["cost_pcb_only"] or Decimal("0")
+        cost_pcb_plus_front = module["cost_pcb_plus_front"] or Decimal("0")
+
+        # Calculate DIY cost from BOM (typically representing the DIY kit build)
+        bom_stats = (
+            ModuleBomListItem.objects.filter(module_id=module_id)
+            .annotate(
+                diy_cost=Sum(
+                    F("components_options__supplier_items__unit_price") * F("quantity")
+                )
+            )
+            .aggregate(avg_diy=Avg("diy_cost"))
+        )
+        diy_cost = bom_stats["avg_diy"] or Decimal("0")
+        if diy_cost == 0:
+            continue  # Skip modules where DIY cost is missing
+
+        # For Assembled comparisons, use cost_built as the baseline.
+        if cost_built > 0:
+            # PCB Only vs Assembled: How much cheaper is PCB Only compared to the assembled cost?
+            if cost_pcb_only > 0:
+                cost_differences["pcb_only_vs_assembled"].append(
+                    float((cost_built - cost_pcb_only) / cost_built * 100)
+                )
+            # PCB + Front Panel vs Assembled: How much cheaper is PCB + Front Panel compared to assembled?
+            if cost_pcb_plus_front > 0:
+                cost_differences["pcb_plus_front_vs_assembled"].append(
+                    float((cost_built - cost_pcb_plus_front) / cost_built * 100)
+                )
+
+        # For Kit comparisons, use cost_kit as the baseline.
+        if cost_kit > 0:
+            # PCB Only vs Kit: How much cheaper is PCB Only compared to the kit cost?
+            if cost_pcb_only > 0:
+                cost_differences["pcb_only_vs_kit"].append(
+                    float((cost_kit - cost_pcb_only) / cost_kit * 100)
+                )
+            # PCB + Front Panel vs Kit: How much cheaper is PCB + Front Panel compared to the kit cost?
+            if cost_pcb_plus_front > 0:
+                cost_differences["pcb_plus_front_vs_kit"].append(
+                    float((cost_kit - cost_pcb_plus_front) / cost_kit * 100)
+                )
+
+    # Compute median and average savings safely
+    def compute_stats(values):
+        values = list(filter(None, values))  # Remove None values
+        return {
+            "average_savings": round(sum(values) / len(values), 2) if values else "N/A",
+            "median_savings": round(statistics.median(values), 2) if values else "N/A",
+        }
+
+    diy_savings_stats = {
+        "pcb_only_vs_assembled": compute_stats(
+            cost_differences["pcb_only_vs_assembled"]
+        ),
+        "pcb_plus_front_vs_assembled": compute_stats(
+            cost_differences["pcb_plus_front_vs_assembled"]
+        ),
+        "pcb_only_vs_kit": compute_stats(cost_differences["pcb_only_vs_kit"]),
+        "pcb_plus_front_vs_kit": compute_stats(
+            cost_differences["pcb_plus_front_vs_kit"]
+        ),
+    }
 
     context = {
         "user": request.user,
@@ -178,6 +261,7 @@ def homepage(request):
         "component_count": component_count_display,
         "manufacturer_count": manufacturer_count,
         "blog_posts": blog_data,
+        "diy_savings_stats": diy_savings_stats,
     }
 
     return render(request, "pages/home.html", context)
