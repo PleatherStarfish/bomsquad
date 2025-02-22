@@ -1,0 +1,170 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load comments %}
+{% load comments_xtd %}
+{% load editorjs %}
+
+{% block title %}{{ post.meta_title|default:post.title }}{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-12 mx-auto lg:px-8">
+
+    <div class="mb-6">
+        <a href="{% url 'blog:blog_list' %}" class="inline-flex items-center py-2 pr-4 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Blog
+        </a>
+    </div>
+    
+    <!-- Featured Image -->
+    {% if post.large_image_webp or post.large_image_jpeg %}
+        <div class="mb-8">
+            <picture>
+                {% if post.large_image_webp %}
+                <source 
+                    srcset="{{ post.large_image_webp.url }}" 
+                    type="image/webp" 
+                />
+                {% endif %}
+                {% if post.large_image_jpeg %}
+                <source 
+                    srcset="{{ post.large_image_jpeg.url }}" 
+                    type="image/jpeg" 
+                />
+                {% endif %}
+                <img
+                    src="{{ post.large_image_jpeg.url }}"
+                    alt="Featured image for {{ post.title }}"
+                    class="object-cover w-full rounded-lg shadow-md"
+                    loading="lazy"
+                />
+            </picture>
+        </div>
+        {% endif %}
+    
+    <!-- Blog Header -->
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 font-display">{{ post.title }}</h1>
+        <div class="mt-4 text-gray-600">
+            <span>Published on {{ post.datetime_created|date:"F j, Y" }}</span>
+            {% if post.categories.exists %}
+                <span> | Categories: 
+                    {% for category in post.categories.all %}
+                        <a href="{% url 'blog:category_posts' category.slug %}" class="text-indigo-600 hover:underline">{{ category.name }}</a>
+                        {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+            {% endif %}
+        </div>
+    </div>    
+
+    <!-- Blog Content -->
+    <div class="prose lg:prose-lg max-w-none">
+        <p>For anyone interested in modular synthesizers or boutique guitar pedals, cost is a major barrier to entry. People are often shocked at just how high the financial barrier to entry is for modular synthesis. The Make Noise ReSynthesizer, the successor to the Shared System, costs nearly $4,000. The ALM Busy Circuits Turismo System is priced at around $4,200, and the Verbos Electronics Producer Configuration Modular Synthesizer, which aspires to a Buchla-like experience, comes in at a stomach-churning $7,000. Even a modular power supply alone can cost $250, and while cheaper options exist, among hardware synthesizers, you truly get what you pay for. Given these costs, it’s no surprise that people frequently ask whether DIY is a good way to save money.</p></br>        
+        <p>High prices reflect not only the cost of components but also design, assembly, quality control, distribution, and business overhead. Manufacturers operating at small to medium scale must price accordingly, and for many musicians, this makes prebuilt gear difficult to afford.</p></br>
+        <p>It's no surprise that DIY is a frequent topic of inquiry and speculation on gear forums. The question is, does building your own gear really save that much money? Many manufacturers sell their own designs as circuit boards, either on their own or with alongside front panels or as part of full kits or partial kits that include some but not all components. These options allow builders to assemble modules themselves, sourcing components independently or buying them as part of a kit. While DIY projects take time and require soldering skills, they also provide a more affordable way to expand a system. But just how much money does DIY actually save?</p></br>
+        <p>I have generally assumed that the financial benefit of DIY was modest. Although a PCB may cost only a fraction of a finished module, components purchased in small quantities tend to be expensive. The assumption has been that by the time all components are sourced, a DIY build does not save much money compared to buying a module preassembled. The real benefits of DIY, I thought, were not financial but rather the ability to customize and the satisfaction of building something by hand.</p></br>
+        <p>This perspective is widely shared in gear forums, where discussions about DIY often focus on trade-offs rather than strict cost savings. Many experienced builders caution newcomers that DIY is not necessarily cheaper once all factors are considered. Component pricing, shipping costs, minimum order quantities, and failed builds can add up quickly, sometimes making DIY more expensive than expected. In these discussions, the emphasis is typically placed on the intangibles—the joy of working with electronics, the ability to create unique designs, and the deeper understanding of circuitry that comes with hands-on experience. There’s also an element of pride involved in knowing that a piece of gear was personally assembled, rather than simply purchased off the shelf.</p></br>
+        <p>Well, the data is finally in. The BOM Squad database is, to my knowledge, the first time this question has been considered quantitatively for a variety of builds from different manufacturers and different categories of gear, and the results are clear: DIY is not just about customization or personal satisfaction—it is, in many cases, a significantly more economical choice.</p></br>
+        <p>Looking at the data from BOM Squad has made me rethink this assumption. Across a large number of projects, the cost savings of DIY are far greater than I expected. Most DIY builds cost less than 20% of the price of a preassembled module. Even when sourcing components independently, a PCB and front panel combination is dramatically cheaper than a finished product. The more components a builder sources themselves, the greater the cost savings. Fully self-sourced builds—where everything from resistors to ICs is purchased independently—offer the highest savings, while full kits, which include all necessary parts in a single package, reduce the sourcing effort but come at a slight premium. Partial kits fall somewhere in between, typically offering more savings than a full kit but less than a fully self-sourced build.</p></br>
+        <p>Let's take a look at the specific grainular data on the cost savings of DIY vs. Assembled/Kit from the database:</p></br>
+        <h2 class="my-4 text-2xl font-bold text-gray-900">Methodology: How BOM Squad Defines Cost</h2>
+        <p>A Bill of Materials (BOM) is a structured list of components required to build a specific module or circuit. Each item in a BOM represents a functional part of the design, such as resistors, capacitors, ICs, or mechanical parts. However, unlike a fixed shopping list, BOM items can often be fulfilled by multiple possible real-world components from different manufacturers and suppliers, each with different price points, availability, and minimum order quantities.</p></br>
+        <p>For example, a BOM may specify a 10kΩ 1% metal film resistor, but this could be sourced from Vishay, Yageo, KOA Speer, or other manufacturers, each offering different pricing structures. Similarly, an operational amplifier like the TL072 may be available from Texas Instruments, STMicroelectronics, or Analog Devices, with varying costs depending on the supplier, package type, and order quantity.</p></br>
+        <p>To account for this variability, BOM Squad does not treat a BOM as a single fixed-price list but instead estimates the expected cost of sourcing each BOM item by evaluating different available components that meet the requirements. These prices are not dynamically fluctuating but rather serve as representative estimates based on common sourcing options.</p></br>
+        <p>To determine the cost of fully self-sourcing a module, BOM Squad analyzes every individual BOM item as follows:</p></br>
+        <ul class="ml-6 list-disc">
+            <li>
+                <p><strong>Identifying the Price Range for Each BOM Item</strong></p>
+                <ul class="ml-6 list-disc">
+                    <li>
+                        <p>For each component in a BOM, BOM Squad identifies the cheapest and most expensive options that would fulfill that requirement, based on estimated distributor pricing.</p>
+                    </li>
+                    <li>
+                        <p>We assume that you are buying the component the <strong>most expensive way</strong>. That is, we don't factor in any bulk discounts at all. We assume you are buying just one resistor from Mouser, etc.</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p><strong>Calculating the Average or Median Price Per BOM Item</strong></p>
+                <ul class="ml-6 list-disc">
+                    <li>
+                        <p>Once the lowest and highest prices for each component are determined, BOM Squad finds the average or median cost to represent a reasonable estimate of what a builder would pay.</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p><strong>Aggregating Costs Across All BOM Items in a Project</strong></p>
+                <ul class="ml-6 list-disc">
+                    <li>
+                        <p>After calculating individual component costs, BOM Squad sums these values to estimate the total cost to self-source all components for a module.</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p><strong>Calculating the Average or Median for All Projects</strong></p>
+                <ul class="ml-6 list-disc">
+                    <li>
+                        <p>Finally, BOM Squad aggregates these values across all tracked projects to find the overall average and median DIY cost savings when compared to prebuilt modules, full kits, and partial kits.</p>
+                    </li>
+                </ul>
+            </li>
+        </ul></br>        
+        <p>By treating BOMs as flexible lists of sourcing options rather than fixed shopping lists, BOM Squad provides a more accurate and adaptable model for evaluating the financial impact of DIY. By identifying the cheapest and most expensive sourcing options for each BOM item, calculating the average or median cost per item, and aggregating these values across all projects, BOM Squad presents a realistic estimate of DIY costs.</p></br>
+        <p>The data consistently shows that sourcing components independently leads to the greatest savings, particularly when builders take advantage of bulk orders and minimize shipping costs. This methodology ensures that cost comparisons remain grounded in real-world sourcing conditions, making BOM Squad one of the most comprehensive tools available for quantifying the cost-effectiveness of DIY gear building.</p></br>
+        <h2 class="my-4 text-2xl font-bold text-gray-900">A Detailed Breakdown of DIY vs. Assembled/Kit Savings</h2>
+        <p class="text-red-500">Note: This table is not static. It is a live tracker, continuously updated with the latest data compiled from all the projects BOM Squad database.</p></br>
+        <div class="overflow-x-auto">
+            <table class="w-full border border-blue-500 divide-y divide-blue-500 rounded-lg shadow-md">
+                <thead class="bg-blue-500">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-white">Comparison</th>
+                        <th class="px-4 py-2 text-center text-white">Average Savings (%)</th>
+                        <th class="px-4 py-2 text-center text-white">Median Savings (%)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-3">PCB Only + Self-Sourcing Components vs. Assembled</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_only_vs_assembled.average_savings }}</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_only_vs_assembled.median_savings }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3">PCB + Front Panel + Self-Sourcing Components vs. Assembled</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_plus_front_vs_assembled.average_savings }}</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_plus_front_vs_assembled.median_savings }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3">PCB Only + Self-Sourcing Components vs. Kit</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_only_vs_kit.average_savings }}</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_only_vs_kit.median_savings }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3">PCB + Front Panel + Self-Sourcing Components vs. Kit</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_plus_front_vs_kit.average_savings }}</td>
+                        <td class="px-4 py-3 text-center">{{ diy_savings_stats.pcb_plus_front_vs_kit.median_savings }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div></br>
+        <h2 class="my-4 text-2xl font-bold text-gray-900">The Challenges and Risks of DIY</h2>
+        <p>Although the costs savings are potentially greater than expected, there are still reasons for caution. One of the biggest challenges DIY builders face is sourcing components efficiently. It is easy to overbuy, especially when minimum order quantities force a builder to purchase 50 resistors when only two are needed. Small costs add up quickly, particularly when spread across multiple projects. BOM Squad dramatically reduces this problem by helping builders buy exactly what they need for a particular build, avoiding unnecessary bulk purchases. That’s why we sometimes call BOM Squad a “virtual kit”—it provides the structure and guidance of a kit while still allowing builders to source their own components, maximizing both cost savings and flexibility.</p></br>
+        <p>Another often-overlooked expense is shipping. Many builders assume that self-sourcing will always be cheaper, but multiple small orders from different suppliers can quickly erode expected savings. Shipping costs are one of the largest unanticipated fees in DIY, particularly when ordering from specialty electronics suppliers or international vendors. BOM Squad helps mitigate this problem with the meta-shopping-list, which allows users to consolidate parts across multiple builds into a single order. By combining components from different projects, builders can place fewer, larger orders instead of multiple smaller ones, significantly reducing shipping costs and making self-sourcing far more economical.</p></br>
+        <p>There is also the reality that mistakes happen. Unlike buying a finished module, where any defects are handled by the manufacturer, DIY builders are responsible for troubleshooting their own errors. A single misplaced component or bad solder joint can prevent a circuit from working, and diagnosing the issue isn’t always straightforward. However, the DIY community is here to help. Across forums, Discord servers, and dedicated subreddits, builders share their experiences, help troubleshoot, and offer advice to those just getting started. The learning curve can be steep, but DIY has always been about more than just assembling a circuit—it’s about gaining a deeper understanding of how the gear works.</p></br>
+        <p>Even when factoring in the potential for mistakes, the cost savings are so substantial that DIY remains a financially compelling option. A catastrophic error might mean having to reorder a PCB or replace a few components, but even with occasional setbacks, builders still end up paying far less than they would for a fully assembled module. The sheer magnitude of the savings makes DIY a viable option even for those who are still learning, and every mistake is an opportunity to build the skills needed for future projects.</p></br>
+    </div>
+
+    <!-- Comments Section -->
+    {% if post.allow_comments %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-gray-900">Comments</h2>
+        {% render_comment_list for post %}
+        <div class="mt-6">
+            {% render_comment_form for post %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

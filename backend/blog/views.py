@@ -1,6 +1,10 @@
+from collections import namedtuple
+from types import SimpleNamespace
 from django.shortcuts import render, get_object_or_404
 from .models import BlogPost, Category
 from django.core.paginator import Paginator
+from core.calculate_diy_savings_stats import calculate_diy_savings_stats
+from django.http import HttpResponse
 
 
 def blog_list(request, category_slug=None):
@@ -51,5 +55,33 @@ def blog_detail(request, slug):
             "post": post,
             "related_posts": related_posts,
             "categories": categories,  # Pass the categories
+        },
+    )
+
+
+def blog_detail_diy_savings(request):
+    # Fetch DIY savings stats
+    diy_savings_stats = calculate_diy_savings_stats()
+
+    post = get_object_or_404(BlogPost, slug="how-much-cheaper-is-diy")
+
+    # Get related posts based on shared categories, excluding the current post
+    related_posts = (
+        BlogPost.objects.filter(categories__in=post.categories.all())
+        .exclude(id=post.id)
+        .distinct()[:3]
+    )
+
+    # Get categories associated with the current post
+    categories = post.categories.all()
+
+    return render(
+        request,
+        "blog/blog_detail_diy_savings.html",
+        {
+            "post": post,
+            "related_posts": related_posts,
+            "categories": categories,  # Pass the categories
+            "diy_savings_stats": diy_savings_stats,  # Pass the DIY savings stats
         },
     )
