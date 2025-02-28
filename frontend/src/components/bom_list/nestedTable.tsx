@@ -207,6 +207,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
   const columns: TableColumn<Component>[] = [
     {
       cell: (row: Component) => {
+        console.log(row)
         return (
           <RowWarning
             id={row.id}
@@ -247,14 +248,14 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       wrap: true,
     },
     {
-      cell: (row) => row.manufacturer?.name,
+      cell: (row: Component) => row.manufacturer?.name,
       hide: 1700,
       name: <small>Manufacturer</small>,
       sortable: true,
       wrap: true,
     },
     {
-      cell: (row) =>
+      cell: (row: Component) =>
         (row.supplier_items || []).length > 0 ? (
           <ul className="pl-5 list-disc">
             {row.supplier_items?.map((item) => (
@@ -292,9 +293,10 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
           "No supplier items"
         ),
       name: <small>Supplier Items</small>,
+      width: "200px",
     },
     {
-      cell: (row) => (
+      cell: (row: Component) => (
         <Tippy
           content={
             <div
@@ -315,7 +317,8 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       wrap: true,
     },
     {
-      cell: (row) => (
+      cell: (row: Component) => (
+        console.log(row),
         <Tippy
           content={
             <div
@@ -336,7 +339,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       wrap: true,
     },
     {
-      cell: (row) => row.forward_voltage,
+      cell: (row: Component) => row.forward_voltage,
       name: <small>Forward Voltage</small>,
       omit: type.name !== "Diodes",
       sortable: true,
@@ -359,12 +362,12 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     {
       hide: 1700,
       name: <small>V. Rating</small>,
-      selector: (row) => row.voltage_rating || "",
+      selector: (row: Component) => row.voltage_rating || "",
       sortable: true,
       wrap: true,
     },
     {
-      cell: (row) => (
+      cell: (row: Component) => (
         <Quantity
           hookArgs={{ component_pk: row.id }}
           useHook={useUserInventoryQuantity}
@@ -376,7 +379,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       width: "85px",
     },
     {
-      cell: (row) => (
+      cell: (row: Component) => (
         <Quantity
           hookArgs={{
             component_pk: row.id,
@@ -392,7 +395,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       width: "85px",
     },
     {
-      cell: (row) => (
+      cell: (row: Component) => (
         <UserRating
           bomItemName={bomItemDescription}
           componentId={row.id}
@@ -409,7 +412,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     },
     {
       button: true,
-      cell: (row) => {
+      cell: (row: Component) => {
         return (
           <>
             <Button
@@ -471,7 +474,7 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
     },
     {
       button: true,
-      cell: (row) => {
+      cell: (row: Component) => {
         return (
           <>
             <Button
@@ -600,11 +603,9 @@ const NestedTable: React.FC<NestedTableProps> = ({ data }) => {
       <div id="table__wrapper" style={{ overflowX: "visible" }}>
         <DataTable
           columns={columns}
-          compact
           conditionalRowStyles={conditionalRowStyles}
           customStyles={customStyles}
-          // @ts-ignore
-          data={componentsData}
+          data={componentsData ?? []}
           progressComponent={
             <div className="flex justify-center w-full p-6 bg-sky-50">
               <div className="text-center text-gray-500 animate-pulse">

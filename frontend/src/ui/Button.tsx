@@ -1,21 +1,14 @@
 import "tippy.js/dist/tippy.css";
 
 import React, { FC, ReactNode } from "react";
+
 import Tippy from "@tippyjs/react";
 import cx from "classnames";
 
 // Define enums or types for sizes and variants
 type ButtonSize = "lg" | "md" | "sm" | "xl" | "xs";
 type ButtonVariant =
-  | "danger"
-  | "light"
-  | "link"
-  | "linkBlue"
-  | "muted"
-  | "mutedHoverPrimary"
-  | "none"
-  | "primary"
-  | "submit";
+  "danger" | "light" | "link" | "linkBlue" | "muted" | "mutedHoverPrimary" | "none" | "primary" | "submit";
 type IconLocation = "left" | "right";
 
 // Style mappings with string enums
@@ -68,7 +61,6 @@ interface ButtonProps {
   iconLocation?: IconLocation;
   iconOnly?: boolean;
   tooltipText?: string;
-  expandOnHover?: boolean; // New prop for hover-expand functionality
   children?: ReactNode;
 }
 
@@ -84,50 +76,33 @@ const Button: FC<ButtonProps> = ({
   iconLocation = "left",
   iconOnly = false,
   tooltipText,
-  expandOnHover = false,
   children,
 }) => {
   const sizeClass = iconOnly ? ButtonSizeIconOnlyMap[size] : ButtonSizeMap[size];
   const variantClass = ButtonVariantMap[variant];
 
-  if (iconOnly || expandOnHover) {
+  // Render button for icon only
+  if (iconOnly && Icon) {
     return (
       <Tippy content={tooltipText} disabled={!tooltipText}>
         <button
           aria-label={children ? children.toString() : ""}
           className={cx(
-            "flex items-center justify-center group transition-all duration-700 overflow-hidden",
+            "flex items-center justify-center",
             sizeClass,
             variantClass,
-            classNames,
-            expandOnHover &&
-              "w-auto min-w-[2.5rem] max-w-fit px-2 group-hover:px-4"
+            classNames
           )}
           onClick={onClick}
-          style={{ transition: "width 0.7s ease, padding 0.7s ease" }} // Gradual width transition
           type="button"
         >
-          {Icon && (
-            <Icon
-              className={cx(
-                ButtonSizeIconSizeMap[size],
-                "group-hover:mr-2 transition-all duration-200"
-              )}
-            />
-          )}
-          <span
-            className={cx(
-              "transition-opacity duration-700 opacity-0 group-hover:opacity-100 whitespace-nowrap",
-              expandOnHover && "hidden group-hover:inline"
-            )}
-          >
-            {children}
-          </span>
+          <Icon className="w-4 h-4" />
         </button>
       </Tippy>
     );
   }
 
+  // Render button with optional icon and image
   return (
     <button
       className={cx(

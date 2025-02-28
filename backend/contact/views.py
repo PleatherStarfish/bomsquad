@@ -58,6 +58,12 @@ def subscribe(email):
 def subscription(request):
     if request.method == "POST":
         email = request.POST.get("email", "").strip()
+        honeypot = request.POST.get("hp_field", "").strip()
+
+        # Check honeypot field (should be empty for humans)
+        if honeypot:
+            logger.warning(f"Spam detected via honeypot for email: {email}")
+            return redirect("error")
 
         # Validate email
         try:

@@ -11,28 +11,28 @@ const ForOurSubscribersModal = ({
 }) => {
   return (
     <Modal
-      open={open}
-      title={title}
-      type="info"
       backdropBlur={"backdrop-blur-sm"}
       buttons={
         <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
           <button
-            type="button"
             className="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-slate-500 hover:bg-slate-600 sm:ml-3 sm:w-auto"
             onClick={onClickSupport}
+            type="button"
           >
             Support
           </button>
           <button
-            type="button"
             className="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
             onClick={onClickCancel}
+            type="button"
           >
             Cancel
           </button>
         </div>
       }
+      open={open}
+      title={title}
+      type="info"
     >
       {message}
     </Modal>

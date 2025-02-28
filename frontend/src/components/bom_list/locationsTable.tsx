@@ -1,9 +1,19 @@
-import DataTable from "react-data-table-component";
+import DataTable, { TableColumn } from "react-data-table-component";
 import Pill from "../../ui/Pill";
 import React from "react";
-import cx from 'classnames';
+import cx from "classnames";
 
-const LocationsList = ({ row, pointerEvents }) => {
+interface LocationRow {
+  locations: string[];
+  quantity: number;
+}
+
+interface LocationsListProps {
+  row: LocationRow;
+  pointerEvents?: string;
+}
+
+const LocationsList: React.FC<LocationsListProps> = ({ row, pointerEvents }) => {
   const locations = row?.locations ?? [];
 
   return (
@@ -28,23 +38,27 @@ const LocationsList = ({ row, pointerEvents }) => {
   );
 };
 
-const LocationsTable = ({ data, onRowClicked, pointerEvents = "pointer-events-auto" }) => {
-  const columns = [
+interface LocationsTableProps {
+  data: LocationRow[];
+  onRowClicked?: (row: LocationRow) => void;
+  pointerEvents?: string;
+}
+
+const LocationsTable: React.FC<LocationsTableProps> = ({ data, onRowClicked, pointerEvents = "pointer-events-auto" }) => {
+  const columns: TableColumn<LocationRow>[] = [
     {
       cell: (row) => <LocationsList pointerEvents={pointerEvents} row={row} />,
       grow: 3,
       name: "Location",
-      pointerOnHover: true,
       sortable: false,
-      wrap: false
+      wrap: false,
     },
     {
       maxWidth: "50px",
       name: "Quantity",
-      pointerOnHover: true,
       selector: (row) => row.quantity,
       sortable: false,
-      wrap: false
+      wrap: false,
     },
   ];
 

@@ -387,11 +387,13 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
   </div>
 
   <div class="flex flex-col cheaper-box md:flex-row">
+    
     <div
       style="padding: 1.5rem"
       class="relative flex flex-col justify-center w-full p-6 overflow-hidden border-t border-b border-gray-200 border-x md:border-b-0 h-52 group"
       role="button"
     >
+    <a href="https://bom-squad.com/blog/how-much-cheaper-is-diy/">
       <div class="absolute z-30 top-3 right-3">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -406,13 +408,15 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
           <div class="text-center">cheaper than buying pre-assembled</div>
         </div>
       </div>
+    </a>
     </div>
-
+    
     <div
       style="padding: 1.5rem"
       class="relative flex flex-col justify-center w-full p-6 overflow-hidden border-gray-200 border-x md:border-t md:border-r md:border-x-0 h-52 group"
       role="button"
     >
+    <a href="https://bom-squad.com/blog/how-much-cheaper-is-diy/">
       <div class="absolute z-30 top-3 right-3">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="gray" class="w-4 h-4 group-hover:stroke-blue-500">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -427,6 +431,7 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
           <div class="text-center">cheaper than building from a kit</div>
         </div>
       </div>
+    </a>
     </div>
   </div>
 
@@ -466,6 +471,7 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
         class="flex flex-col items-center w-full space-y-3 lg:w-1/2"
       >
         {% csrf_token %}
+        <input type="text" name="hp_field" style="display:none">
         <div class="flex w-full mb-3 space-x-2">
           <input
             type="email"
@@ -480,6 +486,7 @@ for DIY Guitar Pedals, Modular Synth Kits, Eurorack Projects, and DIY Eurorack
             Subscribe
           </button>
         </div>
+        <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
       </form>
     </div>
     <div style="margin: 0" class="relative py-2">

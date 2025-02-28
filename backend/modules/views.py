@@ -376,7 +376,16 @@ def rate_component(request):
                 defaults={"rating": request.data["rating"]},
             )
         )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Re-serialize with the actual instance to get updated data
+        updated_serializer = ModuleBomListComponentForItemRatingSerializer(
+            rating_instance
+        )
+
+        print(updated_serializer.data)
+
+        return Response(updated_serializer.data, status=status.HTTP_200_OK)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -646,7 +655,11 @@ def module_list_v2(request):
                 group["component_description"] = "Unknown Component"
 
     # Initial filtering by basic fields
-    module_list = Module.objects.order_by("name")
+    module_list = Module.objects.order_by("name").select_related("manufacturer")
+    module_list = module_list.prefetch_related(
+        "modulebomlistitem_set__components_options"
+    )
+
     if manufacturer:
         module_list = module_list.filter(manufacturer__name__icontains=manufacturer)
     if mounting_style in ["th", "smt"]:

@@ -65,6 +65,16 @@ export interface Component {
   forward_voltage?: string | null;
   max_forward_current?: string | null; 
   tolerance?: string | null;
+  pot_mounting_type?: "Panel Mount" | "PCB Mount" | "Solder Lug" | null;
+  pot_shaft_type?: "D-Shaft" | "Knurled" | "Smooth" | null;
+  pot_split_shaft?: boolean;
+  pot_shaft_diameter?: string | null; // e.g., "6mm" or "1/4in."
+  pot_shaft_length?: string | null; // e.g., "15mm" or "0.75in."
+  pot_shaft_material?: "Metal" | "Plastic" | null;
+  pot_taper?: "Custom" | "Linear" | "Logarithmic" | "Reverse Logarithmic" | null;
+  pot_angle_type?: "Right-Angle-Long" | "Right-Angle" | "Straight" | null;
+  pot_gangs?: number;
+  pot_base_width?: string | null; // e.g., "9mm", "16mm", "24mm"
   price?: {
     amount: number;
     currency: string; 

@@ -196,18 +196,14 @@
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier</th>
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Supplier Item Number</th>
             <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Estimated Price</th>
-            <th class="px-4 py-2 text-sm font-bold text-left bg-gray-200">Link</th>
           </tr>
         </thead>
         <tbody>
           {% for supplier in suppliers %}
           <tr class="border-b">
             <td class="px-4 py-2">{{ supplier.supplier }}</td>
-            <td class="px-4 py-2">{{ supplier.supplier_item_no }}</td>
+            <td class="px-4 py-2"><a href="{{ supplier.link }}" class="text-blue-500 hover:underline" target="_blank">{{ supplier.supplier_item_no }}</a></td>
             <td class="px-4 py-2">{{ supplier.unit_price }}</td>
-            <td class="px-4 py-2">
-              <a href="{{ supplier.link }}" class="text-blue-500 hover:underline" target="_blank">View</a>
-            </td>
           </tr>
           {% endfor %}
         </tbody>

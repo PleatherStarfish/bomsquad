@@ -8,6 +8,9 @@ class ContactForm(forms.Form):
     name = forms.CharField(max_length=100)
     email = forms.EmailField()
     message = forms.CharField(widget=forms.Textarea)
+    honeypot = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"style": "display:none"})
+    )
     captcha = ReCaptchaField()
 
     def __init__(self, *args, **kwargs):

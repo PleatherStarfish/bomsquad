@@ -19,7 +19,7 @@ interface UseModuleStatusReturn {
   refetch: () => Promise<UseQueryResult<ModuleStatusResponse, unknown>>;
 }
 
-const useModuleStatus = (moduleId: string): UseModuleStatusReturn => {
+const useModuleStatus = (moduleId: string, p0: boolean): UseModuleStatusReturn => {
   const csrftoken = Cookies.get('csrftoken');
   const moduleIdCleaned = removeAfterUnderscore(moduleId);
 

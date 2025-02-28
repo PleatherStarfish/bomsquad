@@ -128,23 +128,7 @@ class ComponentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Component
-        fields = [
-            "id",
-            "description",
-            "manufacturer",
-            "manufacturer_part_no",
-            "mounting_style",
-            "type",
-            "category",
-            "size",
-            "discontinued",
-            "notes",
-            "link",
-            "allow_comments",
-            "supplier_items",
-            "qualities",  # Include the custom field
-            "user_submitted_status",
-        ]
+        exclude = ["allow_comments", "user_submitted_status", "submitted_by"]
 
     def get_qualities(self, obj):
         """

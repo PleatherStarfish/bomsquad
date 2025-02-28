@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState, useRef, useMemo } from "react"
 
 import Alert from "../../ui/Alert";
 import Button from "../../ui/Button";
+import ExpandingButton from "../../ui/ExpandingButton";
 import DataTable, { TableColumn } from "react-data-table-component";
 import EditableLocation from "./EditableLocation";
 import EditableQuantity from "./EditableQuantity";
@@ -112,17 +113,14 @@ const Inventory = () => {
   const handleFormSubmit = () => {
     if (isTopSectionValid) {
       if (selectedComponent && updatedQuantityToSubmit && updatedQuantityToSubmit > 0) {
-        const data = {
-          editMode: false,
-          location: null, 
-          quantity: updatedQuantityToSubmit,
-        };
 
         try {
           addOrUpdateInventory(
             {
               componentId: selectedComponent.value,
-              data,
+              editMode: false,
+              location: undefined, 
+              quantity: updatedQuantityToSubmit, 
             },
             {
               onError: (error) => {
@@ -244,10 +242,12 @@ const Inventory = () => {
         inventoryData,
         (el) => el?.id === inventoryPk
       )?.location;
-      location.splice(index, 1);
+      if (location) {
+        location.splice(index, 1);
+      }
       await updateUserInventoryMutate({
         inventoryPk,
-        location: location.join(", "),
+        location: location ? location.join(", ") : "",
       });
       setError(null);
     } catch (error) {
@@ -266,6 +266,9 @@ const Inventory = () => {
   }
 
   const handleDownloadCSV = () => {
+    if (!inventoryData) {
+      return
+    }
     const csvData =
       "data:text/csv;charset=utf-8," +
       encodeURIComponent(
@@ -488,29 +491,26 @@ const Inventory = () => {
                   >
                     Add to database
                   </Button>
-                  <Button
-                    expandOnHover
+                  <ExpandingButton
                     Icon={LightBulbIcon}
-                    iconLocation="left"
                     onClick={() => setOpenSolderingMode(true)}
                     variant="primary"
                   >
                     Soldering Mode
-                  </Button>
+                  </ExpandingButton>
                   <Link to="tree/">
-                    <Button expandOnHover Icon={SignpostSplit} variant="primary">Locations Diagram</Button>
+                    <ExpandingButton Icon={SignpostSplit} variant="primary">Locations Diagram</ExpandingButton>
                   </Link>
                   <Link to="version-history/">
-                    <Button expandOnHover Icon={BookmarkSquareIcon} variant="primary">Version History</Button>
+                    <ExpandingButton Icon={BookmarkSquareIcon} variant="primary">Version History</ExpandingButton>
                   </Link>
-                  <Button
-                    expandOnHover
+                  <ExpandingButton
                     Icon={FolderArrowDownIcon}
                     onClick={handleDownloadCSV}
                     variant="primary"
                   >
                     Download CSV
-                  </Button>
+                  </ExpandingButton>
                 </div>
               </>
             )}
@@ -518,7 +518,7 @@ const Inventory = () => {
           <DataTable
             columns={columns}
             customStyles={customStyles}
-            data={(dataSearched ?? []).length ? dataSearched : inventoryData}
+            data={dataSearched && dataSearched.length ? dataSearched : inventoryData || []}
             exportHeaders
             fixedHeader
             pagination

@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-import Cookies from "js-cookie";
 import axios from "axios";
+import Cookies from "js-cookie";
 import removeAfterUnderscore from "../utils/removeAfterUnderscore";
 
 interface RateComponentData {
@@ -10,17 +11,12 @@ interface RateComponentData {
   rating: number;
 }
 
-interface UseRateComponentReturn {
-  rateComponentMutate: (data: RateComponentData) => Promise<void>;
-  error: unknown;
-}
-
-const useRateComponent = (): UseRateComponentReturn => {
+const useRateComponent = ({ onSuccess }: { onSuccess: () => void; }) => {
   const csrftoken = Cookies.get("csrftoken");
   const queryClient = useQueryClient();
 
-  const { mutateAsync: rateComponentMutate, error } = useMutation<void, unknown, RateComponentData>({
-    mutationFn: (data) => {
+  const { mutateAsync: rateComponentMutate, error } = useMutation<void, unknown, RateComponentData, { previousData: any }>({
+    mutationFn: async (data) => {
       const moduleBomListItemCleaned = removeAfterUnderscore(data.module_bom_list_item);
 
       const updatedData = {
@@ -35,12 +31,38 @@ const useRateComponent = (): UseRateComponentReturn => {
         withCredentials: true,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["component-ratings"] });
+    onError: (_error, _variables, context) => {
+      // Rollback to previous state on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['averageRating', _variables.module_bom_list_item, _variables.component], context.previousData);
+      }
+    },
+    onMutate: async (newRating) => {
+      // Cancel any ongoing fetches for `useGetAverageRating`
+      await queryClient.cancelQueries({ queryKey: ['averageRating', newRating.module_bom_list_item, newRating.component] });
+
+      // Optimistically update the cached query before mutation
+      const previousData = queryClient.getQueryData(['averageRating', newRating.module_bom_list_item, newRating.component]);
+
+      queryClient.setQueryData(['averageRating', newRating.module_bom_list_item, newRating.component], (oldData: any) => {
+        if (!oldData) return { average_rating: newRating.rating, number_of_ratings: 1 };
+        return {
+          ...oldData,
+          average_rating: newRating.rating, // Update the cached rating
+        };
+      });
+
+      return { previousData }; // Return the previous state in case we need to rollback
+    },
+    onSuccess: (_data, variables) => {
+      // Ensure fresh data is fetched from the API after mutation
+      queryClient.invalidateQueries({ queryKey: ['averageRating', variables.module_bom_list_item, variables.component] });
+      onSuccess();
     },
   });
 
   return { error, rateComponentMutate };
 };
+
 
 export default useRateComponent;

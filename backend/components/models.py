@@ -79,6 +79,7 @@ class Component(BaseModel):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     description = models.CharField(max_length=255, blank=True)
+    # vernacular_name = models.CharField(max_length=50, blank=True)
     manufacturer = models.ForeignKey(
         ComponentManufacturer, blank=True, null=True, on_delete=models.PROTECT
     )

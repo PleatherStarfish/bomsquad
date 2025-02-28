@@ -1,7 +1,9 @@
-import { QueryFunctionContext, useQuery } from '@tanstack/react-query';
+import { QueryFunctionContext } from '@tanstack/react-query';
+
+import { useQuery } from '@tanstack/react-query';
 
 import axios from 'axios';
-import removeAfterUnderscore from "../utils/removeAfterUnderscore";
+import removeAfterUnderscore from '../utils/removeAfterUnderscore';
 
 // Define the type for the response data
 interface AverageRatingResponse {
@@ -24,11 +26,11 @@ const fetchAverageRating = async ({ queryKey }: QueryFunctionContext<AverageRati
 const useGetAverageRating = (moduleBomListItemId: string, componentId: string) => {
   return useQuery<AverageRatingResponse, Error, AverageRatingResponse, AverageRatingQueryKey>({
     // @ts-expect-error: Seems to be unsupported at the moment
-    cacheTime: 1000 * 60 * 10, // 10 minutes
+    cacheTime: 0,
     queryFn: fetchAverageRating,
     queryKey: ['averageRating', moduleBomListItemId, componentId] as const,
     retry: false, 
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0,
   });
 };
 
