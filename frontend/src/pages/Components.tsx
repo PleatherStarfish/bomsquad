@@ -253,7 +253,7 @@ const Components: React.FC = () => {
             ) : (
               <a
                 className="text-blue-500 hover:text-blue-700"
-                href={`${getBaseUrl()}/components/${row.id}`}
+                href={`${getBaseUrl()}/components/${row.id}/`}
               >
                 {row.description}
               </a>

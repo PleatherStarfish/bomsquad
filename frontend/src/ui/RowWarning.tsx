@@ -24,7 +24,7 @@ const RowWarning: React.FC<RowWarningProps> = ({
       {user_submitted_status === "pending" && (
         <Tippy content="This component is a user submission. User submissions are reviewed for accuracy and relevance, typically within 24 hours.">
           <div
-            className="flex justify-center align-middle text-2xl"
+            className="flex justify-center text-2xl align-middle"
             style={{
               backgroundColor: "#db2777",
               borderRadius: "12px",
@@ -49,7 +49,7 @@ const RowWarning: React.FC<RowWarningProps> = ({
       )}
       <a
         className="text-blue-500 hover:text-blue-700"
-        href={`${getBaseUrl()}/components/${id}`}
+        href={`${getBaseUrl()}/components/${id}/`}
       >
         {children}
       </a>

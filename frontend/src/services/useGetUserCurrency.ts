@@ -39,6 +39,7 @@ const useGetUserCurrency = () => {
           currency_name: currencyLookup[currency].name,
           currency_symbol: currencyLookup[currency].symbol,
         };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // Fallback to localStorage
         const localCurrency = localStorage.getItem("currency") || "USD";

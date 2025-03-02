@@ -140,7 +140,7 @@ const UserPage: React.FC = () => {
                   </ul>
                 </li>
                 <li className="justify-between mt-auto -mx-6">
-                  <Link to="settings">
+                  <Link to="settings/">
                     <div className="flex items-center px-6 py-3 text-sm font-semibold leading-6 text-gray-900 group/settings gap-x-4 hover:bg-gray-200">
                       {!!user?.emails?.[0].email ? (
                         <Gravatar

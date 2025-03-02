@@ -21,7 +21,7 @@ const ErrorFallback: React.FC<{
     </p>
     <a
       className="text-sm font-medium text-blue-600 hover:underline"
-      href="https://github.com/PleatherStarfish/bomsquad/issues"
+      href="https://github.com/PleatherStarfish/bomsquad/issues/"
       rel="noopener noreferrer"
       target="_blank"
     >

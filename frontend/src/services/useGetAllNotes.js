@@ -19,15 +19,15 @@ const useGetAllNotes = (moduleType) => {
   };
 
   const { data: notes, isLoading, isError } = useQuery({
-    queryKey: ['userNotes', moduleType],
-    queryFn: fetchAllNotes,
     enabled: !!moduleType,
     onError: (error) => {
       console.error('Error while fetching notes:', error);
     },
+    queryFn: fetchAllNotes,
+    queryKey: ['userNotes', moduleType],
   });
 
-  return { notes, isLoading, isError };
+  return { isError, isLoading, notes };
 };
 
 export default useGetAllNotes;

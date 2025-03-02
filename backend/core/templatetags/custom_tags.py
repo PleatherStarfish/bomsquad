@@ -1,6 +1,6 @@
 from django import template
 from django.urls import reverse
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import math
 
 register = template.Library()
@@ -47,26 +47,38 @@ def get_display_name(value, mounting_style_options):
 
 
 @register.filter
-def force_https_and_remove_trailing_slash(url):
+def force_https_and_clean_canonical(url):
     """
-    Ensures the URL uses HTTPS and removes the trailing slash if it exists.
+    Ensures the URL uses HTTPS, includes a trailing slash, and removes unnecessary query parameters.
     """
     parsed_url = urlparse(url)
+
     # Force HTTPS
     scheme = "https"
-    # Remove trailing slash
+
+    # Ensure trailing slash, except for root "/"
     path = parsed_url.path
-    # Rebuild the URL
+    if not path.endswith("/") and path != "/":
+        path += "/"
+
+    # Keep only "important" query parameters (modify as needed)
+    allowed_params = ["lang"]  # Add other necessary parameters here
+    query_dict = parse_qs(parsed_url.query)
+    cleaned_query = urlencode(
+        {k: v[0] for k, v in query_dict.items() if k in allowed_params}
+    )
+
     updated_url = urlunparse(
         (
             scheme,
             parsed_url.netloc,
             path,
             parsed_url.params,
-            parsed_url.query,
+            cleaned_query,
             parsed_url.fragment,
         )
     )
+
     return updated_url
 
 
