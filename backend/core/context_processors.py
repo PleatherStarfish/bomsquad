@@ -193,7 +193,7 @@ def meta_context(request):
 
             schema_markup = {
                 "@context": "https://schema.org",
-                "@type": "Product",
+                "@type": "Article",
                 "name": module.name,
                 "description": module.description or "DIY audio module project.",
                 "brand": module.manufacturer.name,
@@ -385,7 +385,7 @@ def meta_context(request):
             # Schema for Component detail pages
             schema_markup = {
                 "@context": "https://schema.org",
-                "@type": "Product",
+                "@type": "Article",
                 "name": component.description or "DIY Component",
                 "description": f"Perfect for DIY audio projects such as guitar pedals and modular synths.",
                 "brand": (

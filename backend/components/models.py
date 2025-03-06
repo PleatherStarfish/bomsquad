@@ -231,6 +231,31 @@ class Component(BaseModel):
         help_text="Potentiometer base width (e.g., '9mm', '16mm', '24mm').",
     )
 
+    footprint_length = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Capacitor footprint length (e.g., '5mm', '10mm').",
+    )
+    footprint_width = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Capacitor footprint width (e.g., '5mm', '10mm').",
+    )
+    component_height = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Component height (e.g., '5mm', '10mm').",
+    )
+    pin_spacing = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Component height (e.g., '5mm', '10mm').",
+    )
+
     discontinued = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     editor_content = EditorJsTextField(
@@ -509,6 +534,62 @@ class Component(BaseModel):
                     "Farad value and unit must not be set for resistors."
                 )
         if self.type.name == "Capacitor":
+
+            # Regular expression pattern to validate footprint_length, footprint_width, and component_height
+            dimension_pattern = re.compile(r"^\d+(\.\d+)?(mm|cm|in)$")
+
+            if self.mounting_style == "th":
+                # Ensure these fields are not empty
+                if not self.footprint_length:
+                    raise ValidationError(
+                        {
+                            "footprint_length": "This field is required for through-hole capacitors."
+                        }
+                    )
+
+                if not self.footprint_width:
+                    raise ValidationError(
+                        {
+                            "footprint_width": "This field is required for through-hole capacitors."
+                        }
+                    )
+
+                if not self.component_height:
+                    raise ValidationError(
+                        {
+                            "component_height": "This field is required for through-hole capacitors."
+                        }
+                    )
+
+                # Validate format
+                if not dimension_pattern.match(self.footprint_length):
+                    raise ValidationError(
+                        {
+                            "footprint_length": "Invalid format. Use a numeric value followed by 'mm', 'cm', or 'in' (e.g., '5mm', '2.5cm')."
+                        }
+                    )
+
+                if not dimension_pattern.match(self.footprint_width):
+                    raise ValidationError(
+                        {
+                            "footprint_width": "Invalid format. Use a numeric value followed by 'mm', 'cm', or 'in' (e.g., '5mm', '2.5cm')."
+                        }
+                    )
+
+                if not dimension_pattern.match(self.component_height):
+                    raise ValidationError(
+                        {
+                            "component_height": "Invalid format. Use a numeric value followed by 'mm', 'cm', or 'in' (e.g., '5mm', '2.5cm')."
+                        }
+                    )
+
+                if not dimension_pattern.match(self.pin_spacing):
+                    raise ValidationError(
+                        {
+                            "pin_spacing": "Invalid format. Use a numeric value followed by 'mm', 'cm', or 'in' (e.g., '5mm', '2.5cm')."
+                        }
+                    )
+
             if not self.farads or not self.farads_unit:
                 raise ValidationError(
                     "If this component is a capacitor, you must set the Farad value and unit."

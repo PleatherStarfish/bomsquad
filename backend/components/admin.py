@@ -63,7 +63,17 @@ class ComponentAdmin(BaseAdmin):
         ),
         (
             "Capacitor Specific Fields",
-            {"classes": ("collapse",), "fields": ("farads", "farads_unit")},
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "farads",
+                    "farads_unit",
+                    "footprint_length",
+                    "footprint_width",
+                    "component_height",
+                    "pin_spacing",
+                ),
+            },
         ),
         (
             "Diode Specific Fields",
