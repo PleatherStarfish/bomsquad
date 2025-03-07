@@ -1,3 +1,4 @@
+import json
 from django import template
 from django.urls import reverse
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -138,3 +139,15 @@ def get_nested_key(data, key):
         else:
             return None
     return data
+
+
+@register.filter
+def to_json(value):
+    """
+    Converts a Python dictionary to a properly formatted JSON string
+    with double quotes, ensuring it is safe for embedding in <script> tags.
+    """
+    try:
+        return json.dumps(value, indent=None, ensure_ascii=False)
+    except (TypeError, ValueError):
+        return "{}"  # Return an empty JSON object if serialization fails

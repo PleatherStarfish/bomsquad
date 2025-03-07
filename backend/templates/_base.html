@@ -39,7 +39,7 @@
 
     {% if meta.schema_markup %}
     <script type="application/ld+json">
-      {{ meta.schema_markup|safe }}
+      {{ meta.schema_markup|to_json|safe }}
     </script>
     {% endif %}
     
