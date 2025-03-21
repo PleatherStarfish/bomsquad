@@ -4,23 +4,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXVV479GJX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      // Default consent mode to deny all
-      gtag('consent', 'default', {
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'analytics_storage': 'denied'
-      });
-
-      gtag('config', 'G-KXVV479GJX');
-    </script>
     <meta charset="utf-8" />
     <meta name="robots" content="index, follow" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -91,43 +74,27 @@
 
     {% block css %}{% endblock css %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-    <!-- Matomo Tag Manager -->
+    <!-- Matomo -->
     <script>
-      var _mtm = window._mtm = window._mtm || [];
-      _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
+      var _paq = window._paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
       (function() {
+        var u="https://matomo.bom-squad.com/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '1']);
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src='https://cdn.matomo.cloud/bomsquad.matomo.cloud/container_ivskW7SP.js'; s.parentNode.insertBefore(g,s);
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
       })();
     </script>
-    <!-- End Matomo Tag Manager -->
+    <!-- End Matomo Code -->
+
   </head>
 
   <body class="min-h-screen">
     <header>{% include "nav.html" %}</header>
     <div id="currency-container" data-is-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}" data-default-currency="{{ request.user.default_currency|default:'' }}" data-csrf-token="{{ csrf_token }}" data-url-user-currency="{% url 'user_currency' %}"></div>
-
-    <!-- Cookie Consent -->
-    <div id="cookie-consent-banner" class="fixed z-50 hidden max-w-sm transition-all transform bg-gray-600 rounded-lg shadow-lg bottom-4 right-4 sm:bottom-6 sm:right-6">
-      <div class="p-6">
-          <div class="sm:flex sm:items-start">
-              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <h3 class="text-lg font-medium leading-6 text-white">Cookie Consent</h3>
-                  <p class="mt-2 text-sm text-white">
-                      We use cookies to enhance your browsing experience. Please accept or deny to proceed.
-                  </p>
-              </div>
-          </div>
-          <div class="mt-5 sm:mt-4 sm:flex sm:justify-end">
-              <button style="background: #13c3ff" id="allow-cookies" class="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-[#13c3ff] rounded-md shadow-sm hover:bg-blue-500 sm:w-auto">
-                  Accept
-              </button>
-              <button id="deny-cookies" class="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-700 bg-gray-300 rounded-md shadow-sm hover:bg-gray-400 sm:ml-3 sm:mt-0 sm:w-auto">
-                  Deny
-              </button>
-          </div>
-      </div>
-    </div>
 
     <div class="flex flex-col min-h-screen">
       {% with request.path|slice:":5" as path %}
@@ -190,7 +157,6 @@
       {% endwith %}
     </div>
 
-    <script data-cookiecategory="analytics" type=\"text/javascript\" defer>\n(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(\".\");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;\"undefined\"!==typeof c?a=b[c]=[]:c=\"mixpanel\";a.people=a.people||[];a.toString=function(a){var d=\"mixpanel\";\"mixpanel\"!==c&&(d+=\".\"+c);a||(d+=\" (stub)\");return d};a.people.toString=function(){return a.toString(1)+\".people (stub)\"};i=\"disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove\".split(\" \");\nfor(h=0;h<i.length;h++)g(a,i[h]);var j=\"set set_once union unset remove delete\".split(\" \");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=[\"get_group\"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement(\"script\");e.type=\"text/javascript\";e.async=!0;e.src=\"undefined\"!==typeof MIXPANEL_CUSTOM_LIB_URL?\nMIXPANEL_CUSTOM_LIB_URL:\"file:\"===f.location.protocol&&\"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js\".match(/^\\/\\//)?\"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js\":\"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js\";g=f.getElementsByTagName(\"script\")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);\n</script>
     <script src="{% static 'js/toggle_dropdown.min.js' %}" defer></script>
     <script src="{% static 'js/mobile_menu.min.js' %}" defer></script>
     <script src="{% static 'js/logo_shrink.min.js' %}" defer></script>
