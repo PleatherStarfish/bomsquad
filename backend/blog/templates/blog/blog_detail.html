@@ -20,7 +20,7 @@
     
     <!-- Featured Image -->
     {% if post.large_image_webp or post.large_image_jpeg %}
-        <div class="mb-14">
+        <div class="mb-16">
             <picture>
                 {% if post.large_image_webp %}
                 <source 
@@ -47,7 +47,7 @@
     <!-- Blog Header -->
     <div class="mb-12 text-center">
         <h1 class="text-4xl font-bold tracking-tight text-gray-900 font-display">{{ post.title }}</h1>
-        <div class="mt-4 text-gray-600">
+        <div class="mt-6 text-gray-600">
             <span>Published on {{ post.datetime_created|date:"F j, Y" }}</span>
             {% if post.categories.exists %}
                 <span> | Categories: 
@@ -78,7 +78,7 @@
 </div>
 {% endblock %}
 
-{% block js %}
+{% block javascript %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const tables = document.querySelectorAll('.prose table');
@@ -138,4 +138,4 @@
         });
     });
 </script>    
-{% endblock js %}
+{% endblock javascript %}
