@@ -20,7 +20,7 @@
     
     <!-- Featured Image -->
     {% if post.large_image_webp or post.large_image_jpeg %}
-        <div class="mb-8">
+        <div class="mb-14">
             <picture>
                 {% if post.large_image_webp %}
                 <source 
@@ -45,7 +45,7 @@
         {% endif %}
     
     <!-- Blog Header -->
-    <div class="mb-10 text-center">
+    <div class="mb-12 text-center">
         <h1 class="text-4xl font-bold tracking-tight text-gray-900 font-display">{{ post.title }}</h1>
         <div class="mt-4 text-gray-600">
             <span>Published on {{ post.datetime_created|date:"F j, Y" }}</span>
@@ -77,3 +77,65 @@
     {% endif %}
 </div>
 {% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tables = document.querySelectorAll('.prose table');
+    
+        tables.forEach(table => {
+            const headers = table.querySelectorAll('th');
+            const tbody = table.querySelector('tbody');
+    
+            function sortTableByColumn(colIndex, ascending) {
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+                rows.sort((a, b) => {
+                    const aText = a.children[colIndex].textContent.trim();
+                    const bText = b.children[colIndex].textContent.trim();
+    
+                    const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+                    const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+                    const isNumeric = !isNaN(aNum) && !isNaN(bNum);
+    
+                    if (isNumeric) {
+                        return ascending ? aNum - bNum : bNum - aNum;
+                    } else {
+                        return ascending
+                            ? aText.localeCompare(bText)
+                            : bText.localeCompare(aText);
+                    }
+                });
+    
+                // Clear sort indicators
+                headers.forEach((th, i) => {
+                    th.dataset.sort = '';
+                    th.innerHTML = th.textContent.trim(); // remove arrows
+                });
+    
+                // Update current header
+                const arrow = ascending ? ' ↑' : ' ↓';
+                headers[colIndex].dataset.sort = ascending ? 'asc' : 'desc';
+                headers[colIndex].innerHTML = headers[colIndex].textContent.trim() + arrow;
+    
+                // Reinsert sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            }
+    
+            // Add click events to headers
+            headers.forEach((th, colIndex) => {
+                th.style.cursor = 'pointer';
+                th.addEventListener('click', () => {
+                    const isAsc = th.dataset.sort !== 'asc';
+                    sortTableByColumn(colIndex, isAsc);
+                });
+            });
+    
+            // Automatically sort by first column on load
+            if (headers.length > 0) {
+                sortTableByColumn(0, true);
+            }
+        });
+    });
+</script>    
+{% endblock js %}
