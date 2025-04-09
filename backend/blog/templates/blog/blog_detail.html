@@ -87,6 +87,11 @@
             const headers = table.querySelectorAll('th');
             const tbody = table.querySelector('tbody');
     
+            // Store original header text
+            headers.forEach(th => {
+                th.dataset.label = th.textContent.trim();
+            });
+    
             function sortTableByColumn(colIndex, ascending) {
                 const rows = Array.from(tbody.querySelectorAll('tr'));
     
@@ -110,13 +115,13 @@
                 // Clear sort indicators
                 headers.forEach((th, i) => {
                     th.dataset.sort = '';
-                    th.innerHTML = th.textContent.trim(); // remove arrows
+                    th.innerHTML = th.dataset.label;
                 });
     
-                // Update current header
+                // Add new arrow
                 const arrow = ascending ? ' ↑' : ' ↓';
                 headers[colIndex].dataset.sort = ascending ? 'asc' : 'desc';
-                headers[colIndex].innerHTML = headers[colIndex].textContent.trim() + arrow;
+                headers[colIndex].innerHTML = headers[colIndex].dataset.label + arrow;
     
                 // Reinsert sorted rows
                 rows.forEach(row => tbody.appendChild(row));
@@ -137,5 +142,5 @@
             }
         });
     });
-</script>    
+</script>       
 {% endblock javascript %}
